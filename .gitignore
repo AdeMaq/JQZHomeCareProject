@@ -1,0 +1,65 @@
+## =========================
+## .NET (API, Domain, Application, Infrastructure, Persistence)
+## =========================
+bin/
+obj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+.vs/
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Ll]og/
+[Ll]ogs/
+
+# EF Core
+*.mdf
+*.ldf
+*.ndf
+
+# Local secrets / environment
+appsettings.Development.json
+appsettings.Local.json
+*.env
+
+## =========================
+## .NET MAUI (Mobile)
+## =========================
+Mobile/**/bin/
+Mobile/**/obj/
+Mobile/**/*.apk
+Mobile/**/*.aab
+Mobile/**/*.ipa
+Mobile/**/*.appx
+Mobile/**/*.msix
+
+## =========================
+## Angular (jqz-homecare-admin)
+## =========================
+jqz-homecare-admin/node_modules/
+jqz-homecare-admin/dist/
+jqz-homecare-admin/.angular/
+jqz-homecare-admin/coverage/
+jqz-homecare-admin/npm-debug.log*
+jqz-homecare-admin/yarn-error.log*
+jqz-homecare-admin/.env
+jqz-homecare-admin/.env.local
+
+## =========================
+## Editor / OS files
+## =========================
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+
+## =========================
+## Misc
+## =========================
+*.log
+*.tmp
+*.cache

@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="JQZHomeCareProject.API/JQZHomeCareProject.API.csproj" />
+  <Project Path="JQZHomeCareProject.Application/JQZHomeCareProject.Application.csproj" />
+  <Project Path="JQZHomeCareProject.Domain/JQZHomeCareProject.Domain.csproj" />
+  <Project Path="JQZHomeCareProject.Infrastructure/JQZHomeCareProject.Infrastructure.csproj" />
+  <Project Path="JQZHomeCareProject.Persistence/JQZHomeCareProject.Persistence.csproj" />
+</Solution>

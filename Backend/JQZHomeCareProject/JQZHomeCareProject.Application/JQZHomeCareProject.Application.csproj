@@ -10,4 +10,10 @@
     <ProjectReference Include="..\JQZHomeCareProject.Domain\JQZHomeCareProject.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Common\Interfaces\" />
+    <Folder Include="DTOs\" />
+    <Folder Include="Services\" />
+  </ItemGroup>
+
 </Project>

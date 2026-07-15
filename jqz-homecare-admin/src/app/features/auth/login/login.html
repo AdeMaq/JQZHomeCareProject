@@ -1,1 +1,170 @@
-<h1>Login Page</h1>
+<div class="min-h-screen flex bg-slate-100">
+  <!-- ================= LEFT BRANDING ================= -->
+
+  <div
+    class="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-blue-700 via-blue-600 to-cyan-500 text-white items-center justify-center"
+  >
+    <div class="max-w-xl px-12">
+      <!-- Badge -->
+
+      <div
+        class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-white/20 backdrop-blur-md mb-8"
+      >
+        <i class="fa-solid fa-heart-pulse text-emerald-300"></i>
+
+        <span class="text-sm font-medium"> Healthcare Administration Platform </span>
+      </div>
+
+      <!-- Heading -->
+
+      <h1 class="text-6xl font-extrabold leading-tight tracking-tight">JQZ HomeCare</h1>
+
+      <p class="mt-5 text-xl text-blue-100 leading-relaxed">Care Beyond Boundaries</p>
+
+      <!-- Features -->
+
+      <div class="mt-12 space-y-5">
+        <div class="flex items-center gap-4">
+          <i class="fa-solid fa-circle-check text-emerald-300 text-xl"></i>
+
+          <span class="text-lg"> Therapist & Patient Management </span>
+        </div>
+
+        <div class="flex items-center gap-4">
+          <i class="fa-solid fa-circle-check text-emerald-300 text-xl"></i>
+
+          <span class="text-lg"> Appointment Scheduling </span>
+        </div>
+
+        <div class="flex items-center gap-4">
+          <i class="fa-solid fa-circle-check text-emerald-300 text-xl"></i>
+
+          <span class="text-lg"> Secure Medical Records </span>
+        </div>
+      </div>
+
+      <!-- Illustration -->
+
+      <!-- <div class="mt-14 flex justify-center">
+
+        <img
+          src="images/doctor-login.svg"
+          alt="Healthcare Illustration"
+          class="w-[440px] max-w-full select-none drop-shadow-2xl">
+
+      </div> -->
+    </div>
+  </div>
+
+  <!-- ================= RIGHT LOGIN ================= -->
+
+  <div class="flex-1 flex items-center justify-center px-6 py-10">
+    <div class="w-full max-w-md">
+      <!-- Logo -->
+
+      <div class="text-center lg:hidden mb-8">
+        <h1 class="text-3xl font-bold text-blue-600">JQZ HomeCare</h1>
+      </div>
+
+      <!-- Card -->
+
+      <div class="bg-white rounded-3xl shadow-2xl border border-slate-200 p-10">
+        <!-- Avatar -->
+
+        <div class="flex justify-center mb-6">
+          <div class="w-20 h-20 rounded-full bg-blue-100 flex items-center justify-center">
+            <i class="fa-solid fa-user-doctor text-blue-600 text-3xl"></i>
+          </div>
+        </div>
+
+        <!-- Title -->
+
+        <h2 class="text-4xl font-bold text-slate-800 text-center">Welcome Back</h2>
+
+        <p class="text-slate-500 text-center mt-3 mb-8">Sign in to access your admin dashboard.</p>
+
+        <!-- Email -->
+
+        <label class="block text-sm font-semibold text-slate-700 mb-2"> Email Address </label>
+
+        <div class="relative mb-6">
+          <i class="fa-solid fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
+          </i>
+
+          <input
+            type="email"
+            placeholder="Enter your email"
+            class="w-full rounded-xl border border-slate-300 pl-12 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+          />
+        </div>
+
+        <!-- Password -->
+
+        <label class="block text-sm font-semibold text-slate-700 mb-2"> Password </label>
+
+        <div class="relative mb-6">
+          <!-- Lock Icon -->
+
+          <i class="fa-solid fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"> </i>
+
+          <!-- Password Input -->
+
+          <input
+            [type]="hidePassword ? 'password' : 'text'"
+            placeholder="Enter your password"
+            class="w-full rounded-xl border border-slate-300 pl-12 pr-12 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+          />
+
+          <!-- Eye Toggle -->
+
+          <button
+            type="button"
+            (click)="togglePassword()"
+            class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-blue-600 transition"
+            aria-label="Toggle Password"
+          >
+            <i [class]="hidePassword ? 'fa-solid fa-eye' : 'fa-solid fa-eye-slash'"> </i>
+          </button>
+        </div>
+
+        <!-- Remember -->
+
+        <div class="flex items-center justify-between mt-6 mb-8">
+          <label class="flex items-center gap-2 text-sm text-slate-600">
+            <input
+              type="checkbox"
+              class="rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+            />
+
+            Remember Me
+          </label>
+
+          <a href="#" class="text-blue-600 text-sm font-medium hover:underline">
+            Forgot Password?
+          </a>
+        </div>
+
+        <!-- Login Button -->
+
+        <button
+          class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-xl transition-all duration-300 shadow-lg hover:shadow-blue-400/30"
+        >
+          <i class="fa-solid fa-right-to-bracket mr-2"></i>
+
+          Sign In
+        </button>
+
+        <!-- Footer -->
+
+        <div class="border-t border-slate-200 mt-8 pt-6">
+          <p class="text-center text-sm text-slate-500 leading-relaxed">
+            Therapists are added by an administrator.
+            <br />
+
+            Contact your clinic administrator for access.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -16,4 +16,8 @@
     <ProjectReference Include="..\JQZHomeCareProject.Persistence\JQZHomeCareProject.Persistence.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Middleware\" />
+  </ItemGroup>
+
 </Project>

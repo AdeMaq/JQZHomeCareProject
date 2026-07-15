@@ -10,4 +10,10 @@
     <ProjectReference Include="..\JQZHomeCareProject.Application\JQZHomeCareProject.Application.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Auth\" />
+    <Folder Include="Maps\" />
+    <Folder Include="Notifications\" />
+  </ItemGroup>
+
 </Project>

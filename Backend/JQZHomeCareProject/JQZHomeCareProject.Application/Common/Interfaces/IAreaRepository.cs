@@ -2,12 +2,10 @@
 using System.Collections.Generic;
 using System.Text;
 using JQZHomeCareProject.Domain.Entities;
-using Microsoft.EntityFrameworkCore;
 
-namespace JQZHomeCareProject.Persistence.Repositories
+namespace JQZHomeCareProject.Application.Common.Interfaces
 {
-    public class UserRepository 
+    public interface IAreaRepository : IGenericRepository<Area>
     {
-
     }
 }

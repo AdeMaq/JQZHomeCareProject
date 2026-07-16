@@ -20,6 +20,8 @@ namespace JQZHomeCareProject.Persistence
             services.AddScoped<IPractitionerRepository, PractitionerRepository>();
             services.AddScoped<IAreaRepository, AreaRepository>();
             services.AddScoped<IVisitRepository, VisitRepository>();
+            services.AddScoped<IPackageRepository, PackageRepository>();
+            services.AddScoped<IServiceRepository, ServiceRepository>();
 
             return services;
         }

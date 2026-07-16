@@ -5,6 +5,7 @@ using JQZHomeCareProject.Application.Common.Interfaces;
 using JQZHomeCareProject.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
+
 namespace JQZHomeCareProject.Persistence.Repositories
 {
     public class UserRepository : IUserRepository
@@ -28,6 +29,12 @@ namespace JQZHomeCareProject.Persistence.Repositories
             return await _context.Users
                 .Include(u => u.Practitioner)
                 .FirstOrDefaultAsync(u => u.Email == email);
+        }
+
+        public async Task<User?> GetByPractitionerIdAsync(Guid practitionerId)
+        {
+            return await _context.Users
+                .FirstOrDefaultAsync(u => u.PractitionerId == practitionerId);
         }
 
         public async Task<bool> EmailExistsAsync(string email)

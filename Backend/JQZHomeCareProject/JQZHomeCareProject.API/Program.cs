@@ -15,6 +15,8 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddPersistence(builder.Configuration);
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddScoped<IAuthService, JQZHomeCareProject.Application.Services.AuthService>();
+builder.Services.AddScoped<IPractitionerService, JQZHomeCareProject.Application.Services.PractitionerService>();
+builder.Services.AddScoped<IAreaService, JQZHomeCareProject.Application.Services.AreaService>();
 
 
 var jwtSettings = builder.Configuration.GetSection("Jwt").Get<JwtSettings>()

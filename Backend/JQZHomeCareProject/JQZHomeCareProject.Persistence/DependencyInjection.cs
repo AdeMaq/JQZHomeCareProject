@@ -17,6 +17,9 @@ namespace JQZHomeCareProject.Persistence
                 options.UseSqlServer(config.GetConnectionString("DefaultConnection")));
 
             services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IPractitionerRepository, PractitionerRepository>();
+            services.AddScoped<IAreaRepository, AreaRepository>();
+            services.AddScoped<IVisitRepository, VisitRepository>();
 
             return services;
         }

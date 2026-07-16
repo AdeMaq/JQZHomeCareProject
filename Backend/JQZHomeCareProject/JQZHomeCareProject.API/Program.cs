@@ -42,6 +42,7 @@ builder.Services.AddScoped<IAuthService, JQZHomeCareProject.Application.Services
 builder.Services.AddScoped<IPractitionerService, JQZHomeCareProject.Application.Services.PractitionerService>();
 builder.Services.AddScoped<IAreaService, JQZHomeCareProject.Application.Services.AreaService>();
 builder.Services.AddScoped<IPackageService, JQZHomeCareProject.Application.Services.PackageService>();
+builder.Services.AddScoped<IServiceService, JQZHomeCareProject.Application.Services.ServiceService>();
 
 
 var jwtSettings = builder.Configuration.GetSection("Jwt").Get<JwtSettings>()

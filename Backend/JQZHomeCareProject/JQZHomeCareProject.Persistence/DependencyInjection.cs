@@ -2,6 +2,7 @@
 using JQZHomeCareProject.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -15,6 +16,7 @@ namespace JQZHomeCareProject.Persistence
             services.AddDbContext<AppDbContext>(options =>
                 options.UseSqlServer(config.GetConnectionString("DefaultConnection")));
 
+            services.AddScoped<IUserRepository, UserRepository>();
 
             return services;
         }

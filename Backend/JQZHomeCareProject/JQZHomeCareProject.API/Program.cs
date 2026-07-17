@@ -1,3 +1,4 @@
+using JQZHomeCareProject.Application.Common.Interfaces;
 using JQZHomeCareProject.Application.Services;
 using JQZHomeCareProject.Infrastructure;
 using JQZHomeCareProject.Infrastructure.Auth;
@@ -43,6 +44,9 @@ builder.Services.AddScoped<IPractitionerService, JQZHomeCareProject.Application.
 builder.Services.AddScoped<IAreaService, JQZHomeCareProject.Application.Services.AreaService>();
 builder.Services.AddScoped<IPackageService, JQZHomeCareProject.Application.Services.PackageService>();
 builder.Services.AddScoped<IServiceService, JQZHomeCareProject.Application.Services.ServiceService>();
+builder.Services.AddScoped<ILocationRepository, JQZHomeCareProject.Persistence.Repositories.LocationRepository>();
+builder.Services.AddScoped<IPatientRepository, JQZHomeCareProject.Persistence.Repositories.PatientRepository>();
+builder.Services.AddScoped<IVisitService, JQZHomeCareProject.Application.Services.VisitService>();
 
 
 var jwtSettings = builder.Configuration.GetSection("Jwt").Get<JwtSettings>()

@@ -31,5 +31,19 @@ namespace JQZHomeCareProject.API.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
+
+        [HttpGet("summary")]
+        public async Task<ActionResult<DasboardSummaryDto>> GetSummary([FromQuery] DateTime from, [FromQuery] DateTime to)
+        {
+            try
+            {
+                var result = await _dashboardService.GetSummaryAsync(from, to);
+                return Ok(result);
+            }
+            catch (ValidationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
     }
 }

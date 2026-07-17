@@ -49,6 +49,7 @@ builder.Services.AddScoped<IPatientRepository, JQZHomeCareProject.Persistence.Re
 builder.Services.AddScoped<IVisitService, JQZHomeCareProject.Application.Services.VisitService>(); 
 builder.Services.AddScoped<IDashboardService, JQZHomeCareProject.Application.Services.DashboardService>();
 builder.Services.AddScoped<IRatingService, JQZHomeCareProject.Application.Services.RatingService>();
+builder.Services.AddScoped<IPaymentService, JQZHomeCareProject.Application.Services.PaymentService>();
 
 
 var jwtSettings = builder.Configuration.GetSection("Jwt").Get<JwtSettings>()

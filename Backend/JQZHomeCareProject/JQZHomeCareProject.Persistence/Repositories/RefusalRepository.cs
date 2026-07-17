@@ -26,6 +26,7 @@ namespace JQZHomeCareProject.Persistence.Repositories
         {
             return await _context.Refusals
                 .Include(r => r.Visit)
+                .ThenInclude(v => v!.Patient)
                 .Where(r => r.Date.Date >= from.Date && r.Date.Date <= to.Date)
                 .AsNoTracking()
                 .ToListAsync();

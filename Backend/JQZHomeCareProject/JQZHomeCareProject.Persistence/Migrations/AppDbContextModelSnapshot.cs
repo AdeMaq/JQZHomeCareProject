@@ -330,6 +330,35 @@ namespace JQZHomeCareProject.Persistence.Migrations
                     b.HasIndex("PractitionerId");
 
                     b.ToTable("Users", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("11111111-1111-1111-1111-111111111111"),
+                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Email = "superadmin@jqz.com",
+                            Name = "Super Admin",
+                            PasswordHash = "100000.JIa07Th2kT4wSDYr8TvzXw==.MgTSH4YdTIoIbXfnbhUaqkiFAfndmXdEorfcD+x/5r8=",
+                            Role = "SuperAdmin"
+                        },
+                        new
+                        {
+                            Id = new Guid("22222222-2222-2222-2222-222222222222"),
+                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Email = "middleadmin@jqz.com",
+                            Name = "Middle Power Admin",
+                            PasswordHash = "100000.82XTcj/peRxNQbuB6isD+A==.Gsde6PWtQW+b8N5pxtEkvTkmu6N0hvifAvJ3Jyli5sY=",
+                            Role = "MiddlePowerAdmin"
+                        },
+                        new
+                        {
+                            Id = new Guid("33333333-3333-3333-3333-333333333333"),
+                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Email = "simpleadmin@jqz.com",
+                            Name = "Simple Admin",
+                            PasswordHash = "100000.bOi3I8UEigu4rtqVUy+27Q==.s0OCxW8kVkXBgG5TZ9waUrTIU1jhSHu1JqUf0vIL5XY=",
+                            Role = "SimpleAdmin"
+                        });
                 });
 
             modelBuilder.Entity("JQZHomeCareProject.Domain.Entities.Visit", b =>

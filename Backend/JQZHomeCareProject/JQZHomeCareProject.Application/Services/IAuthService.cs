@@ -1,10 +1,12 @@
-﻿using System;
+﻿using JQZHomeCareProject.Application.DTOs.Auth;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace JQZHomeCareProject.Application.Services
 {
-    internal interface IAuthService
+    public interface IAuthService
     {
+        Task<LoginResponseDto> LoginAsync(LoginRequestDto request);
     }
 }

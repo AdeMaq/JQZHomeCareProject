@@ -1,0 +1,20 @@
+.card {
+  background: var(--surface-color);
+
+  border-radius: var(--radius);
+
+  box-shadow: var(--card-shadow);
+
+  padding: 20px;
+}
+.primary-btn {
+  background: var(--primary-color);
+
+  color: white;
+
+  border: none;
+
+  border-radius: 8px;
+
+  cursor: pointer;
+}

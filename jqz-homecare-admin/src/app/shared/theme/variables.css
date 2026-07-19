@@ -1,0 +1,48 @@
+:root {
+  /* Primary */
+
+  --primary-color: #2563eb;
+  --primary-hover: #1d4ed8;
+
+  /* Background */
+
+  --background-color: #f5f7fb;
+  --surface-color: #ffffff;
+
+  /* Text */
+
+  --text-primary: #1f2937;
+  --text-secondary: #6b7280;
+
+  /* Border */
+
+  --border-color: #e5e7eb;
+
+  /* Success */
+
+  --success-color: #22c55e;
+
+  /* Warning */
+
+  --warning-color: #f59e0b;
+
+  /* Danger */
+
+  --danger-color: #ef4444;
+
+  /* Sidebar */
+
+  --sidebar-width: 240px;
+
+  /* Navbar */
+
+  --navbar-height: 70px;
+
+  /* Radius */
+
+  --radius: 12px;
+
+  /* Shadow */
+
+  --card-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+}

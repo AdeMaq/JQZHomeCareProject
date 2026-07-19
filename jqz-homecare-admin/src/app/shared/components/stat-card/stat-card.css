@@ -1,0 +1,78 @@
+.dashboard-card {
+  background: white;
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  height: 100%;
+}
+
+.dashboard-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 18px 38px rgba(15, 23, 42, 0.15);
+}
+
+.card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.icon-box {
+  width: 64px;
+  height: 64px;
+  border-radius: 18px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  font-size: 24px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
+}
+
+.trend-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.positive {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.negative {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.card-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.card-title {
+  color: #64748b;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.card-value {
+  margin: 8px 0;
+  font-size: 34px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.card-footer {
+  margin: 0;
+  font-size: 13px;
+  color: #94a3b8;
+}

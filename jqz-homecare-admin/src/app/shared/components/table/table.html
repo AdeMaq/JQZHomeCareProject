@@ -1,0 +1,32 @@
+<div class="table-wrapper">
+  <table>
+    <thead>
+      <tr>
+        @for (column of columns; track column) {
+          <th>
+            {{ column | titlecase }}
+          </th>
+        }
+      </tr>
+    </thead>
+
+    <tbody>
+      @for (row of rows; track row.patient) {
+        <tr>
+          @for (column of columns; track column) {
+            <td>
+              @if (column === 'status') {
+                <span class="status-badge" [ngClass]="getStatusClass(row[column])">
+                  {{ row[column] }}
+                </span>
+
+              } @else {
+                {{ row[column] }}
+              }
+            </td>
+          }
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>

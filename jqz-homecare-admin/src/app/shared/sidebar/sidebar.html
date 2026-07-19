@@ -1,0 +1,35 @@
+<div
+  class="h-screen w-72 bg-gradient-to-b from-blue-700 via-blue-600 to-cyan-500 text-white flex flex-col shadow-2xl"
+>
+  <!-- Logo -->
+  <div class="px-8 py-8 border-b border-white/20">
+    <div class="flex items-center gap-3">
+      <div class="w-12 h-12 rounded-full bg-white/15 flex items-center justify-center">
+        <i class="fa-solid fa-heart-pulse text-2xl text-emerald-300"></i>
+      </div>
+
+      <div>
+        <h1 class="text-xl font-bold">JQZ HomeCare</h1>
+        <p class="text-sm text-blue-100">Admin Portal</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Menu -->
+  <div class="flex-1 px-4 py-6">
+    @for (item of menuItems; track item.label) {
+      <button
+        class="w-full flex items-center gap-4 px-5 py-4 rounded-xl mb-2 transition-all duration-300"
+        [class.bg-white]="item.active"
+        [class.text-blue-700]="item.active"
+        [class.hover:bg-white/10]="!item.active"
+      >
+        <i class="{{ item.icon }} text-lg"></i>
+
+        <span class="font-medium">
+          {{ item.label }}
+        </span>
+      </button>
+    }
+  </div>
+</div>

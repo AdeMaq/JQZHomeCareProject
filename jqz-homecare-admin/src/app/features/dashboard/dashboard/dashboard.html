@@ -64,7 +64,7 @@
 <div class="section-title">Refusals</div>
 
 <div class="cards-grid refusal-grid">
-  @for (card of refusals; track card.title) {
+  @for (card of refusalStats; track card.title) {
     <app-stat-card
       [title]="card.title"
       [value]="card.value"

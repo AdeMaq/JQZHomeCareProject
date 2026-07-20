@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using JQZHomeCareProject.Domain.Entities;
+﻿using JQZHomeCareProject.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -19,8 +16,8 @@ namespace JQZHomeCareProject.Persistence.Configurations
                 .IsRequired()
                 .HasMaxLength(200);
 
-            builder.Property(a => a.GeoBoundary)
-                .HasColumnType("nvarchar(max)");
+            builder.HasIndex(a => a.Name)
+                .IsUnique();
 
             builder.HasMany(a => a.Visits)
                 .WithOne(v => v.Area)

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using JQZHomeCareProject.Application.Common.Exceptions;
+﻿using JQZHomeCareProject.Application.Common.Exceptions;
 using JQZHomeCareProject.Application.Common.Interfaces;
 using JQZHomeCareProject.Application.DTOs;
 using JQZHomeCareProject.Domain.Entities;
@@ -45,7 +42,6 @@ namespace JQZHomeCareProject.Application.Services
             {
                 Id = Guid.NewGuid(),
                 Name = dto.Name,
-                GeoBoundary = dto.GeoBoundary,
                 CreatedAt = DateTime.UtcNow
             };
 
@@ -68,7 +64,6 @@ namespace JQZHomeCareProject.Application.Services
             }
 
             area.Name = dto.Name;
-            area.GeoBoundary = dto.GeoBoundary;
             area.UpdatedAt = DateTime.UtcNow;
 
             await _areaRepository.UpdateAsync(area);

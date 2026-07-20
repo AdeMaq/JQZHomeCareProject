@@ -20,8 +20,10 @@ namespace JQZHomeCareProject.Application.Services
         private readonly IServiceRepository _serviceRepository;
         private readonly IPackageRepository _packageRepository;
         private readonly IRefusalRepository _refusalRepository;
+        private readonly IMapsService _mapsService;
 
         public VisitService(
+            IMapsService mapsService,
             IVisitRepository visitRepository,
             IPatientRepository patientRepository,
             ILocationRepository locationRepository,
@@ -41,6 +43,7 @@ namespace JQZHomeCareProject.Application.Services
             _serviceRepository = serviceRepository;
             _packageRepository = packageRepository;
             _refusalRepository = refusalRepository;
+            _mapsService = mapsService;
         }
 
         public async Task<VisitDto> CreateVisitAsync(CreateVisitDto dto, Guid createdByUserId)
@@ -87,17 +90,17 @@ namespace JQZHomeCareProject.Application.Services
                 }
             }
 
-            // Reuse an existing patient by phone number, otherwise create a new patient + location
             var patient = await _patientRepository.GetByPhoneAsync(dto.PatientPhone);
 
             if (patient is null)
             {
+                var (latitude, longitude) = await _mapsService.GeocodeAsync(dto.LocationAddress);
                 var location = new Location
                 {
                     Id = Guid.NewGuid(),
                     Address = dto.LocationAddress,
-                    Latitude = 0,
-                    Longitude = 0,
+                    Latitude = latitude,
+                    Longitude = longitude,
                     CreatedAt = DateTime.UtcNow
                 };
 

@@ -1,5 +1,6 @@
 ﻿using JQZHomeCareProject.Application.Common.Interfaces;
 using JQZHomeCareProject.Infrastructure.Auth;
+using JQZHomeCareProject.Infrastructure.Maps;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -11,9 +12,12 @@ namespace JQZHomeCareProject.Infrastructure
         public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration config)
         {
             services.Configure<JwtSettings>(config.GetSection("Jwt"));
+            services.Configure<GeoapifySettings>(config.GetSection("Geoapify"));
 
             services.AddScoped<IPasswordHasher, PasswordHasher>();
             services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
+
+            services.AddHttpClient<IMapsService, MapsService>();
 
             return services;
         }

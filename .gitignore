@@ -1,6 +1,11 @@
 ## =========================
 ## .NET (API, Domain, Application, Infrastructure, Persistence)
 ## =========================
+
+# Firebase service account credentials — never commit
+jqzhomecareproject-firebase-adminsdk-fbsvc-bfc375d324.json
+*firebase-adminsdk*.json
+
 bin/
 obj/
 *.user

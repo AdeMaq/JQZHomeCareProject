@@ -1,5 +1,6 @@
-import { Component, OnInit, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, inject, PLATFORM_ID } from '@angular/core';
+import { Router } from '@angular/router';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 
 import { StatCard } from '../../../shared/components/stat-card/stat-card';
 import { Table } from '../../../shared/components/table/table';
@@ -19,6 +20,8 @@ import { DashboardService } from './dashboard.service';
 })
 export class Dashboard implements OnInit {
   private dashboardService = inject(DashboardService);
+  private router = inject(Router);
+  private platformId = inject(PLATFORM_ID);
 
   /* ========================= */
   /* DATE FILTER */
@@ -68,7 +71,9 @@ export class Dashboard implements OnInit {
   /* ========================= */
 
   ngOnInit(): void {
-    this.selectFilter('Today');
+    if (isPlatformBrowser(this.platformId)) {
+      this.selectFilter('Today');
+    }
   }
 
   /* ========================= */
@@ -232,6 +237,6 @@ export class Dashboard implements OnInit {
   /* ========================= */
 
   addVisit(): void {
-    console.log('Navigate to Add Visit page');
+    this.router.navigate(['/visits/add']);
   }
 }

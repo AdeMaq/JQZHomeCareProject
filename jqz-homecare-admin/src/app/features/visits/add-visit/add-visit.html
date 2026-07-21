@@ -1,0 +1,246 @@
+<div class="add-visit-page">
+  <!-- PAGE HEADER -->
+
+  <div class="page-header">
+    <div>
+      <h1>Add Visit</h1>
+
+      <p>Schedule a new clinic visit.</p>
+    </div>
+
+    <button type="button" class="back-button" (click)="onCancel()">← Back to Visits</button>
+  </div>
+
+  <!-- ERROR MESSAGE -->
+
+  @if (errorMessage) {
+    <div class="error-message">
+      {{ errorMessage }}
+    </div>
+  }
+
+  <!-- LOADING -->
+
+  @if (isLoading) {
+    <div class="loading-message">Loading form data...</div>
+  }
+
+  <!-- FORM -->
+
+  <form [formGroup]="visitForm" (ngSubmit)="onSubmit()" class="visit-form">
+    <!-- ========================= -->
+    <!-- PATIENT INFORMATION -->
+    <!-- ========================= -->
+
+    <div class="form-section">
+      <h2>Patient Information</h2>
+
+      <div class="form-grid">
+        <!-- Patient Name -->
+
+        <div class="form-group">
+          <label for="patientName"> Patient Name </label>
+
+          <input
+            id="patientName"
+            type="text"
+            formControlName="patientName"
+            placeholder="Enter patient name"
+          />
+
+          @if (visitForm.controls.patientName.touched && visitForm.controls.patientName.invalid) {
+            <small class="field-error"> Patient name is required. </small>
+          }
+        </div>
+
+        <!-- Patient Phone -->
+
+        <div class="form-group">
+          <label for="patientPhone"> Patient Phone </label>
+
+          <input
+            id="patientPhone"
+            type="tel"
+            formControlName="patientPhone"
+            placeholder="Enter patient phone"
+          />
+
+          @if (visitForm.controls.patientPhone.touched && visitForm.controls.patientPhone.invalid) {
+            <small class="field-error"> Patient phone is required. </small>
+          }
+        </div>
+
+        <!-- Location Address -->
+
+        <div class="form-group full-width">
+          <label for="locationAddress"> Location Address </label>
+
+          <textarea
+            id="locationAddress"
+            formControlName="locationAddress"
+            placeholder="Enter visit location"
+            rows="3"
+          ></textarea>
+
+          @if (
+            visitForm.controls.locationAddress.touched && visitForm.controls.locationAddress.invalid
+          ) {
+            <small class="field-error"> Location address is required. </small>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================= -->
+    <!-- VISIT DETAILS -->
+    <!-- ========================= -->
+
+    <div class="form-section">
+      <h2>Visit Details</h2>
+
+      <div class="form-grid">
+        <!-- Practitioner -->
+
+        <div class="form-group">
+          <label for="practitionerId"> Practitioner </label>
+
+          <select id="practitionerId" formControlName="practitionerId">
+            <option value="">Select practitioner</option>
+
+            @for (practitioner of practitioners; track practitioner.id) {
+              <option [value]="practitioner.id">
+                {{ practitioner.name }}
+              </option>
+            }
+          </select>
+
+          @if (
+            visitForm.controls.practitionerId.touched && visitForm.controls.practitionerId.invalid
+          ) {
+            <small class="field-error"> Please select a practitioner. </small>
+          }
+        </div>
+
+        <!-- Area -->
+
+        <div class="form-group">
+          <label for="areaId"> Area </label>
+
+          <select id="areaId" formControlName="areaId">
+            <option value="">Select area</option>
+
+            @for (area of areas; track area.id) {
+              <option [value]="area.id">
+                {{ area.name }}
+              </option>
+            }
+          </select>
+
+          @if (visitForm.controls.areaId.touched && visitForm.controls.areaId.invalid) {
+            <small class="field-error"> Please select an area. </small>
+          }
+        </div>
+
+        <!-- Service -->
+
+        <div class="form-group">
+          <label for="serviceId"> Service </label>
+
+          <select id="serviceId" formControlName="serviceId">
+            <option value="">Select service</option>
+
+            @for (service of services; track service.id) {
+              <option [value]="service.id">
+                {{ service.name }}
+              </option>
+            }
+          </select>
+
+          @if (visitForm.controls.serviceId.touched && visitForm.controls.serviceId.invalid) {
+            <small class="field-error"> Please select a service. </small>
+          }
+        </div>
+
+        <!-- Package -->
+
+        <div class="form-group">
+          <label for="packageId"> Package </label>
+
+          <select id="packageId" formControlName="packageId">
+            <option value="">No package</option>
+
+            @for (package of packages; track package.id) {
+              <option [value]="package.id">
+                {{ package.name }}
+                - Rs. {{ package.amount }}
+              </option>
+            }
+          </select>
+        </div>
+
+        <!-- Scheduled Date -->
+
+        <div class="form-group">
+          <label for="scheduledDate"> Scheduled Date </label>
+
+          <input id="scheduledDate" type="date" formControlName="scheduledDate" />
+
+          @if (
+            visitForm.controls.scheduledDate.touched && visitForm.controls.scheduledDate.invalid
+          ) {
+            <small class="field-error"> Please select a date. </small>
+          }
+        </div>
+
+        <!-- Time Slot -->
+
+        <div class="form-group">
+          <label for="timeSlot"> Time Slot </label>
+
+          <input
+            id="timeSlot"
+            type="text"
+            formControlName="timeSlot"
+            placeholder="e.g. 10:00 AM - 11:00 AM"
+          />
+
+          @if (visitForm.controls.timeSlot.touched && visitForm.controls.timeSlot.invalid) {
+            <small class="field-error"> Time slot is required. </small>
+          }
+        </div>
+
+        <!-- Amount Due -->
+
+        <div class="form-group">
+          <label for="amountDue"> Amount Due </label>
+
+          <input
+            id="amountDue"
+            type="number"
+            formControlName="amountDue"
+            min="0"
+            placeholder="Enter amount"
+          />
+
+          @if (visitForm.controls.amountDue.touched && visitForm.controls.amountDue.invalid) {
+            <small class="field-error"> Amount must be 0 or greater. </small>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- FORM ACTIONS -->
+
+    <div class="form-actions">
+      <button type="button" class="cancel-button" (click)="onCancel()">Cancel</button>
+
+      <button type="submit" class="submit-button" [disabled]="isSubmitting">
+        @if (isSubmitting) {
+          Creating Visit...
+        } @else {
+          Create Visit
+        }
+      </button>
+    </div>
+  </form>
+</div>

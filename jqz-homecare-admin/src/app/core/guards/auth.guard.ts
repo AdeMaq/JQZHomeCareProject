@@ -6,9 +6,10 @@ export const authGuard: CanActivateFn = () => {
   const router = inject(Router);
   const platformId = inject(PLATFORM_ID);
 
-  // Don't access localStorage on the server
+  // During SSR, allow the route to render.
+  // localStorage is only available in the browser.
   if (!isPlatformBrowser(platformId)) {
-    return router.createUrlTree(['/login']);
+    return true;
   }
 
   const token = localStorage.getItem('token');

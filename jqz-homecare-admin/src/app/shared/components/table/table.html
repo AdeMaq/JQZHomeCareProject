@@ -11,21 +11,28 @@
     </thead>
 
     <tbody>
-      @for (row of rows; track row.patient) {
+      @if (rows.length === 0) {
         <tr>
-          @for (column of columns; track column) {
-            <td>
-              @if (column === 'status') {
-                <span class="status-badge" [ngClass]="getStatusClass(row[column])">
-                  {{ row[column] }}
-                </span>
-
-              } @else {
-                {{ row[column] }}
-              }
-            </td>
-          }
+          <td [attr.colspan]="columns.length" class="empty-row">
+            No visits found for the selected date.
+          </td>
         </tr>
+      } @else {
+        @for (row of rows; track row.id) {
+          <tr (click)="onRowClick(row)" class="clickable-row">
+            @for (column of columns; track column) {
+              <td>
+                @if (column === 'status') {
+                  <span class="status-badge" [ngClass]="getStatusClass(row[column])">
+                    {{ row[column] }}
+                  </span>
+                } @else {
+                  {{ row[column] }}
+                }
+              </td>
+            }
+          </tr>
+        }
       }
     </tbody>
   </table>

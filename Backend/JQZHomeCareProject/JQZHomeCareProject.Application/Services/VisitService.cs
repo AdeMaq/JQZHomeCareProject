@@ -21,8 +21,10 @@ namespace JQZHomeCareProject.Application.Services
         private readonly IPackageRepository _packageRepository;
         private readonly IRefusalRepository _refusalRepository;
         private readonly IMapsService _mapsService;
+        private readonly IPushNotificationService _pushNotificationService;
 
         public VisitService(
+            IPushNotificationService pushNotificationService,
             IMapsService mapsService,
             IVisitRepository visitRepository,
             IPatientRepository patientRepository,
@@ -44,6 +46,7 @@ namespace JQZHomeCareProject.Application.Services
             _packageRepository = packageRepository;
             _refusalRepository = refusalRepository;
             _mapsService = mapsService;
+            _pushNotificationService = pushNotificationService;
         }
 
         public async Task<VisitDto> CreateVisitAsync(CreateVisitDto dto, Guid createdByUserId)
@@ -136,6 +139,12 @@ namespace JQZHomeCareProject.Application.Services
             };
 
             await _visitRepository.AddAsync(visit);
+
+            var practitionerUser = await _userRepository.GetByPractitionerIdAsync(dto.PractitionerId);
+            if (practitionerUser is not null)
+            {
+                await _pushNotificationService.SendVisitAssignedNotificationAsync(practitionerUser.Id, visit.Id);
+            }
 
             return await MapToDtoAsync(visit);
         }
@@ -236,7 +245,6 @@ namespace JQZHomeCareProject.Application.Services
             }
             else
             {
-                // Company-received visits are treated as already settled for the full amount due
                 visit.AmountReceived = visit.AmountDue;
             }
 

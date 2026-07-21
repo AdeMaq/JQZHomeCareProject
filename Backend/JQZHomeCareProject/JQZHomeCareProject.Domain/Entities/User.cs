@@ -13,6 +13,7 @@ namespace JQZHomeCareProject.Domain.Entities
         public string PasswordHash { get; set; } = string.Empty;
         public UserRole Role { get; set; }
 
+        public string? DeviceToken { get; set; }
         public Guid? PractitionerId { get; set; }
         public Practitioner? Practitioner { get; set; }
     }

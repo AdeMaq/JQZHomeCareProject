@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using JQZHomeCareProject.Domain.Entities;
+﻿using JQZHomeCareProject.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -32,6 +29,9 @@ namespace JQZHomeCareProject.Persistence.Configurations
             builder.Property(u => u.Role)
                 .HasConversion<string>()
                 .IsRequired();
+
+            builder.Property(u => u.DeviceToken)
+                .HasMaxLength(500);
 
             builder.HasOne(u => u.Practitioner)
                 .WithMany()

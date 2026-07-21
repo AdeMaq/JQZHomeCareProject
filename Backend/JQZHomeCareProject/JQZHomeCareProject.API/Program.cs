@@ -8,6 +8,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using System.Text;
 
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
@@ -38,7 +39,7 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 builder.Services.AddPersistence(builder.Configuration);
-builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddInfrastructure(builder.Configuration, builder.Environment);
 builder.Services.AddScoped<IAuthService, JQZHomeCareProject.Application.Services.AuthService>();
 builder.Services.AddScoped<IPractitionerService, JQZHomeCareProject.Application.Services.PractitionerService>();
 builder.Services.AddScoped<IAreaService, JQZHomeCareProject.Application.Services.AreaService>();
@@ -50,6 +51,8 @@ builder.Services.AddScoped<IVisitService, JQZHomeCareProject.Application.Service
 builder.Services.AddScoped<IDashboardService, JQZHomeCareProject.Application.Services.DashboardService>();
 builder.Services.AddScoped<IRatingService, JQZHomeCareProject.Application.Services.RatingService>();
 builder.Services.AddScoped<IPaymentService, JQZHomeCareProject.Application.Services.PaymentService>();
+builder.Services.AddScoped<IUserService, JQZHomeCareProject.Application.Services.UserService>();
+
 
 
 var jwtSettings = builder.Configuration.GetSection("Jwt").Get<JwtSettings>()

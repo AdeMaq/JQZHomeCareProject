@@ -1,0 +1,35 @@
+.page-header {
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: center;
+
+  margin-bottom: 30px;
+}
+
+.header-left h2 {
+  margin: 0;
+
+  font-size: 34px;
+
+  font-weight: 700;
+
+  color: #2563eb;
+}
+
+.header-left p {
+  margin-top: 8px;
+
+  color: #64748b;
+
+  font-size: 15px;
+}
+
+.header-right {
+  display: flex;
+
+  align-items: center;
+
+  gap: 15px;
+}

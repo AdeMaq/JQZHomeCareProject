@@ -1,0 +1,99 @@
+<div class="visits-page">
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+    <div>
+      <h1>Visits</h1>
+
+      <p>View and manage scheduled clinic visits.</p>
+    </div>
+
+    <button type="button" class="add-visit-button" (click)="addVisit()">
+      <i class="fa-solid fa-plus"></i>
+
+      <span>Add Visit</span>
+    </button>
+  </div>
+
+  <!-- SUMMARY CARDS -->
+  <div class="summary-grid">
+    <!-- TODAY'S VISITS -->
+    <div class="summary-card">
+      <div class="summary-card-content">
+        <span class="summary-label">Today's Visits</span>
+
+        <strong>{{ visits.length }}</strong>
+      </div>
+
+      <div class="summary-icon scheduled-icon">
+        <i class="fa-solid fa-calendar-check"></i>
+      </div>
+    </div>
+
+    <!-- COMPLETED -->
+    <div class="summary-card">
+      <div class="summary-card-content">
+        <span class="summary-label">Completed</span>
+
+        <strong>{{ getCompletedVisitsCount() }}</strong>
+      </div>
+
+      <div class="summary-icon completed-icon">
+        <i class="fa-solid fa-check"></i>
+      </div>
+    </div>
+
+    <!-- CANCELLED -->
+    <div class="summary-card">
+      <div class="summary-card-content">
+        <span class="summary-label">Cancelled</span>
+
+        <strong>{{ getCancelledVisitsCount() }}</strong>
+      </div>
+
+      <div class="summary-icon cancelled-icon">
+        <i class="fa-solid fa-xmark"></i>
+      </div>
+    </div>
+
+    <!-- REVENUE -->
+    <div class="summary-card">
+      <div class="summary-card-content">
+        <span class="summary-label">Revenue Today</span>
+
+        <strong>Rs. {{ getTotalRevenue() }}</strong>
+      </div>
+
+      <div class="summary-icon revenue-icon">
+        <i class="fa-solid fa-money-bill-wave"></i>
+      </div>
+    </div>
+  </div>
+
+  <!-- DATE FILTER -->
+  <div class="visits-toolbar">
+    <div class="date-filter">
+      <label for="visitDate">Select Date</label>
+
+      <input id="visitDate" type="date" [value]="selectedDate" (change)="onDateChange($event)" />
+    </div>
+  </div>
+
+  <!-- TABLE -->
+  <div class="table-section">
+    <div class="table-header">
+      <div>
+        <h3>Visits</h3>
+
+        <p>All visits scheduled for the selected date.</p>
+      </div>
+
+      <span class="visit-count"> {{ visits.length }} visits </span>
+    </div>
+
+    <app-table
+      [columns]="columns"
+      [rows]="visits"
+      (rowClicked)="onVisitClicked($event)"
+    ></app-table>
+  </div>
+</div>

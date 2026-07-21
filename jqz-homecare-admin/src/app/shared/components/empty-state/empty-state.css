@@ -1,0 +1,31 @@
+.empty-state {
+  display: flex;
+
+  flex-direction: column;
+
+  justify-content: center;
+
+  align-items: center;
+
+  padding: 60px;
+
+  text-align: center;
+
+  color: #94a3b8;
+}
+
+.empty-state i {
+  font-size: 60px;
+
+  margin-bottom: 20px;
+}
+
+.empty-state h3 {
+  margin: 0;
+
+  color: #334155;
+}
+
+.empty-state p {
+  margin-top: 10px;
+}

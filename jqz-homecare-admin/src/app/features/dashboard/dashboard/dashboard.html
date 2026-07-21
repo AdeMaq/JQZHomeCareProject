@@ -1,1 +1,108 @@
-<h1>Dashboard</h1>
+<!-- Dashboard Header -->
+
+<div class="dashboard-header">
+  <!-- Left Side -->
+
+  <div>
+    <h1>Dashboard</h1>
+
+    <p>Welcome back! Here is today's clinic overview.</p>
+  </div>
+
+  <!-- Right Side -->
+
+  <div class="dashboard-actions">
+    <!-- Filters -->
+
+    <div class="filter-group">
+      @for (filter of filters; track filter) {
+        <button
+          type="button"
+          class="dashboard-filter-button"
+          [class.active-filter]="selectedFilter === filter"
+          (click)="selectFilter(filter)"
+        >
+          {{ filter }}
+        </button>
+      }
+    </div>
+
+    <!-- Today's Date -->
+
+    <div class="dashboard-date">
+      <i class="fa-regular fa-calendar"></i>
+
+      <span>19 July 2026</span>
+    </div>
+
+    <!-- Add Visit -->
+
+    <button type="button" class="add-visit-button" (click)="addVisit()">
+      <i class="fa-solid fa-plus"></i>
+
+      <span>Add Visit</span>
+    </button>
+  </div>
+</div>
+
+<!-- KPI Cards -->
+
+<div class="cards-grid">
+  @for (card of stats; track card.title) {
+    <app-stat-card
+      [title]="card.title"
+      [value]="card.value"
+      [icon]="card.icon"
+      [color]="card.color"
+    >
+    </app-stat-card>
+  }
+</div>
+
+<!-- Refusals -->
+
+<div class="section-title">Refusals</div>
+
+<div class="cards-grid refusal-grid">
+  @for (card of refusalStats; track card.title) {
+    <app-stat-card
+      [title]="card.title"
+      [value]="card.value"
+      [icon]="card.icon"
+      [color]="card.color"
+    >
+    </app-stat-card>
+  }
+</div>
+
+<!-- Charts -->
+
+<div class="charts-grid">
+  <div class="chart-card">
+    <h3>Visits Overview</h3>
+
+    <div class="chart-placeholder">
+      <i class="fa-solid fa-chart-column"></i>
+
+      <p>Chart will be integrated with API</p>
+    </div>
+  </div>
+
+  <div class="chart-card">
+    <h3>Revenue Overview</h3>
+
+    <div class="chart-placeholder">
+      <i class="fa-solid fa-chart-line"></i>
+
+      <p>Chart will be integrated with API</p>
+    </div>
+  </div>
+</div>
+
+<!-- Recent Visits -->
+
+<div class="table-section">
+  <h3>Recent Visits</h3>
+
+  <app-table [columns]="columns" [rows]="recentVisits"> </app-table>
+</div>

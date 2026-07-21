@@ -1,0 +1,32 @@
+<div class="dashboard-card">
+  <div class="card-top">
+    <div class="icon-box" [style.background]="color">
+      <i class="fa-solid {{ icon }}"></i>
+    </div>
+
+    <div class="trend-badge" [class.positive]="trendPositive" [class.negative]="!trendPositive">
+      <i
+        class="fa-solid"
+        [class.fa-arrow-trend-up]="trendPositive"
+        [class.fa-arrow-trend-down]="!trendPositive"
+      >
+      </i>
+
+      {{ trend }}
+    </div>
+  </div>
+
+  <div class="card-content">
+    <span class="card-title">
+      {{ title }}
+    </span>
+
+    <h2 class="card-value">
+      {{ value }}
+    </h2>
+
+    <p class="card-footer">
+      {{ footer }}
+    </p>
+  </div>
+</div>

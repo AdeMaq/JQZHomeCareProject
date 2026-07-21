@@ -1,0 +1,7 @@
+<div class="filter-container">
+  @for (filter of filters; track filter) {
+    <button (click)="selectFilter(filter)" [class.active]="selectedFilter === filter">
+      {{ filter }}
+    </button>
+  }
+</div>

@@ -1,18 +1,27 @@
 import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { Component, OnInit, PLATFORM_ID, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, PLATFORM_ID, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { VisitsListService } from '../visits-list/visits-list.service';
 import { Visit } from '../visits-list/visits-list.interface';
+import { VisitStatus } from '../../../shared/enums/visit-status';
 
 @Component({
   selector: 'app-visit-details',
+
   standalone: true,
+
   imports: [CommonModule],
+
   templateUrl: './visit-details.html',
+
   styleUrl: './visit-details.css',
 })
 export class VisitDetails implements OnInit {
+  // =========================
+  // DEPENDENCIES
+  // =========================
+
   private route = inject(ActivatedRoute);
 
   private router = inject(Router);
@@ -21,11 +30,25 @@ export class VisitDetails implements OnInit {
 
   private platformId = inject(PLATFORM_ID);
 
+  private changeDetectorRef = inject(ChangeDetectorRef);
+
+  // =========================
+  // VISIT DATA
+  // =========================
+
   visit: Visit | null = null;
+
+  // =========================
+  // UI STATE
+  // =========================
 
   isLoading = false;
 
   errorMessage = '';
+
+  // =========================
+  // INITIALIZATION
+  // =========================
 
   ngOnInit(): void {
     if (!isPlatformBrowser(this.platformId)) {
@@ -43,65 +66,119 @@ export class VisitDetails implements OnInit {
     this.loadVisit(visitId);
   }
 
+  // =========================
+  // LOAD VISIT
+  // =========================
+
   loadVisit(id: string): void {
     this.isLoading = true;
 
+    this.errorMessage = '';
+
+    this.visit = null;
+
     this.visitsListService.getVisitById(id).subscribe({
-      next: (response) => {
+      next: (response: Visit) => {
+        console.log('Visit details received:', response);
+
         this.visit = response;
 
         this.isLoading = false;
+
+        // Explicitly notify Angular that the UI state changed
+        this.changeDetectorRef.detectChanges();
       },
 
       error: (error) => {
         console.error('Error loading visit details:', error);
 
-        this.errorMessage = 'Unable to load visit details.';
+        this.visit = null;
 
         this.isLoading = false;
+
+        this.errorMessage = 'Unable to load visit details.';
+
+        // Explicitly update the UI after error
+        this.changeDetectorRef.detectChanges();
       },
     });
   }
+
+  // =========================
+  // NAVIGATION
+  // =========================
 
   onBack(): void {
     this.router.navigate(['/visits']);
   }
 
-  getStatusText(status: number): string {
+  // =========================
+  // STATUS
+  // =========================
+
+  getStatusText(status: VisitStatus): string {
     switch (status) {
-      case 0:
+      case VisitStatus.Scheduled:
         return 'Scheduled';
 
-      case 1:
+      case VisitStatus.Accepted:
+        return 'Accepted';
+
+      case VisitStatus.Completed:
         return 'Completed';
 
-      case 2:
+      case VisitStatus.Cancelled:
         return 'Cancelled';
-
-      case 3:
-        return 'Pending';
 
       default:
         return 'Unknown';
     }
   }
 
-  getStatusClass(status: number): string {
+  getStatusClass(status: VisitStatus): string {
     switch (status) {
-      case 0:
+      case VisitStatus.Scheduled:
         return 'status-scheduled';
 
-      case 1:
+      case VisitStatus.Accepted:
+        return 'status-accepted';
+
+      case VisitStatus.Completed:
         return 'status-completed';
 
-      case 2:
+      case VisitStatus.Cancelled:
         return 'status-cancelled';
-
-      case 3:
-        return 'status-pending';
 
       default:
         return 'status-default';
     }
+  }
+
+  // =========================
+  // DATE FORMATTING
+  // =========================
+
+  formatDate(date: string): string {
+    if (!date) {
+      return '-';
+    }
+
+    return new Date(date).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+    });
+  }
+
+  // =========================
+  // CURRENCY FORMATTING
+  // =========================
+
+  formatCurrency(amount: number | null | undefined): string {
+    if (amount === null || amount === undefined) {
+      return 'Rs. 0';
+    }
+
+    return `Rs. ${amount.toLocaleString('en-PK')}`;
   }
 }

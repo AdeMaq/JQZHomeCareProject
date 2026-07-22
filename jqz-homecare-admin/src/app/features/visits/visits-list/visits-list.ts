@@ -1,15 +1,11 @@
 import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
-
 import { CommonModule, isPlatformBrowser } from '@angular/common';
-
 import { PLATFORM_ID } from '@angular/core';
-
 import { Router } from '@angular/router';
 
 import { Table } from '../../../shared/components/table/table';
 
 import { Visit } from './visits-list.interface';
-
 import { VisitsListService } from './visits-list.service';
 
 import { VisitStatus } from '../../../shared/enums/visit-status';
@@ -43,6 +39,14 @@ export class VisitsList implements OnInit {
   // =========================
 
   selectedDate = '';
+
+  // =========================
+  // UI STATE
+  // =========================
+
+  isLoading = false;
+
+  errorMessage = '';
 
   // =========================
   // TABLE COLUMNS
@@ -95,21 +99,31 @@ export class VisitsList implements OnInit {
   // =========================
 
   loadVisits(): void {
+    this.isLoading = true;
+
+    this.errorMessage = '';
+
+    this.visits = [];
+
     this.visitsListService.getVisitsByDate(this.selectedDate).subscribe({
       next: (response) => {
-        console.log('Visits received in frontend:', response);
-
         this.visits = response;
 
-        console.log('Visits length:', this.visits.length);
-
-        console.log('Visits assigned to component:', this.visits);
+        this.isLoading = false;
 
         this.changeDetectorRef.detectChanges();
       },
 
       error: (error) => {
         console.error('Error loading visits:', error);
+
+        this.visits = [];
+
+        this.isLoading = false;
+
+        this.errorMessage = 'Unable to load visits. Please try again.';
+
+        this.changeDetectorRef.detectChanges();
       },
     });
   }
@@ -143,16 +157,22 @@ export class VisitsList implements OnInit {
   }
 
   getTotalRevenue(): number {
-    return this.visits.reduce((total, visit) => total + visit.amountReceived, 0);
+    return this.visits.reduce((total, visit) => total + (visit.amountReceived ?? 0), 0);
   }
 
   // =========================
-  // TODAY'S DATE
+  // DEFAULT DATE
   // =========================
 
   private getTodayDate(): string {
     const today = new Date();
 
-    return today.toISOString().split('T')[0];
+    const year = today.getFullYear();
+
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+
+    const day = String(today.getDate()).padStart(2, '0');
+
+    return `${year}-${month}-${day}`;
   }
 }

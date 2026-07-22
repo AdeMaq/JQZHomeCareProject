@@ -60,7 +60,7 @@
       <div class="summary-card-content">
         <span class="summary-label">Revenue Today</span>
 
-        <strong>Rs. {{ getTotalRevenue() }}</strong>
+        <strong> Rs. {{ getTotalRevenue() | number: '1.0-0' }} </strong>
       </div>
 
       <div class="summary-icon revenue-icon">
@@ -87,13 +87,52 @@
         <p>All visits scheduled for the selected date.</p>
       </div>
 
-      <span class="visit-count"> {{ visits.length }} visits </span>
+      @if (!isLoading && !errorMessage) {
+        <span class="visit-count">
+          {{ visits.length }}
+          {{ visits.length === 1 ? 'visit' : 'visits' }}
+        </span>
+      }
     </div>
 
-    <app-table
-      [columns]="columns"
-      [rows]="visits"
-      (rowClicked)="onVisitClicked($event)"
-    ></app-table>
+    <!-- LOADING STATE -->
+    @if (isLoading) {
+      <div class="table-state">
+        <i class="fa-solid fa-spinner fa-spin"></i>
+
+        <p>Loading visits...</p>
+      </div>
+    }
+
+    <!-- ERROR STATE -->
+    @else if (errorMessage) {
+      <div class="table-state error-state">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+
+        <p>{{ errorMessage }}</p>
+
+        <button type="button" (click)="loadVisits()">Try Again</button>
+      </div>
+    }
+
+    <!-- EMPTY STATE -->
+    @else if (visits.length === 0) {
+      <div class="table-state empty-state">
+        <i class="fa-solid fa-calendar-xmark"></i>
+
+        <h4>No visits found</h4>
+
+        <p>No visits are scheduled for the selected date.</p>
+      </div>
+    }
+
+    <!-- TABLE -->
+    @else {
+      <app-table
+        [columns]="columns"
+        [rows]="visits"
+        (rowClicked)="onVisitClicked($event)"
+      ></app-table>
+    }
   </div>
 </div>

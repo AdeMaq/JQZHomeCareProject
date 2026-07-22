@@ -4,7 +4,7 @@
       <tr>
         @for (column of columns; track column) {
           <th>
-            {{ column | titlecase }}
+            {{ getColumnLabel(column) }}
           </th>
         }
       </tr>
@@ -22,12 +22,24 @@
           <tr (click)="onRowClick(row)" class="clickable-row">
             @for (column of columns; track column) {
               <td>
-                @if (column === 'status') {
-                  <span class="status-badge" [ngClass]="getStatusClass(row[column])">
-                    {{ row[column] }}
-                  </span>
-                } @else {
-                  {{ row[column] }}
+                @switch (column) {
+                  @case ('scheduledDate') {
+                    {{ formatDate(row[column]) }}
+                  }
+
+                  @case ('amountDue') {
+                    {{ formatCurrency(row[column]) }}
+                  }
+
+                  @case ('status') {
+                    <span class="status-badge" [ngClass]="getStatusClass(row[column])">
+                      {{ getStatusLabel(row[column]) }}
+                    </span>
+                  }
+
+                  @default {
+                    {{ row[column] || '-' }}
+                  }
                 }
               </td>
             }

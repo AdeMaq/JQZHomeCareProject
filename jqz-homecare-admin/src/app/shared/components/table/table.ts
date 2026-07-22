@@ -1,6 +1,8 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
+import { VisitStatus } from '../../enums/visit-status';
+
 @Component({
   selector: 'app-table',
   standalone: true,
@@ -19,93 +21,79 @@ export class Table {
     this.rowClicked.emit(row);
   }
 
-  // =========================
-  // STATUS
-  // =========================
-
-  getStatusText(status: number): string {
-    switch (status) {
-      case 0:
-        return 'Scheduled';
-
-      case 1:
-        return 'Completed';
-
-      case 2:
-        return 'Cancelled';
-
-      case 3:
-        return 'Pending';
-
-      default:
-        return 'Unknown';
-    }
-  }
-
-  getStatusClass(status: number): string {
-    switch (status) {
-      case 0:
-        return 'status-scheduled';
-
-      case 1:
-        return 'status-completed';
-
-      case 2:
-        return 'status-cancelled';
-
-      case 3:
-        return 'status-pending';
-
-      default:
-        return 'status-default';
-    }
-  }
-
-  // =========================
-  // DATE
-  // =========================
-
-  formatDate(date: string): string {
-    if (!date) {
-      return '-';
-    }
-
-    return new Date(date).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-    });
-  }
-
-  // =========================
-  // CURRENCY
-  // =========================
-
-  formatAmount(amount: number): string {
-    if (amount === null || amount === undefined) {
-      return 'Rs. 0';
-    }
-
-    return `Rs. ${amount.toLocaleString('en-PK')}`;
-  }
-
-  // =========================
-  // COLUMN HEADERS
-  // =========================
-
-  getColumnHeader(column: string): string {
-    const headers: Record<string, string> = {
+  getColumnLabel(column: string): string {
+    const labels: Record<string, string> = {
       patientName: 'Patient Name',
       practitionerName: 'Practitioner Name',
-      areaName: 'Area',
-      serviceName: 'Service',
-      packageName: 'Package',
+      areaName: 'Area Name',
+      serviceName: 'Service Name',
+      packageName: 'Package Name',
       scheduledDate: 'Scheduled Date',
       timeSlot: 'Time Slot',
       status: 'Status',
       amountDue: 'Amount Due',
     };
 
-    return headers[column] ?? column;
+    return labels[column] ?? column;
+  }
+
+  formatDate(value: string): string {
+    if (!value) {
+      return '-';
+    }
+
+    const date = new Date(value);
+
+    return date.toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+    });
+  }
+
+  formatCurrency(value: number): string {
+    if (value === null || value === undefined) {
+      return 'Rs. 0';
+    }
+
+    return `Rs. ${value.toLocaleString('en-PK')}`;
+  }
+
+  getStatusLabel(status: VisitStatus | number): string {
+    switch (status) {
+      case VisitStatus.Scheduled:
+        return 'Scheduled';
+
+      case VisitStatus.Accepted:
+        return 'Accepted';
+
+      case VisitStatus.Completed:
+        return 'Completed';
+
+      case VisitStatus.Cancelled:
+        return 'Cancelled';
+
+      default:
+        return 'Unknown';
+    }
+  }
+
+  getStatusClass(status: VisitStatus | number): string {
+    switch (status) {
+      case VisitStatus.Scheduled:
+        return 'status-scheduled';
+
+      case VisitStatus.Accepted:
+        return 'status-accepted';
+
+      case VisitStatus.Completed:
+        return 'status-completed';
+
+      case VisitStatus.Cancelled:
+        return 'status-cancelled';
+
+      default:
+        return 'status-default';
+    }
   }
 }

@@ -1,10 +1,12 @@
 .table-wrapper {
   width: 100%;
   overflow-x: auto;
+  border-radius: 12px;
 }
 
 table {
   width: 100%;
+  min-width: 1100px;
   border-collapse: collapse;
   background: white;
 }
@@ -16,7 +18,7 @@ thead {
 th {
   text-align: left;
   padding: 18px 22px;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 700;
   color: #64748b;
   border-bottom: 1px solid #e2e8f0;
@@ -26,13 +28,13 @@ th {
 td {
   padding: 18px 22px;
   border-bottom: 1px solid #f1f5f9;
-  font-size: 15px;
+  font-size: 14px;
   color: #1e293b;
   white-space: nowrap;
 }
 
 tbody tr {
-  transition: all 0.25s ease;
+  transition: background-color 0.2s ease;
 }
 
 tbody tr:hover {
@@ -47,7 +49,7 @@ tbody tr:hover {
   text-align: center;
   padding: 40px 20px;
   color: #64748b;
-  font-size: 15px;
+  font-size: 14px;
 }
 
 /* STATUS BADGES */
@@ -55,25 +57,27 @@ tbody tr:hover {
 .status-badge {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   padding: 6px 14px;
   border-radius: 999px;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
-}
-
-.status-completed {
-  background: #dcfce7;
-  color: #15803d;
-}
-
-.status-pending {
-  background: #fef3c7;
-  color: #b45309;
+  white-space: nowrap;
 }
 
 .status-scheduled {
   background: #dbeafe;
   color: #1d4ed8;
+}
+
+.status-accepted {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.status-completed {
+  background: #dcfce7;
+  color: #15803d;
 }
 
 .status-cancelled {

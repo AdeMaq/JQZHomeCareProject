@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using JQZHomeCareProject.Application.Common.Interfaces;
+﻿using JQZHomeCareProject.Application.Common.Interfaces;
 using JQZHomeCareProject.Domain.Entities;
-using JQZHomeCareProject.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace JQZHomeCareProject.Persistence.Repositories
@@ -33,10 +29,19 @@ namespace JQZHomeCareProject.Persistence.Repositories
             return await IncludeGraph().FirstOrDefaultAsync(v => v.Id == id);
         }
 
+        public async Task<IEnumerable<Visit>> GetAllAsync()
+        {
+            return await IncludeGraph()
+                .OrderBy(v => v.ScheduledDate)
+                .AsNoTracking()
+                .ToListAsync();
+        }
+
         public async Task<IEnumerable<Visit>> GetByDateAsync(DateTime date)
         {
             return await IncludeGraph()
                 .Where(v => v.ScheduledDate.Date == date.Date)
+                .OrderBy(v => v.ScheduledDate)
                 .AsNoTracking()
                 .ToListAsync();
         }
@@ -52,13 +57,14 @@ namespace JQZHomeCareProject.Persistence.Repositories
                 query = query.Where(v => v.PractitionerId == practitionerId.Value);
             }
 
-            return await query.AsNoTracking().ToListAsync();
+            return await query.OrderBy(v => v.ScheduledDate).AsNoTracking().ToListAsync();
         }
 
         public async Task<IEnumerable<Visit>> GetByPractitionerAsync(Guid practitionerId)
         {
             return await IncludeGraph()
                 .Where(v => v.PractitionerId == practitionerId)
+                .OrderBy(v => v.ScheduledDate)
                 .AsNoTracking()
                 .ToListAsync();
         }
@@ -67,6 +73,7 @@ namespace JQZHomeCareProject.Persistence.Repositories
         {
             return await IncludeGraph()
                 .Where(v => v.ScheduledDate.Date >= from.Date && v.ScheduledDate.Date <= to.Date)
+                .OrderBy(v => v.ScheduledDate)
                 .AsNoTracking()
                 .ToListAsync();
         }
@@ -80,6 +87,18 @@ namespace JQZHomeCareProject.Persistence.Repositories
         public async Task UpdateAsync(Visit visit)
         {
             _context.Visits.Update(visit);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task DeleteAsync(Guid id)
+        {
+            var visit = await _context.Visits.FindAsync(id);
+            if (visit is null)
+            {
+                return;
+            }
+
+            _context.Visits.Remove(visit);
             await _context.SaveChangesAsync();
         }
     }

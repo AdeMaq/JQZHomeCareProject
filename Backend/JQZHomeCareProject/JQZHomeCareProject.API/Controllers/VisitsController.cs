@@ -169,5 +169,46 @@ namespace JQZHomeCareProject.API.Controllers
 
             return practitionerId;
         }
+
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<VisitDto>>> GetAll()
+        {
+            var result = await _visitService.GetAllAsync();
+            return Ok(result);
+        }
+
+        [HttpPut("{id}")]
+        [Authorize(Roles = "SuperAdmin,MiddlePowerAdmin,SimpleAdmin")]
+        public async Task<IActionResult> Update(Guid id, UpdateVisitDto dto)
+        {
+            try
+            {
+                await _visitService.UpdateVisitAsync(id, dto);
+                return NoContent();
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (ValidationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpDelete("{id}")]
+        [Authorize(Roles = "SuperAdmin,MiddlePowerAdmin")]
+        public async Task<IActionResult> Delete(Guid id)
+        {
+            try
+            {
+                await _visitService.DeleteVisitAsync(id);
+                return NoContent();
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+        }
     }
 }

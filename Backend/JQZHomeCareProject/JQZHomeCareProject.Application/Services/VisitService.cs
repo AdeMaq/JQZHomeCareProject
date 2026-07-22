@@ -323,5 +323,79 @@ namespace JQZHomeCareProject.Application.Services
                 ReceivedBy = visit.ReceivedBy
             };
         }
+
+        public async Task<IEnumerable<VisitDto>> GetAllAsync()
+        {
+            var visits = await _visitRepository.GetAllAsync();
+            return await MapManyToDtoAsync(visits);
+        }
+
+        public async Task UpdateVisitAsync(Guid visitId, UpdateVisitDto dto)
+        {
+            var visit = await _visitRepository.GetByIdAsync(visitId);
+            if (visit is null)
+            {
+                throw new NotFoundException($"Visit with id '{visitId}' was not found.");
+            }
+
+            if (visit.Status is VisitStatus.Completed or VisitStatus.Cancelled)
+            {
+                throw new ValidationException($"Visit cannot be updated from status '{visit.Status}'.");
+            }
+
+            if (dto.AmountDue < 0)
+            {
+                throw new ValidationException("Amount due cannot be negative.");
+            }
+
+            var practitioner = await _practitionerRepository.GetByIdAsync(dto.PractitionerId);
+            if (practitioner is null)
+            {
+                throw new NotFoundException($"Practitioner with id '{dto.PractitionerId}' was not found.");
+            }
+
+            var area = await _areaRepository.GetByIdAsync(dto.AreaId);
+            if (area is null)
+            {
+                throw new NotFoundException($"Area with id '{dto.AreaId}' was not found.");
+            }
+
+            var service = await _serviceRepository.GetByIdAsync(dto.ServiceId);
+            if (service is null)
+            {
+                throw new NotFoundException($"Service with id '{dto.ServiceId}' was not found.");
+            }
+
+            if (dto.PackageId.HasValue)
+            {
+                var package = await _packageRepository.GetByIdAsync(dto.PackageId.Value);
+                if (package is null)
+                {
+                    throw new NotFoundException($"Package with id '{dto.PackageId}' was not found.");
+                }
+            }
+
+            visit.PractitionerId = dto.PractitionerId;
+            visit.AreaId = dto.AreaId;
+            visit.ServiceId = dto.ServiceId;
+            visit.PackageId = dto.PackageId;
+            visit.ScheduledDate = dto.ScheduledDate;
+            visit.TimeSlot = dto.TimeSlot;
+            visit.AmountDue = dto.AmountDue;
+            visit.UpdatedAt = DateTime.UtcNow;
+
+            await _visitRepository.UpdateAsync(visit);
+        }
+
+        public async Task DeleteVisitAsync(Guid visitId)
+        {
+            var visit = await _visitRepository.GetByIdAsync(visitId);
+            if (visit is null)
+            {
+                throw new NotFoundException($"Visit with id '{visitId}' was not found.");
+            }
+
+            await _visitRepository.DeleteAsync(visitId);
+        }
     }
 }

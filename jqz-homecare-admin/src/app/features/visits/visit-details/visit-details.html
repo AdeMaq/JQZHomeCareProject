@@ -1,0 +1,143 @@
+<div class="visit-details-page">
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+    <div>
+      <h1>Visit Details</h1>
+
+      <p>View the complete information for this visit.</p>
+    </div>
+
+    <button type="button" class="back-button" (click)="onBack()">
+      <i class="fa-solid fa-arrow-left"></i>
+
+      Back to Visits
+    </button>
+  </div>
+
+  <!-- LOADING STATE -->
+  @if (isLoading) {
+    <div class="loading-message">
+      <i class="fa-solid fa-spinner fa-spin"></i>
+
+      <p>Loading visit details...</p>
+    </div>
+  }
+
+  <!-- ERROR STATE -->
+  @else if (errorMessage) {
+    <div class="error-message">
+      <i class="fa-solid fa-triangle-exclamation"></i>
+
+      <p>{{ errorMessage }}</p>
+    </div>
+  }
+
+  <!-- VISIT DETAILS -->
+  @else if (visit) {
+    <div class="details-card">
+      <div class="details-header">
+        <div>
+          <h2>Visit Information</h2>
+
+          <p>Details about the scheduled visit.</p>
+        </div>
+
+        <span class="status-badge" [ngClass]="getStatusClass(visit.status)">
+          {{ getStatusText(visit.status) }}
+        </span>
+      </div>
+
+      <div class="details-grid">
+        <!-- PATIENT -->
+        <div class="detail-item">
+          <span class="detail-label"> Patient Name </span>
+
+          <span class="detail-value">
+            {{ visit.patientName || '-' }}
+          </span>
+        </div>
+
+        <!-- PRACTITIONER -->
+        <div class="detail-item">
+          <span class="detail-label"> Practitioner Name </span>
+
+          <span class="detail-value">
+            {{ visit.practitionerName || '-' }}
+          </span>
+        </div>
+
+        <!-- AREA -->
+        <div class="detail-item">
+          <span class="detail-label"> Area </span>
+
+          <span class="detail-value">
+            {{ visit.areaName || '-' }}
+          </span>
+        </div>
+
+        <!-- SERVICE -->
+        <div class="detail-item">
+          <span class="detail-label"> Service </span>
+
+          <span class="detail-value">
+            {{ visit.serviceName || '-' }}
+          </span>
+        </div>
+
+        <!-- PACKAGE -->
+        <div class="detail-item">
+          <span class="detail-label"> Package </span>
+
+          <span class="detail-value">
+            {{ visit.packageName || '-' }}
+          </span>
+        </div>
+
+        <!-- DATE -->
+        <div class="detail-item">
+          <span class="detail-label"> Scheduled Date </span>
+
+          <span class="detail-value">
+            {{ formatDate(visit.scheduledDate) }}
+          </span>
+        </div>
+
+        <!-- TIME SLOT -->
+        <div class="detail-item">
+          <span class="detail-label"> Time Slot </span>
+
+          <span class="detail-value">
+            {{ visit.timeSlot || '-' }}
+          </span>
+        </div>
+
+        <!-- AMOUNT DUE -->
+        <div class="detail-item">
+          <span class="detail-label"> Amount Due </span>
+
+          <span class="detail-value">
+            {{ formatCurrency(visit.amountDue) }}
+          </span>
+        </div>
+
+        <!-- AMOUNT RECEIVED -->
+        <div class="detail-item">
+          <span class="detail-label"> Amount Received </span>
+
+          <span class="detail-value">
+            {{ formatCurrency(visit.amountReceived) }}
+          </span>
+        </div>
+
+        <!-- RECEIVED BY -->
+        <div class="detail-item">
+          <span class="detail-label"> Received By </span>
+
+          <span class="detail-value">
+            {{ visit.receivedBy || '-' }}
+          </span>
+        </div>
+      </div>
+    </div>
+  }
+</div>

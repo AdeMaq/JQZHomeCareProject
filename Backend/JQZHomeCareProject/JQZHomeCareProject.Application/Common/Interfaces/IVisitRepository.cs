@@ -14,5 +14,7 @@ namespace JQZHomeCareProject.Application.Common.Interfaces
         Task<IEnumerable<Visit>> GetInRangeAsync(DateTime from, DateTime to);
         Task AddAsync(Visit visit);
         Task UpdateAsync(Visit visit);
+        Task<IEnumerable<Visit>> GetAllAsync();
+        Task DeleteAsync(Guid id);
     }
 }

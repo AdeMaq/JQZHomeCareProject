@@ -8,6 +8,7 @@ namespace JQZHomeCareProject.Application.Services
     public interface IVisitService
     {
         Task<VisitDto> CreateVisitAsync(CreateVisitDto dto, Guid createdByUserId);
+        Task<IEnumerable<VisitDto>> GetAllAsync();
         Task<IEnumerable<VisitDto>> GetTodayVisitsAsync(Guid? practitionerId);
         Task<IEnumerable<VisitDto>> GetByDateAsync(DateTime date);
         Task<VisitDto> GetByIdAsync(Guid id);
@@ -15,5 +16,7 @@ namespace JQZHomeCareProject.Application.Services
         Task CheckInAsync(Guid visitId, CheckInDto dto);
         Task CheckOutAsync(Guid visitId, CheckOutDto dto);
         Task CancelVisitAsync(Guid visitId, CancelVisitDto dto);
+        Task UpdateVisitAsync(Guid visitId, UpdateVisitDto dto);
+        Task DeleteVisitAsync(Guid visitId);
     }
 }

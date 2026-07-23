@@ -310,11 +310,22 @@ namespace JQZHomeCareProject.Application.Services
             return new VisitDto
             {
                 Id = visit.Id,
+
+                PatientId = visit.PatientId,
                 PatientName = visit.Patient?.Name ?? string.Empty,
+
+                PractitionerId = visit.PractitionerId,
                 PractitionerName = practitionerUser?.Name ?? string.Empty,
+
+                AreaId = visit.AreaId,
                 AreaName = visit.Area?.Name ?? string.Empty,
+
+                ServiceId = visit.ServiceId,
                 ServiceName = visit.Service?.Name ?? string.Empty,
+
+                PackageId = visit.PackageId,
                 PackageName = visit.Package?.Name,
+
                 ScheduledDate = visit.ScheduledDate,
                 TimeSlot = visit.TimeSlot,
                 Status = visit.Status,

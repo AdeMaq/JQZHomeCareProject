@@ -1,0 +1,206 @@
+<div class="edit-visit-page">
+  <!-- =====================================================
+       PAGE HEADER
+  ====================================================== -->
+
+  <div class="page-header">
+    <div>
+      <h1>Edit Visit</h1>
+
+      <p>Update the information for this visit.</p>
+    </div>
+
+    <button type="button" class="back-button" (click)="onCancel()">← Back to Visit Details</button>
+  </div>
+
+  <!-- =====================================================
+       ERROR MESSAGE
+  ====================================================== -->
+
+  @if (errorMessage) {
+    <div class="error-message">
+      {{ errorMessage }}
+    </div>
+  }
+
+  <!-- =====================================================
+       LOADING MESSAGE
+  ====================================================== -->
+
+  @if (isLoading) {
+    <div class="loading-message">Loading visit information...</div>
+  }
+
+  <!-- =====================================================
+       FORM
+  ====================================================== -->
+
+  @if (isFormReady && !errorMessage) {
+    <form [formGroup]="visitForm" (ngSubmit)="onSubmit()" class="visit-form">
+      <!-- =================================================
+           VISIT DETAILS
+      ================================================== -->
+
+      <div class="form-section">
+        <h2>Visit Details</h2>
+
+        <div class="form-grid">
+          <!-- =================================================
+               PRACTITIONER
+          ================================================== -->
+
+          <div class="form-group">
+            <label for="practitionerId"> Practitioner </label>
+
+            <select id="practitionerId" formControlName="practitionerId">
+              <option value="">Select practitioner</option>
+
+              @for (practitioner of practitioners; track practitioner.id) {
+                <option [value]="practitioner.id">
+                  {{ practitioner.name }}
+                </option>
+              }
+            </select>
+
+            @if (
+              visitForm.controls.practitionerId.touched && visitForm.controls.practitionerId.invalid
+            ) {
+              <small class="field-error"> Please select a practitioner. </small>
+            }
+          </div>
+
+          <!-- =================================================
+               AREA
+          ================================================== -->
+
+          <div class="form-group">
+            <label for="areaId"> Area </label>
+
+            <select id="areaId" formControlName="areaId">
+              <option value="">Select area</option>
+
+              @for (area of areas; track area.id) {
+                <option [value]="area.id">
+                  {{ area.name }}
+                </option>
+              }
+            </select>
+
+            @if (visitForm.controls.areaId.touched && visitForm.controls.areaId.invalid) {
+              <small class="field-error"> Please select an area. </small>
+            }
+          </div>
+
+          <!-- =================================================
+               SERVICE
+          ================================================== -->
+
+          <div class="form-group">
+            <label for="serviceId"> Service </label>
+
+            <select id="serviceId" formControlName="serviceId">
+              <option value="">Select service</option>
+
+              @for (service of services; track service.id) {
+                <option [value]="service.id">
+                  {{ service.name }}
+                </option>
+              }
+            </select>
+
+            @if (visitForm.controls.serviceId.touched && visitForm.controls.serviceId.invalid) {
+              <small class="field-error"> Please select a service. </small>
+            }
+          </div>
+
+          <!-- =================================================
+               PACKAGE
+          ================================================== -->
+
+          <div class="form-group">
+            <label for="packageId"> Package </label>
+
+            <select id="packageId" formControlName="packageId">
+              <option value="">No package</option>
+
+              @for (package of packages; track package.id) {
+                <option [value]="package.id">{{ package.name }} - Rs. {{ package.amount }}</option>
+              }
+            </select>
+          </div>
+
+          <!-- =================================================
+               SCHEDULED DATE
+          ================================================== -->
+
+          <div class="form-group">
+            <label for="scheduledDate"> Scheduled Date </label>
+
+            <input id="scheduledDate" type="date" formControlName="scheduledDate" />
+
+            @if (
+              visitForm.controls.scheduledDate.touched && visitForm.controls.scheduledDate.invalid
+            ) {
+              <small class="field-error"> Please select a date. </small>
+            }
+          </div>
+
+          <!-- =================================================
+               TIME SLOT
+          ================================================== -->
+
+          <div class="form-group">
+            <label for="timeSlot"> Time Slot </label>
+
+            <input
+              id="timeSlot"
+              type="text"
+              formControlName="timeSlot"
+              placeholder="e.g. 10:00 AM - 11:00 AM"
+            />
+
+            @if (visitForm.controls.timeSlot.touched && visitForm.controls.timeSlot.invalid) {
+              <small class="field-error"> Time slot is required. </small>
+            }
+          </div>
+
+          <!-- =================================================
+               AMOUNT DUE
+          ================================================== -->
+
+          <div class="form-group">
+            <label for="amountDue"> Amount Due </label>
+
+            <input
+              id="amountDue"
+              type="number"
+              formControlName="amountDue"
+              min="0"
+              placeholder="Enter amount"
+            />
+
+            @if (visitForm.controls.amountDue.touched && visitForm.controls.amountDue.invalid) {
+              <small class="field-error"> Amount must be 0 or greater. </small>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- =================================================
+           ACTIONS
+      ================================================== -->
+
+      <div class="form-actions">
+        <button type="button" class="cancel-button" (click)="onCancel()">Cancel</button>
+
+        <button type="submit" class="submit-button" [disabled]="isSubmitting">
+          @if (isSubmitting) {
+            Updating Visit...
+          } @else {
+            Update Visit
+          }
+        </button>
+      </div>
+    </form>
+  }
+</div>

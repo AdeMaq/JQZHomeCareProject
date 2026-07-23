@@ -1,5 +1,6 @@
 <div class="visit-details-page">
   <!-- PAGE HEADER -->
+
   <div class="page-header">
     <div>
       <h1>Visit Details</h1>
@@ -7,14 +8,27 @@
       <p>View the complete information for this visit.</p>
     </div>
 
-    <button type="button" class="back-button" (click)="onBack()">
-      <i class="fa-solid fa-arrow-left"></i>
+    <div class="header-actions">
+      <!-- EDIT BUTTON -->
 
-      Back to Visits
-    </button>
+      <button type="button" class="edit-button" (click)="onEdit()">
+        <i class="fa-solid fa-pen-to-square"></i>
+
+        Edit Visit
+      </button>
+
+      <!-- BACK BUTTON -->
+
+      <button type="button" class="back-button" (click)="onBack()">
+        <i class="fa-solid fa-arrow-left"></i>
+
+        Back to Visits
+      </button>
+    </div>
   </div>
 
   <!-- LOADING STATE -->
+
   @if (isLoading) {
     <div class="loading-message">
       <i class="fa-solid fa-spinner fa-spin"></i>
@@ -24,6 +38,7 @@
   }
 
   <!-- ERROR STATE -->
+
   @else if (errorMessage) {
     <div class="error-message">
       <i class="fa-solid fa-triangle-exclamation"></i>
@@ -33,8 +48,11 @@
   }
 
   <!-- VISIT DETAILS -->
+
   @else if (visit) {
     <div class="details-card">
+      <!-- DETAILS HEADER -->
+
       <div class="details-header">
         <div>
           <h2>Visit Information</h2>
@@ -47,10 +65,13 @@
         </span>
       </div>
 
+      <!-- DETAILS GRID -->
+
       <div class="details-grid">
         <!-- PATIENT -->
+
         <div class="detail-item">
-          <span class="detail-label"> Patient Name </span>
+          <span class="detail-label">Patient Name</span>
 
           <span class="detail-value">
             {{ visit.patientName || '-' }}
@@ -58,8 +79,9 @@
         </div>
 
         <!-- PRACTITIONER -->
+
         <div class="detail-item">
-          <span class="detail-label"> Practitioner Name </span>
+          <span class="detail-label">Practitioner Name</span>
 
           <span class="detail-value">
             {{ visit.practitionerName || '-' }}
@@ -67,8 +89,9 @@
         </div>
 
         <!-- AREA -->
+
         <div class="detail-item">
-          <span class="detail-label"> Area </span>
+          <span class="detail-label">Area</span>
 
           <span class="detail-value">
             {{ visit.areaName || '-' }}
@@ -76,8 +99,9 @@
         </div>
 
         <!-- SERVICE -->
+
         <div class="detail-item">
-          <span class="detail-label"> Service </span>
+          <span class="detail-label">Service</span>
 
           <span class="detail-value">
             {{ visit.serviceName || '-' }}
@@ -85,8 +109,9 @@
         </div>
 
         <!-- PACKAGE -->
+
         <div class="detail-item">
-          <span class="detail-label"> Package </span>
+          <span class="detail-label">Package</span>
 
           <span class="detail-value">
             {{ visit.packageName || '-' }}
@@ -94,8 +119,9 @@
         </div>
 
         <!-- DATE -->
+
         <div class="detail-item">
-          <span class="detail-label"> Scheduled Date </span>
+          <span class="detail-label">Scheduled Date</span>
 
           <span class="detail-value">
             {{ formatDate(visit.scheduledDate) }}
@@ -103,8 +129,9 @@
         </div>
 
         <!-- TIME SLOT -->
+
         <div class="detail-item">
-          <span class="detail-label"> Time Slot </span>
+          <span class="detail-label">Time Slot</span>
 
           <span class="detail-value">
             {{ visit.timeSlot || '-' }}
@@ -112,8 +139,9 @@
         </div>
 
         <!-- AMOUNT DUE -->
+
         <div class="detail-item">
-          <span class="detail-label"> Amount Due </span>
+          <span class="detail-label">Amount Due</span>
 
           <span class="detail-value">
             {{ formatCurrency(visit.amountDue) }}
@@ -121,8 +149,9 @@
         </div>
 
         <!-- AMOUNT RECEIVED -->
+
         <div class="detail-item">
-          <span class="detail-label"> Amount Received </span>
+          <span class="detail-label">Amount Received</span>
 
           <span class="detail-value">
             {{ formatCurrency(visit.amountReceived) }}
@@ -130,8 +159,9 @@
         </div>
 
         <!-- RECEIVED BY -->
+
         <div class="detail-item">
-          <span class="detail-label"> Received By </span>
+          <span class="detail-label">Received By</span>
 
           <span class="detail-value">
             {{ visit.receivedBy || '-' }}

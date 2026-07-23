@@ -10,6 +10,7 @@ import { Dashboard } from './features/dashboard/dashboard/dashboard';
 
 import { VisitsList } from './features/visits/visits-list/visits-list';
 import { AddVisit } from './features/visits/add-visit/add-visit';
+import { EditVisit } from './features/visits/edit-visit/edit-visit';
 import { VisitDetails } from './features/visits/visit-details/visit-details';
 
 export const routes: Routes = [
@@ -59,15 +60,6 @@ export const routes: Routes = [
       },
 
       // =========================
-      // VISITS LIST
-      // =========================
-
-      {
-        path: 'visits',
-        component: VisitsList,
-      },
-
-      // =========================
       // ADD VISIT
       // =========================
 
@@ -77,12 +69,30 @@ export const routes: Routes = [
       },
 
       // =========================
+      // EDIT VISIT
+      // =========================
+
+      {
+        path: 'visits/:id/edit',
+        component: EditVisit,
+      },
+
+      // =========================
       // VISIT DETAILS
       // =========================
 
       {
         path: 'visits/:id',
         component: VisitDetails,
+      },
+
+      // =========================
+      // VISITS LIST
+      // =========================
+
+      {
+        path: 'visits',
+        component: VisitsList,
       },
     ],
   },

@@ -66,6 +66,14 @@ export class VisitDetails implements OnInit {
     this.loadVisit(visitId);
   }
 
+  onEdit(): void {
+    if (!this.visit) {
+      return;
+    }
+
+    this.router.navigate(['/visits', this.visit.id, 'edit']);
+  }
+
   // =========================
   // LOAD VISIT
   // =========================

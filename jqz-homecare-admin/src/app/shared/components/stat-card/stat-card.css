@@ -1,78 +1,163 @@
 .dashboard-card {
-  background: white;
-  border-radius: 20px;
-  padding: 24px;
-  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
-  transition: all 0.3s ease;
+  min-width: 0;
+  height: 100%;
+
   display: flex;
   flex-direction: column;
   gap: 22px;
-  height: 100%;
+
+  padding: 24px;
+
+  background: white;
+  border-radius: 20px;
+
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+
+  transition: all 0.3s ease;
 }
 
 .dashboard-card:hover {
   transform: translateY(-6px);
+
   box-shadow: 0 18px 38px rgba(15, 23, 42, 0.15);
 }
 
 .card-top {
   display: flex;
-  justify-content: space-between;
+
   align-items: center;
+
+  justify-content: space-between;
+
+  gap: 12px;
+
+  min-width: 0;
 }
 
 .icon-box {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  flex-shrink: 0;
+
   width: 64px;
   height: 64px;
-  border-radius: 18px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+
   color: white;
+
   font-size: 24px;
+
+  border-radius: 18px;
+
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
 }
 
 .trend-badge {
   display: flex;
+
   align-items: center;
+
   gap: 6px;
+
+  max-width: 100%;
+
   padding: 6px 12px;
+
   border-radius: 999px;
+
   font-size: 13px;
+
   font-weight: 700;
+
+  white-space: nowrap;
 }
 
 .positive {
   background: #dcfce7;
+
   color: #15803d;
 }
 
 .negative {
   background: #fee2e2;
+
   color: #dc2626;
 }
 
 .card-content {
   display: flex;
+
   flex-direction: column;
+
+  min-width: 0;
 }
 
 .card-title {
+  overflow-wrap: anywhere;
+
   color: #64748b;
+
   font-size: 15px;
+
   font-weight: 500;
 }
 
 .card-value {
   margin: 8px 0;
-  font-size: 34px;
-  font-weight: 700;
+
+  overflow-wrap: anywhere;
+
   color: #0f172a;
+
+  font-size: 34px;
+
+  font-weight: 700;
 }
 
 .card-footer {
   margin: 0;
-  font-size: 13px;
+
+  overflow-wrap: anywhere;
+
   color: #94a3b8;
+
+  font-size: 13px;
+}
+
+/* ========================= */
+/* RESPONSIVE */
+/* ========================= */
+
+@media (max-width: 768px) {
+  .dashboard-card {
+    padding: 20px;
+  }
+
+  .icon-box {
+    width: 56px;
+    height: 56px;
+
+    font-size: 21px;
+  }
+
+  .card-value {
+    font-size: 30px;
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard-card {
+    padding: 18px;
+  }
+
+  .card-value {
+    font-size: 28px;
+  }
+
+  .card-footer {
+    font-size: 12px;
+  }
 }

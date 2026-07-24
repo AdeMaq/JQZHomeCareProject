@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace JQZHomeCareProject.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260721084854_AddUserDeviceToken")]
-    partial class AddUserDeviceToken
+    [Migration("20260724115543_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

@@ -1,5 +1,4 @@
-﻿using JQZHomeCareProject.Application.Common.Exceptions;
-using JQZHomeCareProject.Application.DTOs;
+﻿using JQZHomeCareProject.Application.DTOs;
 using JQZHomeCareProject.Application.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -7,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace JQZHomeCareProject.API.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/areas")]
     [Authorize]
     public class AreasController : ControllerBase
     {
@@ -19,73 +18,41 @@ namespace JQZHomeCareProject.API.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<AreaDto>>> GetAll()
+        public async Task<IActionResult> GetAllAsync()
         {
-            var result = await _areaService.GetAllAsync();
-            return Ok(result);
+            var areas = await _areaService.GetAllAsync();
+            return Ok(areas);
         }
 
-        [HttpGet("{id}")]
-        public async Task<ActionResult<AreaDto>> GetById(Guid id)
+        [HttpGet("{id:guid}")]
+        public async Task<IActionResult> GetByIdAsync(Guid id)
         {
-            try
-            {
-                var result = await _areaService.GetByIdAsync(id);
-                return Ok(result);
-            }
-            catch (NotFoundException ex)
-            {
-                return NotFound(new { message = ex.Message });
-            }
+            var area = await _areaService.GetByIdAsync(id);
+            return Ok(area);
         }
 
         [HttpPost]
         [Authorize(Roles = "SuperAdmin,MiddlePowerAdmin,SimpleAdmin")]
-        public async Task<ActionResult<AreaDto>> Create(CreateAreaDto dto)
+        public async Task<IActionResult> CreateAsync([FromBody] CreateAreaDto dto)
         {
-            try
-            {
-                var result = await _areaService.CreateAsync(dto);
-                return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
-            }
-            catch (ValidationException ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
+            var area = await _areaService.CreateAsync(dto);
+            return CreatedAtAction("GetById", new { id = area.Id }, area);
         }
 
-        [HttpPut("{id}")]
+        [HttpPut("{id:guid}")]
         [Authorize(Roles = "SuperAdmin,MiddlePowerAdmin,SimpleAdmin")]
-        public async Task<IActionResult> Update(Guid id, UpdateAreaDto dto)
+        public async Task<IActionResult> UpdateAsync(Guid id, [FromBody] UpdateAreaDto dto)
         {
-            try
-            {
-                await _areaService.UpdateAsync(id, dto);
-                return NoContent();
-            }
-            catch (NotFoundException ex)
-            {
-                return NotFound(new { message = ex.Message });
-            }
-            catch (ValidationException ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
+            await _areaService.UpdateAsync(id, dto);
+            return NoContent();
         }
 
-        [HttpDelete("{id}")]
-        [Authorize(Roles = "SuperAdmin,MiddlePowerAdmin")]
-        public async Task<IActionResult> Delete(Guid id)
+        [HttpDelete("{id:guid}")]
+        [Authorize(Roles = "SuperAdmin,MiddlePowerAdmin,SimpleAdmin")]
+        public async Task<IActionResult> DeleteAsync(Guid id)
         {
-            try
-            {
-                await _areaService.DeleteAsync(id);
-                return NoContent();
-            }
-            catch (NotFoundException ex)
-            {
-                return NotFound(new { message = ex.Message });
-            }
+            await _areaService.DeleteAsync(id);
+            return NoContent();
         }
     }
 }

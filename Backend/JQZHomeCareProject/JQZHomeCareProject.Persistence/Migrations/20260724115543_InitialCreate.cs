@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
+
 namespace JQZHomeCareProject.Persistence.Migrations
 {
     /// <inheritdoc />
@@ -17,7 +19,6 @@ namespace JQZHomeCareProject.Persistence.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
-                    GeoBoundary = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
@@ -166,6 +167,7 @@ namespace JQZHomeCareProject.Persistence.Migrations
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
                     PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Role = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    DeviceToken = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
                     PractitionerId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
@@ -268,6 +270,22 @@ namespace JQZHomeCareProject.Persistence.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
+
+            migrationBuilder.InsertData(
+                table: "Users",
+                columns: new[] { "Id", "CreatedAt", "DeviceToken", "Email", "Name", "PasswordHash", "PractitionerId", "Role", "UpdatedAt" },
+                values: new object[,]
+                {
+                    { new Guid("11111111-1111-1111-1111-111111111111"), new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, "superadmin@jqz.com", "Super Admin", "100000.JIa07Th2kT4wSDYr8TvzXw==.MgTSH4YdTIoIbXfnbhUaqkiFAfndmXdEorfcD+x/5r8=", null, "SuperAdmin", null },
+                    { new Guid("22222222-2222-2222-2222-222222222222"), new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, "middleadmin@jqz.com", "Middle Power Admin", "100000.82XTcj/peRxNQbuB6isD+A==.Gsde6PWtQW+b8N5pxtEkvTkmu6N0hvifAvJ3Jyli5sY=", null, "MiddlePowerAdmin", null },
+                    { new Guid("33333333-3333-3333-3333-333333333333"), new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, "simpleadmin@jqz.com", "Simple Admin", "100000.bOi3I8UEigu4rtqVUy+27Q==.s0OCxW8kVkXBgG5TZ9waUrTIU1jhSHu1JqUf0vIL5XY=", null, "SimpleAdmin", null }
+                });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Areas_Name",
+                table: "Areas",
+                column: "Name",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Patients_LocationId",

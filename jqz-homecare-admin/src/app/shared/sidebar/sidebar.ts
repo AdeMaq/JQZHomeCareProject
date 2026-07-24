@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -9,6 +9,10 @@ import { CommonModule } from '@angular/common';
   styleUrl: './sidebar.css',
 })
 export class Sidebar {
+  @Input() isOpen = false;
+
+  @Output() closeSidebar = new EventEmitter<void>();
+
   menuItems = [
     {
       icon: 'fa-solid fa-house',
@@ -46,4 +50,12 @@ export class Sidebar {
       active: false,
     },
   ];
+
+  onCloseSidebar(): void {
+    this.closeSidebar.emit();
+  }
+
+  onMenuItemClick(): void {
+    this.closeSidebar.emit();
+  }
 }

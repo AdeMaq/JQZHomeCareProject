@@ -1,0 +1,201 @@
+/* =====================================================
+   SIDEBAR
+===================================================== */
+
+:host {
+  display: block;
+}
+
+/* =====================================================
+   SIDEBAR CONTAINER
+===================================================== */
+
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+
+  width: 288px;
+  height: 100vh;
+
+  display: flex;
+  flex-direction: column;
+
+  color: white;
+
+  background: linear-gradient(to bottom, #1d4ed8, #2563eb, #06b6d4);
+
+  box-shadow: 10px 0 30px rgba(0, 0, 0, 0.15);
+
+  z-index: 1000;
+
+  transform: translateX(0);
+
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+/* =====================================================
+   LOGO
+===================================================== */
+
+.sidebar-logo {
+  padding: 32px;
+
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo-icon {
+  width: 48px;
+  height: 48px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.logo-icon i {
+  font-size: 24px;
+  color: #6ee7b7;
+}
+
+.logo-text h1 {
+  margin: 0;
+
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.logo-text p {
+  margin: 0;
+
+  font-size: 14px;
+  color: #dbeafe;
+}
+
+/* =====================================================
+   MENU
+===================================================== */
+
+.sidebar-menu {
+  flex: 1;
+
+  padding: 24px 16px;
+
+  overflow-y: auto;
+}
+
+.menu-item {
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+
+  gap: 16px;
+
+  margin-bottom: 8px;
+  padding: 16px 20px;
+
+  border: none;
+  border-radius: 12px;
+
+  color: white;
+  background: transparent;
+
+  font-size: 16px;
+  font-weight: 500;
+
+  text-align: left;
+
+  cursor: pointer;
+
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.menu-item i {
+  width: 20px;
+
+  font-size: 18px;
+
+  text-align: center;
+}
+
+.menu-item:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+
+  transform: translateX(2px);
+}
+
+.menu-item.active {
+  color: #1d4ed8;
+
+  background-color: white;
+}
+
+.menu-item.active:hover {
+  background-color: white;
+
+  transform: none;
+}
+
+/* =====================================================
+   MOBILE OVERLAY
+===================================================== */
+
+.sidebar-overlay {
+  position: fixed;
+
+  inset: 0;
+
+  background-color: rgba(0, 0, 0, 0.45);
+
+  z-index: 999;
+
+  animation: fadeIn 0.3s ease;
+}
+
+/* =====================================================
+   MOBILE RESPONSIVENESS
+===================================================== */
+
+@media (max-width: 767px) {
+  .sidebar {
+    transform: translateX(-100%);
+
+    box-shadow: none;
+  }
+
+  .sidebar.sidebar-open {
+    transform: translateX(0);
+
+    box-shadow: 10px 0 30px rgba(0, 0, 0, 0.25);
+  }
+}
+
+/* =====================================================
+   ANIMATION
+===================================================== */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}

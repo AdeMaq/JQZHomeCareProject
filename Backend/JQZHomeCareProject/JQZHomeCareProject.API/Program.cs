@@ -4,6 +4,7 @@ using JQZHomeCareProject.Infrastructure;
 using JQZHomeCareProject.Infrastructure.Auth;
 using JQZHomeCareProject.Persistence;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using JQZHomeCareProject.API.Middleware;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using System.Text;
@@ -52,6 +53,7 @@ builder.Services.AddScoped<IDashboardService, JQZHomeCareProject.Application.Ser
 builder.Services.AddScoped<IRatingService, JQZHomeCareProject.Application.Services.RatingService>();
 builder.Services.AddScoped<IPaymentService, JQZHomeCareProject.Application.Services.PaymentService>();
 builder.Services.AddScoped<IUserService, JQZHomeCareProject.Application.Services.UserService>();
+builder.Services.AddScoped<ICityService, JQZHomeCareProject.Application.Services.CityService>();
 
 
 
@@ -101,6 +103,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseCors("AngularPolicy");
 
+app.UseMiddleware<JQZHomeCareProject.API.Middleware.ExceptionHandlingMiddleware>();
 app.UseAuthentication();
 app.UseAuthorization();
 

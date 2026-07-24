@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace JQZHomeCareProject.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260715100639_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20260724130746_AreasAndCities")]
+    partial class AreasAndCities
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -31,23 +31,51 @@ namespace JQZHomeCareProject.Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid>("CityId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("GeoBoundary")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Areas", (string)null);
+                    b.HasIndex("CityId", "Name")
+                        .IsUnique();
+
+                    b.ToTable("Areas");
+                });
+
+            modelBuilder.Entity("JQZHomeCareProject.Domain.Entities.City", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("Cities");
                 });
 
             modelBuilder.Entity("JQZHomeCareProject.Domain.Entities.Location", b =>
@@ -193,7 +221,7 @@ namespace JQZHomeCareProject.Persistence.Migrations
 
                     b.HasIndex("AreaId");
 
-                    b.ToTable("PractitionerAreas", (string)null);
+                    b.ToTable("PractitionerAreas");
                 });
 
             modelBuilder.Entity("JQZHomeCareProject.Domain.Entities.Rating", b =>
@@ -301,6 +329,10 @@ namespace JQZHomeCareProject.Persistence.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("DeviceToken")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasMaxLength(256)
@@ -333,6 +365,35 @@ namespace JQZHomeCareProject.Persistence.Migrations
                     b.HasIndex("PractitionerId");
 
                     b.ToTable("Users", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("11111111-1111-1111-1111-111111111111"),
+                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Email = "superadmin@jqz.com",
+                            Name = "Super Admin",
+                            PasswordHash = "100000.JIa07Th2kT4wSDYr8TvzXw==.MgTSH4YdTIoIbXfnbhUaqkiFAfndmXdEorfcD+x/5r8=",
+                            Role = "SuperAdmin"
+                        },
+                        new
+                        {
+                            Id = new Guid("22222222-2222-2222-2222-222222222222"),
+                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Email = "middleadmin@jqz.com",
+                            Name = "Middle Power Admin",
+                            PasswordHash = "100000.82XTcj/peRxNQbuB6isD+A==.Gsde6PWtQW+b8N5pxtEkvTkmu6N0hvifAvJ3Jyli5sY=",
+                            Role = "MiddlePowerAdmin"
+                        },
+                        new
+                        {
+                            Id = new Guid("33333333-3333-3333-3333-333333333333"),
+                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Email = "simpleadmin@jqz.com",
+                            Name = "Simple Admin",
+                            PasswordHash = "100000.bOi3I8UEigu4rtqVUy+27Q==.s0OCxW8kVkXBgG5TZ9waUrTIU1jhSHu1JqUf0vIL5XY=",
+                            Role = "SimpleAdmin"
+                        });
                 });
 
             modelBuilder.Entity("JQZHomeCareProject.Domain.Entities.Visit", b =>
@@ -415,6 +476,17 @@ namespace JQZHomeCareProject.Persistence.Migrations
                     b.HasIndex("ServiceId");
 
                     b.ToTable("Visits", (string)null);
+                });
+
+            modelBuilder.Entity("JQZHomeCareProject.Domain.Entities.Area", b =>
+                {
+                    b.HasOne("JQZHomeCareProject.Domain.Entities.City", "City")
+                        .WithMany("Areas")
+                        .HasForeignKey("CityId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("City");
                 });
 
             modelBuilder.Entity("JQZHomeCareProject.Domain.Entities.Patient", b =>
@@ -545,6 +617,11 @@ namespace JQZHomeCareProject.Persistence.Migrations
                     b.Navigation("PractitionerAreas");
 
                     b.Navigation("Visits");
+                });
+
+            modelBuilder.Entity("JQZHomeCareProject.Domain.Entities.City", b =>
+                {
+                    b.Navigation("Areas");
                 });
 
             modelBuilder.Entity("JQZHomeCareProject.Domain.Entities.Location", b =>

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using JQZHomeCareProject.Domain.Entities;
+﻿using JQZHomeCareProject.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -11,8 +8,6 @@ namespace JQZHomeCareProject.Persistence.Configurations
     {
         public void Configure(EntityTypeBuilder<PractitionerArea> builder)
         {
-            builder.ToTable("PractitionerAreas");
-
             builder.HasKey(pa => new { pa.PractitionerId, pa.AreaId });
 
             builder.HasOne(pa => pa.Practitioner)

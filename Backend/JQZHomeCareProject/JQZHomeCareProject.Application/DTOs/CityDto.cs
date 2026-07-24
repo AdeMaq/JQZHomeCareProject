@@ -1,22 +1,18 @@
 ﻿namespace JQZHomeCareProject.Application.DTOs
 {
-    public class AreaDto
+    public class CityDto
     {
         public Guid Id { get; set; }
         public string Name { get; set; } = string.Empty;
-        public Guid CityId { get; set; }
-        public string CityName { get; set; } = string.Empty;
     }
 
-    public class CreateAreaDto
+    public class CreateCityDto
     {
         public string Name { get; set; } = string.Empty;
-        public Guid CityId { get; set; }
     }
 
-    public class UpdateAreaDto
+    public class UpdateCityDto
     {
         public string Name { get; set; } = string.Empty;
-        public Guid CityId { get; set; }
     }
 }

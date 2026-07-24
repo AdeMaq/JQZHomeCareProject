@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using JQZHomeCareProject.Application.DTOs;
+﻿using JQZHomeCareProject.Application.DTOs;
 
 namespace JQZHomeCareProject.Application.Services
 {

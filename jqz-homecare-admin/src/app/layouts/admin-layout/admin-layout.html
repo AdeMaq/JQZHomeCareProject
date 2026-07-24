@@ -1,14 +1,14 @@
-<div class="flex h-screen bg-gray-100">
+<div class="admin-layout">
   <!-- Sidebar -->
   <app-sidebar></app-sidebar>
 
-  <!-- Right Side -->
-  <div class="flex flex-col flex-1 overflow-hidden">
+  <!-- Main Application Area -->
+  <div class="admin-main">
     <!-- Navbar -->
     <app-navbar></app-navbar>
 
-    <!-- Main Content -->
-    <main class="flex-1 overflow-y-auto bg-gray-50 p-6">
+    <!-- Page Content -->
+    <main class="admin-content">
       <router-outlet></router-outlet>
     </main>
   </div>

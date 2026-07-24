@@ -1,50 +1,46 @@
-<nav
-  class="h-20 bg-white border-b border-gray-200 flex items-center justify-between px-8 shadow-sm"
->
-  <!-- Search -->
-  <div class="relative w-[500px]">
-    <i
-      class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
-    ></i>
+<nav class="navbar">
+  <!-- =========================
+       SEARCH
+  ========================== -->
+
+  <div class="search-container">
+    <i class="fa-solid fa-magnifying-glass search-icon"></i>
 
     <input
       type="text"
+      class="search-input"
       placeholder="Search visits, practitioners, patients..."
-      class="w-full h-10 pl-11 pr-4 rounded-lg border border-slate-200 bg-slate-50 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
     />
   </div>
 
-  <!-- Right Side -->
-  <div class="flex items-center gap-5">
-    <!-- Notification -->
-    <button
-      class="w-11 h-11 rounded-full bg-slate-100 hover:bg-slate-200 transition flex items-center justify-center"
-    >
-      <i class="fa-regular fa-bell text-slate-600"></i>
+  <!-- =========================
+       RIGHT SIDE
+  ========================== -->
+
+  <div class="navbar-actions">
+    <!-- NOTIFICATION -->
+
+    <button type="button" class="notification-button" aria-label="Notifications">
+      <i class="fa-regular fa-bell"></i>
     </button>
 
-    <!-- Profile -->
-    <div class="flex items-center gap-3 cursor-pointer">
-      <div
-        class="w-11 h-11 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold"
-      >
-        A
+    <!-- PROFILE -->
+
+    <div class="profile-container">
+      <div class="profile-avatar">A</div>
+
+      <div class="profile-info">
+        <div class="profile-name">Administrator</div>
+
+        <div class="profile-role">Super Admin</div>
       </div>
 
-      <div class="hidden md:block">
-        <div class="font-semibold text-slate-700">Administrator</div>
-
-        <div class="text-xs text-slate-500">Super Admin</div>
-      </div>
-
-      <i class="fa-solid fa-chevron-down text-gray-400 text-sm"></i>
+      <i class="fa-solid fa-chevron-down profile-arrow"></i>
     </div>
 
-    <!-- Logout -->
-    <button
-      (click)="logout()"
-      class="bg-red-500 hover:bg-red-600 text-white px-5 py-2 rounded-lg transition flex items-center gap-2"
-    >
+    <!-- LOGOUT -->
+
+    <button type="button" class="logout-button" (click)="logout()">
       <i class="fa-solid fa-right-from-bracket"></i>
 
       <span>Logout</span>

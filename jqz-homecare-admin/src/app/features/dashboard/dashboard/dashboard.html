@@ -27,12 +27,12 @@
       }
     </div>
 
-    <!-- Today's Date -->
+    <!-- Current Date -->
 
     <div class="dashboard-date">
       <i class="fa-regular fa-calendar"></i>
 
-      <span>19 July 2026</span>
+      <span>{{ displayDate }}</span>
     </div>
 
     <!-- Add Visit -->
@@ -104,5 +104,5 @@
 <div class="table-section">
   <h3>Recent Visits</h3>
 
-  <app-table [columns]="columns" [rows]="recentVisits"> </app-table>
+  <app-table [columns]="columns" [rows]="recentVisits"></app-table>
 </div>

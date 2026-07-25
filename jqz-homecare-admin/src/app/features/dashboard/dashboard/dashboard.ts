@@ -34,6 +34,8 @@ export class Dashboard implements OnInit {
   fromDate!: string;
   toDate!: string;
 
+  displayDate = '';
+
   /* ========================= */
   /* DASHBOARD DATA */
   /* ========================= */
@@ -100,6 +102,8 @@ export class Dashboard implements OnInit {
 
     this.fromDate = this.formatDate(from);
     this.toDate = this.formatDate(to);
+
+    this.displayDate = this.formatDisplayDate(today);
 
     this.loadDashboardData();
   }
@@ -230,6 +234,14 @@ export class Dashboard implements OnInit {
 
   private formatDate(date: Date): string {
     return date.toISOString().split('T')[0];
+  }
+
+  private formatDisplayDate(date: Date): string {
+    return date.toLocaleDateString('en-GB', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+    });
   }
 
   /* ========================= */

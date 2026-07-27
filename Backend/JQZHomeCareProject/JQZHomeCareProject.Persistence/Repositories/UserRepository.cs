@@ -1,9 +1,10 @@
-﻿using System;
+﻿using JQZHomeCareProject.Application.Common.Interfaces;
+using JQZHomeCareProject.Domain.Entities;
+using JQZHomeCareProject.Domain.Enums;
+using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Text;
-using JQZHomeCareProject.Application.Common.Interfaces;
-using JQZHomeCareProject.Domain.Entities;
-using Microsoft.EntityFrameworkCore;
 
 
 namespace JQZHomeCareProject.Persistence.Repositories
@@ -31,12 +32,6 @@ namespace JQZHomeCareProject.Persistence.Repositories
                 .FirstOrDefaultAsync(u => u.Email == email);
         }
 
-        public async Task<User?> GetByPractitionerIdAsync(Guid practitionerId)
-        {
-            return await _context.Users
-                .FirstOrDefaultAsync(u => u.PractitionerId == practitionerId);
-        }
-
         public async Task<bool> EmailExistsAsync(string email)
         {
             return await _context.Users.AnyAsync(u => u.Email == email);
@@ -52,6 +47,29 @@ namespace JQZHomeCareProject.Persistence.Repositories
         {
             _context.Users.Update(user);
             await _context.SaveChangesAsync();
+        }
+
+        public async Task<User?> GetByPractitionerIdAsync(Guid practitionerId)
+        {
+            return await _context.Users.FirstOrDefaultAsync(u => u.PractitionerId == practitionerId);
+        }
+
+        public async Task<IEnumerable<User>> GetAllPractitionerUsersAsync()
+        {
+            return await _context.Users
+                .Where(u => u.Role == UserRole.Practitioner)
+                .AsNoTracking()
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<User>> SearchPractitionerUsersByNameAsync(string name)
+        {
+            return await _context.Users
+                .Where(u => u.Role == UserRole.Practitioner
+                         && u.PractitionerId != null
+                         && u.Name.Contains(name))
+                .AsNoTracking()
+                .ToListAsync();
         }
     }
 }

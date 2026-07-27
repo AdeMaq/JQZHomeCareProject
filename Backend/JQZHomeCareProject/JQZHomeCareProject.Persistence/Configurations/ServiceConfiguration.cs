@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using JQZHomeCareProject.Domain.Entities;
+﻿using JQZHomeCareProject.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -15,20 +12,13 @@ namespace JQZHomeCareProject.Persistence.Configurations
 
             builder.HasKey(s => s.Id);
 
-            builder.Property(s => s.Name)
+            builder.Property(s => s.Name).IsRequired().HasMaxLength(100);
+            builder.Property(s => s.Description).HasMaxLength(1000);
+
+            builder.HasOne(s => s.ServiceCategory)
+                .WithMany(sc => sc.Services)
+                .HasForeignKey(s => s.ServiceCategoryId)
                 .IsRequired()
-                .HasMaxLength(200);
-
-            builder.Property(s => s.Category)
-                .HasConversion<string>()
-                .IsRequired();
-
-            builder.Property(s => s.Description)
-                .HasMaxLength(1000);
-
-            builder.HasMany(s => s.Visits)
-                .WithOne(v => v.Service)
-                .HasForeignKey(v => v.ServiceId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
     }

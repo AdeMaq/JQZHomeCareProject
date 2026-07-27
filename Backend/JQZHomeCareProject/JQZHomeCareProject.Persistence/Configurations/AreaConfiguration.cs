@@ -8,16 +8,22 @@ namespace JQZHomeCareProject.Persistence.Configurations
     {
         public void Configure(EntityTypeBuilder<Area> builder)
         {
+            builder.ToTable("Areas");
+
             builder.HasKey(a => a.Id);
 
             builder.Property(a => a.Name)
                 .IsRequired()
                 .HasMaxLength(100);
 
-            builder.Property(a => a.CityId)
-                .IsRequired();
+            builder.HasOne(a => a.City)
+                .WithMany(c => c.Areas)
+                .HasForeignKey(a => a.CityId)
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Restrict);
 
-            builder.HasIndex(a => new { a.CityId, a.Name }).IsUnique();
+            builder.HasIndex(a => new { a.CityId, a.Name })
+                .IsUnique();
         }
     }
 }

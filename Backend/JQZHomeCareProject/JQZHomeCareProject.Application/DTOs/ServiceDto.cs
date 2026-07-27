@@ -9,7 +9,21 @@ namespace JQZHomeCareProject.Application.DTOs
     {
         public Guid Id { get; set; }
         public string Name { get; set; } = string.Empty;
-        public ServiceCategory Category { get; set; }
+        public Guid ServiceCategoryId { get; set; }
+        public string ServiceCategoryName { get; set; } = string.Empty;
+        public string? Description { get; set; }
+    }
+
+    public class CreateServiceDto
+    {
+        public string Name { get; set; } = string.Empty;
+        public Guid ServiceCategoryId { get; set; }
+        public string? Description { get; set; }
+    }
+
+    public class UpdateServiceDto
+    {
+        public string Name { get; set; } = string.Empty;
         public string? Description { get; set; }
     }
 }

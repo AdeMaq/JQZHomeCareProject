@@ -8,6 +8,8 @@ namespace JQZHomeCareProject.Persistence.Configurations
     {
         public void Configure(EntityTypeBuilder<PractitionerArea> builder)
         {
+            builder.ToTable("PractitionerAreas");
+
             builder.HasKey(pa => new { pa.PractitionerId, pa.AreaId });
 
             builder.HasOne(pa => pa.Practitioner)

@@ -13,14 +13,18 @@ namespace JQZHomeCareProject.Persistence
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
         public DbSet<User> Users => Set<User>();
-        public DbSet<City> Cities { get; set; }
-        public DbSet<Area> Areas { get; set; }
-        public DbSet<PractitionerArea> PractitionerAreas { get; set; }
+        public DbSet<City> Cities => Set<City>();
+        public DbSet<Area> Areas => Set<Area>();
+        public DbSet<ServiceCategory> ServiceCategories => Set<ServiceCategory>();
+        public DbSet<Service> Services => Set<Service>();
         public DbSet<Practitioner> Practitioners => Set<Practitioner>();
+        public DbSet<PractitionerArea> PractitionerAreas => Set<PractitionerArea>();
+
+        public DbSet<PractitionerSettlement> PractitionerSettlements => Set<PractitionerSettlement>();
+
         public DbSet<Patient> Patients => Set<Patient>();
         public DbSet<Location> Locations => Set<Location>();
         public DbSet<Package> Packages => Set<Package>();
-        public DbSet<Service> Services => Set<Service>();
         public DbSet<Visit> Visits => Set<Visit>();
         public DbSet<Refusal> Refusals => Set<Refusal>();
         public DbSet<Rating> Ratings => Set<Rating>();

@@ -17,6 +17,4 @@ namespace JQZHomeCareProject.Domain.Enums
     public enum PatientPackageStatus { Active, Completed, Cancelled }
 
     public enum CollectionStatus { Pending, Received }
-    public enum PractitionerType{ Therapist,Nurse,Doctor}
-    public enum ServiceCategory{Mental,Psychological,Physiological}
 }

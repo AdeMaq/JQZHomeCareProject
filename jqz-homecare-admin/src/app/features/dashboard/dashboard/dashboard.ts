@@ -20,7 +20,9 @@ import { DashboardService } from './dashboard.service';
 })
 export class Dashboard implements OnInit {
   private dashboardService = inject(DashboardService);
+
   private router = inject(Router);
+
   private platformId = inject(PLATFORM_ID);
 
   /* ========================= */
@@ -32,6 +34,7 @@ export class Dashboard implements OnInit {
   filters = ['Today', 'This Week', 'This Month'];
 
   fromDate!: string;
+
   toDate!: string;
 
   displayDate = '';
@@ -42,7 +45,9 @@ export class Dashboard implements OnInit {
 
   summary: DashboardSummary = {
     expectedVisits: 0,
+
     actualVisitsDone: 0,
+
     paymentReceived: 0,
   };
 
@@ -88,6 +93,7 @@ export class Dashboard implements OnInit {
     const today = new Date();
 
     let from = new Date(today);
+
     const to = new Date(today);
 
     if (filter === 'This Week') {
@@ -101,6 +107,7 @@ export class Dashboard implements OnInit {
     }
 
     this.fromDate = this.formatDate(from);
+
     this.toDate = this.formatDate(to);
 
     this.displayDate = this.formatDisplayDate(today);
@@ -109,49 +116,28 @@ export class Dashboard implements OnInit {
   }
 
   /* ========================= */
-  /* LOAD DASHBOARD DATA */
+  /* LOAD STATIC DASHBOARD DATA */
   /* ========================= */
 
   loadDashboardData(): void {
-    /* ========================= */
-    /* LOAD SUMMARY */
-    /* ========================= */
+    /*
+     * TEMPORARY STATIC DATA
+     *
+     * The backend Dashboard API is currently being updated.
+     * Therefore, we are using static mock data for now.
+     */
 
-    this.dashboardService.getSummary(this.fromDate, this.toDate).subscribe({
-      next: (response: DashboardSummary) => {
-        console.log('SUMMARY API RESPONSE:', response);
+    this.summary = this.dashboardService.getSummary();
 
-        this.summary = response;
+    this.refusals = this.dashboardService.getRefusals();
 
-        this.buildStats();
+    this.buildStats();
 
-        console.log('STATS AFTER BUILD:', this.stats);
-      },
+    this.buildRefusalStats();
 
-      error: (error) => {
-        console.error('ERROR LOADING SUMMARY:', error);
-      },
-    });
+    console.log('STATIC SUMMARY:', this.summary);
 
-    /* ========================= */
-    /* LOAD REFUSALS */
-    /* ========================= */
-
-    this.dashboardService.getRefusals(this.fromDate, this.toDate).subscribe({
-      next: (response: Refusal[]) => {
-        console.log('REFUSALS API RESPONSE:', response);
-
-        this.refusals = response;
-
-        this.buildRefusalStats();
-
-        console.log('REFUSAL STATS AFTER BUILD:', this.refusalStats);
-      },
-
-      error: (error) => {
-        console.error('ERROR LOADING REFUSALS:', error);
-      },
-    });
+    console.log('STATIC REFUSALS:', this.refusals);
   }
 
   /* ========================= */
@@ -239,7 +225,9 @@ export class Dashboard implements OnInit {
   private formatDisplayDate(date: Date): string {
     return date.toLocaleDateString('en-GB', {
       day: 'numeric',
+
       month: 'long',
+
       year: 'numeric',
     });
   }

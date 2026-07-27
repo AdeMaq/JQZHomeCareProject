@@ -55,8 +55,9 @@ namespace JQZHomeCareProject.Persistence.Configurations
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasOne(v => v.Service)
-                .WithMany(s => s.Visits)
+                .WithMany()
                 .HasForeignKey(v => v.ServiceId)
+                .IsRequired()
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasOne(v => v.Package)

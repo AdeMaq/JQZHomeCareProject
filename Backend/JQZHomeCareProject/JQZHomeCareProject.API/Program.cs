@@ -54,6 +54,8 @@ builder.Services.AddScoped<IRatingService, JQZHomeCareProject.Application.Servic
 builder.Services.AddScoped<IPaymentService, JQZHomeCareProject.Application.Services.PaymentService>();
 builder.Services.AddScoped<IUserService, JQZHomeCareProject.Application.Services.UserService>();
 builder.Services.AddScoped<ICityService, JQZHomeCareProject.Application.Services.CityService>();
+builder.Services.AddScoped<IServiceCategoryService, JQZHomeCareProject.Application.Services.ServiceCategoryService>();
+
 
 
 
@@ -89,6 +91,11 @@ builder.Services.AddCors(options =>
               .AllowAnyHeader()
               .AllowAnyMethod();
     });
+});
+
+builder.Services.AddControllers(options =>
+{
+    options.SuppressAsyncSuffixInActionNames = false;
 });
 
 var app = builder.Build();

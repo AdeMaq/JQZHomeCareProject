@@ -1,154 +1,105 @@
-﻿using JQZHomeCareProject.Application.Common.Exceptions;
-using JQZHomeCareProject.Application.DTOs;
+﻿using JQZHomeCareProject.Application.DTOs;
 using JQZHomeCareProject.Application.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 namespace JQZHomeCareProject.API.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/practitioners")]
     [Authorize]
     public class PractitionersController : ControllerBase
     {
-        private readonly IPractitionerService _practitionerService;
-
-        public PractitionersController(IPractitionerService practitionerService)
+        private readonly IPractitionerService _service;
+        public PractitionersController(IPractitionerService service)
         {
-            _practitionerService = practitionerService;
+            _service = service;
         }
 
         [HttpPost]
         [Authorize(Roles = "SuperAdmin,MiddlePowerAdmin,SimpleAdmin")]
-        public async Task<ActionResult<PractitionerDto>> Create(CreatePractitionerDto dto)
+        public async Task<ActionResult<PractitionerDto>> CreateAsync(CreatePractitionerDto dto)
         {
             var createdByUserId = GetCurrentUserId();
-
-            try
-            {
-                var result = await _practitionerService.CreatePractitionerAsync(dto, createdByUserId);
-                return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
-            }
-            catch (ValidationException ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-            catch (NotFoundException ex)
-            {
-                return NotFound(new { message = ex.Message });
-            }
+            var result = await _service.CreatePractitionerAsync(dto, createdByUserId);
+            return CreatedAtAction(nameof(GetByIdAsync), new { id = result.Id }, result);
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<PractitionerDto>>> GetAll()
+        [Authorize(Roles = "SuperAdmin,MiddlePowerAdmin,SimpleAdmin")]
+        public async Task<ActionResult<IEnumerable<PractitionerDto>>> GetAllAsync()
         {
-            var result = await _practitionerService.GetAllAsync();
-            return Ok(result);
+           return  Ok(await _service.GetAllAsync());
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<PractitionerDto>> GetById(Guid id)
+        public async Task<ActionResult<PractitionerDto>> GetByIdAsync(Guid id)
         {
-            try
-            {
-                var result = await _practitionerService.GetByIdAsync(id);
-                return Ok(result);
-            }
-            catch (NotFoundException ex)
-            {
-                return NotFound(new { message = ex.Message });
-            }
+            return Ok(await _service.GetByIdAsync(id));
         }
+
+        [HttpGet("available")]
+        [Authorize(Roles = "SuperAdmin,MiddlePowerAdmin,SimpleAdmin")]
+        public async Task<ActionResult<IEnumerable<PractitionerDto>>> FindAvailableAsync(
+            [FromQuery] Guid serviceId, [FromQuery] Guid areaId) =>
+            Ok(await _service.FindAvailableAsync(serviceId, areaId));
 
         [HttpPut("{id}")]
         [Authorize(Roles = "SuperAdmin,MiddlePowerAdmin,SimpleAdmin")]
-        public async Task<IActionResult> Update(Guid id, UpdatePractitionerDto dto)
+        public async Task<IActionResult> UpdateAsync(Guid id, UpdatePractitionerDto dto)
         {
-            try
-            {
-                await _practitionerService.UpdateAsync(id, dto);
-                return NoContent();
-            }
-            catch (NotFoundException ex)
-            {
-                return NotFound(new { message = ex.Message });
-            }
+            await _service.UpdateAsync(id, dto);
+            return NoContent();
         }
 
-        [HttpPatch("{id}/priority")]
+        [HttpPut("{id}/priority")]
         [Authorize(Roles = "SuperAdmin,MiddlePowerAdmin,SimpleAdmin")]
-        public async Task<IActionResult> SetPriority(Guid id, [FromBody] int priority)
+        public async Task<IActionResult> SetPriorityAsync(Guid id, [FromBody] int priority)
         {
-            try
-            {
-                await _practitionerService.SetPriorityAsync(id, priority);
-                return NoContent();
-            }
-            catch (ValidationException ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-            catch (NotFoundException ex)
-            {
-                return NotFound(new { message = ex.Message });
-            }
+            await _service.SetPriorityAsync(id, priority);
+            return NoContent();
+        }
+
+        [HttpPut("{id}/share")]
+        [Authorize(Roles = "SuperAdmin,MiddlePowerAdmin,SimpleAdmin")]
+        public async Task<IActionResult> SetSharePercentageAsync(Guid id, [FromBody] decimal sharePercentage)
+        {
+            await _service.SetSharePercentageAsync(id, sharePercentage);
+            return NoContent();
         }
 
         [HttpGet("{id}/areas")]
-        public async Task<ActionResult<IEnumerable<AreaDto>>> GetAreas(Guid id)
+        public async Task<ActionResult<IEnumerable<AreaDto>>> GetAreasAsync(Guid id)
         {
-            try
-            {
-                var result = await _practitionerService.GetAreasAsync(id);
-                return Ok(result);
-            }
-            catch (NotFoundException ex)
-            {
-                return NotFound(new { message = ex.Message });
-            }
+            return Ok(await _service.GetAreasAsync(id));
         }
 
-        [HttpPost("{id}/areas/{areaId}")]
+        [HttpPost("{id}/areas")]
         [Authorize(Roles = "SuperAdmin,MiddlePowerAdmin,SimpleAdmin")]
-        public async Task<IActionResult> AssignArea(Guid id, Guid areaId)
+        public async Task<IActionResult> AssignAreaAsync(Guid id, [FromBody] Guid areaId)
         {
-            try
-            {
-                await _practitionerService.AssignAreaAsync(id, areaId);
-                return NoContent();
-            }
-            catch (NotFoundException ex)
-            {
-                return NotFound(new { message = ex.Message });
-            }
+            await _service.AssignAreaAsync(id, areaId);
+            return NoContent();
         }
 
         [HttpDelete("{id}/areas/{areaId}")]
         [Authorize(Roles = "SuperAdmin,MiddlePowerAdmin,SimpleAdmin")]
-        public async Task<IActionResult> RemoveArea(Guid id, Guid areaId)
+        public async Task<IActionResult> RemoveAreaAsync(Guid id, Guid areaId)
         {
-            try
-            {
-                await _practitionerService.RemoveAreaAsync(id, areaId);
-                return NoContent();
-            }
-            catch (NotFoundException ex)
-            {
-                return NotFound(new { message = ex.Message });
-            }
+            await _service.RemoveAreaAsync(id, areaId);
+            return NoContent();
         }
 
         private Guid GetCurrentUserId()
         {
-            var sub = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirstValue("sub");
+            var idClaim = User.FindFirst("sub") ?? User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
+            return idClaim is not null ? Guid.Parse(idClaim.Value) : Guid.Empty;
+        }
 
-            if (string.IsNullOrEmpty(sub) || !Guid.TryParse(sub, out var userId))
-            {
-                throw new ValidationException("Unable to resolve the current user from the token.");
-            }
-
-            return userId;
+        [HttpGet("search")]
+        public async Task<ActionResult<IEnumerable<PractitionerDto>>> SearchByNameAsync([FromQuery] string name)
+        {
+            return Ok(await _service.SearchByNameAsync(name));
         }
     }
 }

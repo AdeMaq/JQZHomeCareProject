@@ -1,0 +1,156 @@
+<div class="edit-service-page">
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+    <div>
+      <h1>Edit Service</h1>
+
+      <p>Update the details of this healthcare service.</p>
+    </div>
+  </div>
+
+  <!-- LOADING -->
+  @if (isLoading) {
+    <div class="state-card">
+      <i class="fa-solid fa-spinner fa-spin"></i>
+
+      <p>Loading service...</p>
+    </div>
+  }
+
+  <!-- ERROR -->
+  @else if (errorMessage && !isLoading) {
+    <div class="state-card error-state">
+      <i class="fa-solid fa-triangle-exclamation"></i>
+
+      <h3>Something went wrong</h3>
+
+      <p>{{ errorMessage }}</p>
+
+      <button type="button" class="secondary-button" (click)="loadService()">
+        <i class="fa-solid fa-rotate-right"></i>
+        Try Again
+      </button>
+    </div>
+  }
+
+  <!-- FORM -->
+  @else {
+    <div class="form-card">
+      <!-- CARD HEADER -->
+      <div class="form-card-header">
+        <div>
+          <h2>Service Information</h2>
+
+          <p>Update the details of the healthcare service.</p>
+        </div>
+      </div>
+
+      <!-- FORM BODY -->
+      <form [formGroup]="serviceForm" (ngSubmit)="updateService()" novalidate>
+        <!-- SERVICE NAME -->
+        <div class="form-group">
+          <label for="serviceName">
+            Service Name
+            <span class="required">*</span>
+          </label>
+
+          <input
+            id="serviceName"
+            type="text"
+            formControlName="name"
+            placeholder="Enter service name"
+          />
+
+          <small> Enter the name of the healthcare service. </small>
+
+          @if (nameControl.invalid && nameControl.touched) {
+            <div class="validation-message">
+              @if (nameControl.errors?.['required']) {
+                <span>Service name is required.</span>
+              }
+
+              @if (nameControl.errors?.['minlength']) {
+                <span> Service name must be at least 2 characters. </span>
+              }
+            </div>
+          }
+        </div>
+
+        <!-- SERVICE CATEGORY -->
+        <div class="form-group">
+          <label for="serviceCategory">
+            Service Category
+            <span class="required">*</span>
+          </label>
+
+          <select id="serviceCategory" formControlName="serviceCategoryId">
+            <option value="" disabled>Select a service category</option>
+
+            @for (category of categories; track category.id) {
+              <option [value]="category.id">
+                {{ category.name }}
+              </option>
+            }
+          </select>
+
+          <small> Select the category this service belongs to. </small>
+
+          @if (categoryControl.invalid && categoryControl.touched) {
+            <div class="validation-message">Service category is required.</div>
+          }
+        </div>
+
+        <!-- DESCRIPTION -->
+        <div class="form-group">
+          <label for="description"> Description </label>
+
+          <textarea
+            id="description"
+            rows="5"
+            formControlName="description"
+            placeholder="Enter service description"
+          ></textarea>
+
+          <small> Provide a short description of the service. </small>
+        </div>
+
+        <!-- SUCCESS -->
+        @if (successMessage) {
+          <div class="success-message">
+            <i class="fa-solid fa-circle-check"></i>
+
+            {{ successMessage }}
+          </div>
+        }
+
+        <!-- ERROR -->
+        @if (errorMessage) {
+          <div class="form-error-message">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+
+            {{ errorMessage }}
+          </div>
+        }
+
+        <!-- ACTIONS -->
+        <div class="form-actions">
+          <button type="button" class="cancel-button" (click)="cancel()" [disabled]="isSaving">
+            <i class="fa-solid fa-xmark"></i>
+
+            Cancel
+          </button>
+
+          <button type="submit" class="primary-button" [disabled]="isSaving">
+            @if (isSaving) {
+              <i class="fa-solid fa-spinner fa-spin"></i>
+              Updating...
+            } @else {
+              <i class="fa-solid fa-check"></i>
+              Update Service
+            }
+          </button>
+        </div>
+      </form>
+    </div>
+  }
+</div>

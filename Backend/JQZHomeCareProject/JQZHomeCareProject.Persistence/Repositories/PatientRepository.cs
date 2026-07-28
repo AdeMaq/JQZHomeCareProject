@@ -27,6 +27,13 @@ namespace JQZHomeCareProject.Persistence.Repositories
                 .FirstOrDefaultAsync(p => p.Phone == phone);
         }
 
+        public async Task<IEnumerable<Patient>> GetAllAsync()
+        {
+            return await _context.Patients
+                .Include(p => p.Location)
+                .ToListAsync();
+        }
+
         public async Task AddAsync(Patient patient)
         {
             await _context.Patients.AddAsync(patient);
@@ -36,6 +43,20 @@ namespace JQZHomeCareProject.Persistence.Repositories
         public async Task UpdateAsync(Patient patient)
         {
             _context.Patients.Update(patient);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task IncrementVisitCountAsync(Guid patientId)
+        {
+            await IncrementVisitCountAsync(patientId, 1);
+        }
+
+        public async Task IncrementVisitCountAsync(Guid patientId, int by)
+        {
+            var patient = await _context.Patients.FindAsync(patientId);
+            if (patient is null) return;
+
+            patient.VisitCount += by;
             await _context.SaveChangesAsync();
         }
     }

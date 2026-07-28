@@ -29,5 +29,10 @@ namespace JQZHomeCareProject.Persistence.Repositories
             _context.Locations.Update(location);
             await _context.SaveChangesAsync();
         }
+
+        public async Task<Location?> GetByIdAsync(Guid id)
+        {
+            return await _context.Locations.FindAsync(id);
+        }
     }
 }

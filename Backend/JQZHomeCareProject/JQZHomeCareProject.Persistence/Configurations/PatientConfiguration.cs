@@ -15,17 +15,14 @@ namespace JQZHomeCareProject.Persistence.Configurations
 
             builder.HasKey(p => p.Id);
 
-            builder.Property(p => p.Name)
-                .IsRequired()
-                .HasMaxLength(200);
+            builder.Property(p => p.Name).IsRequired().HasMaxLength(150);
+            builder.Property(p => p.Phone).IsRequired().HasMaxLength(20);
 
-            builder.Property(p => p.Phone)
-                .IsRequired()
-                .HasMaxLength(30);
-
+            builder.HasIndex(p => p.Phone).IsUnique();
             builder.HasOne(p => p.Location)
                 .WithMany(l => l.Patients)
                 .HasForeignKey(p => p.LocationId)
+                .IsRequired()
                 .OnDelete(DeleteBehavior.Restrict);
         }
     }

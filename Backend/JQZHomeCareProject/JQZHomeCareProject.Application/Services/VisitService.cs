@@ -128,7 +128,6 @@ namespace JQZHomeCareProject.Application.Services
                 PractitionerId = dto.PractitionerId,
                 AreaId = dto.AreaId,
                 ServiceId = dto.ServiceId,
-                PackageId = dto.PackageId,
                 ScheduledDate = dto.ScheduledDate,
                 TimeSlot = dto.TimeSlot,
                 Status = VisitStatus.Scheduled,
@@ -323,11 +322,6 @@ namespace JQZHomeCareProject.Application.Services
                 ServiceId = visit.ServiceId,
                 ServiceName = visit.Service?.Name ?? string.Empty,
 
-                PackageId = visit.PackageId,
-                PackageName = visit.Package?.Name,
-
-                ScheduledDate = visit.ScheduledDate,
-                TimeSlot = visit.TimeSlot,
                 Status = visit.Status,
                 AmountDue = visit.AmountDue,
                 AmountReceived = visit.AmountReceived,
@@ -389,7 +383,6 @@ namespace JQZHomeCareProject.Application.Services
             visit.PractitionerId = dto.PractitionerId;
             visit.AreaId = dto.AreaId;
             visit.ServiceId = dto.ServiceId;
-            visit.PackageId = dto.PackageId;
             visit.ScheduledDate = dto.ScheduledDate;
             visit.TimeSlot = dto.TimeSlot;
             visit.AmountDue = dto.AmountDue;

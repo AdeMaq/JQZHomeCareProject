@@ -47,7 +47,6 @@ builder.Services.AddScoped<IAreaService, JQZHomeCareProject.Application.Services
 builder.Services.AddScoped<IPackageService, JQZHomeCareProject.Application.Services.PackageService>();
 builder.Services.AddScoped<IServiceService, JQZHomeCareProject.Application.Services.ServiceService>();
 builder.Services.AddScoped<ILocationRepository, JQZHomeCareProject.Persistence.Repositories.LocationRepository>();
-builder.Services.AddScoped<IPatientRepository, JQZHomeCareProject.Persistence.Repositories.PatientRepository>();
 builder.Services.AddScoped<IVisitService, JQZHomeCareProject.Application.Services.VisitService>(); 
 builder.Services.AddScoped<IDashboardService, JQZHomeCareProject.Application.Services.DashboardService>();
 builder.Services.AddScoped<IRatingService, JQZHomeCareProject.Application.Services.RatingService>();
@@ -55,6 +54,8 @@ builder.Services.AddScoped<IPaymentService, JQZHomeCareProject.Application.Servi
 builder.Services.AddScoped<IUserService, JQZHomeCareProject.Application.Services.UserService>();
 builder.Services.AddScoped<ICityService, JQZHomeCareProject.Application.Services.CityService>();
 builder.Services.AddScoped<IServiceCategoryService, JQZHomeCareProject.Application.Services.ServiceCategoryService>();
+builder.Services.AddScoped<IPatientService, JQZHomeCareProject.Application.Services.PatientService>();
+builder.Services.AddScoped<IPatientPackageService, JQZHomeCareProject.Application.Services.PatientPackageService>();
 
 
 

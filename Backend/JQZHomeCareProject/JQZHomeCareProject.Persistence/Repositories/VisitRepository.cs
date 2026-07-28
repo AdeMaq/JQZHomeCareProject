@@ -20,7 +20,6 @@ namespace JQZHomeCareProject.Persistence.Repositories
                 .Include(v => v.Practitioner)
                 .Include(v => v.Area)
                 .Include(v => v.Service)
-                .Include(v => v.Package)
                 .Include(v => v.Refusals);
         }
 
@@ -40,7 +39,7 @@ namespace JQZHomeCareProject.Persistence.Repositories
         public async Task<IEnumerable<Visit>> GetByDateAsync(DateTime date)
         {
             return await IncludeGraph()
-                .Where(v => v.ScheduledDate.Date == date.Date)
+                .Where(v => v.ScheduledDate == date.Date)
                 .OrderBy(v => v.ScheduledDate)
                 .AsNoTracking()
                 .ToListAsync();
@@ -50,7 +49,7 @@ namespace JQZHomeCareProject.Persistence.Repositories
         {
             var today = DateTime.UtcNow.Date;
 
-            var query = IncludeGraph().Where(v => v.ScheduledDate.Date == today);
+            var query = IncludeGraph().Where(v => v.ScheduledDate == today);
 
             if (practitionerId.HasValue)
             {
@@ -72,7 +71,7 @@ namespace JQZHomeCareProject.Persistence.Repositories
         public async Task<IEnumerable<Visit>> GetInRangeAsync(DateTime from, DateTime to)
         {
             return await IncludeGraph()
-                .Where(v => v.ScheduledDate.Date >= from.Date && v.ScheduledDate.Date <= to.Date)
+                .Where(v => v.ScheduledDate >= from && v.ScheduledDate <= to)
                 .OrderBy(v => v.ScheduledDate)
                 .AsNoTracking()
                 .ToListAsync();

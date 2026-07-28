@@ -1,0 +1,394 @@
+/* =========================
+   PAGE
+========================= */
+
+.add-service-page {
+  width: 100%;
+  padding: 32px 38px 48px;
+  box-sizing: border-box;
+}
+
+/* =========================
+   PAGE HEADER
+========================= */
+
+.page-header {
+  margin-bottom: 24px;
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.header-content h1 {
+  margin: 0 0 7px;
+  color: #102a56;
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.header-content p {
+  margin: 0;
+  color: #718096;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* =========================
+   FORM CARD
+========================= */
+
+.form-card {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  background: #ffffff;
+  border: 1px solid #e5eaf2;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(15, 42, 86, 0.05);
+  overflow: hidden;
+}
+
+/* =========================
+   FORM HEADER
+========================= */
+
+.form-header {
+  padding: 22px 26px;
+  border-bottom: 1px solid #edf0f5;
+}
+
+.form-header h3 {
+  margin: 0 0 6px;
+  color: #102a56;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.form-header p {
+  margin: 0;
+  color: #718096;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* =========================
+   FORM
+========================= */
+
+form {
+  padding: 28px 26px 26px;
+}
+
+.form-group {
+  margin-bottom: 24px;
+}
+
+.form-group:last-of-type {
+  margin-bottom: 8px;
+}
+
+/* =========================
+   LABEL
+========================= */
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  color: #263b5b;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.required {
+  margin-left: 2px;
+  color: #ef4444;
+}
+
+/* =========================
+   INPUTS
+========================= */
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #d8e0eb;
+  border-radius: 7px;
+  background: #ffffff;
+  color: #263b5b;
+  font-family: inherit;
+  font-size: 14px;
+  outline: none;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.form-group input,
+.form-group select {
+  height: 44px;
+  padding: 0 13px;
+}
+
+.form-group textarea {
+  min-height: 120px;
+  padding: 12px 13px;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+/* =========================
+   PLACEHOLDER
+========================= */
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+  color: #a0aec0;
+}
+
+/* =========================
+   FOCUS
+========================= */
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+/* =========================
+   DISABLED
+========================= */
+
+.form-group input:disabled,
+.form-group select:disabled,
+.form-group textarea:disabled {
+  background: #f7f9fc;
+  color: #94a3b8;
+  cursor: not-allowed;
+}
+
+/* =========================
+   HELP TEXT
+========================= */
+
+.form-group small {
+  display: block;
+  margin-top: 7px;
+  color: #8a98ab;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+/* =========================
+   LOADING FIELD
+========================= */
+
+.loading-field {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  height: 44px;
+  padding: 0 13px;
+  box-sizing: border-box;
+  border: 1px solid #d8e0eb;
+  border-radius: 7px;
+  background: #f8fafc;
+  color: #718096;
+  font-size: 13px;
+}
+
+.loading-field i {
+  color: #2563eb;
+}
+
+/* =========================
+   ERROR MESSAGE
+========================= */
+
+.error-message {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 22px 26px 0;
+  padding: 12px 14px;
+  border: 1px solid #fecaca;
+  border-radius: 7px;
+  background: #fef2f2;
+  color: #b91c1c;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.error-message i {
+  margin-top: 2px;
+}
+
+/* =========================
+   FIELD ERROR
+========================= */
+
+.field-error {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 7px;
+  color: #b91c1c;
+  font-size: 12px;
+}
+
+.field-error button {
+  padding: 4px 9px;
+  border: 0;
+  border-radius: 5px;
+  background: #fee2e2;
+  color: #b91c1c;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.field-error button:hover {
+  background: #fecaca;
+}
+
+/* =========================
+   WARNING
+========================= */
+
+.warning-text {
+  color: #b7791f !important;
+}
+
+/* =========================
+   FORM ACTIONS
+========================= */
+
+.form-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 30px;
+  padding-top: 22px;
+  border-top: 1px solid #edf0f5;
+}
+
+/* =========================
+   BUTTONS
+========================= */
+
+.primary-button,
+.secondary-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 42px;
+  padding: 0 17px;
+  border-radius: 7px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.1s ease;
+}
+
+.primary-button {
+  border: 1px solid #2563eb;
+  background: #2563eb;
+  color: #ffffff;
+}
+
+.primary-button:hover:not(:disabled) {
+  background: #1d4ed8;
+  border-color: #1d4ed8;
+  box-shadow: 0 3px 8px rgba(37, 99, 235, 0.2);
+}
+
+.secondary-button {
+  border: 1px solid #d8e0eb;
+  background: #ffffff;
+  color: #526581;
+}
+
+.secondary-button:hover:not(:disabled) {
+  border-color: #c3cedd;
+  background: #f8fafc;
+  color: #263b5b;
+}
+
+.primary-button:active:not(:disabled),
+.secondary-button:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.primary-button:disabled,
+.secondary-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 900px) {
+  .add-service-page {
+    padding: 26px 24px 40px;
+  }
+
+  .form-card {
+    max-width: none;
+  }
+}
+
+@media (max-width: 600px) {
+  .add-service-page {
+    padding: 20px 16px 32px;
+  }
+
+  .header-content {
+    display: block;
+  }
+
+  .header-content h1 {
+    font-size: 24px;
+  }
+
+  .form-header {
+    padding: 20px;
+  }
+
+  form {
+    padding: 22px 20px;
+  }
+
+  .error-message {
+    margin-left: 20px;
+    margin-right: 20px;
+  }
+
+  .form-actions {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+
+  .primary-button,
+  .secondary-button {
+    width: 100%;
+  }
+}

@@ -1,1 +1,165 @@
-<p>services-list works!</p>
+<div class="services-page">
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+    <div class="header-content">
+      <div>
+        <h1>Services</h1>
+
+        <p>Manage healthcare services available in the clinic.</p>
+      </div>
+
+      <div class="header-actions">
+        <button type="button" class="secondary-button" (click)="viewCategories()">
+          <i class="fa-solid fa-layer-group"></i>
+
+          <span>Service Categories</span>
+        </button>
+
+        <button type="button" class="primary-button" (click)="addService()">
+          <i class="fa-solid fa-plus"></i>
+
+          <span>Add Service</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SUMMARY -->
+  <div class="summary-card">
+    <div class="summary-content">
+      <span class="summary-label">Total Services</span>
+
+      <strong>
+        {{ services.length }}
+      </strong>
+    </div>
+
+    <div class="summary-icon">
+      <i class="fa-solid fa-hand-holding-medical"></i>
+    </div>
+  </div>
+
+  <!-- SERVICES TABLE -->
+  <div class="table-section">
+    <!-- TABLE HEADER -->
+    <div class="table-header">
+      <div>
+        <h3>All Services</h3>
+
+        <p>View and manage healthcare services.</p>
+      </div>
+
+      @if (!isLoading && !errorMessage) {
+        <span class="service-count">
+          {{ services.length }}
+          {{ services.length === 1 ? 'service' : 'services' }}
+        </span>
+      }
+    </div>
+
+    <!-- LOADING -->
+    @if (isLoading) {
+      <div class="table-state">
+        <i class="fa-solid fa-spinner fa-spin"></i>
+
+        <p>Loading services...</p>
+      </div>
+    }
+
+    <!-- ERROR -->
+    @else if (errorMessage) {
+      <div class="table-state error-state">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+
+        <p>{{ errorMessage }}</p>
+
+        <button type="button" (click)="loadServices()">Try Again</button>
+      </div>
+    }
+
+    <!-- EMPTY -->
+    @else if (services.length === 0) {
+      <div class="table-state empty-state">
+        <i class="fa-solid fa-hand-holding-medical"></i>
+
+        <h4>No services found</h4>
+
+        <p>No healthcare services have been added yet.</p>
+
+        <button type="button" class="primary-button" (click)="addService()">
+          <i class="fa-solid fa-plus"></i>
+
+          Add Service
+        </button>
+      </div>
+    }
+
+    <!-- DATA TABLE -->
+    @else {
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Service Name</th>
+              <th>Category</th>
+              <th>Description</th>
+              <th class="actions-column">Actions</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            @for (service of services; track service.id) {
+              <tr>
+                <td>
+                  <div class="service-name">
+                    <div class="service-icon">
+                      <i class="fa-solid fa-hand-holding-medical"></i>
+                    </div>
+
+                    <strong>
+                      {{ service.name }}
+                    </strong>
+                  </div>
+                </td>
+
+                <td>
+                  <span class="category-badge">
+                    {{ service.serviceCategoryName || '-' }}
+                  </span>
+                </td>
+
+                <td>
+                  <span class="description">
+                    {{ service.description || '-' }}
+                  </span>
+                </td>
+
+                <td class="actions-column">
+                  <div class="row-actions">
+                    <button
+                      type="button"
+                      class="action-button edit-button"
+                      title="Edit service"
+                      (click)="editService(service)"
+                    >
+                      <i class="fa-solid fa-pen"></i>
+                    </button>
+
+                    <button
+                      type="button"
+                      class="action-button delete-button"
+                      title="Delete service"
+                      (click)="deleteService(service)"
+                    >
+                      <i class="fa-solid fa-trash"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+</div>

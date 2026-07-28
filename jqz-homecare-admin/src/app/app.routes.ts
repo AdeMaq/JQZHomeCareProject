@@ -13,6 +13,11 @@ import { AddVisit } from './features/visits/add-visit/add-visit';
 import { EditVisit } from './features/visits/edit-visit/edit-visit';
 import { VisitDetails } from './features/visits/visit-details/visit-details';
 
+// Services
+import { ServicesList } from './features/services/services-list/services-list';
+import { AddService } from './features/services/add-service/add-service';
+import { ServiceCategories } from './features/services/service-categories/service-categories';
+
 export const routes: Routes = [
   // =========================
   // DEFAULT ROUTE
@@ -93,6 +98,29 @@ export const routes: Routes = [
       {
         path: 'visits',
         component: VisitsList,
+      },
+
+      // =========================
+      // SERVICES
+      // =========================
+
+      {
+        path: 'services/add',
+        component: AddService,
+      },
+
+      {
+        path: 'services',
+        component: ServicesList,
+      },
+
+      // =========================
+      // SERVICE CATEGORIES
+      // =========================
+
+      {
+        path: 'service-categories',
+        component: ServiceCategories,
       },
     ],
   },

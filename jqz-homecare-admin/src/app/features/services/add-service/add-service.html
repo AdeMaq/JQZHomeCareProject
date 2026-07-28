@@ -1,1 +1,146 @@
-<p>add-service works!</p>
+<div class="add-service-page">
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+    <div class="header-content">
+      <div>
+        <h1>Add Service</h1>
+
+        <p>Create a new healthcare service for the clinic.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- FORM CARD -->
+  <div class="form-card">
+    <div class="form-header">
+      <div>
+        <h3>Service Information</h3>
+
+        <p>Enter the details for the new healthcare service.</p>
+      </div>
+    </div>
+
+    <!-- ERROR MESSAGE -->
+    @if (errorMessage) {
+      <div class="error-message">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+
+        <span>
+          {{ errorMessage }}
+        </span>
+      </div>
+    }
+
+    <!-- FORM -->
+    <form (ngSubmit)="createService()">
+      <!-- SERVICE NAME -->
+      <div class="form-group">
+        <label for="serviceName">
+          Service Name
+          <span class="required">*</span>
+        </label>
+
+        <input
+          id="serviceName"
+          type="text"
+          name="serviceName"
+          [(ngModel)]="serviceName"
+          placeholder="Enter service name"
+          [disabled]="isSaving"
+        />
+
+        <small> Enter the name of the healthcare service. </small>
+      </div>
+
+      <!-- SERVICE CATEGORY -->
+      <div class="form-group">
+        <label for="serviceCategory">
+          Service Category
+          <span class="required">*</span>
+        </label>
+
+        @if (isLoadingCategories) {
+          <div class="loading-field">
+            <i class="fa-solid fa-spinner fa-spin"></i>
+
+            <span>Loading categories...</span>
+          </div>
+        } @else {
+          <select
+            id="serviceCategory"
+            name="serviceCategoryId"
+            [(ngModel)]="serviceCategoryId"
+            [disabled]="isSaving || categories.length === 0"
+          >
+            <option value="">Select a service category</option>
+
+            @for (category of categories; track category.id) {
+              <option [value]="category.id">
+                {{ category.name }}
+              </option>
+            }
+          </select>
+        }
+
+        @if (categoryErrorMessage) {
+          <div class="field-error">
+            <span>
+              {{ categoryErrorMessage }}
+            </span>
+
+            <button type="button" (click)="loadCategories()" [disabled]="isLoadingCategories">
+              Try Again
+            </button>
+          </div>
+        } @else if (!isLoadingCategories && categories.length === 0) {
+          <small class="warning-text">
+            No service categories are available. Please create a category first.
+          </small>
+        } @else {
+          <small> Select the category this service belongs to. </small>
+        }
+      </div>
+
+      <!-- DESCRIPTION -->
+      <div class="form-group">
+        <label for="description"> Description </label>
+
+        <textarea
+          id="description"
+          name="description"
+          [(ngModel)]="description"
+          rows="5"
+          placeholder="Enter service description"
+          [disabled]="isSaving"
+        ></textarea>
+
+        <small> Provide a short description of the service. </small>
+      </div>
+
+      <!-- FORM ACTIONS -->
+      <div class="form-actions">
+        <button type="button" class="secondary-button" (click)="cancel()" [disabled]="isSaving">
+          <i class="fa-solid fa-xmark"></i>
+
+          <span> Cancel </span>
+        </button>
+
+        <button
+          type="submit"
+          class="primary-button"
+          [disabled]="isSaving || isLoadingCategories || categories.length === 0"
+        >
+          @if (isSaving) {
+            <i class="fa-solid fa-spinner fa-spin"></i>
+
+            <span> Creating... </span>
+          } @else {
+            <i class="fa-solid fa-plus"></i>
+
+            <span> Create Service </span>
+          }
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

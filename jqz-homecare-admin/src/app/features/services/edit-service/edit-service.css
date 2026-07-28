@@ -1,0 +1,352 @@
+/* =========================================
+   EDIT SERVICE PAGE
+========================================= */
+
+.edit-service-page {
+  padding: 32px 40px 48px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* =========================================
+   PAGE HEADER
+========================================= */
+
+.page-header {
+  margin-bottom: 24px;
+}
+
+.page-header h1 {
+  margin: 0 0 6px;
+  font-size: 28px;
+  font-weight: 700;
+  color: #172b4d;
+}
+
+.page-header p {
+  margin: 0;
+  font-size: 14px;
+  color: #718096;
+}
+
+/* =========================================
+   FORM CARD
+========================================= */
+
+.form-card {
+  width: min(100%, 720px);
+  margin: 0 auto;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+  overflow: hidden;
+}
+
+/* =========================================
+   FORM CARD HEADER
+========================================= */
+
+.form-card-header {
+  padding: 22px 24px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.form-card-header h2 {
+  margin: 0 0 5px;
+  font-size: 17px;
+  font-weight: 700;
+  color: #172b4d;
+}
+
+.form-card-header p {
+  margin: 0;
+  font-size: 13px;
+  color: #718096;
+}
+
+/* =========================================
+   FORM
+========================================= */
+
+form {
+  padding: 24px;
+}
+
+.form-group {
+  margin-bottom: 22px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 7px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #243b53;
+}
+
+.required {
+  color: #e53e3e;
+  margin-left: 2px;
+}
+
+/* =========================================
+   INPUTS
+========================================= */
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #cbd5e0;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #243b53;
+  font-family: inherit;
+  font-size: 14px;
+  outline: none;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.form-group input,
+.form-group select {
+  height: 42px;
+  padding: 0 12px;
+}
+
+.form-group textarea {
+  min-height: 120px;
+  padding: 11px 12px;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+  color: #a0aec0;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.form-group small {
+  display: block;
+  margin-top: 6px;
+  font-size: 11px;
+  line-height: 1.4;
+  color: #8a9ab0;
+}
+
+/* =========================================
+   VALIDATION
+========================================= */
+
+.validation-message {
+  margin-top: 6px;
+  font-size: 12px;
+  color: #e53e3e;
+}
+
+.form-group input.ng-invalid.ng-touched,
+.form-group select.ng-invalid.ng-touched,
+.form-group textarea.ng-invalid.ng-touched {
+  border-color: #e53e3e;
+}
+
+.form-group input.ng-invalid.ng-touched:focus,
+.form-group select.ng-invalid.ng-touched:focus,
+.form-group textarea.ng-invalid.ng-touched:focus {
+  box-shadow: 0 0 0 3px rgba(229, 62, 62, 0.1);
+}
+
+/* =========================================
+   MESSAGES
+========================================= */
+
+.success-message,
+.form-error-message {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 11px 13px;
+  margin-bottom: 18px;
+  border-radius: 6px;
+  font-size: 13px;
+}
+
+.success-message {
+  color: #276749;
+  background: #f0fff4;
+  border: 1px solid #c6f6d5;
+}
+
+.form-error-message {
+  color: #c53030;
+  background: #fff5f5;
+  border: 1px solid #fed7d7;
+}
+
+/* =========================================
+   FORM ACTIONS
+========================================= */
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
+  padding-top: 18px;
+  border-top: 1px solid #e2e8f0;
+}
+
+/* =========================================
+   BUTTONS
+========================================= */
+
+.cancel-button,
+.primary-button,
+.secondary-button {
+  min-height: 40px;
+  padding: 0 16px;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.cancel-button {
+  color: #34495e;
+  background: #ffffff;
+  border: 1px solid #cbd5e0;
+}
+
+.cancel-button:hover:not(:disabled) {
+  background: #f7fafc;
+  border-color: #a0aec0;
+}
+
+.primary-button {
+  color: #ffffff;
+  background: #2563eb;
+  border: 1px solid #2563eb;
+}
+
+.primary-button:hover:not(:disabled) {
+  background: #1d4ed8;
+  border-color: #1d4ed8;
+}
+
+.secondary-button {
+  color: #2563eb;
+  background: #ffffff;
+  border: 1px solid #bfdbfe;
+}
+
+.secondary-button:hover:not(:disabled) {
+  background: #eff6ff;
+}
+
+.cancel-button:disabled,
+.primary-button:disabled,
+.secondary-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* =========================================
+   STATE CARD
+========================================= */
+
+.state-card {
+  width: min(100%, 720px);
+  margin: 40px auto 0;
+  padding: 40px 24px;
+  box-sizing: border-box;
+  text-align: center;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+}
+
+.state-card > i {
+  display: block;
+  margin-bottom: 14px;
+  font-size: 24px;
+  color: #2563eb;
+}
+
+.state-card p {
+  margin: 0 0 18px;
+  color: #718096;
+  font-size: 14px;
+}
+
+.state-card h3 {
+  margin: 0 0 8px;
+  color: #243b53;
+  font-size: 16px;
+}
+
+.error-state > i {
+  color: #e53e3e;
+}
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 900px) {
+  .edit-service-page {
+    padding: 28px 24px 40px;
+  }
+}
+
+@media (max-width: 600px) {
+  .edit-service-page {
+    padding: 24px 16px 32px;
+  }
+
+  .page-header h1 {
+    font-size: 24px;
+  }
+
+  .form-card {
+    width: 100%;
+  }
+
+  .form-card-header {
+    padding: 20px;
+  }
+
+  form {
+    padding: 20px;
+  }
+
+  .form-actions {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+
+  .cancel-button,
+  .primary-button {
+    width: 100%;
+  }
+}

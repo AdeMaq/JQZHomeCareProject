@@ -16,6 +16,7 @@ import { VisitDetails } from './features/visits/visit-details/visit-details';
 // Services
 import { ServicesList } from './features/services/services-list/services-list';
 import { AddService } from './features/services/add-service/add-service';
+import { EditService } from './features/services/edit-service/edit-service';
 import { ServiceCategories } from './features/services/service-categories/service-categories';
 
 export const routes: Routes = [
@@ -107,6 +108,11 @@ export const routes: Routes = [
       {
         path: 'services/add',
         component: AddService,
+      },
+
+      {
+        path: 'services/:id/edit',
+        component: EditService,
       },
 
       {

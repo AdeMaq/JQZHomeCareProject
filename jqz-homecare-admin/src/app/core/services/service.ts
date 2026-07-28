@@ -41,6 +41,7 @@ export class ServiceService {
   private http = inject(HttpClient);
 
   private readonly servicesApiUrl = 'http://localhost:5212/api/services';
+
   private readonly categoriesApiUrl = 'http://localhost:5212/api/service-categories';
 
   // =========================

@@ -10,5 +10,7 @@ namespace JQZHomeCareProject.Application.Common.Interfaces
         Task<Location?> GetLocationAsync(Guid id);
         Task AddAsync(Location location);
         Task UpdateAsync(Location location);
+        Task<Location?> GetByIdAsync(Guid id);
+
     }
 }

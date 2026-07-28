@@ -15,21 +15,15 @@ namespace JQZHomeCareProject.Persistence.Configurations
 
             builder.HasKey(p => p.Id);
 
-            builder.Property(p => p.Name)
+            builder.Property(p => p.Name).IsRequired().HasMaxLength(150);
+            builder.Property(p => p.Amount).HasColumnType("decimal(12,2)");
+
+            builder.HasOne(p => p.Service)
+                .WithMany(s => s.Packages)
+                .HasForeignKey(p => p.ServiceId)
                 .IsRequired()
-                .HasMaxLength(200);
-
-            builder.Property(p => p.NumberOfVisits)
-                .IsRequired();
-
-            builder.Property(p => p.Amount)
-                .HasColumnType("decimal(18,2)");
-
-            builder.HasMany(p => p.Visits)
-                .WithOne(v => v.Package)
-                .HasForeignKey(v => v.PackageId)
-                .IsRequired(false)
                 .OnDelete(DeleteBehavior.Restrict);
+
         }
     }
 }

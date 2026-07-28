@@ -23,6 +23,8 @@ namespace JQZHomeCareProject.Persistence
         public DbSet<PractitionerSettlement> PractitionerSettlements => Set<PractitionerSettlement>();
 
         public DbSet<Patient> Patients => Set<Patient>();
+
+        public DbSet<PatientPackage> PatientPackages => Set<PatientPackage>();
         public DbSet<Location> Locations => Set<Location>();
         public DbSet<Package> Packages => Set<Package>();
         public DbSet<Visit> Visits => Set<Visit>();

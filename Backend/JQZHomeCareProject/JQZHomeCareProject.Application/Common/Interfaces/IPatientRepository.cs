@@ -9,7 +9,11 @@ namespace JQZHomeCareProject.Application.Common.Interfaces
     {
         Task<Patient?> GetByIdAsync(Guid id);
         Task<Patient?> GetByPhoneAsync(string phone);
+        Task<IEnumerable<Patient>> GetAllAsync();
         Task AddAsync(Patient patient);
         Task UpdateAsync(Patient patient);
+        Task IncrementVisitCountAsync(Guid patientId);
+
+        Task IncrementVisitCountAsync(Guid patientId, int by);
     }
 }

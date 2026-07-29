@@ -11,10 +11,12 @@ namespace JQZHomeCareProject.Application.Common.Interfaces
         Task<IEnumerable<Visit>> GetByDateAsync(DateTime date);
         Task<IEnumerable<Visit>> GetTodayAsync(Guid? practitionerId = null);
         Task<IEnumerable<Visit>> GetByPractitionerAsync(Guid practitionerId);
+        Task<IEnumerable<Visit>> GetByPatientPackageIdAsync(Guid patientPackageId);
         Task<IEnumerable<Visit>> GetInRangeAsync(DateTime from, DateTime to);
-        Task AddAsync(Visit visit);
-        Task UpdateAsync(Visit visit);
+        Task<IEnumerable<Visit>> GetUnsettledCompletedAsync(Guid practitionerId, DateTime from, DateTime to);
         Task<IEnumerable<Visit>> GetAllAsync();
-        Task DeleteAsync(Guid id);
+        Task AddAsync(Visit visit);
+        Task AddRangeAsync(IEnumerable<Visit> visits);
+        Task UpdateAsync(Visit visit);
     }
 }

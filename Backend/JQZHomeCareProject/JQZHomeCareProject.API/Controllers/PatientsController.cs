@@ -1,4 +1,5 @@
-﻿using JQZHomeCareProject.Application.Services;
+﻿using JQZHomeCareProject.Application.DTOs;
+using JQZHomeCareProject.Application.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -35,6 +36,14 @@ namespace JQZHomeCareProject.API.Controllers
         {
             var patient = await _patientService.GetByPhoneAsync(phone);
             return patient is null ? NotFound() : Ok(patient);
+        }
+
+        [HttpPut("{id:guid}")]
+        [Authorize(Roles = "SuperAdmin,MiddlePowerAdmin,SimpleAdmin")]
+        public async Task<IActionResult> UpdateAsync(Guid id, [FromBody] UpdatePatientDto dto)
+        {
+            var updated = await _patientService.UpdateAsync(id, dto);
+            return Ok(updated);
         }
     }
 }

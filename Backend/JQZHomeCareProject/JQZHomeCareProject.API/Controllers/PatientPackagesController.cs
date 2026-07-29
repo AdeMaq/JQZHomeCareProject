@@ -1,11 +1,12 @@
-﻿using JQZHomeCareProject.Application.DTOs;
+﻿using System.Security.Claims;
+using JQZHomeCareProject.Application.DTOs;
 using JQZHomeCareProject.Application.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 namespace JQZHomeCareProject.API.Controllers
 {
+
     [ApiController]
     [Route("api/patient-packages")]
     [Authorize]
@@ -18,27 +19,28 @@ namespace JQZHomeCareProject.API.Controllers
             _patientPackageService = patientPackageService;
         }
 
+
         [HttpPost]
         [Authorize(Roles = "SuperAdmin,MiddlePowerAdmin,SimpleAdmin")]
         public async Task<IActionResult> PurchaseAsync([FromBody] PurchasePackageDto dto)
         {
-            var createdByUserId = GetCurrentUserId();
-            var patientPackage = await _patientPackageService.PurchaseAsync(dto, createdByUserId);
-            return CreatedAtAction(nameof(GetByIdAsync), new { id = patientPackage.Id }, patientPackage);
+            var createdByUserId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var result = await _patientPackageService.PurchaseAsync(dto, createdByUserId);
+            return CreatedAtAction(nameof(GetByIdAsync), new { id = result.Id }, result);
         }
 
         [HttpGet("{id:guid}")]
         public async Task<IActionResult> GetByIdAsync(Guid id)
         {
-            var patientPackage = await _patientPackageService.GetByIdAsync(id);
-            return Ok(patientPackage);
+            var result = await _patientPackageService.GetByIdAsync(id);
+            return Ok(result);
         }
 
         [HttpGet("patient/{patientId:guid}")]
         public async Task<IActionResult> GetByPatientAsync(Guid patientId)
         {
-            var patientPackages = await _patientPackageService.GetByPatientAsync(patientId);
-            return Ok(patientPackages);
+            var results = await _patientPackageService.GetByPatientAsync(patientId);
+            return Ok(results);
         }
 
         [HttpGet("{id:guid}/visits")]
@@ -54,12 +56,6 @@ namespace JQZHomeCareProject.API.Controllers
         {
             await _patientPackageService.RecordInstallmentAsync(id, dto);
             return NoContent();
-        }
-
-        private Guid GetCurrentUserId()
-        {
-            var idClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            return Guid.TryParse(idClaim, out var userId) ? userId : Guid.Empty;
         }
     }
 }

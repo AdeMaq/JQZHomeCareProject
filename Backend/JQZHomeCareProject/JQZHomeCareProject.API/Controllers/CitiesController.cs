@@ -43,7 +43,7 @@ namespace JQZHomeCareProject.API.Controllers
         public async Task<IActionResult> CreateAsync([FromBody] CreateCityDto dto)
         {
             var city = await _cityService.CreateAsync(dto);
-            return CreatedAtAction("GetById", new { id = city.Id }, city);
+            return CreatedAtAction(nameof(GetByIdAsync), new { id = city.Id }, city);
         }
 
         [HttpPut("{id:guid}")]

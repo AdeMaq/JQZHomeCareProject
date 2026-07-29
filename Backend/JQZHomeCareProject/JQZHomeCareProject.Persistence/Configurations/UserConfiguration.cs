@@ -34,10 +34,10 @@ namespace JQZHomeCareProject.Persistence.Configurations
                 .HasMaxLength(500);
 
             builder.HasOne(u => u.Practitioner)
-                .WithMany()
-                .HasForeignKey(u => u.PractitionerId)
-                .IsRequired(false)
-                .OnDelete(DeleteBehavior.SetNull);
+            .WithOne(p => p.User)
+            .HasForeignKey<User>(u => u.PractitionerId)
+            .IsRequired(false)
+            .OnDelete(DeleteBehavior.SetNull);
         }
     }
 }

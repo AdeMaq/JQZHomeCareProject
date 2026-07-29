@@ -25,7 +25,7 @@ namespace JQZHomeCareProject.Domain.Entities
 
         public DateTime? ScheduledDate { get; set; }
         public string? TimeSlot { get; set; }
-        public VisitStatus Status { get; set; }
+        public VisitStatus Status { get; set; } = VisitStatus.Scheduled;
 
         public DateTime? CheckInTime { get; set; }
         public string? CheckInLocation { get; set; }

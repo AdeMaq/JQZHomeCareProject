@@ -1,14 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using JQZHomeCareProject.Application.Common.Exceptions;
-using JQZHomeCareProject.Application.DTOs;
+﻿using JQZHomeCareProject.Application.DTOs;
 using JQZHomeCareProject.Application.Services;
 using Microsoft.AspNetCore.Authorization;
-using System.Security.Claims;
+using Microsoft.AspNetCore.Mvc;
 
 namespace JQZHomeCareProject.API.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/visits")]
     [Authorize]
     public class VisitsController : ControllerBase
     {
@@ -19,196 +17,84 @@ namespace JQZHomeCareProject.API.Controllers
             _visitService = visitService;
         }
 
-        [HttpPost]
+        [HttpPut("{id:guid}/schedule")]
         [Authorize(Roles = "SuperAdmin,MiddlePowerAdmin,SimpleAdmin")]
-        public async Task<ActionResult<VisitDto>> Create(CreateVisitDto dto)
+        public async Task<IActionResult> ScheduleAsync(Guid id, [FromBody] ScheduleVisitDto dto)
         {
-            var createdByUserId = GetCurrentUserId();
-
-            try
-            {
-                var result = await _visitService.CreateVisitAsync(dto, createdByUserId);
-                return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
-            }
-            catch (ValidationException ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-            catch (NotFoundException ex)
-            {
-                return NotFound(new { message = ex.Message });
-            }
+            await _visitService.ScheduleVisitAsync(id, dto);
+            return NoContent();
         }
 
         [HttpGet("today")]
-        public async Task<ActionResult<IEnumerable<VisitDto>>> GetToday([FromQuery] Guid? practitionerId)
+        public async Task<IActionResult> GetTodayAsync([FromQuery] Guid? practitionerId)
         {
-            var result = await _visitService.GetTodayVisitsAsync(practitionerId);
-            return Ok(result);
+            var visits = await _visitService.GetTodayVisitsAsync(practitionerId);
+            return Ok(visits);
         }
 
-        [HttpGet("by-date/{date}")]
-        public async Task<ActionResult<IEnumerable<VisitDto>>> GetByDate(DateTime date)
+        [HttpGet("by-date")]
+        public async Task<IActionResult> GetAllAsync([FromQuery] DateTime? date)
         {
-            var result = await _visitService.GetByDateAsync(date);
-            return Ok(result);
-        }
-
-        [HttpGet("{id}")]
-        public async Task<ActionResult<VisitDto>> GetById(Guid id)
-        {
-            try
-            {
-                var result = await _visitService.GetByIdAsync(id);
-                return Ok(result);
-            }
-            catch (NotFoundException ex)
-            {
-                return NotFound(new { message = ex.Message });
-            }
-        }
-
-        [HttpPost("{id}/accept")]
-        [Authorize(Roles = "Practitioner")]
-        public async Task<IActionResult> Accept(Guid id)
-        {
-            var practitionerId = GetCurrentPractitionerId();
-
-            try
-            {
-                await _visitService.AcceptVisitAsync(id, practitionerId);
-                return NoContent();
-            }
-            catch (NotFoundException ex)
-            {
-                return NotFound(new { message = ex.Message });
-            }
-            catch (ValidationException ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-        }
-
-        [HttpPost("{id}/checkin")]
-        [Authorize(Roles = "Practitioner")]
-        public async Task<IActionResult> CheckIn(Guid id, CheckInDto dto)
-        {
-            try
-            {
-                await _visitService.CheckInAsync(id, dto);
-                return NoContent();
-            }
-            catch (NotFoundException ex)
-            {
-                return NotFound(new { message = ex.Message });
-            }
-            catch (ValidationException ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-        }
-
-        [HttpPost("{id}/checkout")]
-        [Authorize(Roles = "Practitioner")]
-        public async Task<IActionResult> CheckOut(Guid id, CheckOutDto dto)
-        {
-            try
-            {
-                await _visitService.CheckOutAsync(id, dto);
-                return NoContent();
-            }
-            catch (NotFoundException ex)
-            {
-                return NotFound(new { message = ex.Message });
-            }
-            catch (ValidationException ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-        }
-
-        [HttpPost("{id}/cancel")]
-        [Authorize(Roles = "SuperAdmin,MiddlePowerAdmin,SimpleAdmin,Practitioner")]
-        public async Task<IActionResult> Cancel(Guid id, CancelVisitDto dto)
-        {
-            try
-            {
-                await _visitService.CancelVisitAsync(id, dto);
-                return NoContent();
-            }
-            catch (NotFoundException ex)
-            {
-                return NotFound(new { message = ex.Message });
-            }
-            catch (ValidationException ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-        }
-
-        private Guid GetCurrentUserId()
-        {
-            var sub = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirstValue("sub");
-
-            if (string.IsNullOrEmpty(sub) || !Guid.TryParse(sub, out var userId))
-            {
-                throw new ValidationException("Unable to resolve the current user from the token.");
-            }
-
-            return userId;
-        }
-
-        private Guid GetCurrentPractitionerId()
-        {
-            var practitionerIdClaim = User.FindFirstValue("practitionerId");
-
-            if (string.IsNullOrEmpty(practitionerIdClaim) || !Guid.TryParse(practitionerIdClaim, out var practitionerId))
-            {
-                throw new ValidationException("This action requires a practitioner-linked account.");
-            }
-
-            return practitionerId;
+            var visits = date.HasValue
+                ? await _visitService.GetByDateAsync(date.Value)
+                : await _visitService.GetAllAsync();
+            return Ok(visits);
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<VisitDto>>> GetAll()
+        public async Task<IActionResult> GetAllAsync()
         {
-            var result = await _visitService.GetAllAsync();
-            return Ok(result);
+            var visits = await _visitService.GetAllAsync();
+            return Ok(visits);
         }
 
-        [HttpPut("{id}")]
-        [Authorize(Roles = "SuperAdmin,MiddlePowerAdmin,SimpleAdmin")]
-        public async Task<IActionResult> Update(Guid id, UpdateVisitDto dto)
+
+
+        [HttpGet("{id:guid}")]
+        public async Task<IActionResult> GetByIdAsync(Guid id)
         {
-            try
-            {
-                await _visitService.UpdateVisitAsync(id, dto);
-                return NoContent();
-            }
-            catch (NotFoundException ex)
-            {
-                return NotFound(new { message = ex.Message });
-            }
-            catch (ValidationException ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
+            var visit = await _visitService.GetByIdAsync(id);
+            return Ok(visit);
         }
 
-        [HttpDelete("{id}")]
-        [Authorize(Roles = "SuperAdmin,MiddlePowerAdmin")]
-        public async Task<IActionResult> Delete(Guid id)
+        [HttpPut("{id:guid}/accept")]
+        [Authorize(Roles = "Practitioner")]
+        public async Task<IActionResult> AcceptAsync(Guid id, [FromQuery] Guid practitionerId)
         {
-            try
-            {
-                await _visitService.DeleteVisitAsync(id);
-                return NoContent();
-            }
-            catch (NotFoundException ex)
-            {
-                return NotFound(new { message = ex.Message });
-            }
+            await _visitService.AcceptVisitAsync(id, practitionerId);
+            return NoContent();
+        }
+
+        [HttpPut("{id:guid}/checkin")]
+        [Authorize(Roles = "Practitioner")]
+        public async Task<IActionResult> CheckInAsync(Guid id, [FromBody] CheckInDto dto)
+        {
+            await _visitService.CheckInAsync(id, dto);
+            return NoContent();
+        }
+
+        [HttpPut("{id:guid}/checkout")]
+        [Authorize(Roles = "Practitioner")]
+        public async Task<IActionResult> CheckOutAsync(Guid id, [FromBody] CheckOutDto dto)
+        {
+            await _visitService.CheckOutAsync(id, dto);
+            return NoContent();
+        }
+
+        [HttpPut("{id:guid}/cancel")]
+        [Authorize(Roles = "SuperAdmin,MiddlePowerAdmin,SimpleAdmin,Practitioner")]
+        public async Task<IActionResult> CancelAsync(Guid id, [FromBody] CancelVisitDto dto)
+        {
+            await _visitService.CancelVisitAsync(id, dto);
+            return NoContent();
+        }
+
+        [HttpPut("{id:guid}/reassign")]
+        [Authorize(Roles = "SuperAdmin,MiddlePowerAdmin,SimpleAdmin,Practitioner")]
+        public async Task<IActionResult> ReassignAsync(Guid id, [FromBody] ReassignPractitionerDto dto)
+        {
+            await _visitService.ReassignPractitionerAsync(id, dto);
+            return NoContent();
         }
     }
 }

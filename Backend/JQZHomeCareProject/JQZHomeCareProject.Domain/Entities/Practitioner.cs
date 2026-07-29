@@ -14,8 +14,9 @@ namespace JQZHomeCareProject.Domain.Entities
         public string Education { get; set; } = string.Empty;
         public int Priority { get; set; } 
         public string Phone { get; set; } = string.Empty; 
-        public decimal SharePercentage { get; set; } 
+        public decimal SharePercentage { get; set; }
 
+        public User? User { get; set; }
         public Guid CreatedByUserId { get; set; }
         public User? CreatedByUser { get; set; }
 

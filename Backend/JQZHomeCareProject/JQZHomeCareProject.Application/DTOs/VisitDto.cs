@@ -8,9 +8,9 @@ namespace JQZHomeCareProject.Application.DTOs
         public Guid Id { get; set; }
         public Guid PatientId { get; set; }
         public string PatientName { get; set; } = string.Empty;
-        public Guid PractitionerId { get; set; }
+        public Guid? PractitionerId { get; set; }
         public string? PractitionerName { get; set; }
-        public Guid AreaId { get; set; }
+        public Guid? AreaId { get; set; }
         public string? AreaName { get; set; }
         public Guid ServiceId { get; set; }
         public string? ServiceName { get; set; }
@@ -59,5 +59,12 @@ namespace JQZHomeCareProject.Application.DTOs
         public RefusedBy RefusedBy { get; set; }
 
         public string Reason { get; set; } = string.Empty;
+    }
+
+    public class AssignVisitDto
+    {
+        public Guid PractitionerId { get; set; }
+
+        public Guid AreaId { get; set; }
     }
 }

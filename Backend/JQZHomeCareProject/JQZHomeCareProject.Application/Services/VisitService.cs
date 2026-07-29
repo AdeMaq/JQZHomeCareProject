@@ -53,20 +53,6 @@ namespace JQZHomeCareProject.Application.Services
             return Map(visit);
         }
 
-        public async Task AcceptVisitAsync(Guid visitId, Guid practitionerId)
-        {
-            var visit = await GetVisitOrThrow(visitId);
-
-            if (visit.Status != VisitStatus.Scheduled)
-                throw new ValidationException("Only Scheduled visits can be accepted.");
-
-            visit.PractitionerId = practitionerId;
-            visit.Status = VisitStatus.Accepted;
-            visit.UpdatedAt = DateTime.UtcNow;
-
-            await _visitRepository.UpdateAsync(visit);
-        }
-
         public async Task CheckInAsync(Guid visitId, CheckInDto dto)
         {
             var visit = await GetVisitOrThrow(visitId);
@@ -133,6 +119,9 @@ namespace JQZHomeCareProject.Application.Services
             if (visit.Status is VisitStatus.Completed or VisitStatus.Cancelled)
                 throw new ValidationException($"Cannot reassign a visit that is already {visit.Status}.");
 
+            if (visit.PractitionerId is null)
+                throw new ValidationException("Visit has no practitioner assigned yet — use assign, not reassign.");
+
             if (visit.PractitionerId == dto.NewPractitionerId)
                 throw new ValidationException("New practitioner is the same as the currently assigned practitioner.");
 
@@ -149,10 +138,41 @@ namespace JQZHomeCareProject.Application.Services
                 visit.AreaId = dto.AreaId.Value;
 
             visit.Status = VisitStatus.Scheduled;
-
             visit.CheckInTime = null;
             visit.CheckInLocation = null;
+            visit.UpdatedAt = DateTime.UtcNow;
 
+            await _visitRepository.UpdateAsync(visit);
+        }
+
+        public async Task AssignAsync(Guid visitId, AssignVisitDto dto)
+        {
+            var visit = await GetVisitOrThrow(visitId);
+
+            if (visit.Status != VisitStatus.Scheduled)
+                throw new ValidationException("Only Scheduled visits can be assigned a practitioner.");
+
+            visit.PractitionerId = dto.PractitionerId;
+            visit.AreaId = dto.AreaId;
+            visit.UpdatedAt = DateTime.UtcNow;
+
+            await _visitRepository.UpdateAsync(visit);
+        }
+
+        public async Task AcceptVisitAsync(Guid visitId, Guid practitionerId)
+        {
+            var visit = await GetVisitOrThrow(visitId);
+
+            if (visit.Status != VisitStatus.Scheduled)
+                throw new ValidationException("Only Scheduled visits can be accepted.");
+
+            if (visit.PractitionerId is null)
+                throw new ValidationException("Visit has not been assigned a practitioner yet — call assign first.");
+
+            if (visit.PractitionerId != practitionerId)
+                throw new ValidationException("This visit is assigned to a different practitioner.");
+
+            visit.Status = VisitStatus.Accepted;
             visit.UpdatedAt = DateTime.UtcNow;
 
             await _visitRepository.UpdateAsync(visit);

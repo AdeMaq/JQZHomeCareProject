@@ -32,22 +32,21 @@ namespace JQZHomeCareProject.Persistence.Repositories
         {
             patientPackage.CreatedAt = DateTime.UtcNow;
 
+            foreach (var visit in patientPackage.Visits)
+            {
+                visit.PatientPackageId = patientPackage.Id;
+                visit.CreatedAt = DateTime.UtcNow;
+            }
+
             IExecutionStrategy strategy = _context.Database.CreateExecutionStrategy();
             await strategy.ExecuteAsync(async () =>
             {
                 await using var transaction = await _context.Database.BeginTransactionAsync();
 
                 await _context.PatientPackages.AddAsync(patientPackage);
-                await _context.SaveChangesAsync();
-
-                foreach (var visit in patientPackage.Visits)
-                {
-                    visit.PatientPackageId = patientPackage.Id;
-                    visit.CreatedAt = DateTime.UtcNow;
-                }
                 await _context.Visits.AddRangeAsync(patientPackage.Visits);
-
                 await _context.SaveChangesAsync();
+
                 await transaction.CommitAsync();
             });
         }

@@ -96,5 +96,13 @@ namespace JQZHomeCareProject.API.Controllers
             await _visitService.ReassignPractitionerAsync(id, dto);
             return NoContent();
         }
+
+        [HttpPut("{id:guid}/assign")]
+        [Authorize(Roles = "SuperAdmin,MiddlePowerAdmin,SimpleAdmin")]
+        public async Task<IActionResult> AssignAsync(Guid id, [FromBody] AssignVisitDto dto)
+        {
+            await _visitService.AssignAsync(id, dto);
+            return NoContent();
+        }
     }
 }

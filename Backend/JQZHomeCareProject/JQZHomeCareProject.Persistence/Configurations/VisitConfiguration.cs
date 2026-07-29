@@ -27,13 +27,13 @@ namespace JQZHomeCareProject.Persistence.Configurations
             builder.HasOne(v => v.Practitioner)
                 .WithMany(p => p.Visits)
                 .HasForeignKey(v => v.PractitionerId)
-                .IsRequired()
+                .IsRequired(false)
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasOne(v => v.Area)
                 .WithMany(a => a.Visits)
                 .HasForeignKey(v => v.AreaId)
-                .IsRequired()
+                .IsRequired(false)
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasOne(v => v.Service)

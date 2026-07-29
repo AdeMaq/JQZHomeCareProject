@@ -18,5 +18,6 @@ namespace JQZHomeCareProject.Application.Services
         Task CancelVisitAsync(Guid visitId, CancelVisitDto dto);
 
         Task ReassignPractitionerAsync(Guid visitId, ReassignPractitionerDto dto);
+        Task AssignAsync(Guid visitId, AssignVisitDto dto);
     }
 }

@@ -60,6 +60,7 @@ namespace JQZHomeCareProject.Application.Services
 
             var patientPackage = new PatientPackage
             {
+                Id = Guid.NewGuid(),
                 PatientId = patient.Id,
                 PackageId = package.Id,
                 PaymentType = dto.PaymentType,
@@ -78,9 +79,10 @@ namespace JQZHomeCareProject.Application.Services
             {
                 visits.Add(new Visit
                 {
+                    Id = Guid.NewGuid(),
                     PatientId = patient.Id,
                     ServiceId = package.ServiceId,
-                    PatientPackageId = patientPackage.Id, 
+                    PatientPackageId = patientPackage.Id,
                     ScheduledDate = null,
                     Status = VisitStatus.Scheduled,
                     AmountDue = perVisitAmount,

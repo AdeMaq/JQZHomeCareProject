@@ -28,24 +28,6 @@ namespace JQZHomeCareProject.Application.Services
             var refusals = await _refusalRepository.GetByDateRangeAsync(from, to);
             var result = new List<RefusalDto>();
 
-            foreach (var refusal in refusals)
-            {
-                var practitionerUser = refusal.Visit is not null
-                    ? await _userRepository.GetByPractitionerIdAsync(refusal.Visit.PractitionerId)
-                    : null;
-
-                result.Add(new RefusalDto
-                {
-                    Id = refusal.Id,
-                    VisitId = refusal.VisitId,
-                    PatientName = refusal.Visit?.Patient?.Name ?? string.Empty,
-                    PractitionerName = practitionerUser?.Name ?? string.Empty,
-                    RefusedBy = refusal.RefusedBy,
-                    Reason = refusal.Reason,
-                    Date = refusal.Date
-                });
-            }
-
             return result;
         }
 

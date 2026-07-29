@@ -12,16 +12,14 @@ namespace JQZHomeCareProject.Application.DTOs
         public string LocationAddress { get; set; } = string.Empty;
         public Guid PackageId { get; set; }
         public PackagePaymentType PaymentType { get; set; }
-        public decimal? InitialAmountPaid { get; set; } 
+        public decimal? InitialAmountPaid { get; set; }
     }
 
     public class PatientPackageDto
     {
         public Guid Id { get; set; }
-        public Guid PatientId { get; set; }
-        public string PatientName { get; set; } = string.Empty;
-        public Guid PackageId { get; set; }
-        public string PackageName { get; set; } = string.Empty;
+        public PatientDto Patient { get; set; } = new();
+        public PackageDto Package { get; set; } = new();
         public PackagePaymentType PaymentType { get; set; }
         public decimal TotalAmount { get; set; }
         public decimal AmountPaid { get; set; }

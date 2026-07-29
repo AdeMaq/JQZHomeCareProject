@@ -10,10 +10,8 @@ namespace JQZHomeCareProject.Domain.Entities
         public string Name { get; set; } = string.Empty;
         public string Phone { get; set; } = string.Empty; 
         public int VisitCount { get; set; }
-
         public Guid LocationId { get; set; }
         public Location? Location { get; set; }
-
         public ICollection<Visit> Visits { get; set; } = new List<Visit>();
         public ICollection<PatientPackage> PatientPackages { get; set; } = new List<PatientPackage>();
     }

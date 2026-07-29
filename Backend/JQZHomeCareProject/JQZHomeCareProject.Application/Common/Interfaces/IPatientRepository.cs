@@ -12,8 +12,6 @@ namespace JQZHomeCareProject.Application.Common.Interfaces
         Task<IEnumerable<Patient>> GetAllAsync();
         Task AddAsync(Patient patient);
         Task UpdateAsync(Patient patient);
-        Task IncrementVisitCountAsync(Guid patientId);
-
-        Task IncrementVisitCountAsync(Guid patientId, int by);
+        Task IncrementVisitCountAsync(Guid patientId, int count);
     }
 }

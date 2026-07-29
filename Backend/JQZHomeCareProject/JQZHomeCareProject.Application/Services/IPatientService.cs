@@ -11,5 +11,6 @@ namespace JQZHomeCareProject.Application.Services
         Task<PatientDto?> GetByPhoneAsync(string phone);
         Task<IEnumerable<PatientDto>> GetAllAsync();
         Task<PatientDto?> GetByIdAsync(Guid id);
+        Task<PatientDto> UpdateAsync(Guid id, UpdatePatientDto dto);
     }
 }

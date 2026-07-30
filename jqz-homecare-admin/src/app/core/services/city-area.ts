@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 
 // =========================
 // CITY MODELS
@@ -54,11 +54,29 @@ export class CityAreaService {
   private readonly areasApiUrl = 'http://localhost:5212/api/areas';
 
   // =========================
+  // CITY CACHE
+  // =========================
+
+  private citiesCache: City[] = [];
+
+  // =========================
   // CITIES
   // =========================
 
   getCities(): Observable<City[]> {
-    return this.http.get<City[]>(this.citiesApiUrl);
+    return this.http.get<City[]>(this.citiesApiUrl).pipe(
+      tap((cities) => {
+        this.citiesCache = cities;
+      }),
+    );
+  }
+
+  getCachedCityById(id: string): City | undefined {
+    return this.citiesCache.find((city) => city.id === id);
+  }
+
+  clearCitiesCache(): void {
+    this.citiesCache = [];
   }
 
   getCityById(id: string): Observable<City> {

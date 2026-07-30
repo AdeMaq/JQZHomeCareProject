@@ -8,6 +8,7 @@ import { AdminLayout } from './layouts/admin-layout/admin-layout';
 import { Login } from './features/auth/login/login';
 import { Dashboard } from './features/dashboard/dashboard/dashboard';
 
+// Visits
 import { VisitsList } from './features/visits/visits-list/visits-list';
 import { AddVisit } from './features/visits/add-visit/add-visit';
 import { EditVisit } from './features/visits/edit-visit/edit-visit';
@@ -18,6 +19,11 @@ import { ServicesList } from './features/services/services-list/services-list';
 import { AddService } from './features/services/add-service/add-service';
 import { EditService } from './features/services/edit-service/edit-service';
 import { ServiceCategories } from './features/services/service-categories/service-categories';
+
+// Cities
+import { CitiesList } from './features/locations/cities-list/cities-list';
+import { AddCity } from './features/locations/add-city/add-city';
+import { EditCity } from './features/locations/edit-city/edit-city';
 
 export const routes: Routes = [
   // =========================
@@ -66,7 +72,7 @@ export const routes: Routes = [
       },
 
       // =========================
-      // ADD VISIT
+      // VISITS
       // =========================
 
       {
@@ -74,27 +80,15 @@ export const routes: Routes = [
         component: AddVisit,
       },
 
-      // =========================
-      // EDIT VISIT
-      // =========================
-
       {
         path: 'visits/:id/edit',
         component: EditVisit,
       },
 
-      // =========================
-      // VISIT DETAILS
-      // =========================
-
       {
         path: 'visits/:id',
         component: VisitDetails,
       },
-
-      // =========================
-      // VISITS LIST
-      // =========================
 
       {
         path: 'visits',
@@ -127,6 +121,25 @@ export const routes: Routes = [
       {
         path: 'service-categories',
         component: ServiceCategories,
+      },
+
+      // =========================
+      // CITIES
+      // =========================
+
+      {
+        path: 'cities/add',
+        component: AddCity,
+      },
+
+      {
+        path: 'cities/:id/edit',
+        component: EditCity,
+      },
+
+      {
+        path: 'cities',
+        component: CitiesList,
       },
     ],
   },

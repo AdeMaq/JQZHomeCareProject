@@ -1,1 +1,196 @@
-<p>cities-list works!</p>
+<div class="cities-page">
+  <!-- =========================
+       PAGE HEADER
+  ========================== -->
+
+  <div class="page-header">
+    <div class="page-header-left">
+      <div class="breadcrumb">
+        <span>Locations</span>
+
+        <i class="fa-solid fa-chevron-right"></i>
+
+        <strong>Cities</strong>
+      </div>
+
+      <h1>Cities</h1>
+
+      <p>Manage cities available in the system.</p>
+    </div>
+
+    <div class="page-header-actions">
+      <button type="button" class="primary-button" (click)="addCity()">
+        <i class="fa-solid fa-plus"></i>
+        Add City
+      </button>
+    </div>
+  </div>
+
+  <!-- =========================
+       SUMMARY CARD
+  ========================== -->
+
+  <div class="summary-card">
+    <div class="summary-content">
+      <span class="summary-label"> Total Cities </span>
+
+      <strong class="summary-value">
+        {{ cities.length }}
+      </strong>
+    </div>
+
+    <div class="summary-icon">
+      <i class="fa-solid fa-city"></i>
+    </div>
+  </div>
+
+  <!-- =========================
+       CITY LIST CARD
+  ========================== -->
+
+  <div class="table-card">
+    <!-- CARD HEADER -->
+
+    <div class="table-header">
+      <div>
+        <h2>All Cities</h2>
+
+        <p>View and manage cities registered in the system.</p>
+      </div>
+
+      <span class="city-count">
+        {{ cities.length }}
+
+        {{ cities.length === 1 ? 'City' : 'Cities' }}
+      </span>
+    </div>
+
+    <!-- =========================
+         LOADING
+    ========================== -->
+
+    @if (isLoading) {
+      <div class="state-container">
+        <div class="loading-spinner"></div>
+
+        <h3>Loading cities...</h3>
+
+        <p>Please wait while we load the cities.</p>
+      </div>
+    }
+
+    <!-- =========================
+         ERROR
+    ========================== -->
+
+    @else if (errorMessage) {
+      <div class="state-container error-state">
+        <div class="state-icon error-icon">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+        </div>
+
+        <h3>Unable to load cities</h3>
+
+        <p>
+          {{ errorMessage }}
+        </p>
+
+        <button type="button" class="primary-button retry-button" (click)="loadCities()">
+          <i class="fa-solid fa-rotate-right"></i>
+          Try Again
+        </button>
+      </div>
+    }
+
+    <!-- =========================
+         EMPTY
+    ========================== -->
+
+    @else if (cities.length === 0) {
+      <div class="state-container">
+        <div class="state-icon">
+          <i class="fa-solid fa-city"></i>
+        </div>
+
+        <h3>No cities found</h3>
+
+        <p>There are currently no cities available. Add a city to get started.</p>
+
+        <button type="button" class="primary-button" (click)="addCity()">
+          <i class="fa-solid fa-plus"></i>
+          Add City
+        </button>
+      </div>
+    }
+
+    <!-- =========================
+         CITY TABLE
+    ========================== -->
+
+    @else {
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+
+              <th>City Name</th>
+
+              <th class="actions-column">Actions</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            @for (city of cities; track city.id; let i = $index) {
+              <tr>
+                <td class="index-cell">
+                  {{ i + 1 }}
+                </td>
+
+                <td>
+                  <div class="city-name-cell">
+                    <div class="city-avatar">
+                      <i class="fa-solid fa-city"></i>
+                    </div>
+
+                    <div>
+                      <strong>
+                        {{ city.name }}
+                      </strong>
+
+                      <span> City </span>
+                    </div>
+                  </div>
+                </td>
+
+                <td class="actions-cell">
+                  <!-- EDIT -->
+
+                  <button
+                    type="button"
+                    class="icon-button edit-button"
+                    title="Edit City"
+                    (click)="editCity(city.id)"
+                  >
+                    <i class="fa-solid fa-pen"></i>
+                  </button>
+
+                  <!-- DELETE -->
+
+                  <button
+                    type="button"
+                    class="icon-button delete-button"
+                    title="Delete City"
+                    (click)="deleteCity(city.id)"
+                  >
+                    <i class="fa-solid fa-trash"></i>
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+</div>

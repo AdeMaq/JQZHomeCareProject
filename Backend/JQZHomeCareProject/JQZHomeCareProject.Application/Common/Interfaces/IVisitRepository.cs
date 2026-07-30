@@ -18,5 +18,7 @@ namespace JQZHomeCareProject.Application.Common.Interfaces
         Task AddAsync(Visit visit);
         Task AddRangeAsync(IEnumerable<Visit> visits);
         Task UpdateAsync(Visit visit);
+        Task<IEnumerable<Visit>> GetByPractitionerAndDateAsync(Guid practitionerId, DateTime date);
+        Task<IEnumerable<Visit>> GetByPatientAndDateAsync(Guid patientId, DateTime date);
     }
 }

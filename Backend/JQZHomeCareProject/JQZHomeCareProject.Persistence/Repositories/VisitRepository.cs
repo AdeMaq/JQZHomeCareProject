@@ -82,5 +82,21 @@ namespace JQZHomeCareProject.Persistence.Repositories
             _context.Visits.Update(visit);
             await _context.SaveChangesAsync();
         }
+
+        public async Task<IEnumerable<Visit>> GetByPractitionerAndDateAsync(Guid practitionerId, DateTime date) =>
+            await BaseQuery()
+                .Where(v => v.PractitionerId == practitionerId
+                    && v.ScheduledDate.HasValue
+                    && v.ScheduledDate.Value.Date == date.Date
+                    && v.Status != VisitStatus.Cancelled)
+                .ToListAsync();
+
+        public async Task<IEnumerable<Visit>> GetByPatientAndDateAsync(Guid patientId, DateTime date) =>
+            await BaseQuery()
+                .Where(v => v.PatientId == patientId
+                    && v.ScheduledDate.HasValue
+                    && v.ScheduledDate.Value.Date == date.Date
+                    && v.Status != VisitStatus.Cancelled)
+                .ToListAsync();
     }
 }

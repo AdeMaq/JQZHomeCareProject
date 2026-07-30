@@ -22,6 +22,10 @@ namespace JQZHomeCareProject.Application.Services
             if (visit.Status != VisitStatus.Scheduled)
                 throw new ValidationException("Only visits in Scheduled status can have their date/time set.");
 
+
+            if (visit.PractitionerId.HasValue)
+                await EnsureNoScheduleConflictAsync(visit.PractitionerId.Value, visit.PatientId, dto.ScheduledDate, dto.TimeSlot, visit.Id);
+
             visit.ScheduledDate = dto.ScheduledDate;
             visit.TimeSlot = dto.TimeSlot;
             visit.UpdatedAt = DateTime.UtcNow;
@@ -125,6 +129,9 @@ namespace JQZHomeCareProject.Application.Services
             if (visit.PractitionerId == dto.NewPractitionerId)
                 throw new ValidationException("New practitioner is the same as the currently assigned practitioner.");
 
+            if (visit.ScheduledDate.HasValue && !string.IsNullOrWhiteSpace(visit.TimeSlot))
+                await EnsureNoScheduleConflictAsync(dto.NewPractitionerId, visit.PatientId, visit.ScheduledDate.Value, visit.TimeSlot, visit.Id);
+
             visit.Refusals.Add(new Refusal
             {
                 VisitId = visit.Id,
@@ -152,6 +159,9 @@ namespace JQZHomeCareProject.Application.Services
             if (visit.Status != VisitStatus.Scheduled)
                 throw new ValidationException("Only Scheduled visits can be assigned a practitioner.");
 
+            if (visit.ScheduledDate.HasValue && !string.IsNullOrWhiteSpace(visit.TimeSlot))
+                await EnsureNoScheduleConflictAsync(dto.PractitionerId, visit.PatientId, visit.ScheduledDate.Value, visit.TimeSlot, visit.Id);
+
             visit.PractitionerId = dto.PractitionerId;
             visit.AreaId = dto.AreaId;
             visit.UpdatedAt = DateTime.UtcNow;
@@ -176,6 +186,75 @@ namespace JQZHomeCareProject.Application.Services
             visit.UpdatedAt = DateTime.UtcNow;
 
             await _visitRepository.UpdateAsync(visit);
+        }
+
+        private const string TimeSlotFormat = "h:mm tt";
+        private async Task EnsureNoScheduleConflictAsync(
+            Guid practitionerId, DateTime scheduledDate, string timeSlot, Guid excludeVisitId)
+        {
+            if (!TryParseTimeRange(timeSlot, out var newStart, out var newEnd))
+                throw new ValidationException($"TimeSlot '{timeSlot}' is not in the expected format, e.g. '9:00 AM - 10:00 AM'.");
+
+            var sameDayVisits = await _visitRepository.GetByPractitionerAndDateAsync(practitionerId, scheduledDate);
+
+            foreach (var existing in sameDayVisits)
+            {
+                if (existing.Id == excludeVisitId) continue;
+                if (string.IsNullOrWhiteSpace(existing.TimeSlot)) continue;
+                if (!TryParseTimeRange(existing.TimeSlot, out var existingStart, out var existingEnd)) continue;
+
+                var overlaps = newStart < existingEnd && existingStart < newEnd;
+                if (overlaps)
+                {
+                    throw new ValidationException(
+                        $"Practitioner already has a visit from {existing.TimeSlot} on {scheduledDate:yyyy-MM-dd} that overlaps {timeSlot}.");
+                }
+            }
+        }
+
+        private static bool TryParseTimeRange(string timeSlot, out TimeSpan start, out TimeSpan end)
+        {
+            start = default;
+            end = default;
+
+            var parts = timeSlot.Split('-', StringSplitOptions.TrimEntries);
+            if (parts.Length != 2) return false;
+
+            if (!DateTime.TryParseExact(parts[0], TimeSlotFormat, null, System.Globalization.DateTimeStyles.None, out var startTime))
+                return false;
+            if (!DateTime.TryParseExact(parts[1], TimeSlotFormat, null, System.Globalization.DateTimeStyles.None, out var endTime))
+                return false;
+
+            start = startTime.TimeOfDay;
+            end = endTime.TimeOfDay;
+            return end > start;
+        }
+        private async Task EnsureNoScheduleConflictAsync(Guid practitionerId, Guid patientId, DateTime scheduledDate, string timeSlot, Guid excludeVisitId)
+        {
+            if (!TryParseTimeRange(timeSlot, out var newStart, out var newEnd))
+                throw new ValidationException($"TimeSlot '{timeSlot}' is not in the expected format, e.g. '9:00 AM - 10:00 AM'.");
+
+            var practitionerVisits = await _visitRepository.GetByPractitionerAndDateAsync(practitionerId, scheduledDate);
+            CheckOverlap(practitionerVisits, excludeVisitId, newStart, newEnd, scheduledDate, timeSlot, "Practitioner");
+
+            var patientVisits = await _visitRepository.GetByPatientAndDateAsync(patientId, scheduledDate);
+            CheckOverlap(patientVisits, excludeVisitId, newStart, newEnd, scheduledDate, timeSlot, "Patient");
+        }
+
+        private static void CheckOverlap( IEnumerable<Visit> sameDayVisits, Guid excludeVisitId, TimeSpan newStart, TimeSpan newEnd,DateTime scheduledDate, string timeSlot, string who)
+        {
+            foreach (var existing in sameDayVisits)
+            {
+                if (existing.Id == excludeVisitId) continue;
+                if (string.IsNullOrWhiteSpace(existing.TimeSlot)) continue;
+                if (!TryParseTimeRange(existing.TimeSlot, out var existingStart, out var existingEnd)) continue;
+
+                if (newStart < existingEnd && existingStart < newEnd)
+                {
+                    throw new ValidationException(
+                        $"{who} already has a visit from {existing.TimeSlot} on {scheduledDate:yyyy-MM-dd} that overlaps {timeSlot}.");
+                }
+            }
         }
 
         private static VisitDto Map(Visit v) => new()

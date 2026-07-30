@@ -14,12 +14,7 @@ namespace JQZHomeCareProject.Application.Services
         private readonly IVisitRepository _visitRepository;
         private readonly IPatientService _patientService;
 
-        public PatientPackageService(
-            IPatientPackageRepository patientPackageRepository,
-            IPatientRepository patientRepository,
-            IPackageRepository packageRepository,
-            IVisitRepository visitRepository,
-            IPatientService patientService)
+        public PatientPackageService(IPatientPackageRepository patientPackageRepository,IPatientRepository patientRepository,IPackageRepository packageRepository,IVisitRepository visitRepository,IPatientService patientService)
         {
             _patientPackageRepository = patientPackageRepository;
             _patientRepository = patientRepository;

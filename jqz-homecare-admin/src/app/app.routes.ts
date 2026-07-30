@@ -25,6 +25,11 @@ import { CitiesList } from './features/locations/cities-list/cities-list';
 import { AddCity } from './features/locations/add-city/add-city';
 import { EditCity } from './features/locations/edit-city/edit-city';
 
+// Areas
+import { AreasList } from './features/locations/areas-list/areas-list';
+import { AddArea } from './features/locations/add-area/add-area';
+import { EditArea } from './features/locations/edit-area/edit-area';
+
 export const routes: Routes = [
   // =========================
   // DEFAULT ROUTE
@@ -140,6 +145,25 @@ export const routes: Routes = [
       {
         path: 'cities',
         component: CitiesList,
+      },
+
+      // =========================
+      // AREAS
+      // =========================
+
+      {
+        path: 'areas/add',
+        component: AddArea,
+      },
+
+      {
+        path: 'areas/:id/edit',
+        component: EditArea,
+      },
+
+      {
+        path: 'areas',
+        component: AreasList,
       },
     ],
   },

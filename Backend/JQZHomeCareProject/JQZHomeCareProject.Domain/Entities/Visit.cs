@@ -22,7 +22,11 @@ namespace JQZHomeCareProject.Domain.Entities
         public Guid? PatientPackageId { get; set; }
         public PatientPackage? PatientPackage { get; set; }
         public DateTime? ScheduledDate { get; set; }
-        public string? TimeSlot { get; set; }
+        //public string? TimeSlot { get; set; }
+
+        public TimeSpan? SlotStart { get; set; }
+        public TimeSpan? SlotEnd { get; set; }
+
         public VisitStatus Status { get; set; }
         public DateTime? CheckInTime { get; set; }
         public string? CheckInLocation { get; set; }

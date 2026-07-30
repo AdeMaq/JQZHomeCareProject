@@ -1,1 +1,86 @@
-<p>add-city works!</p>
+<div class="add-city-page">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="breadcrumb">
+      <span>Locations</span>
+
+      <span class="breadcrumb-separator">/</span>
+
+      <span>Cities</span>
+
+      <span class="breadcrumb-separator">/</span>
+
+      <strong>Add City</strong>
+    </div>
+
+    <h1>Add City</h1>
+
+    <p>Add a new city to the system.</p>
+  </div>
+
+  <!-- Form Card -->
+  <div class="form-card">
+    <div class="form-header">
+      <div class="form-icon">
+        <i class="fa-solid fa-city"></i>
+      </div>
+
+      <div>
+        <h2>City Information</h2>
+
+        <p>Enter the details below to add a new city.</p>
+      </div>
+    </div>
+
+    <form (ngSubmit)="submit()">
+      <div class="form-body">
+        <div class="form-group">
+          <label for="cityName">
+            City Name
+            <span>*</span>
+          </label>
+
+          <input
+            id="cityName"
+            name="cityName"
+            type="text"
+            [(ngModel)]="cityName"
+            placeholder="Enter city name"
+            autocomplete="off"
+            [disabled]="isSubmitting"
+          />
+
+          <small> Enter the official name of the city. </small>
+        </div>
+
+        @if (errorMessage) {
+          <div class="error-message">
+            <i class="fa-solid fa-circle-exclamation"></i>
+
+            <span>
+              {{ errorMessage }}
+            </span>
+          </div>
+        }
+      </div>
+
+      <div class="form-footer">
+        <button type="button" class="cancel-button" (click)="cancel()" [disabled]="isSubmitting">
+          Cancel
+        </button>
+
+        <button type="submit" class="submit-button" [disabled]="isSubmitting || !cityName.trim()">
+          @if (isSubmitting) {
+            <span class="button-spinner"></span>
+
+            Adding...
+          } @else {
+            <i class="fa-solid fa-plus"></i>
+
+            Add City
+          }
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

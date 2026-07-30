@@ -17,7 +17,9 @@ namespace JQZHomeCareProject.Application.DTOs
         public Guid? PatientPackageId { get; set; }
         public string? PackageName { get; set; }
         public DateTime? ScheduledDate { get; set; }
-        public string? TimeSlot { get; set; }
+        //public string? TimeSlot { get; set; }
+        public TimeSpan? SlotStart { get; set; }
+        public TimeSpan? SlotEnd { get; set; }
         public VisitStatus Status { get; set; }
         public decimal AmountDue { get; set; }
         public decimal AmountReceived { get; set; }
@@ -41,7 +43,9 @@ namespace JQZHomeCareProject.Application.DTOs
     public class ScheduleVisitDto
     {
         public DateTime ScheduledDate { get; set; }
-        public string TimeSlot { get; set; } = string.Empty;
+        //public string TimeSlot { get; set; } = string.Empty;
+        public TimeSpan SlotStart { get; set; }
+        public TimeSpan SlotEnd { get; set; }
     }
 
     public class CancelVisitDto

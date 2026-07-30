@@ -1,0 +1,486 @@
+/* =========================
+   PAGE
+========================= */
+
+.add-city-page {
+  width: 100%;
+  padding: 28px 32px 40px;
+  box-sizing: border-box;
+}
+
+/* =========================
+   PAGE HEADER
+========================= */
+
+.page-header {
+  margin-bottom: 24px;
+}
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+
+  color: #667085;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.breadcrumb strong {
+  color: #101828;
+  font-weight: 600;
+}
+
+.breadcrumb-separator {
+  color: #98a2b3;
+}
+
+.page-header h1 {
+  margin: 0 0 6px;
+
+  color: #101828;
+  font-size: 26px;
+  line-height: 1.25;
+  font-weight: 700;
+}
+
+.page-header p {
+  margin: 0;
+
+  color: #667085;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* =========================
+   FORM CARD
+========================= */
+
+.form-card {
+  width: 100%;
+  max-width: 900px;
+
+  margin: 0 auto;
+
+  background: #ffffff;
+
+  border: 1px solid #e4e7ec;
+  border-radius: 10px;
+
+  box-shadow: 0 2px 6px rgba(16, 24, 40, 0.04);
+
+  overflow: hidden;
+}
+
+/* =========================
+   FORM HEADER
+========================= */
+
+.form-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+
+  padding: 22px 24px;
+
+  border-bottom: 1px solid #eaecf0;
+}
+
+.form-icon {
+  width: 42px;
+  height: 42px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  background: #eff4ff;
+
+  border-radius: 9px;
+
+  color: #2864e8;
+
+  font-size: 18px;
+}
+
+.form-header h2 {
+  margin: 0 0 4px;
+
+  color: #101828;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.form-header p {
+  margin: 0;
+
+  color: #667085;
+  font-size: 13px;
+}
+
+/* =========================
+   FORM BODY
+========================= */
+
+.form-body {
+  padding: 26px 24px;
+}
+
+/* =========================
+   FORM GROUP
+========================= */
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+
+  width: 100%;
+}
+
+.form-group label {
+  margin-bottom: 8px;
+
+  color: #344054;
+
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.form-group label span {
+  margin-left: 3px;
+
+  color: #d92d20;
+}
+
+.form-group input {
+  width: 100%;
+  height: 44px;
+
+  padding: 0 13px;
+
+  box-sizing: border-box;
+
+  background: #ffffff;
+
+  border: 1px solid #d0d5dd;
+  border-radius: 7px;
+
+  outline: none;
+
+  color: #101828;
+
+  font-family: inherit;
+  font-size: 14px;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.form-group input::placeholder {
+  color: #98a2b3;
+}
+
+.form-group input:focus {
+  border-color: #2864e8;
+
+  box-shadow: 0 0 0 3px rgba(40, 100, 232, 0.12);
+}
+
+.form-group input:disabled {
+  background: #f2f4f7;
+
+  cursor: not-allowed;
+
+  color: #667085;
+}
+
+.form-group small {
+  margin-top: 7px;
+
+  color: #667085;
+
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+/* =========================
+   ERROR MESSAGE
+========================= */
+
+.error-message {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+
+  margin-top: 18px;
+  padding: 11px 13px;
+
+  background: #fef3f2;
+
+  border: 1px solid #fecdca;
+  border-radius: 7px;
+
+  color: #b42318;
+
+  font-size: 13px;
+}
+
+.error-message i {
+  flex-shrink: 0;
+
+  font-size: 15px;
+}
+
+/* =========================
+   FORM FOOTER
+========================= */
+
+.form-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+
+  padding: 18px 24px;
+
+  background: #f9fafb;
+
+  border-top: 1px solid #eaecf0;
+}
+
+/* =========================
+   BUTTONS
+========================= */
+
+.cancel-button,
+.submit-button {
+  height: 40px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  padding: 0 17px;
+
+  border-radius: 7px;
+
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.cancel-button {
+  background: #ffffff;
+
+  border: 1px solid #d0d5dd;
+
+  color: #344054;
+}
+
+.cancel-button:hover:not(:disabled) {
+  background: #f9fafb;
+}
+
+.submit-button {
+  background: #2864e8;
+
+  border: 1px solid #2864e8;
+
+  color: #ffffff;
+}
+
+.submit-button:hover:not(:disabled) {
+  background: #1f55c7;
+
+  border-color: #1f55c7;
+}
+
+.cancel-button:disabled,
+.submit-button:disabled {
+  opacity: 0.6;
+
+  cursor: not-allowed;
+}
+
+/* =========================
+   BUTTON SPINNER
+========================= */
+
+.button-spinner {
+  width: 14px;
+  height: 14px;
+
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-top-color: #ffffff;
+
+  border-radius: 50%;
+
+  animation: spin 0.7s linear infinite;
+}
+
+/* =========================
+   LOADING STATE
+========================= */
+
+.state-container {
+  min-height: 260px;
+
+  padding: 60px 20px;
+
+  display: flex;
+  flex-direction: column;
+
+  align-items: center;
+  justify-content: center;
+
+  text-align: center;
+
+  box-sizing: border-box;
+}
+
+.state-container h3 {
+  margin: 16px 0 6px;
+
+  color: #101828;
+
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.state-container p {
+  max-width: 450px;
+
+  margin: 0;
+
+  color: #667085;
+
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* =========================
+   LOADING SPINNER
+========================= */
+
+.loading-spinner {
+  width: 30px;
+  height: 30px;
+
+  border: 3px solid #e4e7ec;
+  border-top-color: #2864e8;
+
+  border-radius: 50%;
+
+  animation: spin 0.7s linear infinite;
+}
+
+/* =========================
+   ERROR ICON
+========================= */
+
+.error-icon {
+  width: 42px;
+  height: 42px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin-bottom: 2px;
+
+  background: #fef3f2;
+
+  border-radius: 50%;
+
+  color: #d92d20;
+
+  font-size: 18px;
+}
+
+/* =========================
+   ANIMATION
+========================= */
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 768px) {
+  .add-city-page {
+    padding: 22px 18px 30px;
+  }
+
+  .page-header h1 {
+    font-size: 23px;
+  }
+
+  .form-card {
+    max-width: 100%;
+  }
+
+  .form-header {
+    padding: 18px;
+  }
+
+  .form-body {
+    padding: 22px 18px;
+  }
+
+  .form-footer {
+    padding: 16px 18px;
+  }
+}
+
+@media (max-width: 480px) {
+  .add-city-page {
+    padding: 18px 14px 24px;
+  }
+
+  .breadcrumb {
+    font-size: 12px;
+  }
+
+  .page-header h1 {
+    font-size: 21px;
+  }
+
+  .page-header p {
+    font-size: 13px;
+  }
+
+  .form-header {
+    align-items: flex-start;
+  }
+
+  .form-footer {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+
+  .cancel-button,
+  .submit-button {
+    width: 100%;
+  }
+}

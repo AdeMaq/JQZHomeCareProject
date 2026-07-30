@@ -1,1 +1,146 @@
-<p>edit-city works!</p>
+<div class="add-city-page">
+  <!-- =========================
+       PAGE HEADER
+  ========================== -->
+
+  <div class="page-header">
+    <div class="breadcrumb">
+      <span>Locations</span>
+
+      <span class="breadcrumb-separator">/</span>
+
+      <span>Cities</span>
+
+      <span class="breadcrumb-separator">/</span>
+
+      <strong>Edit City</strong>
+    </div>
+
+    <h1>Edit City</h1>
+
+    <p>Update the city information.</p>
+  </div>
+
+  <!-- =========================
+       ERROR STATE
+  ========================== -->
+
+  @if (errorMessage && !isLoading) {
+    <div class="form-card">
+      <div class="state-container">
+        <div class="error-icon">
+          <i class="fa-solid fa-circle-exclamation"></i>
+        </div>
+
+        <h3>Unable to load city</h3>
+
+        <p>{{ errorMessage }}</p>
+
+        <button type="button" class="submit-button" (click)="loadCity()">
+          <i class="fa-solid fa-rotate-right"></i>
+
+          Try Again
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- =========================
+       LOADING STATE
+  ========================== -->
+
+  @else if (isLoading && !cityName) {
+    <div class="form-card">
+      <div class="state-container">
+        <div class="loading-spinner"></div>
+
+        <h3>Loading city...</h3>
+
+        <p>Please wait while we load the city information.</p>
+      </div>
+    </div>
+  }
+
+  <!-- =========================
+       EDIT FORM
+  ========================== -->
+
+  @else {
+    <div class="form-card">
+      <!-- FORM HEADER -->
+
+      <div class="form-header">
+        <div class="form-icon">
+          <i class="fa-solid fa-city"></i>
+        </div>
+
+        <div>
+          <h2>City Information</h2>
+
+          <p>Update the details below.</p>
+        </div>
+      </div>
+
+      <!-- FORM -->
+
+      <form (ngSubmit)="submit()">
+        <div class="form-body">
+          <!-- CITY NAME -->
+
+          <div class="form-group">
+            <label for="cityName">
+              City Name
+
+              <span>*</span>
+            </label>
+
+            <input
+              id="cityName"
+              name="cityName"
+              type="text"
+              [(ngModel)]="cityName"
+              placeholder="Enter city name"
+              autocomplete="off"
+              [disabled]="isSubmitting"
+            />
+
+            <small> Enter the official name of the city. </small>
+          </div>
+
+          <!-- ERROR -->
+
+          @if (errorMessage) {
+            <div class="error-message">
+              <i class="fa-solid fa-circle-exclamation"></i>
+
+              <span>
+                {{ errorMessage }}
+              </span>
+            </div>
+          }
+        </div>
+
+        <!-- FORM FOOTER -->
+
+        <div class="form-footer">
+          <button type="button" class="cancel-button" (click)="cancel()" [disabled]="isSubmitting">
+            Cancel
+          </button>
+
+          <button type="submit" class="submit-button" [disabled]="isSubmitting || !cityName.trim()">
+            @if (isSubmitting) {
+              <span class="button-spinner"></span>
+
+              Saving...
+
+            } @else {
+              <i class="fa-solid fa-check"></i>
+
+              Save Changes
+            }
+          </button>
+        </div>
+      </form>
+    </div>
+  }
+</div>

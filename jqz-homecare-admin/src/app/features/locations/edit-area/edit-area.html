@@ -5,15 +5,15 @@
     ========================== -->
 
     <div class="mb-6 flex items-center gap-2 text-sm">
-      <span class="font-medium text-slate-500">Locations</span>
+      <span class="font-medium text-slate-500"> Locations </span>
 
       <i class="fa-solid fa-chevron-right text-[10px] text-slate-400"></i>
 
-      <span class="font-medium text-slate-500">Areas</span>
+      <span class="font-medium text-slate-500"> Areas </span>
 
       <i class="fa-solid fa-chevron-right text-[10px] text-slate-400"></i>
 
-      <span class="font-semibold text-slate-800">Edit Area</span>
+      <span class="font-semibold text-slate-800"> Edit Area </span>
     </div>
 
     <!-- =========================
@@ -40,77 +40,24 @@
         [disabled]="isSubmitting"
       >
         <i class="fa-solid fa-arrow-left text-xs"></i>
+
         Back to Areas
       </button>
     </div>
 
-    <!-- =========================
-         INITIAL LOADING
-         ONLY SHOW IF AREA IS NOT
-         AVAILABLE YET
-    ========================== -->
-
-    @if (!area && isLoadingArea) {
-      <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-        <div class="flex min-h-[320px] flex-col items-center justify-center px-5 py-10">
-          <div
-            class="h-8 w-8 animate-spin rounded-full border-4 border-slate-200 border-t-blue-600"
-          ></div>
-
-          <h3 class="mt-4 text-sm font-semibold text-slate-800">Loading area...</h3>
-
-          <p class="mt-1 text-xs text-slate-500">Please wait while we load the area information.</p>
-        </div>
-      </div>
-    }
-
-    <!-- =========================
-         ERROR
-    ========================== -->
-
-    @else if (!area && errorMessage) {
-      <div class="overflow-hidden rounded-2xl border border-red-200 bg-white shadow-sm">
-        <div class="flex min-h-[320px] flex-col items-center justify-center px-5 py-10 text-center">
-          <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-red-50">
-            <i class="fa-solid fa-triangle-exclamation text-lg text-red-600"></i>
-          </div>
-
-          <h3 class="mt-4 text-base font-semibold text-slate-900">Unable to load area</h3>
-
-          <p class="mt-2 max-w-md text-sm leading-6 text-slate-500">
-            {{ errorMessage }}
-          </p>
-
-          <div class="mt-5 flex flex-col gap-3 sm:flex-row">
-            <button
-              type="button"
-              class="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700"
-              (click)="retry()"
-            >
-              <i class="fa-solid fa-rotate-right text-xs"></i>
-              Try Again
-            </button>
-
-            <button
-              type="button"
-              class="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50"
-              (click)="cancel()"
-            >
-              <i class="fa-solid fa-arrow-left text-xs"></i>
-              Back to Areas
-            </button>
-          </div>
-        </div>
-      </div>
-    }
+    <!-- =========================================================
+         IMPORTANT STATE ORDER
+         
+         1. AREA EXISTS       -> SHOW FORM
+         2. NO AREA + LOADING -> SHOW LOADING
+         3. NO AREA + ERROR   -> SHOW ERROR
+    ========================================================== -->
 
     <!-- =========================
          EDIT FORM
-         IMPORTANT:
-         IF AREA EXISTS, SHOW FORM
-         ========================== -->
+    ========================== -->
 
-    @else if (area) {
+    @if (area) {
       <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
         <!-- =========================
              CARD HEADER
@@ -216,7 +163,7 @@
             </div>
 
             <!-- =========================
-                 ERROR
+                 ERROR INSIDE FORM
             ========================== -->
 
             @if (errorMessage) {
@@ -285,6 +232,82 @@
         <p class="text-xs leading-5 text-blue-700">
           Make sure the area name is correct before saving your changes.
         </p>
+      </div>
+    }
+
+    <!-- =========================
+         LOADING STATE
+         
+         Only displayed when:
+         area = null
+         AND
+         isLoadingArea = true
+    ========================== -->
+
+    @else if (isLoadingArea) {
+      <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <div class="flex min-h-[320px] flex-col items-center justify-center px-5 py-10">
+          <div
+            class="h-8 w-8 animate-spin rounded-full border-4 border-slate-200 border-t-blue-600"
+          ></div>
+
+          <h3 class="mt-4 text-sm font-semibold text-slate-800">Loading area...</h3>
+
+          <p class="mt-1 text-xs text-slate-500">Please wait while we load the area information.</p>
+        </div>
+      </div>
+    }
+
+    <!-- =========================
+         ERROR STATE
+         
+         Only displayed when:
+         area = null
+         AND
+         isLoadingArea = false
+         AND
+         errorMessage exists
+    ========================== -->
+
+    @else if (errorMessage) {
+      <div class="overflow-hidden rounded-2xl border border-red-200 bg-white shadow-sm">
+        <div class="flex min-h-[320px] flex-col items-center justify-center px-5 py-10 text-center">
+          <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-red-50">
+            <i class="fa-solid fa-triangle-exclamation text-lg text-red-600"></i>
+          </div>
+
+          <h3 class="mt-4 text-base font-semibold text-slate-900">Unable to load area</h3>
+
+          <p class="mt-2 max-w-md text-sm leading-6 text-slate-500">
+            {{ errorMessage }}
+          </p>
+
+          <div class="mt-5 flex flex-col gap-3 sm:flex-row">
+            <!-- RETRY -->
+
+            <button
+              type="button"
+              class="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700"
+              (click)="retry()"
+            >
+              <i class="fa-solid fa-rotate-right text-xs"></i>
+
+              Try Again
+            </button>
+
+            <!-- BACK -->
+
+            <button
+              type="button"
+              class="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50"
+              (click)="cancel()"
+            >
+              <i class="fa-solid fa-arrow-left text-xs"></i>
+
+              Back to Areas
+            </button>
+          </div>
+        </div>
       </div>
     }
   </div>

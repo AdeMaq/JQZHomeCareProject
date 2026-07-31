@@ -1,1 +1,227 @@
-<p>add-area works!</p>
+<div class="min-h-full bg-slate-50 px-4 py-6 sm:px-6 lg:px-8">
+  <div class="mx-auto max-w-5xl">
+    <!-- =========================
+         BREADCRUMB
+    ========================== -->
+
+    <div class="mb-6 flex items-center gap-2 text-sm">
+      <span class="font-medium text-slate-500"> Locations </span>
+
+      <i class="fa-solid fa-chevron-right text-[10px] text-slate-400"></i>
+
+      <span class="font-medium text-slate-500"> Areas </span>
+
+      <i class="fa-solid fa-chevron-right text-[10px] text-slate-400"></i>
+
+      <span class="font-semibold text-slate-800"> Add Area </span>
+    </div>
+
+    <!-- =========================
+         PAGE HEADER
+    ========================== -->
+
+    <div class="mb-8 flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+      <div>
+        <div class="mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-blue-50">
+          <i class="fa-solid fa-location-dot text-xl text-blue-600"></i>
+        </div>
+
+        <h1 class="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">Add Area</h1>
+
+        <p class="mt-2 text-sm text-slate-500 sm:text-base">
+          Add a new area and assign it to a city.
+        </p>
+      </div>
+
+      <button
+        type="button"
+        class="inline-flex w-fit items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+        (click)="cancel()"
+        [disabled]="isSubmitting"
+      >
+        <i class="fa-solid fa-arrow-left text-xs"></i>
+
+        Back to Areas
+      </button>
+    </div>
+
+    <!-- =========================
+         FORM CARD
+    ========================== -->
+
+    <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+      <!-- CARD HEADER -->
+
+      <div class="border-b border-slate-100 px-5 py-5 sm:px-7">
+        <div class="flex items-start gap-4">
+          <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-blue-50">
+            <i class="fa-solid fa-map-location-dot text-lg text-blue-600"></i>
+          </div>
+
+          <div>
+            <h2 class="text-base font-semibold text-slate-900">Area Information</h2>
+
+            <p class="mt-1 text-sm text-slate-500">Enter the details below to add a new area.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- =========================
+           FORM
+      ========================== -->
+
+      <form (ngSubmit)="submit()">
+        <div class="grid gap-6 px-5 py-6 sm:px-7 md:grid-cols-2">
+          <!-- =========================
+               AREA NAME
+          ========================== -->
+
+          <div class="md:col-span-1">
+            <label for="areaName" class="mb-2 block text-sm font-semibold text-slate-700">
+              Area Name
+
+              <span class="text-red-500">*</span>
+            </label>
+
+            <div class="relative">
+              <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
+                <i class="fa-solid fa-location-dot text-sm text-slate-400"></i>
+              </div>
+
+              <input
+                id="areaName"
+                name="areaName"
+                type="text"
+                [(ngModel)]="areaName"
+                placeholder="Enter area name"
+                autocomplete="off"
+                [disabled]="isSubmitting"
+                class="w-full rounded-lg border border-slate-300 bg-white py-3 pl-10 pr-4 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 hover:border-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 disabled:cursor-not-allowed disabled:bg-slate-50"
+              />
+            </div>
+
+            <p class="mt-2 text-xs text-slate-500">Enter the official name of the area.</p>
+          </div>
+
+          <!-- =========================
+               CITY
+          ========================== -->
+
+          <div>
+            <label for="cityId" class="mb-2 block text-sm font-semibold text-slate-700">
+              City
+
+              <span class="text-red-500">*</span>
+            </label>
+
+            <div class="relative">
+              <div
+                class="pointer-events-none absolute inset-y-0 left-0 z-10 flex items-center pl-3.5"
+              >
+                <i class="fa-solid fa-city text-sm text-slate-400"></i>
+              </div>
+
+              <select
+                id="cityId"
+                name="cityId"
+                [(ngModel)]="selectedCityId"
+                [disabled]="isSubmitting || isLoadingCities || cities.length === 0"
+                class="w-full appearance-none rounded-lg border border-slate-300 bg-white py-3 pl-10 pr-10 text-sm text-slate-900 outline-none transition hover:border-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 disabled:cursor-not-allowed disabled:bg-slate-50"
+              >
+                @if (isLoadingCities) {
+                  <option value="">Loading cities...</option>
+                } @else if (cities.length === 0) {
+                  <option value="">No cities available</option>
+                } @else {
+                  <option value="">Select a city</option>
+
+                  @for (city of cities; track city.id) {
+                    <option [value]="city.id">
+                      {{ city.name }}
+                    </option>
+                  }
+                }
+              </select>
+
+              <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3.5">
+                <i class="fa-solid fa-chevron-down text-xs text-slate-400"></i>
+              </div>
+            </div>
+
+            <p class="mt-2 text-xs text-slate-500">Select the city this area belongs to.</p>
+          </div>
+
+          <!-- =========================
+               ERROR
+          ========================== -->
+
+          @if (errorMessage) {
+            <div
+              class="flex items-start gap-3 rounded-lg border border-red-200 bg-red-50 px-4 py-3 md:col-span-2"
+            >
+              <i class="fa-solid fa-circle-exclamation mt-0.5 text-sm text-red-600"></i>
+
+              <p class="text-sm font-medium text-red-700">
+                {{ errorMessage }}
+              </p>
+            </div>
+          }
+        </div>
+
+        <!-- =========================
+             FORM FOOTER
+        ========================== -->
+
+        <div
+          class="flex flex-col-reverse gap-3 border-t border-slate-100 bg-slate-50/70 px-5 py-5 sm:flex-row sm:justify-end sm:px-7"
+        >
+          <button
+            type="button"
+            class="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+            (click)="cancel()"
+            [disabled]="isSubmitting"
+          >
+            Cancel
+          </button>
+
+          <button
+            type="submit"
+            class="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-500/20 disabled:cursor-not-allowed disabled:opacity-50"
+            [disabled]="
+              isSubmitting ||
+              isLoadingCities ||
+              cities.length === 0 ||
+              !areaName.trim() ||
+              !selectedCityId
+            "
+          >
+            @if (isSubmitting) {
+              <span
+                class="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white"
+              ></span>
+
+              Adding...
+            } @else {
+              <i class="fa-solid fa-plus text-xs"></i>
+
+              Add Area
+            }
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- =========================
+         HELP TEXT
+    ========================== -->
+
+    <div class="mt-5 flex items-start gap-3 rounded-xl border border-blue-100 bg-blue-50 px-4 py-3">
+      <i class="fa-solid fa-circle-info mt-0.5 text-sm text-blue-600"></i>
+
+      <p class="text-xs leading-5 text-blue-700">
+        Make sure the area name is correct and the appropriate city is selected before adding the
+        area.
+      </p>
+    </div>
+  </div>
+</div>

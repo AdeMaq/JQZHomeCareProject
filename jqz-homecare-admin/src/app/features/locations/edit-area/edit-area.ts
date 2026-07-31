@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 
@@ -15,6 +15,7 @@ export class EditArea implements OnInit {
   private readonly cityAreaService = inject(CityAreaService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   // =========================
   // AREA
@@ -76,6 +77,9 @@ export class EditArea implements OnInit {
     if (!this.areaId) {
       this.errorMessage = 'Invalid area ID.';
       this.isLoadingArea = false;
+
+      this.cdr.detectChanges();
+
       return;
     }
 
@@ -90,6 +94,8 @@ export class EditArea implements OnInit {
   loadArea(): void {
     this.isLoadingArea = true;
     this.errorMessage = '';
+
+    this.cdr.detectChanges();
 
     console.log('=================================');
     console.log('EDIT AREA: Loading area');
@@ -118,31 +124,26 @@ export class EditArea implements OnInit {
 
         this.selectedCityName = response.cityName ?? '';
 
-        // IMPORTANT:
-        // API request has completed.
+        // API request completed
         this.isLoadingArea = false;
 
-        // Debug logs
-        console.log('=================================');
-        console.log('AFTER SETTING LOADING FALSE');
-        console.log('isLoadingArea:', this.isLoadingArea);
-        console.log('area:', this.area);
-        console.log('areaName:', this.areaName);
-        console.log('selectedCityId:', this.selectedCityId);
-        console.log('selectedCityName:', this.selectedCityName);
-        console.log('=================================');
-
-        // Resolve city name from cities list if necessary
+        // Resolve city name if API didn't provide it
         this.resolveCityName();
 
         console.log('=================================');
-        console.log('FINAL AREA STATE');
+        console.log('EDIT AREA: FINAL STATE');
         console.log('isLoadingArea:', this.isLoadingArea);
         console.log('area:', this.area);
         console.log('areaName:', this.areaName);
         console.log('selectedCityId:', this.selectedCityId);
         console.log('selectedCityName:', this.selectedCityName);
         console.log('=================================');
+
+        // IMPORTANT:
+        // Force Angular to update the Edit Area template.
+        this.cdr.detectChanges();
+
+        console.log('EDIT AREA: Change detection triggered after area load.');
       },
 
       // =========================
@@ -165,6 +166,9 @@ export class EditArea implements OnInit {
 
         this.isLoadingArea = false;
 
+        // Force Angular to display error state
+        this.cdr.detectChanges();
+
         console.log('=================================');
         console.log('AREA LOAD ERROR STATE');
         console.log('isLoadingArea:', this.isLoadingArea);
@@ -181,6 +185,8 @@ export class EditArea implements OnInit {
 
   loadCities(): void {
     this.isLoadingCities = true;
+
+    this.cdr.detectChanges();
 
     console.log('=================================');
     console.log('EDIT AREA: Loading cities');
@@ -211,6 +217,11 @@ export class EditArea implements OnInit {
         console.log('selectedCityId:', this.selectedCityId);
         console.log('selectedCityName:', this.selectedCityName);
         console.log('=================================');
+
+        // Force Angular to update city-related UI
+        this.cdr.detectChanges();
+
+        console.log('EDIT AREA: Change detection triggered after cities load.');
       },
 
       // =========================
@@ -234,6 +245,9 @@ export class EditArea implements OnInit {
         }
 
         this.isLoadingCities = false;
+
+        // Force Angular to update city error/loading state
+        this.cdr.detectChanges();
       },
     });
   }
@@ -283,17 +297,26 @@ export class EditArea implements OnInit {
     // =========================
 
     if (!this.areaName) {
-      this.errorMessage = 'Area name is required.';
+      this.errorMessage = 'Area name is required';
+
+      this.cdr.detectChanges();
+
       return;
     }
 
     if (!this.areaId) {
       this.errorMessage = 'Invalid area ID.';
+
+      this.cdr.detectChanges();
+
       return;
     }
 
     if (!this.selectedCityId) {
       this.errorMessage = 'Area city information is missing.';
+
+      this.cdr.detectChanges();
+
       return;
     }
 
@@ -303,15 +326,13 @@ export class EditArea implements OnInit {
 
     this.isSubmitting = true;
 
+    this.cdr.detectChanges();
+
     /*
-     * IMPORTANT:
-     *
-     * Backend UpdateAreaDto requires BOTH:
+     * Backend UpdateAreaDto requires:
      *
      * Name
      * CityId
-     *
-     * Therefore we must send both values.
      */
     const request: UpdateAreaRequest = {
       name: this.areaName,
@@ -339,6 +360,8 @@ export class EditArea implements OnInit {
 
         this.isSubmitting = false;
 
+        this.cdr.detectChanges();
+
         /*
          * Navigate back to Areas list.
          */
@@ -362,6 +385,8 @@ export class EditArea implements OnInit {
           error?.error?.message ?? error?.message ?? 'Unable to update area. Please try again.';
 
         this.isSubmitting = false;
+
+        this.cdr.detectChanges();
       },
     });
   }

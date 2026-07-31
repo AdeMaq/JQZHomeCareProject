@@ -1,13 +1,14 @@
-﻿using System;
+﻿using JQZHomeCareProject.Application.DTOs;
+using JQZHomeCareProject.Domain.Entities;
+using System;
 using System.Collections.Generic;
 using System.Text;
-using JQZHomeCareProject.Application.DTOs;
 
 namespace JQZHomeCareProject.Application.Services
 {
     public interface IDashboardService
     {
-        Task<IEnumerable<RefusalDto>> GetRefusalsAsync(DateTime from, DateTime to);
-        Task<DasboardSummaryDto> GetSummaryAsync(DateTime from, DateTime to);
+        Task<DashboardSummaryDto> GetSummaryAsync(DateTime from, DateTime to);
+        Task<IEnumerable<Refusal>> GetRefusalsAsync(DateTime from, DateTime to);
     }
 }

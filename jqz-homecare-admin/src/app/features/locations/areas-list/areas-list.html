@@ -32,7 +32,7 @@
 
   <div class="summary-card">
     <div class="summary-content">
-      <span class="summary-label">Total Areas</span>
+      <span class="summary-label"> Total Areas </span>
 
       <strong class="summary-value">
         {{ areas.length }}
@@ -82,7 +82,7 @@
          ERROR STATE
     ========================== -->
 
-    @else if (errorMessage) {
+    @else if (errorMessage !== '') {
       <div class="state-container error-state">
         <div class="state-icon error-icon">
           <i class="fa-solid fa-triangle-exclamation"></i>
@@ -96,6 +96,7 @@
 
         <button type="button" class="primary-button retry-button" (click)="loadAreas()">
           <i class="fa-solid fa-rotate-right"></i>
+
           Try Again
         </button>
       </div>
@@ -117,6 +118,7 @@
 
         <button type="button" class="primary-button" (click)="addArea()">
           <i class="fa-solid fa-plus"></i>
+
           Add Area
         </button>
       </div>
@@ -172,11 +174,17 @@
 
                 <td>
                   <div class="city-cell">
-                    <i class="fa-solid fa-city"></i>
+                    <div class="city-avatar">
+                      <i class="fa-solid fa-city"></i>
+                    </div>
 
-                    <span>
-                      {{ area.cityName || area.cityId }}
-                    </span>
+                    <div>
+                      <strong>
+                        {{ area.cityName || area.cityId }}
+                      </strong>
+
+                      <span> City </span>
+                    </div>
                   </div>
                 </td>
 

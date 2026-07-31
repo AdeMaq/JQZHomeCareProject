@@ -337,19 +337,46 @@ tbody tr:last-child td {
 ========================= */
 
 .city-cell {
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 11px;
+}
 
-  color: #475569;
+.city-avatar {
+  width: 34px;
+  height: 34px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  border-radius: 8px;
+
+  background: #eff6ff;
+  color: #2563eb;
 
   font-size: 13px;
 }
 
-.city-cell i {
-  color: #64748b;
+.city-cell strong {
+  display: block;
 
-  font-size: 12px;
+  color: #1e293b;
+
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.city-cell span {
+  display: block;
+
+  margin-top: 2px;
+
+  color: #94a3b8;
+
+  font-size: 11px;
 }
 
 /* =========================

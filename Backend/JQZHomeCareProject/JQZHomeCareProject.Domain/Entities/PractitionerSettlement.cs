@@ -7,7 +7,6 @@ namespace JQZHomeCareProject.Domain.Entities
     {
         public Guid PractitionerId { get; set; }
         public Practitioner? Practitioner { get; set; }
-
         public DateTime WeekStartDate { get; set; }
         public DateTime WeekEndDate { get; set; }
         public decimal TotalVisitAmount { get; set; }
@@ -15,10 +14,8 @@ namespace JQZHomeCareProject.Domain.Entities
         public decimal CompanyShareAmount { get; set; }
         public CollectionStatus Status { get; set; } = CollectionStatus.Pending;
         public DateTime? ReceivedDate { get; set; }
-
         public Guid? ReceivedByUserId { get; set; }
         public User? ReceivedByUser { get; set; }
-
         public ICollection<Visit> Visits { get; set; } = new List<Visit>();
     }
 }

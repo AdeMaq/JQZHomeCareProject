@@ -13,10 +13,6 @@ namespace JQZHomeCareProject.Persistence.Repositories
         {
             _context = context;
         }
-        public async Task<Location?> GetLocationAsync(Guid id)
-        {
-            return await _context.Locations.FindAsync(id);
-        }
 
         public async Task AddAsync(Location location)
         {

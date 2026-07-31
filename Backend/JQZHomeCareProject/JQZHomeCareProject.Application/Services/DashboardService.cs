@@ -1,55 +1,45 @@
-﻿using JQZHomeCareProject.Application.Common.Exceptions;
-using JQZHomeCareProject.Application.Common.Interfaces;
+﻿using JQZHomeCareProject.Application.Common.Interfaces;
 using JQZHomeCareProject.Application.DTOs;
+using JQZHomeCareProject.Domain.Entities;
 using JQZHomeCareProject.Domain.Enums;
 
 namespace JQZHomeCareProject.Application.Services
 {
     public class DashboardService : IDashboardService
     {
-        private readonly IRefusalRepository _refusalRepository;
-        private readonly IUserRepository _userRepository;
         private readonly IVisitRepository _visitRepository;
+        private readonly IRefusalRepository _refusalRepository;
 
-        public DashboardService(IRefusalRepository refusalRepository, IUserRepository userRepository, IVisitRepository visitRepository)
+        public DashboardService(IVisitRepository visitRepository, IRefusalRepository refusalRepository)
         {
-            _refusalRepository = refusalRepository;
-            _userRepository = userRepository;
             _visitRepository = visitRepository;
+            _refusalRepository = refusalRepository;
         }
 
-        public async Task<IEnumerable<RefusalDto>> GetRefusalsAsync(DateTime from, DateTime to)
+        public async Task<DashboardSummaryDto> GetSummaryAsync(DateTime from, DateTime to)
         {
-            if (to < from)
-            {
-                throw new ValidationException("'to' date cannot be earlier than 'from' date.");
-            }
+            var visits = (await _visitRepository.GetInRangeAsync(from, to)).ToList();
 
-            var refusals = await _refusalRepository.GetByDateRangeAsync(from, to);
-            var result = new List<RefusalDto>();
+            var expectedVisits = visits.Count(v => v.Status != VisitStatus.Cancelled);
+            var completedVisits = visits.Where(v => v.Status == VisitStatus.Completed).ToList();
 
-            return result;
-        }
+            var paymentReceived = completedVisits.Sum(v => v.AmountReceived);
+            var pendingCollectionAmount = completedVisits
+                .Where(v => v.CollectionStatus == CollectionStatus.Pending)
+                .Sum(v => v.AmountDue);
 
-        public async Task<DasboardSummaryDto> GetSummaryAsync(DateTime from, DateTime to)
-        {
-            if (to < from)
-            {
-                throw new ValidationException("'to' date cannot be earlier than 'from' date.");
-            }
-            var visits = await _visitRepository.GetInRangeAsync(from, to);
-            var VisitList = visits.ToList();
-
-            var expectedVisits = VisitList.Count(v => v.Status != VisitStatus.Cancelled);
-            var actualVisitsDone = VisitList.Count(v => v.Status == VisitStatus.Completed);
-            var paymentReceived = VisitList.Where(v => v.Status == VisitStatus.Completed).Sum(v => v.AmountReceived);
-
-            return new DasboardSummaryDto
+            return new DashboardSummaryDto
             {
                 ExpectedVisits = expectedVisits,
-                ActualVisitsDone = actualVisitsDone,
-                PaymentReceived = paymentReceived
+                ActualVisitsDone = completedVisits.Count,
+                PaymentReceived = paymentReceived,
+                PendingCollectionAmount = pendingCollectionAmount
             };
+        }
+
+        public Task<IEnumerable<Refusal>> GetRefusalsAsync(DateTime from, DateTime to)
+        {
+            return _refusalRepository.GetByDateRangeAsync(from, to);
         }
     }
 }

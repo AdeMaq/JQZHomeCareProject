@@ -37,6 +37,7 @@ export interface CreateAreaRequest {
 
 export interface UpdateAreaRequest {
   name: string;
+  cityId: string;
 }
 
 // =========================

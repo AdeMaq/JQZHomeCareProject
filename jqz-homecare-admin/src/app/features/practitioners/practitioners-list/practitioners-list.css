@@ -1,0 +1,744 @@
+.practitioners-page {
+  width: 100%;
+  padding: 28px 32px 40px;
+  box-sizing: border-box;
+}
+
+/* =========================
+   PAGE HEADER
+========================= */
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.page-header-left {
+  min-width: 0;
+}
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 10px;
+
+  color: #718096;
+  font-size: 12px;
+}
+
+.breadcrumb i {
+  font-size: 9px;
+  color: #a0aec0;
+}
+
+.breadcrumb strong {
+  color: #2d3748;
+}
+
+.page-header h1 {
+  margin: 0;
+
+  color: #111827;
+
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.page-header p {
+  margin: 7px 0 0;
+
+  color: #718096;
+
+  font-size: 14px;
+}
+
+/* =========================
+   BUTTONS
+========================= */
+
+.primary-button,
+.secondary-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  border-radius: 7px;
+
+  padding: 10px 17px;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.primary-button {
+  border: none;
+
+  background: #2563eb;
+  color: #ffffff;
+}
+
+.primary-button:hover:not(:disabled) {
+  background: #1d4ed8;
+
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.18);
+}
+
+.primary-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.secondary-button {
+  border: 1px solid #dbe2ea;
+
+  background: #ffffff;
+  color: #334155;
+}
+
+.secondary-button:hover {
+  background: #f8fafc;
+}
+
+/* =========================
+   SUMMARY CARD
+========================= */
+
+.summary-card {
+  min-height: 105px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 20px;
+
+  margin-bottom: 20px;
+
+  background: #ffffff;
+
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+
+  box-sizing: border-box;
+
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+}
+
+.summary-content {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.summary-label {
+  color: #718096;
+  font-size: 12px;
+}
+
+.summary-value {
+  color: #111827;
+
+  font-size: 25px;
+  font-weight: 700;
+}
+
+.summary-icon {
+  width: 40px;
+  height: 40px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 9px;
+
+  background: #eff6ff;
+  color: #2563eb;
+
+  font-size: 17px;
+}
+
+/* =========================
+   TABLE CARD
+========================= */
+
+.table-card {
+  overflow: hidden;
+
+  background: #ffffff;
+
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+}
+
+.table-header {
+  min-height: 75px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  padding: 17px 20px;
+
+  border-bottom: 1px solid #edf0f4;
+
+  box-sizing: border-box;
+}
+
+.table-header h2 {
+  margin: 0 0 5px;
+
+  color: #111827;
+
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.table-header p {
+  margin: 0;
+
+  color: #718096;
+
+  font-size: 12px;
+}
+
+.practitioner-count {
+  flex-shrink: 0;
+
+  color: #718096;
+
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* =========================
+   SEARCH
+========================= */
+
+.search-container {
+  padding: 15px 20px;
+
+  border-bottom: 1px solid #edf0f4;
+}
+
+.search-box {
+  max-width: 480px;
+
+  position: relative;
+
+  display: flex;
+  align-items: center;
+}
+
+.search-box > i {
+  position: absolute;
+  left: 13px;
+
+  color: #94a3b8;
+
+  font-size: 13px;
+
+  pointer-events: none;
+}
+
+.search-box input {
+  width: 100%;
+
+  padding: 10px 38px 10px 36px;
+
+  box-sizing: border-box;
+
+  border: 1px solid #dbe2ea;
+  border-radius: 7px;
+
+  outline: none;
+
+  color: #1e293b;
+
+  font-family: inherit;
+  font-size: 13px;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.search-box input::placeholder {
+  color: #94a3b8;
+}
+
+.search-box input:focus {
+  border-color: #2563eb;
+
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.08);
+}
+
+.clear-search {
+  position: absolute;
+  right: 8px;
+
+  width: 26px;
+  height: 26px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: none;
+  border-radius: 5px;
+
+  background: transparent;
+  color: #94a3b8;
+
+  cursor: pointer;
+}
+
+.clear-search:hover {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+/* =========================
+   TABLE
+========================= */
+
+.table-wrapper {
+  width: 100%;
+
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+
+  min-width: 1150px;
+
+  border-collapse: collapse;
+}
+
+thead {
+  background: #f8fafc;
+}
+
+th {
+  padding: 13px 16px;
+
+  color: #64748b;
+
+  border-bottom: 1px solid #e5e7eb;
+
+  text-align: left;
+
+  font-size: 11px;
+  font-weight: 700;
+
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+
+  white-space: nowrap;
+}
+
+td {
+  padding: 14px 16px;
+
+  color: #334155;
+
+  border-bottom: 1px solid #f1f5f9;
+
+  font-size: 13px;
+
+  white-space: nowrap;
+}
+
+tbody tr {
+  transition: background 0.15s ease;
+}
+
+tbody tr:hover {
+  background: #f8fafc;
+}
+
+tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.index-cell {
+  width: 45px;
+
+  color: #94a3b8;
+
+  font-weight: 600;
+}
+
+/* =========================
+   PRACTITIONER
+========================= */
+
+.practitioner-cell {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+.practitioner-avatar {
+  width: 36px;
+  height: 36px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  border-radius: 8px;
+
+  background: #eff6ff;
+  color: #2563eb;
+
+  font-size: 14px;
+}
+
+.practitioner-cell strong {
+  display: block;
+
+  color: #1e293b;
+
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.practitioner-cell span {
+  display: block;
+
+  max-width: 220px;
+
+  margin-top: 2px;
+
+  overflow: hidden;
+
+  color: #94a3b8;
+
+  font-size: 11px;
+
+  text-overflow: ellipsis;
+}
+
+/* =========================
+   CONTACT
+========================= */
+
+.contact-cell strong {
+  display: block;
+
+  color: #334155;
+
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.contact-cell span {
+  display: block;
+
+  margin-top: 2px;
+
+  color: #94a3b8;
+
+  font-size: 11px;
+}
+
+/* =========================
+   SERVICE
+========================= */
+
+.service-cell {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.service-avatar {
+  width: 30px;
+  height: 30px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 7px;
+
+  background: #f0fdf4;
+  color: #16a34a;
+
+  font-size: 12px;
+}
+
+/* =========================
+   EDUCATION
+========================= */
+
+.education-text {
+  max-width: 180px;
+
+  display: inline-block;
+
+  overflow: hidden;
+
+  color: #475569;
+
+  text-overflow: ellipsis;
+}
+
+/* =========================
+   BADGES
+========================= */
+
+.area-badge,
+.priority-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-width: 40px;
+
+  padding: 5px 9px;
+
+  border-radius: 999px;
+
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.area-badge {
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+.priority-badge {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+/* =========================
+   VISITS
+========================= */
+
+.visit-summary strong {
+  display: block;
+
+  color: #1e293b;
+
+  font-size: 13px;
+}
+
+.visit-summary span {
+  display: block;
+
+  margin-top: 2px;
+
+  color: #94a3b8;
+
+  font-size: 10px;
+}
+
+/* =========================
+   ACTIONS
+========================= */
+
+.actions-cell {
+  text-align: right;
+}
+
+.icon-button {
+  width: 32px;
+  height: 32px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid transparent;
+  border-radius: 6px;
+
+  background: transparent;
+
+  color: #2563eb;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.icon-button:hover {
+  background: #eff6ff;
+
+  border-color: #dbeafe;
+}
+
+/* =========================
+   STATES
+========================= */
+
+.state-container {
+  min-height: 260px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  padding: 30px 20px;
+
+  text-align: center;
+
+  box-sizing: border-box;
+}
+
+.state-container h3 {
+  margin: 14px 0 6px;
+
+  color: #1e293b;
+
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.state-container p {
+  max-width: 420px;
+
+  margin: 0 0 17px;
+
+  color: #718096;
+
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.loading-spinner {
+  width: 27px;
+  height: 27px;
+
+  border: 3px solid #e5e7eb;
+  border-top-color: #2563eb;
+
+  border-radius: 50%;
+
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.state-icon {
+  width: 46px;
+  height: 46px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 10px;
+
+  background: #eff6ff;
+  color: #2563eb;
+
+  font-size: 19px;
+}
+
+.error-icon {
+  background: #fef2f2;
+
+  color: #dc2626;
+}
+
+.retry-button {
+  margin-top: 2px;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 768px) {
+  .practitioners-page {
+    padding: 20px 16px 30px;
+  }
+
+  .page-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .page-header-actions {
+    width: 100%;
+  }
+
+  .page-header-actions .primary-button {
+    width: 100%;
+  }
+
+  .page-header h1 {
+    font-size: 24px;
+  }
+
+  .summary-card {
+    min-height: 95px;
+  }
+
+  .table-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .practitioner-count {
+    align-self: flex-start;
+  }
+
+  .search-container {
+    padding: 14px 15px;
+  }
+
+  .search-box {
+    max-width: none;
+  }
+}
+
+@media (max-width: 520px) {
+  .practitioners-page {
+    padding: 16px 12px 25px;
+  }
+
+  .summary-card {
+    padding: 16px;
+  }
+
+  .table-header {
+    padding: 15px;
+  }
+
+  .state-container {
+    min-height: 230px;
+  }
+}

@@ -30,6 +30,11 @@ import { AreasList } from './features/locations/areas-list/areas-list';
 import { AddArea } from './features/locations/add-area/add-area';
 import { EditArea } from './features/locations/edit-area/edit-area';
 
+// Practitioners
+import { PractitionersList } from './features/practitioners/practitioners-list/practitioners-list';
+import { AddPractitioner } from './features/practitioners/add-practitioner/add-practitioner';
+import { PractitionerProfile } from './features/practitioners/practitioner-profile/practitioner-profile';
+
 export const routes: Routes = [
   // =========================
   // DEFAULT ROUTE
@@ -164,6 +169,25 @@ export const routes: Routes = [
       {
         path: 'areas',
         component: AreasList,
+      },
+
+      // =========================
+      // PRACTITIONERS
+      // =========================
+
+      {
+        path: 'practitioners/add',
+        component: AddPractitioner,
+      },
+
+      {
+        path: 'practitioners/:id',
+        component: PractitionerProfile,
+      },
+
+      {
+        path: 'practitioners',
+        component: PractitionersList,
       },
     ],
   },

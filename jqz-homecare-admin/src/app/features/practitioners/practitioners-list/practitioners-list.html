@@ -1,1 +1,319 @@
-<p>practitioners-list works!</p>
+<div class="practitioners-page">
+  <!-- =========================
+       PAGE HEADER
+  ========================== -->
+
+  <div class="page-header">
+    <div class="page-header-left">
+      <div class="breadcrumb">
+        <span>Management</span>
+
+        <i class="fa-solid fa-chevron-right"></i>
+
+        <strong>Practitioners</strong>
+      </div>
+
+      <h1>Practitioners</h1>
+
+      <p>Manage practitioners registered in the system.</p>
+    </div>
+
+    <div class="page-header-actions">
+      <button
+        type="button"
+        class="primary-button"
+        (click)="addPractitioner()"
+        [disabled]="isLoading"
+      >
+        <i class="fa-solid fa-plus"></i>
+
+        Add Practitioner
+      </button>
+    </div>
+  </div>
+
+  <!-- =========================
+       SUMMARY
+  ========================== -->
+
+  <div class="summary-card">
+    <div class="summary-content">
+      <span class="summary-label"> Total Practitioners </span>
+
+      <strong class="summary-value">
+        {{ practitioners.length }}
+      </strong>
+    </div>
+
+    <div class="summary-icon">
+      <i class="fa-solid fa-user-doctor"></i>
+    </div>
+  </div>
+
+  <!-- =========================
+       MAIN TABLE CARD
+  ========================== -->
+
+  <div class="table-card">
+    <!-- TABLE HEADER -->
+
+    <div class="table-header">
+      <div>
+        <h2>All Practitioners</h2>
+
+        <p>View practitioners and their assigned services.</p>
+      </div>
+
+      <span class="practitioner-count">
+        {{ filteredPractitioners.length }}
+
+        {{ filteredPractitioners.length === 1 ? 'Practitioner' : 'Practitioners' }}
+      </span>
+    </div>
+
+    <!-- =========================
+         SEARCH
+    ========================== -->
+
+    <div class="search-container">
+      <div class="search-box">
+        <i class="fa-solid fa-magnifying-glass"></i>
+
+        <input
+          type="text"
+          [(ngModel)]="searchTerm"
+          placeholder="Search by name, email, phone or service..."
+        />
+
+        @if (searchTerm) {
+          <button type="button" class="clear-search" title="Clear search" (click)="searchTerm = ''">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        }
+      </div>
+    </div>
+
+    <!-- =========================
+         LOADING
+    ========================== -->
+
+    @if (isLoading) {
+      <div class="state-container">
+        <div class="loading-spinner"></div>
+
+        <h3>Loading practitioners...</h3>
+
+        <p>Please wait while we load the practitioners.</p>
+      </div>
+    }
+
+    <!-- =========================
+         ERROR
+    ========================== -->
+
+    @else if (errorMessage !== '') {
+      <div class="state-container error-state">
+        <div class="state-icon error-icon">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+        </div>
+
+        <h3>Unable to load practitioners</h3>
+
+        <p>
+          {{ errorMessage }}
+        </p>
+
+        <button type="button" class="primary-button retry-button" (click)="retry()">
+          <i class="fa-solid fa-rotate-right"></i>
+
+          Try Again
+        </button>
+      </div>
+    }
+
+    <!-- =========================
+         EMPTY STATE
+    ========================== -->
+
+    @else if (practitioners.length === 0) {
+      <div class="state-container">
+        <div class="state-icon">
+          <i class="fa-solid fa-user-doctor"></i>
+        </div>
+
+        <h3>No practitioners found</h3>
+
+        <p>There are currently no practitioners registered in the system.</p>
+
+        <button type="button" class="primary-button" (click)="addPractitioner()">
+          <i class="fa-solid fa-plus"></i>
+
+          Add Practitioner
+        </button>
+      </div>
+    }
+
+    <!-- =========================
+         NO SEARCH RESULTS
+    ========================== -->
+
+    @else if (filteredPractitioners.length === 0) {
+      <div class="state-container">
+        <div class="state-icon">
+          <i class="fa-solid fa-magnifying-glass"></i>
+        </div>
+
+        <h3>No matching practitioners</h3>
+
+        <p>No practitioner matches "{{ searchTerm }}".</p>
+
+        <button type="button" class="secondary-button" (click)="searchTerm = ''">
+          Clear Search
+        </button>
+      </div>
+    }
+
+    <!-- =========================
+         TABLE
+    ========================== -->
+
+    @else {
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+
+              <th>Practitioner</th>
+
+              <th>Contact</th>
+
+              <th>Service</th>
+
+              <th>Education</th>
+
+              <th>Areas</th>
+
+              <th>Priority</th>
+
+              <th>Visits</th>
+
+              <th>Actions</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            @for (practitioner of filteredPractitioners; track practitioner.id; let i = $index) {
+              <tr>
+                <!-- INDEX -->
+
+                <td class="index-cell">
+                  {{ i + 1 }}
+                </td>
+
+                <!-- PRACTITIONER -->
+
+                <td>
+                  <div class="practitioner-cell">
+                    <div class="practitioner-avatar">
+                      <i class="fa-solid fa-user-doctor"></i>
+                    </div>
+
+                    <div>
+                      <strong>
+                        {{ practitioner.name || '-' }}
+                      </strong>
+
+                      <span>
+                        {{ practitioner.email || '-' }}
+                      </span>
+                    </div>
+                  </div>
+                </td>
+
+                <!-- CONTACT -->
+
+                <td>
+                  <div class="contact-cell">
+                    <strong>
+                      {{ practitioner.phone || '-' }}
+                    </strong>
+
+                    <span> Phone </span>
+                  </div>
+                </td>
+
+                <!-- SERVICE -->
+
+                <td>
+                  <div class="service-cell">
+                    <div class="service-avatar">
+                      <i class="fa-solid fa-briefcase-medical"></i>
+                    </div>
+
+                    <span>
+                      {{ practitioner.serviceName || '-' }}
+                    </span>
+                  </div>
+                </td>
+
+                <!-- EDUCATION -->
+
+                <td>
+                  <span class="education-text">
+                    {{ practitioner.education || '-' }}
+                  </span>
+                </td>
+
+                <!-- AREAS -->
+
+                <td>
+                  <span class="area-badge">
+                    {{ practitioner.areas.length }}
+                    {{ practitioner.areas.length === 1 ? 'Area' : 'Areas' }}
+                  </span>
+                </td>
+
+                <!-- PRIORITY -->
+
+                <td>
+                  <span class="priority-badge">
+                    {{ practitioner.priority }}
+                  </span>
+                </td>
+
+                <!-- VISITS -->
+
+                <td>
+                  <div class="visit-summary">
+                    <strong>
+                      {{ practitioner.visitCount }}
+                    </strong>
+
+                    <span>
+                      {{ practitioner.cancellationCount }}
+                      cancelled
+                    </span>
+                  </div>
+                </td>
+
+                <!-- ACTIONS -->
+
+                <td class="actions-cell">
+                  <button
+                    type="button"
+                    class="icon-button view-button"
+                    title="View Practitioner"
+                    (click)="viewProfile(practitioner.id)"
+                  >
+                    <i class="fa-solid fa-eye"></i>
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+</div>

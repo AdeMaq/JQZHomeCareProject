@@ -1,7 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { forkJoin } from 'rxjs';
 
 import {
   Area,
@@ -21,6 +22,7 @@ export class AddPractitioner implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly router = inject(Router);
   private readonly practitionerService = inject(PractitionerService);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   // =========================
   // FORM
@@ -82,48 +84,43 @@ export class AddPractitioner implements OnInit {
     this.isLoading = true;
     this.errorMessage = '';
 
-    let servicesLoaded = false;
-    let areasLoaded = false;
+    forkJoin({
+      services: this.practitionerService.getServices(),
+      areas: this.practitionerService.getAreas(),
+    }).subscribe({
+      next: ({ services, areas }) => {
+        console.log('SERVICES LOADED:', services);
+        console.log('AREAS LOADED:', areas);
 
-    this.practitionerService.getServices().subscribe({
-      next: (services) => {
         this.services = Array.isArray(services) ? services : [];
-
-        servicesLoaded = true;
-
-        if (areasLoaded) {
-          this.isLoading = false;
-        }
-      },
-
-      error: (error) => {
-        console.error('Unable to load services:', error);
-
-        this.errorMessage =
-          error?.error?.message ?? error?.message ?? 'Unable to load services. Please try again.';
-
-        this.isLoading = false;
-      },
-    });
-
-    this.practitionerService.getAreas().subscribe({
-      next: (areas) => {
         this.areas = Array.isArray(areas) ? areas : [];
 
-        areasLoaded = true;
+        this.isLoading = false;
 
-        if (servicesLoaded) {
-          this.isLoading = false;
-        }
+        this.cdr.detectChanges();
+
+        console.log('FORM DATA LOADING COMPLETE');
+        console.log('isLoading:', this.isLoading);
       },
 
       error: (error) => {
-        console.error('Unable to load areas:', error);
+        console.error('Unable to load practitioner form data:', error);
+
+        this.services = [];
+        this.areas = [];
 
         this.errorMessage =
-          error?.error?.message ?? error?.message ?? 'Unable to load areas. Please try again.';
+          error?.error?.message ??
+          error?.error?.title ??
+          error?.message ??
+          'Unable to load form data. Please try again.';
 
         this.isLoading = false;
+
+        this.cdr.detectChanges();
+
+        console.log('FORM DATA LOADING FAILED');
+        console.log('isLoading:', this.isLoading);
       },
     });
   }

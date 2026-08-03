@@ -34,16 +34,26 @@ namespace JQZHomeCareProject.Application.DTOs
         public string PatientName { get; set; } = string.Empty;
         public string PatientPhone { get; set; } = string.Empty;
         public string LocationAddress { get; set; } = string.Empty;
-        public Guid PractitionerId { get; set; }
-        public Guid AreaId { get; set; }
-        public Guid ServiceId { get; set; }
-        public decimal AmountDue { get; set; }
+
+        public Guid PackageId { get; set; }
+        public PackagePaymentType PaymentType { get; set; }
+        public decimal? InitialAmountPaid { get; set; } 
+        public List<VisitAssignmentDto> VisitAssignments { get; set; } = new();
     }
+
+    public class VisitAssignmentDto
+    {
+        public Guid? PractitionerId { get; set; }
+        public Guid? AreaId { get; set; }        
+        public DateTime? ScheduledDate { get; set; }
+        public TimeSpan? SlotStart { get; set; }
+        public TimeSpan? SlotEnd { get; set; }
+    }
+
 
     public class ScheduleVisitDto
     {
         public DateTime ScheduledDate { get; set; }
-        //public string TimeSlot { get; set; } = string.Empty;
         public TimeSpan SlotStart { get; set; }
         public TimeSpan SlotEnd { get; set; }
     }
@@ -56,19 +66,16 @@ namespace JQZHomeCareProject.Application.DTOs
 
     public class ReassignPractitionerDto
     {
-        public Guid NewPractitionerId { get; set; }
-
+        public Guid PractitionerId { get; set; }
         public Guid? AreaId { get; set; }
-
         public RefusedBy RefusedBy { get; set; }
-
         public string Reason { get; set; } = string.Empty;
     }
 
     public class AssignVisitDto
     {
         public Guid PractitionerId { get; set; }
-
-        public Guid AreaId { get; set; }
+        public Guid? AreaId { get; set; } 
     }
+
 }

@@ -6,55 +6,40 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace JQZHomeCareProject.API.Controllers
 {
-
     [ApiController]
     [Route("api/patient-packages")]
-    [Authorize]
+    [Authorize(Roles = "SuperAdmin,MiddlePowerAdmin,SimpleAdmin")]
     public class PatientPackagesController : ControllerBase
     {
         private readonly IPatientPackageService _patientPackageService;
+        private readonly IVisitService _visitService; 
 
-        public PatientPackagesController(IPatientPackageService patientPackageService)
+        public PatientPackagesController(IPatientPackageService patientPackageService, IVisitService visitService)
         {
             _patientPackageService = patientPackageService;
+            _visitService = visitService;
         }
 
-
-        [HttpPost]
-        [Authorize(Roles = "SuperAdmin,MiddlePowerAdmin,SimpleAdmin")]
-        public async Task<IActionResult> PurchaseAsync([FromBody] PurchasePackageDto dto)
-        {
-            var createdByUserId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-            var result = await _patientPackageService.PurchaseAsync(dto, createdByUserId);
-            return CreatedAtAction(nameof(GetByIdAsync), new { id = result.Id }, result);
-        }
+        [HttpGet]
+        public async Task<IActionResult> GetAllAsync() =>
+            Ok(await _patientPackageService.GetAllAsync());
 
         [HttpGet("{id:guid}")]
-        public async Task<IActionResult> GetByIdAsync(Guid id)
-        {
-            var result = await _patientPackageService.GetByIdAsync(id);
-            return Ok(result);
-        }
+        public async Task<IActionResult> GetByIdAsync(Guid id) =>
+            Ok(await _patientPackageService.GetByIdAsync(id));
 
         [HttpGet("patient/{patientId:guid}")]
-        public async Task<IActionResult> GetByPatientAsync(Guid patientId)
-        {
-            var results = await _patientPackageService.GetByPatientAsync(patientId);
-            return Ok(results);
-        }
+        public async Task<IActionResult> GetByPatientAsync(Guid patientId) =>
+            Ok(await _patientPackageService.GetByPatientAsync(patientId));
 
         [HttpGet("{id:guid}/visits")]
-        public async Task<IActionResult> GetVisitsAsync(Guid id)
-        {
-            var visits = await _patientPackageService.GetVisitsAsync(id);
-            return Ok(visits);
-        }
+        public async Task<IActionResult> GetVisitsAsync(Guid id) =>
+            Ok(await _patientPackageService.GetVisitsAsync(id));
 
         [HttpPost("{id:guid}/installments")]
-        [Authorize(Roles = "SuperAdmin,MiddlePowerAdmin,SimpleAdmin")]
         public async Task<IActionResult> RecordInstallmentAsync(Guid id, [FromBody] RecordInstallmentDto dto)
         {
-            await _patientPackageService.RecordInstallmentAsync(id, dto);
+            await _visitService.RecordInstallmentAsync(id, dto);
             return NoContent();
         }
     }

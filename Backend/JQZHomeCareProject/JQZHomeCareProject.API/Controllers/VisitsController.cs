@@ -2,6 +2,7 @@
 using JQZHomeCareProject.Application.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace JQZHomeCareProject.API.Controllers
 {
@@ -11,10 +12,15 @@ namespace JQZHomeCareProject.API.Controllers
     public class VisitsController : ControllerBase
     {
         private readonly IVisitService _visitService;
+        public VisitsController(IVisitService visitService) => _visitService = visitService;
 
-        public VisitsController(IVisitService visitService)
+        [HttpPost]
+        [Authorize(Roles = "SuperAdmin,MiddlePowerAdmin,SimpleAdmin")]
+        public async Task<IActionResult> CreateVisitAsync([FromBody] CreateVisitDto dto)
         {
-            _visitService = visitService;
+            var createdByUserId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var result = await _visitService.CreateVisitAsync(dto, createdByUserId);
+            return CreatedAtAction(nameof(GetByIdAsync), new { id = result.Visits.FirstOrDefault()?.Id }, result);
         }
 
         [HttpPut("{id:guid}/schedule")]
@@ -26,36 +32,18 @@ namespace JQZHomeCareProject.API.Controllers
         }
 
         [HttpGet("today")]
-        public async Task<IActionResult> GetTodayAsync([FromQuery] Guid? practitionerId)
-        {
-            var visits = await _visitService.GetTodayVisitsAsync(practitionerId);
-            return Ok(visits);
-        }
+        public async Task<IActionResult> GetTodayAsync([FromQuery] Guid? practitionerId) =>
+            Ok(await _visitService.GetTodayVisitsAsync(practitionerId));
 
         [HttpGet("by-date")]
-        public async Task<IActionResult> GetAllAsync([FromQuery] DateTime? date)
-        {
-            var visits = date.HasValue
-                ? await _visitService.GetByDateAsync(date.Value)
-                : await _visitService.GetAllAsync();
-            return Ok(visits);
-        }
+        public async Task<IActionResult> GetByDateFilterAsync([FromQuery] DateTime? date) =>
+            Ok(date.HasValue ? await _visitService.GetByDateAsync(date.Value) : await _visitService.GetAllAsync());
 
         [HttpGet]
-        public async Task<IActionResult> GetAllAsync()
-        {
-            var visits = await _visitService.GetAllAsync();
-            return Ok(visits);
-        }
-
-
+        public async Task<IActionResult> GetAllAsync() => Ok(await _visitService.GetAllAsync());
 
         [HttpGet("{id:guid}")]
-        public async Task<IActionResult> GetByIdAsync(Guid id)
-        {
-            var visit = await _visitService.GetByIdAsync(id);
-            return Ok(visit);
-        }
+        public async Task<IActionResult> GetByIdAsync(Guid id) => Ok(await _visitService.GetByIdAsync(id));
 
         [HttpPut("{id:guid}/accept")]
         [Authorize(Roles = "Practitioner")]
@@ -82,7 +70,6 @@ namespace JQZHomeCareProject.API.Controllers
         }
 
         [HttpPut("{id:guid}/cancel")]
-        [Authorize(Roles = "SuperAdmin,MiddlePowerAdmin,SimpleAdmin,Practitioner")]
         public async Task<IActionResult> CancelAsync(Guid id, [FromBody] CancelVisitDto dto)
         {
             await _visitService.CancelVisitAsync(id, dto);
@@ -90,7 +77,7 @@ namespace JQZHomeCareProject.API.Controllers
         }
 
         [HttpPut("{id:guid}/reassign")]
-        [Authorize(Roles = "SuperAdmin,MiddlePowerAdmin,SimpleAdmin,Practitioner")]
+        [Authorize(Roles = "SuperAdmin,MiddlePowerAdmin,SimpleAdmin")]
         public async Task<IActionResult> ReassignAsync(Guid id, [FromBody] ReassignPractitionerDto dto)
         {
             await _visitService.ReassignPractitionerAsync(id, dto);

@@ -31,6 +31,7 @@ namespace JQZHomeCareProject.Persistence
             services.AddScoped<IPatientPackageRepository, PatientPackageRepository>();
             services.AddScoped<IPractitionerSettlementRepository, PractitionerSettlementRepository>();
             services.AddScoped<IApiClientRepository, ApiClientRepository>();
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             return services;
         }

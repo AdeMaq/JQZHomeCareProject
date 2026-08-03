@@ -30,6 +30,7 @@ namespace JQZHomeCareProject.Persistence
             services.AddScoped<IServiceCategoryRepository, ServiceCategoryRepository>();
             services.AddScoped<IPatientPackageRepository, PatientPackageRepository>();
             services.AddScoped<IPractitionerSettlementRepository, PractitionerSettlementRepository>();
+            services.AddScoped<IApiClientRepository, ApiClientRepository>();
 
             return services;
         }

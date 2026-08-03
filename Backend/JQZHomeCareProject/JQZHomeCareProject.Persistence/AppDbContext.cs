@@ -12,6 +12,7 @@ namespace JQZHomeCareProject.Persistence
     {
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
+        public DbSet<ApiClient> ApiClients => Set<ApiClient>();
         public DbSet<User> Users => Set<User>();
         public DbSet<City> Cities => Set<City>();
         public DbSet<Area> Areas => Set<Area>();

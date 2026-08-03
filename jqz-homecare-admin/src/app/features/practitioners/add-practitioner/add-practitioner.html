@@ -55,6 +55,7 @@
 
       <button type="button" class="secondary-button" (click)="loadFormData()">
         <i class="fa-solid fa-rotate-right"></i>
+
         Try Again
       </button>
     </div>
@@ -306,7 +307,7 @@
       </div>
 
       <!-- =========================
-           AREAS
+           ASSIGNED AREAS
       ========================== -->
 
       <div class="section">
@@ -323,49 +324,221 @@
         </div>
 
         @if (areas.length === 0) {
+          <!-- NO AREAS -->
+
           <div class="empty-areas">
             <i class="fa-solid fa-location-dot"></i>
 
             <span> No areas are currently available. </span>
           </div>
-        } @else {
-          <div class="areas-grid">
-            @for (area of areas; track area.id) {
-              <label class="area-option" [class.selected]="isAreaSelected(area.id)">
-                <input
-                  type="checkbox"
-                  [checked]="isAreaSelected(area.id)"
-                  (change)="toggleArea(area.id)"
-                />
 
-                <div class="area-checkbox">
-                  @if (isAreaSelected(area.id)) {
-                    <i class="fa-solid fa-check"></i>
+        } @else {
+          <!-- =========================
+               AREA TOOLBAR
+          ========================== -->
+
+          <div class="areas-toolbar">
+            <!-- SEARCH -->
+
+            <div class="area-search">
+              <i class="fa-solid fa-magnifying-glass"></i>
+
+              <input
+                type="text"
+                [(ngModel)]="areaSearchTerm"
+                [ngModelOptions]="{ standalone: true }"
+                (input)="filterAreas()"
+                placeholder="Search by area or city..."
+                aria-label="Search areas"
+              />
+
+              @if (areaSearchTerm) {
+                <button
+                  type="button"
+                  class="clear-search-button"
+                  (click)="clearAreaSearch()"
+                  aria-label="Clear area search"
+                >
+                  <i class="fa-solid fa-xmark"></i>
+                </button>
+              }
+            </div>
+
+            <!-- AREA ACTIONS -->
+
+            <div class="area-actions">
+              <!-- SELECT ALL -->
+
+              <button
+                type="button"
+                class="area-action-button"
+                (click)="selectAllAreas()"
+                [disabled]="filteredAreas.length === 0 || areAllFilteredAreasSelected()"
+              >
+                <i class="fa-solid fa-check-double"></i>
+
+                Select All
+              </button>
+
+              <!-- CLEAR ALL -->
+
+              <button
+                type="button"
+                class="area-action-button clear"
+                (click)="clearAllAreas()"
+                [disabled]="selectedAreaIds.length === 0"
+              >
+                <i class="fa-solid fa-xmark"></i>
+
+                Clear All
+              </button>
+            </div>
+          </div>
+
+          <!-- =========================
+               SEARCH RESULT INFO
+          ========================== -->
+
+          <div class="area-result-info">
+            <span>
+              Showing
+
+              <strong> {{ areaStartIndex }}–{{ areaEndIndex }} </strong>
+
+              of
+
+              <strong>
+                {{ filteredAreaCount }}
+              </strong>
+
+              areas
+            </span>
+
+            <span class="selected-count">
+              <i class="fa-solid fa-location-dot"></i>
+
+              <strong>
+                {{ selectedAreaCount }}
+              </strong>
+
+              {{ selectedAreaCount === 1 ? 'area' : 'areas' }}
+
+              selected
+            </span>
+          </div>
+
+          <!-- =========================
+               NO SEARCH RESULTS
+          ========================== -->
+
+          @if (filteredAreas.length === 0) {
+            <div class="no-area-results">
+              <div class="no-area-results-icon">
+                <i class="fa-solid fa-magnifying-glass"></i>
+              </div>
+
+              <strong> No areas found </strong>
+
+              <span> No areas match "{{ areaSearchTerm }}". </span>
+
+              <button type="button" class="secondary-button" (click)="clearAreaSearch()">
+                Clear Search
+              </button>
+            </div>
+
+          } @else {
+            <!-- =========================
+                 AREA CARDS
+            ========================== -->
+
+            <div class="areas-grid">
+              @for (area of paginatedAreas; track area.id) {
+                <label class="area-option" [class.selected]="isAreaSelected(area.id)">
+                  <!-- REAL CHECKBOX -->
+
+                  <input
+                    type="checkbox"
+                    [checked]="isAreaSelected(area.id)"
+                    (change)="toggleArea(area.id)"
+                  />
+
+                  <!-- CUSTOM CHECKBOX -->
+
+                  <div class="area-checkbox">
+                    @if (isAreaSelected(area.id)) {
+                      <i class="fa-solid fa-check"></i>
+                    }
+                  </div>
+
+                  <!-- AREA INFORMATION -->
+
+                  <div class="area-info">
+                    <strong>
+                      {{ area.name }}
+                    </strong>
+
+                    <span>
+                      <i class="fa-solid fa-city"></i>
+
+                      {{ area.cityName }}
+                    </span>
+                  </div>
+                </label>
+              }
+            </div>
+
+            <!-- =========================
+                 AREA PAGINATION
+            ========================== -->
+
+            @if (totalAreaPages > 1) {
+              <div class="area-pagination">
+                <!-- PREVIOUS -->
+
+                <button
+                  type="button"
+                  class="pagination-button"
+                  [disabled]="currentAreaPage === 1"
+                  (click)="goToPreviousAreaPage()"
+                  aria-label="Previous page"
+                >
+                  <i class="fa-solid fa-chevron-left"></i>
+
+                  <span>Previous</span>
+                </button>
+
+                <!-- PAGE NUMBERS -->
+
+                <div class="pagination-pages">
+                  @for (page of areaPageNumbers; track page) {
+                    <button
+                      type="button"
+                      class="pagination-page"
+                      [class.active]="currentAreaPage === page"
+                      [attr.aria-current]="currentAreaPage === page ? 'page' : null"
+                      (click)="goToAreaPage(page)"
+                    >
+                      {{ page }}
+                    </button>
                   }
                 </div>
 
-                <div class="area-info">
-                  <strong>
-                    {{ area.name }}
-                  </strong>
+                <!-- NEXT -->
 
-                  <span>
-                    <i class="fa-solid fa-city"></i>
-                    {{ area.cityName }}
-                  </span>
-                </div>
-              </label>
+                <button
+                  type="button"
+                  class="pagination-button"
+                  [disabled]="currentAreaPage === totalAreaPages"
+                  (click)="goToNextAreaPage()"
+                  aria-label="Next page"
+                >
+                  <span>Next</span>
+
+                  <i class="fa-solid fa-chevron-right"></i>
+                </button>
+              </div>
             }
-          </div>
-
-          <div class="selected-count">
-            <i class="fa-solid fa-location-dot"></i>
-
-            {{ selectedAreaIds.length }}
-
-            {{ selectedAreaIds.length === 1 ? 'area' : 'areas' }}
-            selected
-          </div>
+          }
         }
       </div>
 
@@ -388,15 +561,20 @@
       ========================== -->
 
       <div class="form-actions">
+        <!-- CANCEL -->
+
         <button type="button" class="secondary-button" (click)="cancel()" [disabled]="isSubmitting">
           Cancel
         </button>
+
+        <!-- SUBMIT -->
 
         <button type="submit" class="primary-button" [disabled]="isSubmitting">
           @if (isSubmitting) {
             <span class="button-spinner"></span>
 
             Creating...
+
           } @else {
             <i class="fa-solid fa-plus"></i>
 

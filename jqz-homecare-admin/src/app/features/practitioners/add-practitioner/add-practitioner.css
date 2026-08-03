@@ -254,7 +254,216 @@
 }
 
 /* =========================
-   AREAS
+   AREAS TOOLBAR
+========================= */
+
+.areas-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  margin-bottom: 12px;
+}
+
+/* =========================
+   AREA SEARCH
+========================= */
+
+.area-search {
+  position: relative;
+
+  flex: 1;
+  min-width: 0;
+
+  display: flex;
+  align-items: center;
+}
+
+.area-search > i {
+  position: absolute;
+  left: 13px;
+
+  color: #64748b;
+
+  font-size: 13px;
+
+  pointer-events: none;
+}
+
+.area-search input {
+  width: 100%;
+
+  height: 40px;
+
+  padding: 9px 38px 9px 35px;
+
+  box-sizing: border-box;
+
+  border: 1px solid #dbe2ea;
+  border-radius: 7px;
+
+  outline: none;
+
+  background: #ffffff;
+  color: #1e293b;
+
+  font-family: inherit;
+  font-size: 13px;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.area-search input::placeholder {
+  color: #94a3b8;
+}
+
+.area-search input:focus {
+  border-color: #2563eb;
+
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.08);
+}
+
+/* =========================
+   CLEAR SEARCH
+========================= */
+
+.clear-search-button {
+  position: absolute;
+  right: 8px;
+
+  width: 25px;
+  height: 25px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  border: none;
+  border-radius: 5px;
+
+  background: transparent;
+  color: #94a3b8;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+.clear-search-button:hover {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+/* =========================
+   AREA ACTIONS
+========================= */
+
+.area-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  flex-shrink: 0;
+}
+
+.area-action-button {
+  min-height: 38px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+
+  padding: 8px 12px;
+
+  border: 1px solid #dbe2ea;
+  border-radius: 7px;
+
+  background: #ffffff;
+  color: #334155;
+
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.area-action-button:hover:not(:disabled) {
+  border-color: #bfdbfe;
+
+  background: #eff6ff;
+
+  color: #2563eb;
+}
+
+.area-action-button.clear:hover:not(:disabled) {
+  border-color: #fecaca;
+
+  background: #fef2f2;
+
+  color: #dc2626;
+}
+
+.area-action-button:disabled {
+  opacity: 0.5;
+
+  cursor: not-allowed;
+}
+
+.area-action-button i {
+  font-size: 11px;
+}
+
+/* =========================
+   AREA RESULT INFO
+========================= */
+
+.area-result-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+
+  margin-bottom: 12px;
+
+  color: #64748b;
+
+  font-size: 11px;
+}
+
+.area-result-info > span:first-child {
+  color: #475569;
+}
+
+.area-result-info strong {
+  color: #334155;
+
+  font-weight: 600;
+}
+
+.area-result-info .selected-count {
+  margin-top: 0;
+}
+
+.area-result-info .selected-count i {
+  color: #2563eb;
+}
+
+/* =========================
+   AREAS GRID
 ========================= */
 
 .areas-grid {
@@ -264,6 +473,10 @@
 
   gap: 12px;
 }
+
+/* =========================
+   AREA OPTION
+========================= */
 
 .area-option {
   position: relative;
@@ -285,7 +498,8 @@
 
   transition:
     border-color 0.2s ease,
-    background 0.2s ease;
+    background 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .area-option:hover {
@@ -298,6 +512,8 @@
   border-color: #93c5fd;
 
   background: #eff6ff;
+
+  box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.04);
 }
 
 .area-option input {
@@ -310,6 +526,10 @@
 
   pointer-events: none;
 }
+
+/* =========================
+   AREA CHECKBOX
+========================= */
 
 .area-checkbox {
   width: 18px;
@@ -329,6 +549,14 @@
   color: #ffffff;
 
   font-size: 10px;
+
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease;
+}
+
+.area-option:hover .area-checkbox {
+  border-color: #93c5fd;
 }
 
 .area-option.selected .area-checkbox {
@@ -336,6 +564,10 @@
 
   background: #2563eb;
 }
+
+/* =========================
+   AREA INFORMATION
+========================= */
 
 .area-info {
   min-width: 0;
@@ -371,21 +603,134 @@
   font-size: 9px;
 }
 
-.selected-count {
+/* =========================
+   AREA PAGINATION
+========================= */
+
+.area-pagination {
   display: flex;
   align-items: center;
-  gap: 6px;
+  justify-content: space-between;
 
-  margin-top: 12px;
+  margin-top: 16px;
+  padding-top: 14px;
 
-  color: #64748b;
-
-  font-size: 11px;
+  border-top: 1px solid #edf0f4;
 }
 
-.selected-count i {
+/* =========================
+   PAGINATION PAGES
+========================= */
+
+.pagination-pages {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+
+/* =========================
+   PAGINATION BUTTONS
+========================= */
+
+.pagination-button,
+.pagination-page {
+  height: 34px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid #dbe2ea;
+  border-radius: 6px;
+
+  background: #ffffff;
+  color: #475569;
+
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    box-shadow 0.2s ease,
+    opacity 0.2s ease;
+}
+
+/* =========================
+   PREVIOUS / NEXT
+========================= */
+
+.pagination-button {
+  gap: 7px;
+
+  padding: 0 12px;
+}
+
+.pagination-button i {
+  font-size: 9px;
+}
+
+.pagination-button:hover:not(:disabled) {
+  border-color: #bfdbfe;
+
+  background: #eff6ff;
+
   color: #2563eb;
 }
+
+/* =========================
+   PAGE NUMBER
+========================= */
+
+.pagination-page {
+  width: 34px;
+
+  padding: 0;
+}
+
+.pagination-page:hover:not(.active) {
+  border-color: #bfdbfe;
+
+  background: #eff6ff;
+
+  color: #2563eb;
+}
+
+/* =========================
+   ACTIVE PAGE
+========================= */
+
+.pagination-page.active {
+  border-color: #2563eb;
+
+  background: #2563eb;
+  color: #ffffff;
+
+  box-shadow: 0 2px 5px rgba(37, 99, 235, 0.16);
+
+  cursor: default;
+}
+
+/* =========================
+   DISABLED PAGINATION
+========================= */
+
+.pagination-button:disabled {
+  opacity: 0.45;
+
+  cursor: not-allowed;
+
+  background: #f8fafc;
+}
+
+/* =========================
+   EMPTY AREAS
+========================= */
 
 .empty-areas {
   display: flex;
@@ -406,6 +751,65 @@
 
 .empty-areas i {
   color: #94a3b8;
+}
+
+/* =========================
+   NO SEARCH RESULTS
+========================= */
+
+.no-area-results {
+  min-height: 180px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  padding: 25px 20px;
+
+  border: 1px dashed #cbd5e1;
+  border-radius: 8px;
+
+  background: #f8fafc;
+
+  text-align: center;
+}
+
+.no-area-results-icon {
+  width: 38px;
+  height: 38px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin-bottom: 10px;
+
+  border-radius: 8px;
+
+  background: #ffffff;
+
+  color: #94a3b8;
+
+  font-size: 14px;
+}
+
+.no-area-results strong {
+  color: #334155;
+
+  font-size: 13px;
+}
+
+.no-area-results > span {
+  margin-top: 5px;
+
+  color: #94a3b8;
+
+  font-size: 11px;
+}
+
+.no-area-results .secondary-button {
+  margin-top: 13px;
 }
 
 /* =========================
@@ -606,6 +1010,10 @@
   color: #dc2626;
 }
 
+/* =========================
+   ANIMATION
+========================= */
+
 @keyframes spin {
   to {
     transform: rotate(360deg);
@@ -615,6 +1023,17 @@
 /* =========================
    RESPONSIVE
 ========================= */
+
+@media (max-width: 900px) {
+  .areas-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .area-actions {
+    justify-content: flex-end;
+  }
+}
 
 @media (max-width: 768px) {
   .add-practitioner-page {
@@ -635,6 +1054,12 @@
 
   .areas-grid {
     grid-template-columns: 1fr;
+  }
+
+  .area-result-info {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 6px;
   }
 
   .form-actions {
@@ -660,6 +1085,41 @@
     height: 32px;
 
     font-size: 12px;
+  }
+
+  .area-actions {
+    width: 100%;
+  }
+
+  .area-action-button {
+    flex: 1;
+  }
+
+  /* =========================
+     MOBILE PAGINATION
+  ========================== */
+
+  .area-pagination {
+    gap: 8px;
+  }
+
+  .pagination-pages {
+    flex: 1;
+  }
+
+  .pagination-button {
+    width: 34px;
+
+    padding: 0;
+  }
+
+  .pagination-button span {
+    display: none;
+  }
+
+  .pagination-page {
+    width: 32px;
+    height: 32px;
   }
 
   .form-actions {

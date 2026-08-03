@@ -1,4 +1,5 @@
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -14,7 +15,7 @@ import {
 @Component({
   selector: 'app-add-practitioner',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule],
   templateUrl: './add-practitioner.html',
   styleUrl: './add-practitioner.css',
 })
@@ -54,7 +55,35 @@ export class AddPractitioner implements OnInit {
 
   areas: Area[] = [];
 
+  /**
+   * Contains only the IDs of areas selected
+   * for the practitioner currently being created.
+   *
+   * This does NOT delete areas from the database.
+   */
   selectedAreaIds: string[] = [];
+
+  // =========================
+  // AREA SEARCH
+  // =========================
+
+  areaSearchTerm = '';
+
+  filteredAreas: Area[] = [];
+
+  // =========================
+  // AREA PAGINATION
+  // =========================
+
+  /**
+   * Number of areas displayed on one page.
+   */
+  readonly areasPerPage = 10;
+
+  /**
+   * Current pagination page.
+   */
+  currentAreaPage = 1;
 
   // =========================
   // STATE
@@ -93,14 +122,27 @@ export class AddPractitioner implements OnInit {
         console.log('AREAS LOADED:', areas);
 
         this.services = Array.isArray(services) ? services : [];
+
         this.areas = Array.isArray(areas) ? areas : [];
+
+        // Show all areas initially.
+        this.filteredAreas = [...this.areas];
+
+        // Reset area selection when form data is loaded.
+        this.selectedAreaIds = [];
+
+        // Start from first page.
+        this.currentAreaPage = 1;
 
         this.isLoading = false;
 
         this.cdr.detectChanges();
 
         console.log('FORM DATA LOADING COMPLETE');
-        console.log('isLoading:', this.isLoading);
+        console.log('Services:', this.services.length);
+        console.log('Areas:', this.areas.length);
+        console.log('Selected areas:', this.selectedAreaIds.length);
+        console.log('Total area pages:', this.totalAreaPages);
       },
 
       error: (error) => {
@@ -108,6 +150,10 @@ export class AddPractitioner implements OnInit {
 
         this.services = [];
         this.areas = [];
+        this.filteredAreas = [];
+        this.selectedAreaIds = [];
+
+        this.currentAreaPage = 1;
 
         this.errorMessage =
           error?.error?.message ??
@@ -126,21 +172,250 @@ export class AddPractitioner implements OnInit {
   }
 
   // =========================
+  // AREA SEARCH
+  // =========================
+
+  filterAreas(): void {
+    const searchTerm = this.areaSearchTerm.trim().toLowerCase();
+
+    // If search is empty, show all areas.
+    if (!searchTerm) {
+      this.filteredAreas = [...this.areas];
+    } else {
+      this.filteredAreas = this.areas.filter((area) => {
+        const areaName = area.name?.toLowerCase() ?? '';
+
+        const cityName = area.cityName?.toLowerCase() ?? '';
+
+        return areaName.includes(searchTerm) || cityName.includes(searchTerm);
+      });
+    }
+
+    // Always return to page 1 after searching.
+    this.currentAreaPage = 1;
+
+    this.cdr.detectChanges();
+  }
+
+  // =========================
+  // CLEAR AREA SEARCH
+  // =========================
+
+  clearAreaSearch(): void {
+    this.areaSearchTerm = '';
+
+    this.filteredAreas = [...this.areas];
+
+    // Return to first page.
+    this.currentAreaPage = 1;
+
+    this.cdr.detectChanges();
+  }
+
+  // =========================
   // AREA SELECTION
   // =========================
 
   toggleArea(areaId: string): void {
-    const index = this.selectedAreaIds.indexOf(areaId);
-
-    if (index === -1) {
-      this.selectedAreaIds.push(areaId);
+    if (this.selectedAreaIds.includes(areaId)) {
+      // Remove area from selection.
+      this.selectedAreaIds = this.selectedAreaIds.filter((id) => id !== areaId);
     } else {
-      this.selectedAreaIds.splice(index, 1);
+      // Add area to selection.
+      this.selectedAreaIds = [...this.selectedAreaIds, areaId];
     }
+
+    console.log('Selected area IDs:', this.selectedAreaIds);
+
+    this.cdr.detectChanges();
   }
+
+  // =========================
+  // CHECK AREA SELECTION
+  // =========================
 
   isAreaSelected(areaId: string): boolean {
     return this.selectedAreaIds.includes(areaId);
+  }
+
+  // =========================
+  // SELECT ALL FILTERED AREAS
+  // =========================
+
+  selectAllAreas(): void {
+    const filteredAreaIds = this.filteredAreas.map((area) => area.id);
+
+    /**
+     * Merge existing selections with filtered areas.
+     *
+     * Set prevents duplicate IDs.
+     *
+     * Important:
+     * This selects all currently filtered areas,
+     * not only the 10 areas visible on the current page.
+     */
+    this.selectedAreaIds = [...new Set([...this.selectedAreaIds, ...filteredAreaIds])];
+
+    console.log('Selected all filtered areas:', this.selectedAreaIds);
+
+    this.cdr.detectChanges();
+  }
+
+  // =========================
+  // CLEAR ALL SELECTED AREAS
+  // =========================
+
+  clearAllAreas(): void {
+    /**
+     * IMPORTANT:
+     *
+     * This does NOT delete areas.
+     *
+     * It only clears the area IDs selected
+     * for the practitioner currently being created.
+     */
+    this.selectedAreaIds = [];
+
+    console.log('All selected areas cleared.');
+
+    this.cdr.detectChanges();
+  }
+
+  // =========================
+  // CHECK IF ALL FILTERED AREAS
+  // ARE SELECTED
+  // =========================
+
+  areAllFilteredAreasSelected(): boolean {
+    if (this.filteredAreas.length === 0) {
+      return false;
+    }
+
+    return this.filteredAreas.every((area) => this.selectedAreaIds.includes(area.id));
+  }
+
+  // =========================
+  // AREA COUNTS
+  // =========================
+
+  get selectedAreaCount(): number {
+    return this.selectedAreaIds.length;
+  }
+
+  get filteredAreaCount(): number {
+    return this.filteredAreas.length;
+  }
+
+  // =========================
+  // AREA PAGINATION
+  // =========================
+
+  /**
+   * Total number of pages based on
+   * the number of filtered areas.
+   *
+   * Example:
+   *
+   * 14 areas / 10 = 2 pages
+   * 50 areas / 10 = 5 pages
+   * 51 areas / 10 = 6 pages
+   */
+  get totalAreaPages(): number {
+    return Math.ceil(this.filteredAreas.length / this.areasPerPage);
+  }
+
+  /**
+   * Returns only the areas that belong
+   * to the current page.
+   */
+  get paginatedAreas(): Area[] {
+    const startIndex = (this.currentAreaPage - 1) * this.areasPerPage;
+
+    const endIndex = startIndex + this.areasPerPage;
+
+    return this.filteredAreas.slice(startIndex, endIndex);
+  }
+
+  /**
+   * Generates dynamic page numbers.
+   *
+   * Example:
+   *
+   * 14 areas:
+   * [1, 2]
+   *
+   * 50 areas:
+   * [1, 2, 3, 4, 5]
+   */
+  get areaPageNumbers(): number[] {
+    return Array.from({ length: this.totalAreaPages }, (_, index) => index + 1);
+  }
+
+  /**
+   * First visible area number.
+   *
+   * Example:
+   * Page 1 -> 1
+   * Page 2 -> 11
+   */
+  get areaStartIndex(): number {
+    if (this.filteredAreas.length === 0) {
+      return 0;
+    }
+
+    return (this.currentAreaPage - 1) * this.areasPerPage + 1;
+  }
+
+  /**
+   * Last visible area number.
+   *
+   * Example:
+   *
+   * 14 areas:
+   * Page 1 -> 10
+   * Page 2 -> 14
+   */
+  get areaEndIndex(): number {
+    return Math.min(this.currentAreaPage * this.areasPerPage, this.filteredAreas.length);
+  }
+
+  /**
+   * Go directly to a specific page.
+   */
+  goToAreaPage(page: number): void {
+    if (page < 1 || page > this.totalAreaPages || page === this.currentAreaPage) {
+      return;
+    }
+
+    this.currentAreaPage = page;
+
+    this.cdr.detectChanges();
+  }
+
+  /**
+   * Go to previous page.
+   */
+  goToPreviousAreaPage(): void {
+    if (this.currentAreaPage <= 1) {
+      return;
+    }
+
+    this.currentAreaPage--;
+
+    this.cdr.detectChanges();
+  }
+
+  /**
+   * Go to next page.
+   */
+  goToNextAreaPage(): void {
+    if (this.currentAreaPage >= this.totalAreaPages) {
+      return;
+    }
+
+    this.currentAreaPage++;
+
+    this.cdr.detectChanges();
   }
 
   // =========================
@@ -195,8 +470,10 @@ export class AddPractitioner implements OnInit {
     this.errorMessage = '';
     this.successMessage = '';
 
+    // Mark all form fields as touched.
     this.practitionerForm.markAllAsTouched();
 
+    // Stop submission if form is invalid.
     if (this.practitionerForm.invalid) {
       return;
     }
@@ -205,15 +482,26 @@ export class AddPractitioner implements OnInit {
 
     const request: CreatePractitionerRequest = {
       name: formValue.name.trim(),
+
       email: formValue.email.trim(),
+
       password: formValue.password,
+
       phone: formValue.phone.trim(),
+
       serviceId: formValue.serviceId,
+
       education: formValue.education.trim(),
+
       priority: Number(formValue.priority),
+
       sharePercentage: Number(formValue.sharePercentage),
+
+      // Only selected area IDs are sent to backend.
       areaIds: [...this.selectedAreaIds],
     };
+
+    console.log('CREATE PRACTITIONER REQUEST:', request);
 
     this.isSubmitting = true;
 
@@ -234,6 +522,8 @@ export class AddPractitioner implements OnInit {
           'Unable to create practitioner. Please try again.';
 
         this.isSubmitting = false;
+
+        this.cdr.detectChanges();
       },
     });
   }

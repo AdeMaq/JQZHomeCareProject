@@ -18,8 +18,10 @@ namespace JQZHomeCareProject.Application.DTOs
     public class PatientPackageDto
     {
         public Guid Id { get; set; }
-        public PatientDto Patient { get; set; } = new();
-        public PackageDto Package { get; set; } = new();
+        public Guid PatientId { get; set; }
+        public string PatientName { get; set; } = string.Empty;
+        public Guid PackageId { get; set; }
+        public string PackageName { get; set; } = string.Empty;
         public PackagePaymentType PaymentType { get; set; }
         public decimal TotalAmount { get; set; }
         public decimal AmountPaid { get; set; }
@@ -28,6 +30,8 @@ namespace JQZHomeCareProject.Application.DTOs
         public DateTime PurchaseDate { get; set; }
         public List<VisitDto> Visits { get; set; } = new();
     }
+
+
 
     public class RecordInstallmentDto
     {

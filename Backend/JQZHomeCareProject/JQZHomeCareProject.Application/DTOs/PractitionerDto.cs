@@ -37,6 +37,10 @@ namespace JQZHomeCareProject.Application.DTOs
     public class UpdatePractitionerDto
     {
         public string Name { get; set; } = string.Empty;
+        public string Phone { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+        public Guid ServiceId { get; set; }
+        public string ServiceName { get; set; } = string.Empty;
         public string Education { get; set; } = string.Empty;
         public int Priority { get; set; }
         public decimal SharePercentage { get; set; }

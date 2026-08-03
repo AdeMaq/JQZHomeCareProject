@@ -83,7 +83,8 @@ namespace JQZHomeCareProject.Persistence.Repositories
             _context.PractitionerAreas.Remove(link);
             await _context.SaveChangesAsync();
         }
-
+        public Task<Practitioner?> GetByPhoneAsync(string phone) =>
+            _context.Practitioners.FirstOrDefaultAsync(p => p.Phone == phone);
         public async Task<IEnumerable<Practitioner>> FindAvailableAsync(Guid serviceId, Guid areaId, Guid cityId)
         {
             var exactMatches = await _context.Practitioners

@@ -14,19 +14,22 @@ namespace JQZHomeCareProject.Application.Services
         private readonly IAreaRepository _areaRepository;
         private readonly IServiceRepository _serviceRepository;
         private readonly IPasswordHasher _passwordHasher;
+        private readonly IUnitOfWork _unitOfWork;
 
         public PractitionerService(
             IPractitionerRepository practitionerRepository,
             IUserRepository userRepository,
             IAreaRepository areaRepository,
             IServiceRepository serviceRepository,
-            IPasswordHasher passwordHasher)
+            IPasswordHasher passwordHasher,
+            IUnitOfWork unitOfWork)
         {
             _practitionerRepository = practitionerRepository;
             _userRepository = userRepository;
             _areaRepository = areaRepository;
             _serviceRepository = serviceRepository;
             _passwordHasher = passwordHasher;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<PractitionerDto> CreatePractitionerAsync(CreatePractitionerDto dto, Guid createdByUserId)
@@ -127,10 +130,39 @@ namespace JQZHomeCareProject.Application.Services
             var practitioner = await _practitionerRepository.GetByIdAsync(id)
                 ?? throw new NotFoundException($"Practitioner {id} not found.");
 
-            practitioner.Education = dto.Education;
-            practitioner.Priority = dto.Priority;
-            practitioner.SharePercentage = dto.SharePercentage;
-            await _practitionerRepository.UpdateAsync(practitioner);
+            var linkedUser = await _userRepository.GetByPractitionerIdAsync(id)
+                ?? throw new NotFoundException($"No linked login found for practitioner {id}.");
+
+            var phoneOwner = await _practitionerRepository.GetByPhoneAsync(dto.Phone);
+            if (phoneOwner is not null && phoneOwner.Id != id)
+                throw new ValidationException($"Phone '{dto.Phone}' is already in use by another practitioner.");
+
+            var emailOwner = await _userRepository.GetByEmailAsync(dto.Email);
+            if (emailOwner is not null && emailOwner.Id != linkedUser.Id)
+                throw new ValidationException($"Email '{dto.Email}' is already in use by another account.");
+
+            var service = await _serviceRepository.GetByIdAsync(dto.ServiceId)
+                ?? throw new NotFoundException($"Service {dto.ServiceId} not found.");
+
+            if (dto.Priority is < 1 or > 5)
+                throw new ValidationException("Priority must be between 1 and 5.");
+
+            if (dto.SharePercentage is < 0 or > 100)
+                throw new ValidationException("SharePercentage must be between 0 and 100.");
+
+            await _unitOfWork.ExecuteInTransactionAsync(async () =>
+            {
+                linkedUser.Name = dto.Name;
+                linkedUser.Email = dto.Email;
+                await _userRepository.UpdateAsync(linkedUser);
+
+                practitioner.Phone = dto.Phone;
+                practitioner.ServiceId = dto.ServiceId;
+                practitioner.Education = dto.Education;
+                practitioner.Priority = dto.Priority;
+                practitioner.SharePercentage = dto.SharePercentage;
+                await _practitionerRepository.UpdateAsync(practitioner);
+            });
         }
 
         public async Task SetPriorityAsync(Guid id, int priority)

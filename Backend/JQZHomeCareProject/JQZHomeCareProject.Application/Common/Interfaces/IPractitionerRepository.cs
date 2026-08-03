@@ -18,5 +18,6 @@ namespace JQZHomeCareProject.Application.Common.Interfaces
         Task RemoveAreaAsync(Guid practitionerId, Guid areaId);
 
         Task<IEnumerable<Practitioner>> FindAvailableAsync(Guid serviceId, Guid areaId, Guid cityId);
+        Task<Practitioner?> GetByPhoneAsync(string phone);
     }
 }

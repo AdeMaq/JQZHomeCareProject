@@ -1,7 +1,9 @@
 ﻿using JQZHomeCareProject.Application.Common.Interfaces;
+using JQZHomeCareProject.Application.Services;
 using JQZHomeCareProject.Infrastructure.Auth;
 using JQZHomeCareProject.Infrastructure.Maps;
 using JQZHomeCareProject.Infrastructure.Notifications;
+using JQZHomeCareProject.Infrastructure.Security;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -31,8 +33,10 @@ namespace JQZHomeCareProject.Infrastructure
             services.AddScoped<IPasswordHasher, PasswordHasher>();
             services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
             services.AddScoped<IPushNotificationService, FirebasePushNotificationService>();
-
             services.AddHttpClient<IMapsService, MapsService>();
+            services.AddScoped<IApiKeyHasher, ApiKeyHasher>();
+            services.AddScoped<IApiClientService, ApiClientService>();
+
 
             return services;
         }

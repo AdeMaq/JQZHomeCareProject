@@ -1,10 +1,11 @@
+using JQZHomeCareProject.API.Middleware;
 using JQZHomeCareProject.Application.Common.Interfaces;
 using JQZHomeCareProject.Application.Services;
 using JQZHomeCareProject.Infrastructure;
 using JQZHomeCareProject.Infrastructure.Auth;
+using JQZHomeCareProject.Infrastructure.Authentication;
 using JQZHomeCareProject.Persistence;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using JQZHomeCareProject.API.Middleware;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using System.Text;
@@ -56,6 +57,7 @@ builder.Services.AddScoped<ICityService, JQZHomeCareProject.Application.Services
 builder.Services.AddScoped<IServiceCategoryService, JQZHomeCareProject.Application.Services.ServiceCategoryService>();
 builder.Services.AddScoped<IPatientService, JQZHomeCareProject.Application.Services.PatientService>();
 builder.Services.AddScoped<IPatientPackageService, JQZHomeCareProject.Application.Services.PatientPackageService>();
+builder.Services.AddScoped<IApiClientService, JQZHomeCareProject.Application.Services.ApiClientService>();
 
 
 
@@ -80,9 +82,16 @@ builder.Services.AddAuthentication(options =>
         ValidAudience = jwtSettings.Audience,
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Secret))
     };
-});
+})
+    .AddScheme<ApiKeyAuthenticationOptions, ApiKeyAuthenticationHandler>(
+        ApiKeyAuthenticationOptions.SchemeName, options => { }); ;
 
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("ApiClientOnly", policy =>
+        policy.AddAuthenticationSchemes(ApiKeyAuthenticationOptions.SchemeName)
+              .RequireClaim("client_type", "external_partner"));
+});
 
 builder.Services.AddCors(options =>
 {

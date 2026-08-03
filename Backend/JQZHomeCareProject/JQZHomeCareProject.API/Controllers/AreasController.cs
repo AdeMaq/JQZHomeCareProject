@@ -8,6 +8,7 @@ namespace JQZHomeCareProject.API.Controllers
     [ApiController]
     [Route("api/areas")]
     [Authorize]
+    //[Authorize(AuthenticationSchemes = "ApiKey", Policy = "ApiClientOnly")]
     public class AreasController : ControllerBase
     {
         private readonly IAreaService _areaService;

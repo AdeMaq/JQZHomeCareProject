@@ -18,5 +18,7 @@ namespace JQZHomeCareProject.Application.Services
         Task RemoveAreaAsync(Guid practitionerId, Guid areaId);
         Task<IEnumerable<PractitionerDto>> FindAvailableAsync(Guid serviceId, Guid patientAreaId);
         Task<IEnumerable<PractitionerDto>> SearchByNameAsync(string name);
+
+        Task ResetPasswordAsync(Guid practitionerId, ResetPractitionerPasswordDto dto);  
     }
 }

@@ -39,10 +39,18 @@ namespace JQZHomeCareProject.Application.DTOs
         public string Name { get; set; } = string.Empty;
         public string Phone { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
+        public string? Password { get; set; } = null;
         public Guid ServiceId { get; set; }
         public string ServiceName { get; set; } = string.Empty;
         public string Education { get; set; } = string.Empty;
         public int Priority { get; set; }
         public decimal SharePercentage { get; set; }
+        public List<Guid> AreaIds { get; set; } = new();
     }
+
+    public class ResetPractitionerPasswordDto
+    {
+        public string NewPassword { get; set; } = string.Empty;
+    }
+
 }

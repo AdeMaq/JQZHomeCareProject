@@ -150,6 +150,13 @@ namespace JQZHomeCareProject.Application.Services
             if (dto.SharePercentage is < 0 or > 100)
                 throw new ValidationException("SharePercentage must be between 0 and 100.");
 
+            var distinctAreaIds = dto.AreaIds.Distinct().ToList();
+            foreach (var areaId in distinctAreaIds)
+            {
+                _ = await _areaRepository.GetByIdAsync(areaId)
+                    ?? throw new NotFoundException($"Area {areaId} not found.");
+            }
+
             await _unitOfWork.ExecuteInTransactionAsync(async () =>
             {
                 linkedUser.Name = dto.Name;
@@ -162,6 +169,16 @@ namespace JQZHomeCareProject.Application.Services
                 practitioner.Priority = dto.Priority;
                 practitioner.SharePercentage = dto.SharePercentage;
                 await _practitionerRepository.UpdateAsync(practitioner);
+
+                var currentAreas = (await _practitionerRepository.GetAreasAsync(id)).Select(a => a.Id).ToList();
+
+                var areasToRemove = currentAreas.Except(distinctAreaIds);
+                foreach (var areaId in areasToRemove)
+                    await _practitionerRepository.RemoveAreaAsync(id, areaId);
+
+                var areasToAdd = distinctAreaIds.Except(currentAreas);
+                foreach (var areaId in areasToAdd)
+                    await _practitionerRepository.AssignAreaAsync(id, areaId);
             });
         }
 
@@ -227,6 +244,22 @@ namespace JQZHomeCareProject.Application.Services
             return result;
         }
 
+        public async Task ResetPasswordAsync(Guid practitionerId, ResetPractitionerPasswordDto dto)
+        {
+            var linkedUser = await _userRepository.GetByPractitionerIdAsync(practitionerId)
+                ?? throw new NotFoundException($"No linked login found for practitioner {practitionerId}.");
+
+            ValidatePasswordStrength(dto.NewPassword);
+
+            linkedUser.PasswordHash = _passwordHasher.Hash(dto.NewPassword);
+            await _userRepository.UpdateAsync(linkedUser);
+        }
+
+        private static void ValidatePasswordStrength(string password)
+        {
+            if (string.IsNullOrWhiteSpace(password) || password.Length < 8)
+                throw new ValidationException("Password must be at least 8 characters.");
+        }
         private static PractitionerDto MapToDto(Practitioner practitioner, User? user, IEnumerable<Area> areas) => new()
         {
             Id = practitioner.Id,

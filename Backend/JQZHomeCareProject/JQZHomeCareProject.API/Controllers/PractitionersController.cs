@@ -2,6 +2,8 @@
 using JQZHomeCareProject.Application.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Authentication;
+using System.Security.Claims;
 
 namespace JQZHomeCareProject.API.Controllers
 {
@@ -100,6 +102,14 @@ namespace JQZHomeCareProject.API.Controllers
         public async Task<ActionResult<IEnumerable<PractitionerDto>>> SearchByNameAsync([FromQuery] string name)
         {
             return Ok(await _service.SearchByNameAsync(name));
+        }
+
+        [HttpPut("{id:guid}/reset-password")]
+        [Authorize(Roles = "SuperAdmin,MiddlePowerAdmin")]
+        public async Task<IActionResult> ResetPasswordAsync(Guid id, [FromBody] ResetPractitionerPasswordDto dto)
+        {
+            await _service.ResetPasswordAsync(id, dto);
+            return NoContent();
         }
     }
 }

@@ -38,7 +38,7 @@
 
   <div class="summary-card">
     <div class="summary-content">
-      <span class="summary-label"> Total Practitioners </span>
+      <span class="summary-label">Total Practitioners</span>
 
       <strong class="summary-value">
         {{ practitioners.length }}
@@ -205,13 +205,17 @@
           <tbody>
             @for (practitioner of filteredPractitioners; track practitioner.id; let i = $index) {
               <tr>
-                <!-- INDEX -->
+                <!-- =========================
+                     INDEX
+                ========================== -->
 
                 <td class="index-cell">
                   {{ i + 1 }}
                 </td>
 
-                <!-- PRACTITIONER -->
+                <!-- =========================
+                     PRACTITIONER
+                ========================== -->
 
                 <td>
                   <div class="practitioner-cell">
@@ -231,7 +235,9 @@
                   </div>
                 </td>
 
-                <!-- CONTACT -->
+                <!-- =========================
+                     CONTACT
+                ========================== -->
 
                 <td>
                   <div class="contact-cell">
@@ -239,11 +245,13 @@
                       {{ practitioner.phone || '-' }}
                     </strong>
 
-                    <span> Phone </span>
+                    <span>Phone</span>
                   </div>
                 </td>
 
-                <!-- SERVICE -->
+                <!-- =========================
+                     SERVICE
+                ========================== -->
 
                 <td>
                   <div class="service-cell">
@@ -257,7 +265,9 @@
                   </div>
                 </td>
 
-                <!-- EDUCATION -->
+                <!-- =========================
+                     EDUCATION
+                ========================== -->
 
                 <td>
                   <span class="education-text">
@@ -265,16 +275,27 @@
                   </span>
                 </td>
 
-                <!-- AREAS -->
+                <!-- =========================
+                     AREAS
+                     CLICK -> MANAGE AREAS
+                ========================== -->
 
                 <td>
-                  <span class="area-badge">
+                  <button
+                    type="button"
+                    class="area-badge area-badge-button"
+                    title="Manage practitioner areas"
+                    (click)="manageAreas(practitioner.id)"
+                  >
                     {{ practitioner.areas.length }}
+
                     {{ practitioner.areas.length === 1 ? 'Area' : 'Areas' }}
-                  </span>
+                  </button>
                 </td>
 
-                <!-- PRIORITY -->
+                <!-- =========================
+                     PRIORITY
+                ========================== -->
 
                 <td>
                   <span class="priority-badge">
@@ -282,7 +303,9 @@
                   </span>
                 </td>
 
-                <!-- VISITS -->
+                <!-- =========================
+                     VISITS
+                ========================== -->
 
                 <td>
                   <div class="visit-summary">
@@ -297,7 +320,9 @@
                   </div>
                 </td>
 
-                <!-- ACTIONS -->
+                <!-- =========================
+                     ACTIONS
+                ========================== -->
 
                 <td class="actions-cell">
                   <button

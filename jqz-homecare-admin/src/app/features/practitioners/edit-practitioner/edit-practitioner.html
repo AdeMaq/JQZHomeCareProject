@@ -1,0 +1,317 @@
+<div class="edit-practitioner-page">
+  <!-- =========================
+       LOADING
+  ========================== -->
+
+  @if (isLoading) {
+    <div class="state-card">
+      <div class="loading-spinner"></div>
+
+      <h3>Loading practitioner</h3>
+
+      <p>Please wait while the practitioner information is being loaded.</p>
+    </div>
+  }
+
+  <!-- =========================
+       ERROR
+  ========================== -->
+
+  @else if (hasError || !practitioner) {
+    <div class="state-card">
+      <div class="state-icon error-icon">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+      </div>
+
+      <h3>Unable to load practitioner</h3>
+
+      <p>We couldn't retrieve the practitioner information. Please try again.</p>
+
+      <button type="button" class="secondary-button" (click)="goBack()">
+        <i class="fa-solid fa-arrow-left"></i>
+
+        Back to Profile
+      </button>
+    </div>
+  }
+
+  <!-- =========================
+       EDIT FORM
+  ========================== -->
+
+  @else {
+    <!-- =========================
+         PAGE HEADER
+    ========================== -->
+
+    <div class="page-header">
+      <div class="breadcrumb">
+        <span>Practitioners</span>
+
+        <i class="fa-solid fa-chevron-right"></i>
+
+        <span>
+          {{ practitioner.name }}
+        </span>
+
+        <i class="fa-solid fa-chevron-right"></i>
+
+        <strong>Edit</strong>
+      </div>
+
+      <div class="title-row">
+        <div>
+          <h1>Edit Practitioner</h1>
+
+          <p>Update practitioner account and professional information.</p>
+        </div>
+
+        <button type="button" class="secondary-button" (click)="goBack()">
+          <i class="fa-solid fa-arrow-left"></i>
+
+          Back to Profile
+        </button>
+      </div>
+    </div>
+
+    <!-- =========================
+         FORM CARD
+    ========================== -->
+
+    <form class="form-card" (ngSubmit)="saveChanges()">
+      <!-- =========================
+           ACCOUNT INFORMATION
+      ========================== -->
+
+      <section class="form-section">
+        <div class="section-header">
+          <div class="section-icon">
+            <i class="fa-solid fa-user"></i>
+          </div>
+
+          <div>
+            <h2>Account Information</h2>
+
+            <p>Update the practitioner's basic account information.</p>
+          </div>
+        </div>
+
+        <div class="form-grid">
+          <!-- NAME -->
+
+          <div class="form-field">
+            <label for="name">
+              Name
+              <span>*</span>
+            </label>
+
+            <input
+              id="name"
+              name="name"
+              type="text"
+              [(ngModel)]="form.name"
+              placeholder="Enter practitioner name"
+              autocomplete="name"
+            />
+          </div>
+
+          <!-- EMAIL -->
+
+          <div class="form-field">
+            <label for="email">
+              Email Address
+              <span>*</span>
+            </label>
+
+            <input
+              id="email"
+              name="email"
+              type="email"
+              [(ngModel)]="form.email"
+              placeholder="Enter email address"
+              autocomplete="email"
+            />
+          </div>
+
+          <!-- PHONE -->
+
+          <div class="form-field">
+            <label for="phone">
+              Phone Number
+              <span>*</span>
+            </label>
+
+            <input
+              id="phone"
+              name="phone"
+              type="tel"
+              [(ngModel)]="form.phone"
+              placeholder="Enter phone number"
+              autocomplete="tel"
+            />
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================
+           PROFESSIONAL INFORMATION
+      ========================== -->
+
+      <section class="form-section">
+        <div class="section-header">
+          <div class="section-icon">
+            <i class="fa-solid fa-user-doctor"></i>
+          </div>
+
+          <div>
+            <h2>Professional Information</h2>
+
+            <p>Update the practitioner's service and professional details.</p>
+          </div>
+        </div>
+
+        <div class="form-grid">
+          <!-- SERVICE -->
+
+          <div class="form-field">
+            <label for="service">
+              Service
+              <span>*</span>
+            </label>
+
+            <select
+              id="service"
+              name="serviceId"
+              [(ngModel)]="form.serviceId"
+              (ngModelChange)="onServiceChange()"
+            >
+              <option value="">Select service</option>
+
+              @for (service of services; track service.id) {
+                <option [value]="service.id">
+                  {{ service.name }}
+                </option>
+              }
+            </select>
+          </div>
+
+          <!-- EDUCATION -->
+
+          <div class="form-field">
+            <label for="education">
+              Education
+              <span>*</span>
+            </label>
+
+            <input
+              id="education"
+              name="education"
+              type="text"
+              [(ngModel)]="form.education"
+              placeholder="Enter education"
+            />
+          </div>
+
+          <!-- PRIORITY -->
+
+          <div class="form-field">
+            <label for="priority">
+              Priority
+              <span>*</span>
+            </label>
+
+            <select id="priority" name="priority" [(ngModel)]="form.priority">
+              <option [ngValue]="1">1</option>
+              <option [ngValue]="2">2</option>
+              <option [ngValue]="3">3</option>
+              <option [ngValue]="4">4</option>
+              <option [ngValue]="5">5</option>
+            </select>
+
+            <small> Priority must be between 1 and 5. </small>
+          </div>
+
+          <!-- SHARE PERCENTAGE -->
+
+          <div class="form-field">
+            <label for="sharePercentage">
+              Share Percentage
+              <span>*</span>
+            </label>
+
+            <div class="input-with-suffix">
+              <input
+                id="sharePercentage"
+                name="sharePercentage"
+                type="number"
+                min="0"
+                max="100"
+                step="0.01"
+                [(ngModel)]="form.sharePercentage"
+              />
+
+              <span>%</span>
+            </div>
+
+            <small> Value must be between 0 and 100. </small>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================
+           INFORMATION NOTE
+      ========================== -->
+
+      <section class="info-section">
+        <div class="info-icon">
+          <i class="fa-solid fa-circle-info"></i>
+        </div>
+
+        <div>
+          <strong> About practitioner updates </strong>
+
+          <p>
+            Password changes and service areas are managed separately. Use the practitioner's
+            profile to manage assigned service areas.
+          </p>
+        </div>
+      </section>
+
+      <!-- =========================
+           SAVE ERROR
+      ========================== -->
+
+      @if (saveError) {
+        <div class="error-message">
+          <i class="fa-solid fa-circle-exclamation"></i>
+
+          <span>
+            {{ saveError }}
+          </span>
+        </div>
+      }
+
+      <!-- =========================
+           ACTIONS
+      ========================== -->
+
+      <div class="form-actions">
+        <button type="button" class="secondary-button" [disabled]="isSaving" (click)="cancel()">
+          Cancel
+        </button>
+
+        <button type="submit" class="primary-button" [disabled]="isSaving">
+          @if (isSaving) {
+            <span class="button-spinner"></span>
+
+            Saving...
+          } @else {
+            <i class="fa-solid fa-check"></i>
+
+            Save Changes
+          }
+        </button>
+      </div>
+    </form>
+  }
+</div>

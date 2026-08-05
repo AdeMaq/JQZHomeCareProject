@@ -34,6 +34,8 @@ import { EditArea } from './features/locations/edit-area/edit-area';
 import { PractitionersList } from './features/practitioners/practitioners-list/practitioners-list';
 import { AddPractitioner } from './features/practitioners/add-practitioner/add-practitioner';
 import { PractitionerProfile } from './features/practitioners/practitioner-profile/practitioner-profile';
+import { EditPractitioner } from './features/practitioners/edit-practitioner/edit-practitioner';
+import { MergePractitionerAreas } from './features/practitioners/merge-practitioner-areas/merge-practitioner-areas';
 
 export const routes: Routes = [
   // =========================
@@ -178,6 +180,18 @@ export const routes: Routes = [
       {
         path: 'practitioners/add',
         component: AddPractitioner,
+      },
+
+      {
+        path: 'practitioners/:id/edit',
+        component: EditPractitioner,
+      },
+
+      // IMPORTANT:
+      // This route must come BEFORE /practitioners/:id
+      {
+        path: 'practitioners/:id/areas',
+        component: MergePractitionerAreas,
       },
 
       {

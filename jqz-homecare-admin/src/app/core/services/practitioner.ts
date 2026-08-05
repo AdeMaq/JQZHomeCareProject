@@ -85,10 +85,31 @@ export interface CreatePractitionerRequest {
 // UPDATE PRACTITIONER
 // =========================
 
+/*
+ * IMPORTANT:
+ *
+ * Area assignment is managed separately now.
+ *
+ * Therefore areaIds does NOT belong here.
+ *
+ * Practitioner information is updated from the
+ * Edit Practitioner page.
+ *
+ * Practitioner areas are managed from the
+ * dedicated Manage Practitioner Areas page.
+ */
 export interface UpdatePractitionerRequest {
   name: string;
+  phone: string;
+  email: string;
+
+  serviceId: string;
+  serviceName: string;
+
   education: string;
+
   priority: number;
+
   sharePercentage: number;
 }
 
@@ -102,11 +123,19 @@ export interface UpdatePractitionerRequest {
 export class PractitionerService {
   private readonly http = inject(HttpClient);
 
+  // =========================
+  // API URLS
+  // =========================
+
   private readonly apiUrl = 'http://localhost:5212/api/practitioners';
 
   private readonly servicesUrl = 'http://localhost:5212/api/services';
 
   private readonly areasUrl = 'http://localhost:5212/api/areas';
+
+  // ============================================================
+  // PRACTITIONERS
+  // ============================================================
 
   // =========================
   // GET ALL PRACTITIONERS
@@ -136,9 +165,24 @@ export class PractitionerService {
   // UPDATE PRACTITIONER
   // =========================
 
+  /*
+   * Updates only practitioner information.
+   *
+   * Areas are intentionally NOT included here.
+   *
+   * Area assignment/removal is handled through:
+   *
+   * assignArea()
+   * removeArea()
+   */
+
   updatePractitioner(id: string, request: UpdatePractitionerRequest): Observable<void> {
     return this.http.put<void>(`${this.apiUrl}/${id}`, request);
   }
+
+  // ============================================================
+  // PRIORITY
+  // ============================================================
 
   // =========================
   // SET PRIORITY
@@ -148,6 +192,10 @@ export class PractitionerService {
     return this.http.put<void>(`${this.apiUrl}/${id}/priority`, priority);
   }
 
+  // ============================================================
+  // SHARE PERCENTAGE
+  // ============================================================
+
   // =========================
   // SET SHARE PERCENTAGE
   // =========================
@@ -156,9 +204,18 @@ export class PractitionerService {
     return this.http.put<void>(`${this.apiUrl}/${id}/share`, sharePercentage);
   }
 
+  // ============================================================
+  // PRACTITIONER AREAS
+  // ============================================================
+
   // =========================
   // GET PRACTITIONER AREAS
   // =========================
+
+  /*
+   * Gets only the areas currently assigned
+   * to a specific practitioner.
+   */
 
   getPractitionerAreas(id: string): Observable<PractitionerArea[]> {
     return this.http.get<PractitionerArea[]>(`${this.apiUrl}/${id}/areas`);
@@ -168,17 +225,39 @@ export class PractitionerService {
   // ASSIGN AREA
   // =========================
 
+  /*
+   * Assigns one area to a practitioner.
+   *
+   * This is used by the dedicated
+   * Manage Practitioner Areas page.
+   */
+
   assignArea(practitionerId: string, areaId: string): Observable<void> {
-    return this.http.post<void>(`${this.apiUrl}/${practitionerId}/areas`, areaId);
+    return this.http.post<void>(`${this.apiUrl}/${practitionerId}/areas`, JSON.stringify(areaId), {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
   }
 
   // =========================
   // REMOVE AREA
   // =========================
 
+  /*
+   * Removes one assigned area from a practitioner.
+   *
+   * This is also handled by the dedicated
+   * Manage Practitioner Areas page.
+   */
+
   removeArea(practitionerId: string, areaId: string): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${practitionerId}/areas/${areaId}`);
   }
+
+  // ============================================================
+  // AVAILABLE PRACTITIONERS
+  // ============================================================
 
   // =========================
   // FIND AVAILABLE PRACTITIONERS
@@ -193,6 +272,10 @@ export class PractitionerService {
     });
   }
 
+  // ============================================================
+  // SEARCH
+  // ============================================================
+
   // =========================
   // SEARCH BY NAME
   // =========================
@@ -205,6 +288,10 @@ export class PractitionerService {
     });
   }
 
+  // ============================================================
+  // SERVICES
+  // ============================================================
+
   // =========================
   // GET SERVICES
   // =========================
@@ -213,9 +300,20 @@ export class PractitionerService {
     return this.http.get<Service[]>(this.servicesUrl);
   }
 
+  // ============================================================
+  // AREAS
+  // ============================================================
+
   // =========================
-  // GET AREAS
+  // GET ALL AREAS
   // =========================
+
+  /*
+   * Gets all available areas.
+   *
+   * The Manage Practitioner Areas page can use this
+   * to show areas that can be assigned.
+   */
 
   getAreas(): Observable<Area[]> {
     return this.http.get<Area[]>(this.areasUrl);

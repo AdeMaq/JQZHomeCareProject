@@ -117,6 +117,32 @@ export class PractitionersList implements OnInit {
   }
 
   // =========================
+  // MANAGE PRACTITIONER AREAS
+  // =========================
+  //
+  // Clicking the Areas badge/count from the
+  // practitioner list opens the dedicated
+  // practitioner-area management page.
+  //
+  // Example:
+  // /practitioners/123/areas
+  //
+  // This page will allow the admin to:
+  // - View practitioner's profile
+  // - View currently assigned areas
+  // - Add/assign areas
+  // - Remove assigned areas
+  // =========================
+
+  manageAreas(id: string): void {
+    if (!id) {
+      return;
+    }
+
+    this.router.navigate(['/practitioners', id, 'areas']);
+  }
+
+  // =========================
   // RETRY
   // =========================
 

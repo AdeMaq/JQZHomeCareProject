@@ -1,1 +1,422 @@
-<p>practitioner-profile works!</p>
+<div class="practitioner-profile-page">
+  <!-- =========================
+       LOADING STATE
+  ========================== -->
+
+  @if (isLoading) {
+    <div class="state-card">
+      <div class="loading-spinner"></div>
+
+      <h3>Loading practitioner profile</h3>
+
+      <p>Please wait while the practitioner information is being loaded.</p>
+    </div>
+  }
+
+  <!-- =========================
+       ERROR STATE
+  ========================== -->
+
+  @else if (hasError || !practitioner) {
+    <div class="state-card">
+      <div class="state-icon error-icon">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+      </div>
+
+      <h3>Unable to load practitioner</h3>
+
+      <p>We couldn't retrieve the practitioner information. Please try again.</p>
+
+      <div class="state-actions">
+        <button type="button" class="secondary-button" (click)="goBack()">
+          <i class="fa-solid fa-arrow-left"></i>
+
+          Back to Practitioners
+        </button>
+
+        <button type="button" class="primary-button" (click)="retry()">
+          <i class="fa-solid fa-rotate-right"></i>
+
+          Try Again
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- =========================
+       PROFILE
+  ========================== -->
+
+  @else {
+    <div class="page-header">
+      <div class="page-header-left">
+        <!-- BREADCRUMB -->
+
+        <div class="breadcrumb">
+          <span>Practitioners</span>
+
+          <i class="fa-solid fa-chevron-right"></i>
+
+          <strong>
+            {{ practitioner.name }}
+          </strong>
+        </div>
+
+        <!-- TITLE -->
+
+        <div class="title-row">
+          <div>
+            <h1>Practitioner Profile</h1>
+
+            <p>
+              View practitioner information, professional details, performance, and assigned service
+              areas.
+            </p>
+          </div>
+
+          <div class="header-actions">
+            <!-- EDIT -->
+
+            <button type="button" class="primary-button" (click)="editPractitioner()">
+              <i class="fa-solid fa-pen-to-square"></i>
+
+              Edit Practitioner
+            </button>
+
+            <!-- BACK -->
+
+            <button type="button" class="secondary-button" (click)="goBack()">
+              <i class="fa-solid fa-arrow-left"></i>
+
+              Back to Practitioners
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- =========================
+         PROFILE CARD
+    ========================== -->
+
+    <div class="profile-card">
+      <!-- =========================
+           PROFILE SUMMARY
+      ========================== -->
+
+      <div class="profile-summary">
+        <div class="avatar">
+          {{ practitioner.name.charAt(0).toUpperCase() }}
+        </div>
+
+        <div class="profile-summary-info">
+          <h2>
+            {{ practitioner.name }}
+          </h2>
+
+          <span class="service-badge">
+            {{ practitioner.serviceName || 'Service not available' }}
+          </span>
+
+          <div class="contact-summary">
+            <span>
+              <i class="fa-solid fa-envelope"></i>
+
+              {{ practitioner.email || 'Email not available' }}
+            </span>
+
+            <span>
+              <i class="fa-solid fa-phone"></i>
+
+              {{ practitioner.phone || 'Phone not available' }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- =========================
+           PROFESSIONAL INFORMATION
+      ========================== -->
+
+      <section class="profile-section">
+        <div class="section-header">
+          <div class="section-icon">
+            <i class="fa-solid fa-user-doctor"></i>
+          </div>
+
+          <div>
+            <h2>Professional Information</h2>
+
+            <p>Practitioner service and professional details.</p>
+          </div>
+        </div>
+
+        <div class="details-grid">
+          <!-- SERVICE -->
+
+          <div class="detail-item">
+            <span class="detail-label"> Service </span>
+
+            <strong>
+              {{ practitioner.serviceName || 'Not available' }}
+            </strong>
+          </div>
+
+          <!-- EDUCATION -->
+
+          <div class="detail-item">
+            <span class="detail-label"> Education </span>
+
+            <strong>
+              {{ practitioner.education || 'Not available' }}
+            </strong>
+          </div>
+
+          <!-- PRIORITY -->
+
+          <div class="detail-item">
+            <span class="detail-label"> Priority </span>
+
+            <strong>
+              {{ practitioner.priority }}
+            </strong>
+          </div>
+
+          <!-- SHARE -->
+
+          <div class="detail-item">
+            <span class="detail-label"> Share Percentage </span>
+
+            <strong> {{ practitioner.sharePercentage }}% </strong>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================
+           CONTACT INFORMATION
+      ========================== -->
+
+      <section class="profile-section">
+        <div class="section-header">
+          <div class="section-icon">
+            <i class="fa-solid fa-address-card"></i>
+          </div>
+
+          <div>
+            <h2>Contact Information</h2>
+
+            <p>Practitioner contact details.</p>
+          </div>
+        </div>
+
+        <div class="details-grid">
+          <!-- EMAIL -->
+
+          <div class="detail-item">
+            <span class="detail-label"> Email Address </span>
+
+            <strong class="breakable">
+              {{ practitioner.email || 'Not available' }}
+            </strong>
+          </div>
+
+          <!-- PHONE -->
+
+          <div class="detail-item">
+            <span class="detail-label"> Phone Number </span>
+
+            <strong>
+              {{ practitioner.phone || 'Not available' }}
+            </strong>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================
+           PERFORMANCE
+      ========================== -->
+
+      <section class="profile-section">
+        <div class="section-header">
+          <div class="section-icon">
+            <i class="fa-solid fa-chart-line"></i>
+          </div>
+
+          <div>
+            <h2>Performance</h2>
+
+            <p>Practitioner visit and cancellation statistics.</p>
+          </div>
+        </div>
+
+        <div class="stats-grid">
+          <!-- VISITS -->
+
+          <div class="stat-item">
+            <div class="stat-icon visits-icon">
+              <i class="fa-solid fa-calendar-check"></i>
+            </div>
+
+            <div>
+              <span> Visits </span>
+
+              <strong>
+                {{ practitioner.visitCount }}
+              </strong>
+            </div>
+          </div>
+
+          <!-- CANCELLATIONS -->
+
+          <div class="stat-item">
+            <div class="stat-icon cancellation-icon">
+              <i class="fa-solid fa-calendar-xmark"></i>
+            </div>
+
+            <div>
+              <span> Cancellations </span>
+
+              <strong>
+                {{ practitioner.cancellationCount }}
+              </strong>
+            </div>
+          </div>
+
+          <!-- PRIORITY -->
+
+          <div class="stat-item">
+            <div class="stat-icon priority-icon">
+              <i class="fa-solid fa-arrow-up-wide-short"></i>
+            </div>
+
+            <div>
+              <span> Priority </span>
+
+              <strong>
+                {{ practitioner.priority }}
+              </strong>
+            </div>
+          </div>
+
+          <!-- SHARE -->
+
+          <div class="stat-item">
+            <div class="stat-icon percentage-icon">
+              <i class="fa-solid fa-percent"></i>
+            </div>
+
+            <div>
+              <span> Share </span>
+
+              <strong> {{ practitioner.sharePercentage }}% </strong>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================
+           ASSIGNED AREAS
+      ========================== -->
+
+      <section class="profile-section assigned-areas-section">
+        <!-- SECTION HEADER -->
+
+        <div class="section-header">
+          <!-- ICON -->
+
+          <div class="section-icon">
+            <i class="fa-solid fa-location-dot"></i>
+          </div>
+
+          <!-- TITLE + DESCRIPTION -->
+
+          <div class="section-header-content">
+            <h2>Assigned Areas</h2>
+
+            <p>Areas where this practitioner can provide services.</p>
+          </div>
+
+          <!-- AREA COUNT + MANAGE BUTTON -->
+
+          <div class="section-header-actions">
+            <span class="area-count">
+              {{ practitioner.areas.length }}
+
+              {{ practitioner.areas.length === 1 ? 'area' : 'areas' }}
+            </span>
+
+            <button type="button" class="manage-areas-button" (click)="manageAreas()">
+              <i class="fa-solid fa-location-dot"></i>
+
+              Manage Areas
+            </button>
+          </div>
+        </div>
+
+        <!-- =========================
+             AREAS EXIST
+        ========================== -->
+
+        @if (practitioner.areas.length > 0) {
+          <div class="areas-grid">
+            @for (area of practitioner.areas; track area.id) {
+              <div class="area-item">
+                <div class="area-icon">
+                  <i class="fa-solid fa-location-dot"></i>
+                </div>
+
+                <div class="area-info">
+                  <strong>
+                    {{ area.name }}
+                  </strong>
+
+                  <span>
+                    <i class="fa-solid fa-city"></i>
+
+                    {{ area.cityName }}
+                  </span>
+                </div>
+              </div>
+            }
+          </div>
+        }
+
+        <!-- =========================
+             NO AREAS
+        ========================== -->
+
+        @else {
+          <div class="empty-areas">
+            <div class="empty-areas-icon">
+              <i class="fa-solid fa-location-dot"></i>
+            </div>
+
+            <div>
+              <strong> No areas assigned </strong>
+
+              <span> This practitioner currently has no assigned service areas. </span>
+            </div>
+          </div>
+        }
+      </section>
+
+      <!-- =========================
+           FOOTER ACTIONS
+      ========================== -->
+
+      <div class="profile-actions">
+        <button type="button" class="secondary-button" (click)="goBack()">
+          <i class="fa-solid fa-arrow-left"></i>
+
+          Back to Practitioners
+        </button>
+
+        <button type="button" class="primary-button" (click)="editPractitioner()">
+          <i class="fa-solid fa-pen-to-square"></i>
+
+          Edit Practitioner
+        </button>
+      </div>
+    </div>
+  }
+</div>

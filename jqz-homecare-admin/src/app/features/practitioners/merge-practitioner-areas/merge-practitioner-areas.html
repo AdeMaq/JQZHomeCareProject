@@ -1,0 +1,307 @@
+<div class="manage-areas-page">
+  <!-- =========================
+       LOADING
+  ========================== -->
+
+  @if (isLoading) {
+    <div class="state-card">
+      <div class="loading-spinner"></div>
+
+      <h3>Loading practitioner areas</h3>
+
+      <p>Please wait while the assigned and available areas are being loaded.</p>
+    </div>
+  }
+
+  <!-- =========================
+       ERROR
+  ========================== -->
+
+  @else if (errorMessage && !practitionerName) {
+    <div class="state-card error-state">
+      <div class="state-icon error-icon">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+      </div>
+
+      <h3>Unable to load areas</h3>
+
+      <p>
+        {{ errorMessage }}
+      </p>
+
+      <button type="button" class="primary-button" (click)="retry()">
+        <i class="fa-solid fa-rotate-right"></i>
+
+        Try Again
+      </button>
+    </div>
+
+  } @else {
+    <!-- =========================
+         PAGE HEADER
+    ========================== -->
+
+    <div class="page-header">
+      <div class="page-header-left">
+        <div class="breadcrumb">
+          <span>Practitioners</span>
+
+          <i class="fa-solid fa-chevron-right"></i>
+
+          <span>{{ practitionerName }}</span>
+
+          <i class="fa-solid fa-chevron-right"></i>
+
+          <strong>Manage Areas</strong>
+        </div>
+
+        <h1>Manage Practitioner Areas</h1>
+
+        <p>Assign or remove service areas for {{ practitionerName }}.</p>
+      </div>
+
+      <button
+        type="button"
+        class="secondary-button"
+        [disabled]="isSaving"
+        (click)="backToProfile()"
+      >
+        <i class="fa-solid fa-arrow-left"></i>
+
+        Back to Profile
+      </button>
+    </div>
+
+    <!-- =========================
+         SUCCESS
+    ========================== -->
+
+    @if (successMessage) {
+      <div class="success-message">
+        <i class="fa-solid fa-circle-check"></i>
+
+        <span>
+          {{ successMessage }}
+        </span>
+      </div>
+    }
+
+    <!-- =========================
+         ERROR
+    ========================== -->
+
+    @if (errorMessage) {
+      <div class="error-message">
+        <i class="fa-solid fa-circle-exclamation"></i>
+
+        <span>
+          {{ errorMessage }}
+        </span>
+      </div>
+    }
+
+    <!-- =========================
+         CONTENT
+    ========================== -->
+
+    <div class="areas-layout">
+      <!-- =========================
+           ASSIGNED AREAS
+      ========================== -->
+
+      <section class="areas-card">
+        <div class="card-header">
+          <div class="section-icon assigned-icon">
+            <i class="fa-solid fa-location-dot"></i>
+          </div>
+
+          <div>
+            <h2>Assigned Areas</h2>
+
+            <p>Areas where this practitioner can currently provide services.</p>
+          </div>
+
+          <span class="area-count">
+            {{ assignedAreas.length }}
+
+            {{ assignedAreas.length === 1 ? 'Area' : 'Areas' }}
+          </span>
+        </div>
+
+        <div class="card-content">
+          @if (assignedAreas.length > 0) {
+            <div class="assigned-list">
+              @for (area of assignedAreas; track area.id) {
+                <div class="assigned-area">
+                  <div class="area-main">
+                    <div class="area-icon">
+                      <i class="fa-solid fa-location-dot"></i>
+                    </div>
+
+                    <div class="area-info">
+                      <strong>
+                        {{ area.name }}
+                      </strong>
+
+                      <span>
+                        <i class="fa-solid fa-city"></i>
+
+                        {{ area.cityName }}
+                      </span>
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    class="remove-button"
+                    [disabled]="isSaving"
+                    (click)="removeArea(area)"
+                  >
+                    <i class="fa-solid fa-xmark"></i>
+
+                    Remove
+                  </button>
+                </div>
+              }
+            </div>
+
+          } @else {
+            <div class="empty-state">
+              <div class="empty-icon">
+                <i class="fa-solid fa-location-dot"></i>
+              </div>
+
+              <h3>No areas assigned</h3>
+
+              <p>This practitioner currently has no assigned service areas.</p>
+            </div>
+          }
+        </div>
+      </section>
+
+      <!-- =========================
+           AVAILABLE AREAS
+      ========================== -->
+
+      <section class="areas-card">
+        <div class="card-header">
+          <div class="section-icon available-icon">
+            <i class="fa-solid fa-map-location-dot"></i>
+          </div>
+
+          <div>
+            <h2>Available Areas</h2>
+
+            <p>Select an area to assign it to this practitioner.</p>
+          </div>
+        </div>
+
+        <!-- SEARCH -->
+
+        <div class="search-container">
+          <div class="search-box">
+            <i class="fa-solid fa-magnifying-glass"></i>
+
+            <input
+              type="text"
+              [value]="searchTerm"
+              (input)="searchTerm = $any($event.target).value"
+              placeholder="Search by area or city..."
+            />
+
+            @if (searchTerm) {
+              <button
+                type="button"
+                class="clear-search"
+                title="Clear search"
+                (click)="clearSearch()"
+              >
+                <i class="fa-solid fa-xmark"></i>
+              </button>
+            }
+          </div>
+        </div>
+
+        <!-- AREA LIST -->
+
+        <div class="available-area-list">
+          @if (filteredAreas.length > 0) {
+            @for (area of filteredAreas; track area.id) {
+              <div class="available-area" [class.assigned]="isAreaAssigned(area.id)">
+                <div class="area-main">
+                  <div class="area-icon">
+                    <i class="fa-solid fa-location-dot"></i>
+                  </div>
+
+                  <div class="area-info">
+                    <strong>
+                      {{ area.name }}
+                    </strong>
+
+                    <span>
+                      <i class="fa-solid fa-city"></i>
+
+                      {{ area.cityName }}
+                    </span>
+                  </div>
+                </div>
+
+                @if (isAreaAssigned(area.id)) {
+                  <span class="assigned-badge">
+                    <i class="fa-solid fa-check"></i>
+
+                    Assigned
+                  </span>
+
+                } @else {
+                  <button
+                    type="button"
+                    class="assign-button"
+                    [disabled]="isSaving"
+                    (click)="assignArea(area)"
+                  >
+                    <i class="fa-solid fa-plus"></i>
+
+                    Assign
+                  </button>
+                }
+              </div>
+            }
+
+          } @else {
+            <div class="empty-state compact">
+              <div class="empty-icon">
+                <i class="fa-solid fa-magnifying-glass"></i>
+              </div>
+
+              <h3>No areas found</h3>
+
+              <p>No areas match "{{ searchTerm }}".</p>
+
+              <button type="button" class="secondary-button" (click)="clearSearch()">
+                Clear Search
+              </button>
+            </div>
+          }
+        </div>
+      </section>
+    </div>
+
+    <!-- =========================
+         FOOTER
+    ========================== -->
+
+    <div class="page-footer">
+      <button
+        type="button"
+        class="secondary-button"
+        [disabled]="isSaving"
+        (click)="backToProfile()"
+      >
+        <i class="fa-solid fa-arrow-left"></i>
+
+        Back to Profile
+      </button>
+    </div>
+  }
+</div>

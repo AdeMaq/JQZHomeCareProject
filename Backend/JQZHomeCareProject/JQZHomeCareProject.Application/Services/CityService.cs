@@ -31,7 +31,10 @@ namespace JQZHomeCareProject.Application.Services
 
         public async Task<CityDto> CreateAsync(CreateCityDto dto)
         {
-            var city = new City { Name = dto.Name };
+            var city = new City
+            {
+                Name = dto.Name.Trim()
+            };
             await _cityRepository.AddAsync(city);
             return MapToDto(city);
         }
@@ -41,7 +44,7 @@ namespace JQZHomeCareProject.Application.Services
             var city = await _cityRepository.GetByIdAsync(id)
                 ?? throw new NotFoundException($"City with id {id} was not found.");
 
-            city.Name = dto.Name;
+            city.Name = dto.Name.Trim();
             await _cityRepository.UpdateAsync(city);
         }
 
@@ -54,7 +57,7 @@ namespace JQZHomeCareProject.Application.Services
 
         public async Task<IEnumerable<AreaDto>> GetAreasByCityAsync(Guid cityId)
         {
-            await GetByIdAsync(cityId); // ensures the city exists, throws NotFoundException otherwise
+            await GetByIdAsync(cityId); 
 
             var areas = await _areaRepository.GetByCityIdAsync(cityId);
             return areas.Select(a => new AreaDto

@@ -259,6 +259,104 @@
       </section>
 
       <!-- =========================
+           RESET PASSWORD
+      ========================== -->
+
+      <section class="form-section password-section">
+        <div class="section-header">
+          <div class="section-icon">
+            <i class="fa-solid fa-key"></i>
+          </div>
+
+          <div>
+            <h2>Reset Password</h2>
+
+            <p>Set a new login password for this practitioner.</p>
+          </div>
+        </div>
+
+        <div class="password-reset-content">
+          <div class="form-field password-field">
+            <label for="newPassword">
+              New Password
+              <span>*</span>
+            </label>
+
+            <div class="password-input-wrapper">
+              <input
+                id="newPassword"
+                name="newPassword"
+                [type]="showNewPassword ? 'text' : 'password'"
+                [(ngModel)]="passwordForm.newPassword"
+                placeholder="Enter new password"
+                autocomplete="new-password"
+                [disabled]="isResettingPassword"
+              />
+
+              <button
+                type="button"
+                class="password-toggle"
+                (click)="togglePasswordVisibility()"
+                [disabled]="isResettingPassword"
+                [attr.aria-label]="showNewPassword ? 'Hide password' : 'Show password'"
+              >
+                @if (showNewPassword) {
+                  <i class="fa-solid fa-eye-slash"></i>
+                } @else {
+                  <i class="fa-solid fa-eye"></i>
+                }
+              </button>
+            </div>
+
+            <small> Password must be at least 8 characters. </small>
+          </div>
+
+          <div class="password-action">
+            <button
+              type="button"
+              class="secondary-button reset-password-button"
+              [disabled]="isResettingPassword || !passwordForm.newPassword.trim()"
+              (click)="resetPassword()"
+            >
+              @if (isResettingPassword) {
+                <span class="button-spinner"></span>
+
+                Resetting...
+              } @else {
+                <i class="fa-solid fa-key"></i>
+
+                Reset Password
+              }
+            </button>
+          </div>
+        </div>
+
+        <!-- RESET PASSWORD ERROR -->
+
+        @if (resetPasswordError) {
+          <div class="error-message password-message">
+            <i class="fa-solid fa-circle-exclamation"></i>
+
+            <span>
+              {{ resetPasswordError }}
+            </span>
+          </div>
+        }
+
+        <!-- RESET PASSWORD SUCCESS -->
+
+        @if (resetPasswordSuccess) {
+          <div class="success-message password-message">
+            <i class="fa-solid fa-circle-check"></i>
+
+            <span>
+              {{ resetPasswordSuccess }}
+            </span>
+          </div>
+        }
+      </section>
+
+      <!-- =========================
            INFORMATION NOTE
       ========================== -->
 

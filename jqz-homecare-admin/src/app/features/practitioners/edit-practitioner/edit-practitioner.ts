@@ -7,6 +7,7 @@ import {
   PractitionerService,
   Service,
   UpdatePractitionerRequest,
+  ResetPractitionerPasswordRequest,
 } from '../../../core/services/practitioner';
 
 @Component({
@@ -45,6 +46,18 @@ export class EditPractitioner implements OnInit {
   saveError = '';
 
   // ============================================================
+  // RESET PASSWORD STATES
+  // ============================================================
+
+  isResettingPassword = false;
+
+  resetPasswordError = '';
+
+  resetPasswordSuccess = '';
+
+  showNewPassword = false;
+
+  // ============================================================
   // FORM
   // ============================================================
 
@@ -57,6 +70,14 @@ export class EditPractitioner implements OnInit {
     education: '',
     priority: 1,
     sharePercentage: 0,
+  };
+
+  // ============================================================
+  // RESET PASSWORD FORM
+  // ============================================================
+
+  passwordForm = {
+    newPassword: '',
   };
 
   // ============================================================
@@ -86,7 +107,6 @@ export class EditPractitioner implements OnInit {
 
     this.practitionerId = id;
 
-    // Load only the data required by this page.
     this.loadPractitioner(id);
     this.loadServices();
   }
@@ -178,8 +198,6 @@ export class EditPractitioner implements OnInit {
       error: (error) => {
         console.error('Services API request failed:', error);
 
-        // Service loading failure should not completely
-        // destroy the practitioner edit page.
         this.services = [];
 
         this.changeDetector.detectChanges();
@@ -248,15 +266,6 @@ export class EditPractitioner implements OnInit {
     // ==========================================================
     // UPDATE REQUEST
     // ==========================================================
-    //
-    // IMPORTANT:
-    // areaIds are intentionally NOT included here.
-    //
-    // Areas are managed separately from:
-    //
-    // /practitioners/:id/areas
-    //
-    // ==========================================================
 
     const request: UpdatePractitionerRequest = {
       name: this.form.name.trim(),
@@ -306,6 +315,90 @@ export class EditPractitioner implements OnInit {
         this.changeDetector.detectChanges();
       },
     });
+  }
+
+  // ============================================================
+  // RESET PASSWORD
+  // ============================================================
+
+  resetPassword(): void {
+    this.resetPasswordError = '';
+    this.resetPasswordSuccess = '';
+
+    const newPassword = this.passwordForm.newPassword.trim();
+
+    // ==========================================================
+    // VALIDATION
+    // ==========================================================
+
+    if (!newPassword) {
+      this.resetPasswordError = 'New password is required.';
+      return;
+    }
+
+    if (newPassword.length < 8) {
+      this.resetPasswordError = 'Password must be at least 8 characters.';
+      return;
+    }
+
+    // ==========================================================
+    // REQUEST
+    // ==========================================================
+
+    const request: ResetPractitionerPasswordRequest = {
+      newPassword,
+    };
+
+    console.log('=================================');
+    console.log('RESET PRACTITIONER PASSWORD');
+    console.log('=================================');
+    console.log({
+      practitionerId: this.practitionerId,
+      passwordLength: newPassword.length,
+    });
+
+    this.isResettingPassword = true;
+
+    this.practitionerService.resetPractitionerPassword(this.practitionerId, request).subscribe({
+      next: () => {
+        console.log('Practitioner password reset successfully.');
+
+        this.isResettingPassword = false;
+
+        this.passwordForm.newPassword = '';
+
+        this.showNewPassword = false;
+
+        this.resetPasswordSuccess = 'Practitioner password has been updated successfully.';
+
+        this.changeDetector.detectChanges();
+      },
+
+      error: (error) => {
+        console.error('Failed to reset practitioner password:', error);
+
+        this.isResettingPassword = false;
+
+        if (error?.error?.message) {
+          this.resetPasswordError = error.error.message;
+        } else if (error?.status === 403) {
+          this.resetPasswordError =
+            'You do not have permission to reset this practitioner password.';
+        } else {
+          this.resetPasswordError = 'Failed to reset practitioner password. Please try again.';
+        }
+
+        this.changeDetector.detectChanges();
+      },
+    });
+  }
+
+  // ============================================================
+  // TOGGLE PASSWORD VISIBILITY
+  // ============================================================
+
+  togglePasswordVisibility(): void {
+    this.showNewPassword = !this.showNewPassword;
   }
 
   // ============================================================

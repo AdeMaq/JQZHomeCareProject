@@ -50,5 +50,13 @@ namespace JQZHomeCareProject.API.Controllers
             var result = await _ratingService.GetMonthlyAsync(year, month);
             return Ok(result);
         }
+
+        [HttpPut("{ratingId:guid}")]
+        [Authorize(Roles = "SuperAdmin,MiddlePowerAdmin,SimpleAdmin")]
+        public async Task<IActionResult> UpdateAsync(Guid ratingId, [FromBody] UpdateRatingDto dto)
+        {
+            var rating = await _ratingService.UpdateAsync(ratingId, dto);
+            return Ok(rating);
+        }
     }
 }

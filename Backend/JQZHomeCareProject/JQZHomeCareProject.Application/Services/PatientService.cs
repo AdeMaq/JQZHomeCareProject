@@ -1,5 +1,6 @@
 ﻿using JQZHomeCareProject.Application.Common.Exceptions;
 using JQZHomeCareProject.Application.Common.Interfaces;
+using JQZHomeCareProject.Application.Common.Validation;
 using JQZHomeCareProject.Application.DTOs;
 using JQZHomeCareProject.Domain.Entities;
 
@@ -20,17 +21,21 @@ namespace JQZHomeCareProject.Application.Services
 
         public async Task<PatientDto> GetOrCreateAsync(string name, string phone, string locationAddress)
         {
-            var existing = await _patientRepository.GetByPhoneAsync(phone);
+            var normalizedPhone = Guard.NormalizePhone(phone);
+            var normalizedName = NameValidator.NormalizeRequired(name, "Patient name", 150);
+            var normalizedAddress = NameValidator.NormalizeRequired(locationAddress, "Location address", 500);
+
+            var existing = await _patientRepository.GetByPhoneAsync(normalizedPhone);
             if (existing is not null)
             {
                 return Map(existing);
             }
 
-            var (latitude, longitude) = await _mapsService.GeocodeAsync(locationAddress);
+            var (latitude, longitude) = await _mapsService.GeocodeAsync(normalizedAddress);
 
             var location = new Location
             {
-                Address = locationAddress,
+                Address = normalizedAddress,
                 Latitude = latitude,
                 Longitude = longitude
             };
@@ -38,8 +43,8 @@ namespace JQZHomeCareProject.Application.Services
 
             var patient = new Patient
             {
-                Name = name,
-                Phone = phone,
+                Name = normalizedName,
+                Phone = normalizedPhone,
                 VisitCount = 0,
                 LocationId = location.Id,
                 Location = location
@@ -72,22 +77,26 @@ namespace JQZHomeCareProject.Application.Services
             var patient = await _patientRepository.GetByIdAsync(id)
                 ?? throw new NotFoundException($"Patient with id {id} was not found.");
 
-            var byPhone = await _patientRepository.GetByPhoneAsync(dto.Phone);
+            var name = NameValidator.NormalizeRequired(dto.Name, "Patient name", 150);
+            var phone = Guard.NormalizePhone(dto.Phone, "Phone");
+            var address = NameValidator.NormalizeRequired(dto.LocationAddress, "Location address", 500);
+
+            var byPhone = await _patientRepository.GetByPhoneAsync(phone);
             if (byPhone is not null && byPhone.Id != id)
-                throw new ValidationException($"Phone number {dto.Phone} is already in use by another patient.");
+                throw new ValidationException($"Phone number {phone} is already in use by another patient.");
 
-            patient.Name = dto.Name;
-            patient.Phone = dto.Phone;
+            patient.Name = name;
+            patient.Phone = phone;
 
-            if (!string.Equals(patient.Location?.Address, dto.LocationAddress, StringComparison.OrdinalIgnoreCase))
+            if (!string.Equals(patient.Location?.Address, address, StringComparison.OrdinalIgnoreCase))
             {
-                var (latitude, longitude) = await _mapsService.GeocodeAsync(dto.LocationAddress);
+                var (latitude, longitude) = await _mapsService.GeocodeAsync(address);
 
                 if (patient.Location is null)
                 {
                     var location = new Location
                     {
-                        Address = dto.LocationAddress,
+                        Address = address,
                         Latitude = latitude,
                         Longitude = longitude
                     };
@@ -97,7 +106,7 @@ namespace JQZHomeCareProject.Application.Services
                 }
                 else
                 {
-                    patient.Location.Address = dto.LocationAddress;
+                    patient.Location.Address = address;
                     patient.Location.Latitude = latitude;
                     patient.Location.Longitude = longitude;
                     await _locationRepository.UpdateAsync(patient.Location);

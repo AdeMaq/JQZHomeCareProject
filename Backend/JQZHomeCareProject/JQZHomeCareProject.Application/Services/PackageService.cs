@@ -1,5 +1,6 @@
 ﻿using JQZHomeCareProject.Application.Common.Exceptions;
 using JQZHomeCareProject.Application.Common.Interfaces;
+using JQZHomeCareProject.Application.Common.Validation;
 using JQZHomeCareProject.Application.DTOs;
 using JQZHomeCareProject.Domain.Entities;
 
@@ -8,10 +9,12 @@ namespace JQZHomeCareProject.Application.Services
     public class PackageService : IPackageService
     {
         private readonly IPackageRepository _packageRepository;
+        private readonly IServiceRepository _serviceRepository;
 
-        public PackageService(IPackageRepository packageRepository)
+        public PackageService(IPackageRepository packageRepository, IServiceRepository serviceRepository)
         {
             _packageRepository = packageRepository;
+            _serviceRepository = serviceRepository;
         }
 
         public async Task<IEnumerable<PackageDto>> GetAllAsync()
@@ -35,23 +38,36 @@ namespace JQZHomeCareProject.Application.Services
 
         public async Task<PackageDto> CreateAsync(CreatePackageDto dto)
         {
+            Guard.EnsureNotEmpty(dto.ServiceId, "ServiceId");
+            var service = await _serviceRepository.GetByIdAsync(dto.ServiceId)
+                ?? throw new NotFoundException($"Service with id {dto.ServiceId} was not found.");
+
+            var name = NameValidator.NormalizeRequired(dto.Name, "Package name", 150);
+            Guard.EnsurePositive(dto.NumberOfVisits, "NumberOfVisits");
+            Guard.EnsurePositive(dto.Amount, "Amount");
+
             var package = new Package
             {
                 ServiceId = dto.ServiceId,
-                Name = dto.Name,
+                Name = name,
                 NumberOfVisits = dto.NumberOfVisits,
                 Amount = dto.Amount
             };
             await _packageRepository.AddAsync(package);
+            package.Service = service;
             return MapToDto(package);
         }
 
         public async Task UpdateAsync(Guid id, UpdatePackageDto dto)
         {
             var package = await _packageRepository.GetByIdAsync(id)
-                ?? throw new NotFoundException($"Package {id} was not found.");
+            ?? throw new NotFoundException($"Package {id} was not found.");
 
-            package.Name = dto.Name;
+            var name = NameValidator.NormalizeRequired(dto.Name, "Package name", 150);
+            Guard.EnsurePositive(dto.NumberOfVisits, "NumberOfVisits");
+            Guard.EnsurePositive(dto.Amount, "Amount");
+
+            package.Name = name;
             package.NumberOfVisits = dto.NumberOfVisits;
             package.Amount = dto.Amount;
 
@@ -60,6 +76,8 @@ namespace JQZHomeCareProject.Application.Services
 
         public async Task DeleteAsync(Guid id)
         {
+            var package = await _packageRepository.GetByIdAsync(id)
+            ?? throw new NotFoundException($"Package {id} was not found.");
             await _packageRepository.DeleteAsync(id);
         }
 

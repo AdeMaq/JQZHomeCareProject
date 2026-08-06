@@ -11,22 +11,14 @@ namespace JQZHomeCareProject.Application.DTOs
     public class CreateCityDto
     {
         [Required(ErrorMessage = "City name is required.")]
-        [StringLength(100, ErrorMessage = "City name cannot exceed 100 characters.")]
-        [RegularExpression(
-            @"^[A-Za-z\s]+$",
-            ErrorMessage = "City name must not be empty, contain only spaces, or contain special characters."
-        )]
+        [StringLength(100, MinimumLength = 1, ErrorMessage = "City name must be between 1 and 100 characters.")]
         public string Name { get; set; } = string.Empty;
     }
 
     public class UpdateCityDto
     {
         [Required(ErrorMessage = "City name is required.")]
-        [StringLength(100, ErrorMessage = "City name cannot exceed 100 characters.")]
-        [RegularExpression(
-            @"^[A-Za-z\s]+$",
-            ErrorMessage = "City name must not be empty, contain only spaces, or contain special characters."
-        )]
+        [StringLength(100, MinimumLength = 1, ErrorMessage = "City name must be between 1 and 100 characters.")]
         public string Name { get; set; } = string.Empty;
     }
 }

@@ -1,5 +1,6 @@
 ﻿using JQZHomeCareProject.Application.Common.Exceptions;
 using JQZHomeCareProject.Application.Common.Interfaces;
+using JQZHomeCareProject.Application.Common.Validation;
 using JQZHomeCareProject.Application.DTOs;
 using JQZHomeCareProject.Domain.Entities;
 
@@ -29,7 +30,11 @@ namespace JQZHomeCareProject.Application.Services
 
         public async Task<ServiceCategoryDto> CreateAsync(CreateServiceCategoryDto dto)
         {
-            var category = new ServiceCategory { Name = dto.Name };
+            var name = NameValidator.NormalizeRequired(dto.Name, "Category name");
+            var all = await _repository.GetAllAsync();
+            NameValidator.EnsureUnique(all, c => c.Name, c => c.Id, name, excludeId: null, entityLabel: "category");
+
+            var category = new ServiceCategory { Name = name };
             await _repository.AddAsync(category);
             return MapToDto(category);
         }
@@ -39,7 +44,11 @@ namespace JQZHomeCareProject.Application.Services
             var category = await _repository.GetByIdAsync(id)
                 ?? throw new NotFoundException($"ServiceCategory {id} not found.");
 
-            category.Name = dto.Name;
+            var name = NameValidator.NormalizeRequired(dto.Name, "Category name");
+            var all = await _repository.GetAllAsync();
+            NameValidator.EnsureUnique(all, c => c.Name, c => c.Id, name, excludeId: id, entityLabel: "category");
+
+            category.Name = name;
             await _repository.UpdateAsync(category);
         }
 

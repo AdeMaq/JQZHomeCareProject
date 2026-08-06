@@ -58,7 +58,6 @@ namespace JQZHomeCareProject.API.Middleware
                 statusCode = (int)statusCode,
                 message,
                 traceId = context.TraceIdentifier,
-                // Only include stack traces outside Production, never leak them to real users
                 details = _env.IsDevelopment() ? ex.ToString() : null
             };
 
@@ -72,11 +71,9 @@ namespace JQZHomeCareProject.API.Middleware
             ValidationException => (HttpStatusCode.BadRequest, ex.Message),
             AuthenticationException => (HttpStatusCode.Unauthorized, ex.Message),
 
-            // Duplicate key / unique constraint violations (e.g. duplicate ServiceCategory name)
             DbUpdateException dbEx when IsUniqueConstraintViolation(dbEx) =>
                 (HttpStatusCode.Conflict, "A record with these values already exists."),
 
-            // Any other DB update failure (FK violations, null constraint, etc.)
             DbUpdateException => (HttpStatusCode.BadRequest, "The request could not be saved due to a data conflict."),
 
             UnauthorizedAccessException => (HttpStatusCode.Forbidden, "You do not have permission to perform this action."),
@@ -86,8 +83,6 @@ namespace JQZHomeCareProject.API.Middleware
 
         private static bool IsUniqueConstraintViolation(DbUpdateException ex)
         {
-            // SQL Server error 2601 = duplicate key on unique index
-            // SQL Server error 2627 = violation of unique constraint
             return ex.InnerException is Microsoft.Data.SqlClient.SqlException sqlEx
                    && (sqlEx.Number == 2601 || sqlEx.Number == 2627);
         }

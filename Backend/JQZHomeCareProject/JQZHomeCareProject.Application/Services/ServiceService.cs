@@ -1,5 +1,6 @@
 ﻿using JQZHomeCareProject.Application.Common.Exceptions;
 using JQZHomeCareProject.Application.Common.Interfaces;
+using JQZHomeCareProject.Application.Common.Validation;
 using JQZHomeCareProject.Application.DTOs;
 using JQZHomeCareProject.Domain.Entities;
 
@@ -37,16 +38,22 @@ namespace JQZHomeCareProject.Application.Services
 
         public async Task<ServiceDto> CreateAsync(CreateServiceDto dto)
         {
+            if (dto.ServiceCategoryId == Guid.Empty)
+                throw new ValidationException("ServiceCategoryId is required.");
+
             var category = await _categoryRepository.GetByIdAsync(dto.ServiceCategoryId)
                 ?? throw new ValidationException("ServiceCategoryId does not reference an existing category.");
+            var name = NameValidator.NormalizeRequired(dto.Name, "Service name");
+            var description = NameValidator.NormalizeOptional(dto.Description, "Description", 1000);
+            var all = await _serviceRepository.GetAllAsync();
+            NameValidator.EnsureUnique(all, s => s.Name, s => s.Id, name, excludeId: null, entityLabel: "service");
 
-            var service = new Service
-            {
-                Name = dto.Name,
-                ServiceCategoryId = dto.ServiceCategoryId,
-                Description = dto.Description
+            var service = new Service 
+            { 
+                Name = name, 
+                ServiceCategoryId = dto.ServiceCategoryId, 
+                Description = description 
             };
-
             await _serviceRepository.AddAsync(service);
             service.ServiceCategory = category;
             return MapToDto(service);
@@ -57,8 +64,12 @@ namespace JQZHomeCareProject.Application.Services
             var service = await _serviceRepository.GetByIdAsync(id)
                 ?? throw new NotFoundException($"Service {id} not found.");
 
-            service.Name = dto.Name;
-            service.Description = dto.Description;
+            var name = NameValidator.NormalizeRequired(dto.Name, "Service name");
+            var all = await _serviceRepository.GetAllAsync();
+            NameValidator.EnsureUnique(all, s => s.Name, s => s.Id, name, excludeId: id, entityLabel: "service");
+
+            service.Name = name;
+            service.Description = NameValidator.NormalizeOptional(dto.Description, "Description", 1000);
             await _serviceRepository.UpdateAsync(service);
         }
 

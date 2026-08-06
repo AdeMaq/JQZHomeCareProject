@@ -1,5 +1,6 @@
 ﻿using JQZHomeCareProject.Application.Common.Exceptions;
 using JQZHomeCareProject.Application.Common.Interfaces;
+using JQZHomeCareProject.Application.Common.Validation;
 using JQZHomeCareProject.Application.DTOs;
 using JQZHomeCareProject.Domain.Entities;
 
@@ -31,15 +32,17 @@ namespace JQZHomeCareProject.Application.Services
 
         public async Task<AreaDto> CreateAsync(CreateAreaDto dto)
         {
+            if (dto.CityId == Guid.Empty)
+                throw new ValidationException("CityId is required.");
+
             var city = await _cityRepository.GetByIdAsync(dto.CityId)
                 ?? throw new NotFoundException($"City with id {dto.CityId} was not found.");
 
-            var area = new Area
-            {
-                Name = dto.Name,
-                CityId = dto.CityId
-            };
+            var name = NameValidator.NormalizeRequired(dto.Name, "Area name");
+            var areasInCity = await _areaRepository.GetByCityIdAsync(dto.CityId);
+            NameValidator.EnsureUnique(areasInCity, a => a.Name, a => a.Id, name, excludeId: null, entityLabel: "area in this city");
 
+            var area = new Area { Name = name, CityId = dto.CityId };
             await _areaRepository.AddAsync(area);
             area.City = city;
             return MapToDto(area);
@@ -50,14 +53,23 @@ namespace JQZHomeCareProject.Application.Services
             var area = await _areaRepository.GetByIdAsync(id)
                 ?? throw new NotFoundException($"Area with id {id} was not found.");
 
+            if (dto.CityId == Guid.Empty)
+                throw new ValidationException("CityId is required.");
+
+            var name = NameValidator.NormalizeRequired(dto.Name, "Area name");
+
             if (dto.CityId != area.CityId)
             {
-                _ = await _cityRepository.GetByIdAsync(dto.CityId)
+                var newCity = await _cityRepository.GetByIdAsync(dto.CityId)
                     ?? throw new NotFoundException($"City with id {dto.CityId} was not found.");
+                area.City = newCity;
                 area.CityId = dto.CityId;
             }
 
-            area.Name = dto.Name;
+            var areasInCity = await _areaRepository.GetByCityIdAsync(dto.CityId);
+            NameValidator.EnsureUnique(areasInCity, a => a.Name, a => a.Id, name, excludeId: id, entityLabel: "area in this city");
+
+            area.Name = name;
             await _areaRepository.UpdateAsync(area);
         }
 

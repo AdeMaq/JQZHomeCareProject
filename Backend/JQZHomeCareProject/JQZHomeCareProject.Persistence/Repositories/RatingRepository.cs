@@ -37,5 +37,18 @@ namespace JQZHomeCareProject.Persistence.Repositories
                 .AsNoTracking()
                 .ToListAsync();
         }
+
+        public async Task<Rating?> GetByIdAsync(Guid id)
+        {
+            return await _context.Ratings
+                .Include(r => r.Practitioner)
+                .FirstOrDefaultAsync(r => r.Id == id);
+        }
+
+        public async Task UpdateAsync(Rating rating)
+        {
+            _context.Ratings.Update(rating);
+            await _context.SaveChangesAsync();
+        }
     }
 }

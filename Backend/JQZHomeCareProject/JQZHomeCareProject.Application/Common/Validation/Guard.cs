@@ -74,5 +74,23 @@ namespace JQZHomeCareProject.Application.Common.Validation
             if (!Regex.IsMatch(rawEmail.Trim(), @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
                 throw new ValidationException($"{fieldLabel} format is invalid.");
         }
+        public static void EnsureValidCoordinates(double latitude, double longitude)
+        {
+            if (latitude < -90 || latitude > 90)
+                throw new ValidationException("Latitude must be between -90 and 180.");
+            if (longitude < -180 || longitude > 180)
+                throw new ValidationException("Longitude must be between -180 and 180.");
+
+            if (latitude == 0 && longitude == 0)
+                throw new ValidationException("Unable to determine your location — GPS reading was invalid. Please try again.");
+        }
+
+        public static void EnsureSlotOrder(TimeSpan start, TimeSpan end, string fieldLabel = "Time slot")
+        {
+            if (start >= end)
+                throw new ValidationException($"{fieldLabel} start time must be before end time.");
+            if (start < TimeSpan.Zero || end > TimeSpan.FromHours(24))
+                throw new ValidationException($"{fieldLabel} must fall within a single day.");
+        }
     }
 }

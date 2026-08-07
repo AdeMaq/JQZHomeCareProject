@@ -1,12 +1,12 @@
 ﻿using JQZHomeCareProject.Application.Common.Exceptions;
 using JQZHomeCareProject.Application.Common.Interfaces;
+using JQZHomeCareProject.Application.Common.Validation;
 using JQZHomeCareProject.Application.DTOs;
 using JQZHomeCareProject.Domain.Entities;
 using JQZHomeCareProject.Domain.Enums;
 
 namespace JQZHomeCareProject.Application.Services
 {
-
     public class VisitService : IVisitService
     {
         private readonly IVisitRepository _visitRepository;
@@ -14,6 +14,8 @@ namespace JQZHomeCareProject.Application.Services
         private readonly IPackageRepository _packageRepository;
         private readonly IPatientRepository _patientRepository;
         private readonly IPatientService _patientService;
+        private readonly IPractitionerRepository _practitionerRepository;
+        private readonly IAreaRepository _areaRepository;
         private readonly IUnitOfWork _unitOfWork;
 
         public VisitService(
@@ -22,6 +24,8 @@ namespace JQZHomeCareProject.Application.Services
             IPackageRepository packageRepository,
             IPatientRepository patientRepository,
             IPatientService patientService,
+            IPractitionerRepository practitionerRepository,
+            IAreaRepository areaRepository,
             IUnitOfWork unitOfWork)
         {
             _visitRepository = visitRepository;
@@ -29,20 +33,37 @@ namespace JQZHomeCareProject.Application.Services
             _packageRepository = packageRepository;
             _patientRepository = patientRepository;
             _patientService = patientService;
+            _practitionerRepository = practitionerRepository;
+            _areaRepository = areaRepository;
             _unitOfWork = unitOfWork;
         }
 
         public async Task<PatientPackageDto> CreateVisitAsync(CreateVisitDto dto, Guid createdByUserId)
         {
+            Guard.EnsureNotEmpty(dto.PackageId, "PackageId");
+
             var package = await _packageRepository.GetByIdAsync(dto.PackageId)
                 ?? throw new NotFoundException($"Package {dto.PackageId} not found.");
 
-            if (dto.VisitAssignments.Count > package.NumberOfVisits)
-                throw new ValidationException(
-                    $"'{package.Name}' has {package.NumberOfVisits} visit(s); {dto.VisitAssignments.Count} assignment(s) were supplied.");
+            if (package.NumberOfVisits <= 0)
+                throw new ValidationException($"'{package.Name}' has an invalid NumberOfVisits configuration.");
 
-            if (dto.PaymentType == PackagePaymentType.Installment && dto.InitialAmountPaid is null)
-                throw new ValidationException("InitialAmountPaid is required when PaymentType is Installment.");
+            if (dto.VisitAssignments.Count > package.NumberOfVisits)
+                throw new ValidationException( $"'{package.Name}' has {package.NumberOfVisits} visit(s); {dto.VisitAssignments.Count} assignment(s) were supplied.");
+
+            if (dto.PaymentType == PackagePaymentType.Installment)
+            {
+                if (dto.InitialAmountPaid is null)
+                    throw new ValidationException("InitialAmountPaid is required when PaymentType is Installment.");
+                if (dto.InitialAmountPaid.Value < 0)
+                    throw new ValidationException("InitialAmountPaid cannot be negative.");
+                if (dto.InitialAmountPaid.Value > package.Amount)
+                    throw new ValidationException(
+                        $"InitialAmountPaid ({dto.InitialAmountPaid.Value}) cannot exceed the package amount ({package.Amount}).");
+            }
+
+            foreach (var assignment in dto.VisitAssignments)
+                await ValidateAssignmentAsync(assignment);
 
             var patient = await _patientService.GetOrCreateAsync(dto.PatientName, dto.PatientPhone, dto.LocationAddress);
 
@@ -85,8 +106,8 @@ namespace JQZHomeCareProject.Application.Services
                     {
                         Id = Guid.NewGuid(),
                         PatientId = patient.Id,
-                        PractitionerId = assignment?.PractitionerId,   
-                        AreaId = assignment?.AreaId,                   
+                        PractitionerId = assignment?.PractitionerId,
+                        AreaId = assignment?.AreaId,
                         ServiceId = package.ServiceId,
                         PatientPackageId = patientPackage.Id,
                         ScheduledDate = assignment?.ScheduledDate,
@@ -121,8 +142,13 @@ namespace JQZHomeCareProject.Application.Services
 
         public async Task RecordInstallmentAsync(Guid patientPackageId, RecordInstallmentDto dto)
         {
+            Guard.EnsureNotEmpty(patientPackageId, "PatientPackageId");
+
             var patientPackage = await _patientPackageRepository.GetByIdAsync(patientPackageId)
                 ?? throw new NotFoundException($"PatientPackage {patientPackageId} not found.");
+
+            if (patientPackage.Status != PatientPackageStatus.Active)
+                throw new ValidationException($"Cannot record an installment on a package with status '{patientPackage.Status}'.");
 
             if (dto.Amount <= 0)
                 throw new ValidationException("Installment amount must be greater than zero.");
@@ -138,7 +164,33 @@ namespace JQZHomeCareProject.Application.Services
         }
 
         private static bool Overlaps(TimeSpan aStart, TimeSpan aEnd, TimeSpan bStart, TimeSpan bEnd)
-            => aStart < bEnd && bStart < aEnd;
+        {
+            return aStart < bEnd && bStart < aEnd;
+        }
+
+        private async Task ValidateAssignmentAsync(VisitAssignmentDto assignment)
+        {
+            var hasAny = assignment.ScheduledDate.HasValue || assignment.SlotStart.HasValue || assignment.SlotEnd.HasValue;
+            var hasAll = assignment.ScheduledDate.HasValue && assignment.SlotStart.HasValue && assignment.SlotEnd.HasValue;
+
+            if (hasAny && !hasAll)
+                throw new ValidationException("A visit assignment's ScheduledDate, SlotStart and SlotEnd must all be supplied together, or all omitted.");
+
+            if (hasAll)
+                Guard.EnsureSlotOrder(assignment.SlotStart!.Value, assignment.SlotEnd!.Value);
+
+            if (assignment.PractitionerId.HasValue)
+            {
+                _ = await _practitionerRepository.GetByIdAsync(assignment.PractitionerId.Value)
+                    ?? throw new NotFoundException($"Practitioner {assignment.PractitionerId.Value} not found.");
+            }
+
+            if (assignment.AreaId.HasValue)
+            {
+                _ = await _areaRepository.GetByIdAsync(assignment.AreaId.Value)
+                    ?? throw new NotFoundException($"Area {assignment.AreaId.Value} not found.");
+            }
+        }
 
         private static void CheckAssignmentsAgainstEachOther(List<VisitAssignmentDto> assignments)
         {
@@ -161,9 +213,7 @@ namespace JQZHomeCareProject.Application.Services
             }
         }
 
-        private async Task EnsureNoConflictAsync(
-            Guid? practitionerId, Guid patientId,
-            DateTime? scheduledDate, TimeSpan? slotStart, TimeSpan? slotEnd,
+        private async Task EnsureNoConflictAsync(Guid? practitionerId, Guid patientId,DateTime? scheduledDate, TimeSpan? slotStart, TimeSpan? slotEnd,
             Guid? excludeVisitId = null)
         {
             if (scheduledDate is null || slotStart is null || slotEnd is null)
@@ -195,11 +245,15 @@ namespace JQZHomeCareProject.Application.Services
             }
         }
 
-
         public async Task ScheduleVisitAsync(Guid visitId, ScheduleVisitDto dto)
         {
             var visit = await _visitRepository.GetByIdAsync(visitId)
                 ?? throw new NotFoundException($"Visit {visitId} not found.");
+
+            if (visit.Status is VisitStatus.Completed or VisitStatus.Cancelled)
+                throw new ValidationException($"Cannot schedule a visit with status '{visit.Status}'.");
+
+            Guard.EnsureSlotOrder(dto.SlotStart, dto.SlotEnd);
 
             await EnsureNoConflictAsync(visit.PractitionerId, visit.PatientId, dto.ScheduledDate, dto.SlotStart, dto.SlotEnd, excludeVisitId: visitId);
 
@@ -211,8 +265,23 @@ namespace JQZHomeCareProject.Application.Services
 
         public async Task AssignAsync(Guid visitId, AssignVisitDto dto)
         {
+            Guard.EnsureNotEmpty(dto.PractitionerId, "PractitionerId");
+
             var visit = await _visitRepository.GetByIdAsync(visitId)
                 ?? throw new NotFoundException($"Visit {visitId} not found.");
+
+            if (visit.Status is VisitStatus.Completed or VisitStatus.Cancelled)
+                throw new ValidationException($"Cannot assign a practitioner to a visit with status '{visit.Status}'.");
+
+            _ = await _practitionerRepository.GetByIdAsync(dto.PractitionerId)
+                ?? throw new NotFoundException($"Practitioner {dto.PractitionerId} not found.");
+
+            if (dto.AreaId.HasValue)
+            {
+                _ = await _areaRepository.GetByIdAsync(dto.AreaId.Value)
+                    ?? throw new NotFoundException($"Area {dto.AreaId.Value} not found.");
+            }
+
             await EnsureNoConflictAsync(dto.PractitionerId, visit.PatientId, visit.ScheduledDate, visit.SlotStart, visit.SlotEnd, excludeVisitId: visitId);
 
             visit.PractitionerId = dto.PractitionerId;
@@ -222,8 +291,22 @@ namespace JQZHomeCareProject.Application.Services
 
         public async Task ReassignPractitionerAsync(Guid visitId, ReassignPractitionerDto dto)
         {
+            Guard.EnsureNotEmpty(dto.PractitionerId, "PractitionerId");
+
             var visit = await _visitRepository.GetByIdAsync(visitId)
                 ?? throw new NotFoundException($"Visit {visitId} not found.");
+
+            if (visit.Status is VisitStatus.Completed or VisitStatus.Cancelled)
+                throw new ValidationException($"Cannot reassign a practitioner on a visit with status '{visit.Status}'.");
+
+            _ = await _practitionerRepository.GetByIdAsync(dto.PractitionerId)
+                ?? throw new NotFoundException($"Practitioner {dto.PractitionerId} not found.");
+
+            if (dto.AreaId.HasValue)
+            {
+                _ = await _areaRepository.GetByIdAsync(dto.AreaId.Value)
+                    ?? throw new NotFoundException($"Area {dto.AreaId.Value} not found.");
+            }
 
             await EnsureNoConflictAsync(dto.PractitionerId, visit.PatientId, visit.ScheduledDate, visit.SlotStart, visit.SlotEnd, excludeVisitId: visitId);
 
@@ -232,7 +315,7 @@ namespace JQZHomeCareProject.Application.Services
                 Id = Guid.NewGuid(),
                 VisitId = visit.Id,
                 RefusedBy = dto.RefusedBy,
-                Reason = dto.Reason,
+                Reason = dto.Reason.Trim(),
                 Date = DateTime.UtcNow
             });
 
@@ -244,8 +327,17 @@ namespace JQZHomeCareProject.Application.Services
 
         public async Task AcceptVisitAsync(Guid visitId, Guid practitionerId)
         {
+            Guard.EnsureNotEmpty(practitionerId, "PractitionerId");
+
             var visit = await _visitRepository.GetByIdAsync(visitId)
                 ?? throw new NotFoundException($"Visit {visitId} not found.");
+
+            if (visit.Status != VisitStatus.Scheduled)
+                throw new ValidationException($"Cannot accept a visit with status '{visit.Status}'.");
+
+            if (visit.PractitionerId is null)
+                throw new ValidationException("This visit has no assigned practitioner yet.");
+
             if (visit.PractitionerId != practitionerId)
                 throw new ValidationException("This visit is not assigned to you.");
 
@@ -258,6 +350,14 @@ namespace JQZHomeCareProject.Application.Services
             var visit = await _visitRepository.GetByIdAsync(visitId)
                 ?? throw new NotFoundException($"Visit {visitId} not found.");
 
+            if (visit.Status != VisitStatus.Accepted)
+                throw new ValidationException($"Cannot check in a visit with status '{visit.Status}'. It must be Accepted first.");
+
+            if (visit.CheckInTime is not null)
+                throw new ValidationException("This visit has already been checked in.");
+
+            Guard.EnsureValidCoordinates(dto.Latitude, dto.Longitude);
+
             visit.CheckInTime = dto.Timestamp;
             visit.CheckInLocation = $"{dto.Latitude},{dto.Longitude}";
             await _visitRepository.UpdateAsync(visit);
@@ -268,8 +368,24 @@ namespace JQZHomeCareProject.Application.Services
             var visit = await _visitRepository.GetByIdAsync(visitId)
                 ?? throw new NotFoundException($"Visit {visitId} not found.");
 
-            if (dto.ReceivedBy == ReceivedByType.Practitioner && dto.AmountReceived is null)
-                throw new ValidationException("AmountReceived is required when ReceivedBy is Practitioner.");
+            if (visit.Status != VisitStatus.Accepted)
+                throw new ValidationException($"Cannot check out a visit with status '{visit.Status}'.");
+
+            if (visit.CheckInTime is null)
+                throw new ValidationException("This visit must be checked in before it can be checked out.");
+
+            if (visit.CheckOutTime is not null)
+                throw new ValidationException("This visit has already been checked out.");
+
+            Guard.EnsureValidCoordinates(dto.Latitude, dto.Longitude);
+
+            if (dto.ReceivedBy == ReceivedByType.Practitioner)
+            {
+                if (dto.AmountReceived is null)
+                    throw new ValidationException("AmountReceived is required when ReceivedBy is Practitioner.");
+                if (dto.AmountReceived.Value < 0)
+                    throw new ValidationException("AmountReceived cannot be negative.");
+            }
 
             visit.CheckOutTime = dto.Timestamp;
             visit.CheckOutLocation = $"{dto.Latitude},{dto.Longitude}";
@@ -285,12 +401,15 @@ namespace JQZHomeCareProject.Application.Services
             var visit = await _visitRepository.GetByIdAsync(visitId)
                 ?? throw new NotFoundException($"Visit {visitId} not found.");
 
+            if (visit.Status is VisitStatus.Completed or VisitStatus.Cancelled)
+                throw new ValidationException($"Cannot cancel a visit with status '{visit.Status}'.");
+
             visit.Refusals.Add(new Refusal
             {
                 Id = Guid.NewGuid(),
                 VisitId = visit.Id,
                 RefusedBy = dto.RefusedBy,
-                Reason = dto.Reason,
+                Reason = dto.Reason.Trim(),
                 Date = DateTime.UtcNow
             });
             visit.Status = VisitStatus.Cancelled;

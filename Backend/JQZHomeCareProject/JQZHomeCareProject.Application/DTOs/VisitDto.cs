@@ -31,8 +31,13 @@ namespace JQZHomeCareProject.Application.DTOs
 
     public class CreateVisitDto
     {
+        [Required, StringLength(150, MinimumLength = 1)]
         public string PatientName { get; set; } = string.Empty;
+
+        [Required]
         public string PatientPhone { get; set; } = string.Empty;
+
+        [Required, StringLength(500, MinimumLength = 1)]
         public string LocationAddress { get; set; } = string.Empty;
 
         public Guid PackageId { get; set; }
@@ -61,6 +66,8 @@ namespace JQZHomeCareProject.Application.DTOs
     public class CancelVisitDto
     {
         public RefusedBy RefusedBy { get; set; }
+
+        [Required, StringLength(500, MinimumLength = 1)]
         public string Reason { get; set; } = string.Empty;
     }
 
@@ -69,6 +76,8 @@ namespace JQZHomeCareProject.Application.DTOs
         public Guid PractitionerId { get; set; }
         public Guid? AreaId { get; set; }
         public RefusedBy RefusedBy { get; set; }
+
+        [Required, StringLength(500, MinimumLength = 1)]
         public string Reason { get; set; } = string.Empty;
     }
 

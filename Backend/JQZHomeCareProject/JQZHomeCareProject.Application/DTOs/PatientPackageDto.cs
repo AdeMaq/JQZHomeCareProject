@@ -1,6 +1,7 @@
 ﻿using JQZHomeCareProject.Domain.Enums;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Text;
 
 namespace JQZHomeCareProject.Application.DTOs
@@ -35,6 +36,7 @@ namespace JQZHomeCareProject.Application.DTOs
 
     public class RecordInstallmentDto
     {
+        [Range(0.01, double.MaxValue, ErrorMessage = "Amount must be greater than 0.")]
         public decimal Amount { get; set; }
     }
 

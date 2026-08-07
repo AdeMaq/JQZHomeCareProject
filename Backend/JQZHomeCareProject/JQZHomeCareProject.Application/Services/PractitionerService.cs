@@ -1,12 +1,12 @@
 ﻿using JQZHomeCareProject.Application.Common.Exceptions;
 using JQZHomeCareProject.Application.Common.Interfaces;
+using JQZHomeCareProject.Application.Common.Validation;
 using JQZHomeCareProject.Application.DTOs;
 using JQZHomeCareProject.Domain.Entities;
 using JQZHomeCareProject.Domain.Enums;
 
 namespace JQZHomeCareProject.Application.Services
 {
-
     public class PractitionerService : IPractitionerService
     {
         private readonly IPractitionerRepository _practitionerRepository;
@@ -34,38 +34,62 @@ namespace JQZHomeCareProject.Application.Services
 
         public async Task<PractitionerDto> CreatePractitionerAsync(CreatePractitionerDto dto, Guid createdByUserId)
         {
+            var name = NameValidator.NormalizeRequired(dto.Name, "Name", 150);
+            Guard.EnsureValidEmail(dto.Email);
+            var phone = Guard.NormalizePhone(dto.Phone);
+            var education = NameValidator.NormalizeRequired(dto.Education, "Education", 200);
+            Guard.EnsureInRange(dto.Priority, 1, 5, "Priority");
+            Guard.EnsureInRange(dto.SharePercentage, 0, 100, "SharePercentage");
+            ValidatePasswordStrength(dto.Password);
+
             if (await _userRepository.EmailExistsAsync(dto.Email))
                 throw new ValidationException("A user with this email already exists.");
+
+            var phoneOwner = await _practitionerRepository.GetByPhoneAsync(phone);
+            if (phoneOwner is not null)
+                throw new ValidationException($"Phone '{phone}' is already in use by another practitioner.");
 
             var service = await _serviceRepository.GetByIdAsync(dto.ServiceId)
                 ?? throw new ValidationException("ServiceId does not reference an existing service.");
 
-            var practitioner = new Practitioner
+            var distinctAreaIds = dto.AreaIds.Distinct().ToList();
+            foreach (var areaId in distinctAreaIds)
             {
-                ServiceId = dto.ServiceId,
-                Education = dto.Education,
-                Priority = dto.Priority,
-                Phone = dto.Phone,
-                SharePercentage = dto.SharePercentage,
-                CreatedByUserId = createdByUserId
-            };
-
-            await _practitionerRepository.AddAsync(practitioner);
-
-            var user = new User
-            {
-                Name = dto.Name,
-                Email = dto.Email,
-                PasswordHash = _passwordHasher.Hash(dto.Password),
-                Role = UserRole.Practitioner,
-                PractitionerId = practitioner.Id
-            };
-            await _userRepository.AddAsync(user);
-
-            foreach (var areaId in dto.AreaIds.Distinct())
-            {
-                await _practitionerRepository.AssignAreaAsync(practitioner.Id, areaId);
+                _ = await _areaRepository.GetByIdAsync(areaId)
+                    ?? throw new NotFoundException($"Area {areaId} not found.");
             }
+
+            Practitioner practitioner = null!;
+            User user = null!;
+
+            await _unitOfWork.ExecuteInTransactionAsync(async () =>
+            {
+                practitioner = new Practitioner
+                {
+                    ServiceId = dto.ServiceId,
+                    Education = education,
+                    Priority = dto.Priority,
+                    Phone = phone,
+                    SharePercentage = dto.SharePercentage,
+                    CreatedByUserId = createdByUserId
+                };
+                await _practitionerRepository.AddAsync(practitioner);
+
+                user = new User
+                {
+                    Name = name,
+                    Email = dto.Email.Trim(),
+                    PasswordHash = _passwordHasher.Hash(dto.Password),
+                    Role = UserRole.Practitioner,
+                    PractitionerId = practitioner.Id
+                };
+                await _userRepository.AddAsync(user);
+
+                foreach (var areaId in distinctAreaIds)
+                {
+                    await _practitionerRepository.AssignAreaAsync(practitioner.Id, areaId);
+                }
+            });
 
             practitioner.Service = service;
             var areas = await _practitionerRepository.GetAreasAsync(practitioner.Id);
@@ -108,7 +132,7 @@ namespace JQZHomeCareProject.Application.Services
             if (string.IsNullOrWhiteSpace(name))
                 return Enumerable.Empty<PractitionerDto>();
 
-            var users = await _userRepository.SearchPractitionerUsersByNameAsync(name);
+            var users = await _userRepository.SearchPractitionerUsersByNameAsync(name.Trim());
             var result = new List<PractitionerDto>();
 
             foreach (var user in users)
@@ -133,9 +157,16 @@ namespace JQZHomeCareProject.Application.Services
             var linkedUser = await _userRepository.GetByPractitionerIdAsync(id)
                 ?? throw new NotFoundException($"No linked login found for practitioner {id}.");
 
-            var phoneOwner = await _practitionerRepository.GetByPhoneAsync(dto.Phone);
+            var name = NameValidator.NormalizeRequired(dto.Name, "Name", 150);
+            Guard.EnsureValidEmail(dto.Email);
+            var phone = Guard.NormalizePhone(dto.Phone);
+            var education = NameValidator.NormalizeRequired(dto.Education, "Education", 200);
+            Guard.EnsureInRange(dto.Priority, 1, 5, "Priority");
+            Guard.EnsureInRange(dto.SharePercentage, 0, 100, "SharePercentage");
+
+            var phoneOwner = await _practitionerRepository.GetByPhoneAsync(phone);
             if (phoneOwner is not null && phoneOwner.Id != id)
-                throw new ValidationException($"Phone '{dto.Phone}' is already in use by another practitioner.");
+                throw new ValidationException($"Phone '{phone}' is already in use by another practitioner.");
 
             var emailOwner = await _userRepository.GetByEmailAsync(dto.Email);
             if (emailOwner is not null && emailOwner.Id != linkedUser.Id)
@@ -144,28 +175,27 @@ namespace JQZHomeCareProject.Application.Services
             var service = await _serviceRepository.GetByIdAsync(dto.ServiceId)
                 ?? throw new NotFoundException($"Service {dto.ServiceId} not found.");
 
-            if (dto.Priority is < 1 or > 5)
-                throw new ValidationException("Priority must be between 1 and 5.");
-
-            if (dto.SharePercentage is < 0 or > 100)
-                throw new ValidationException("SharePercentage must be between 0 and 100.");
-
             var distinctAreaIds = dto.AreaIds.Distinct().ToList();
             foreach (var areaId in distinctAreaIds)
             {
                 _ = await _areaRepository.GetByIdAsync(areaId)
                     ?? throw new NotFoundException($"Area {areaId} not found.");
             }
+            var isPasswordChange = !string.IsNullOrWhiteSpace(dto.Password);
+            if (isPasswordChange)
+                ValidatePasswordStrength(dto.Password!);
 
             await _unitOfWork.ExecuteInTransactionAsync(async () =>
             {
-                linkedUser.Name = dto.Name;
-                linkedUser.Email = dto.Email;
+                linkedUser.Name = name;
+                linkedUser.Email = dto.Email.Trim();
+                if (isPasswordChange)
+                    linkedUser.PasswordHash = _passwordHasher.Hash(dto.Password!);
                 await _userRepository.UpdateAsync(linkedUser);
 
-                practitioner.Phone = dto.Phone;
+                practitioner.Phone = phone;
                 practitioner.ServiceId = dto.ServiceId;
-                practitioner.Education = dto.Education;
+                practitioner.Education = education;
                 practitioner.Priority = dto.Priority;
                 practitioner.SharePercentage = dto.SharePercentage;
                 await _practitionerRepository.UpdateAsync(practitioner);
@@ -184,6 +214,8 @@ namespace JQZHomeCareProject.Application.Services
 
         public async Task SetPriorityAsync(Guid id, int priority)
         {
+            Guard.EnsureInRange(priority, 1, 5, "Priority");
+
             var practitioner = await _practitionerRepository.GetByIdAsync(id)
                 ?? throw new NotFoundException($"Practitioner {id} not found.");
 
@@ -193,6 +225,8 @@ namespace JQZHomeCareProject.Application.Services
 
         public async Task SetSharePercentageAsync(Guid id, decimal sharePercentage)
         {
+            Guard.EnsureInRange(sharePercentage, 0, 100, "SharePercentage");
+
             var practitioner = await _practitionerRepository.GetByIdAsync(id)
                 ?? throw new NotFoundException($"Practitioner {id} not found.");
 
@@ -224,11 +258,20 @@ namespace JQZHomeCareProject.Application.Services
 
         public async Task RemoveAreaAsync(Guid practitionerId, Guid areaId)
         {
+            _ = await _practitionerRepository.GetByIdAsync(practitionerId)
+                ?? throw new NotFoundException($"Practitioner {practitionerId} not found.");
+
             await _practitionerRepository.RemoveAreaAsync(practitionerId, areaId);
         }
 
         public async Task<IEnumerable<PractitionerDto>> FindAvailableAsync(Guid serviceId, Guid patientAreaId)
         {
+            Guard.EnsureNotEmpty(serviceId, "ServiceId");
+            Guard.EnsureNotEmpty(patientAreaId, "patientAreaId");
+
+            _ = await _serviceRepository.GetByIdAsync(serviceId)
+                ?? throw new ValidationException("serviceId does not reference an existing service.");
+
             var patientArea = await _areaRepository.GetByIdAsync(patientAreaId)
                 ?? throw new ValidationException("patientAreaId does not reference an existing area.");
 
@@ -260,6 +303,7 @@ namespace JQZHomeCareProject.Application.Services
             if (string.IsNullOrWhiteSpace(password) || password.Length < 8)
                 throw new ValidationException("Password must be at least 8 characters.");
         }
+
         private static PractitionerDto MapToDto(Practitioner practitioner, User? user, IEnumerable<Area> areas) => new()
         {
             Id = practitioner.Id,

@@ -59,5 +59,20 @@ namespace JQZHomeCareProject.Application.Common.Validation
 
             return normalized;
         }
+
+        public static void EnsureInRange(decimal value, decimal min, decimal max, string fieldLabel)
+        {
+            if (value < min || value > max)
+                throw new ValidationException($"{fieldLabel} must be between {min} and {max}.");
+        }
+
+        public static void EnsureValidEmail(string? rawEmail, string fieldLabel = "Email")
+        {
+            if (string.IsNullOrWhiteSpace(rawEmail))
+                throw new ValidationException($"{fieldLabel} is required.");
+
+            if (!Regex.IsMatch(rawEmail.Trim(), @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
+                throw new ValidationException($"{fieldLabel} format is invalid.");
+        }
     }
 }

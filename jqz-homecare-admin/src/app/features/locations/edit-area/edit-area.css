@@ -1,4 +1,97 @@
+/* =========================
+   EDIT AREA PAGE
+========================= */
+
 :host {
   display: block;
   min-height: 100%;
+}
+
+/* =========================
+   PAGE WRAPPER
+========================= */
+
+.edit-area-page {
+  width: 100%;
+  min-height: 100%;
+  box-sizing: border-box;
+}
+
+/* =========================
+   FORM CARD
+========================= */
+
+.edit-area-page form {
+  width: 100%;
+}
+
+/* =========================
+   BUTTON TRANSITIONS
+========================= */
+
+.edit-area-page button {
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.15s ease;
+}
+
+.edit-area-page button:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+/* =========================
+   INPUT FOCUS
+========================= */
+
+.edit-area-page input,
+.edit-area-page select {
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+/* =========================
+   DISABLED STATES
+========================= */
+
+.edit-area-page input:disabled,
+.edit-area-page select:disabled {
+  cursor: not-allowed;
+}
+
+/* =========================
+   LOADING SPINNER
+========================= */
+
+.edit-area-page .animate-spin {
+  animation: edit-area-spin 0.8s linear infinite;
+}
+
+@keyframes edit-area-spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 768px) {
+  .edit-area-page {
+    padding: 20px 16px;
+  }
+}
+
+@media (max-width: 520px) {
+  .edit-area-page {
+    padding: 16px 12px;
+  }
 }

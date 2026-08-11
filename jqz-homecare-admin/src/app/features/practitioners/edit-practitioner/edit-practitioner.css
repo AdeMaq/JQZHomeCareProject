@@ -1,16 +1,21 @@
-/* =========================
-   PAGE
-========================= */
+/* =========================================================
+   EDIT PRACTITIONER PAGE
+========================================================= */
 
 .edit-practitioner-page {
   width: 100%;
+  min-height: 100%;
+
   padding: 28px 32px 40px;
+
   box-sizing: border-box;
+
+  background: #fff8f8;
 }
 
-/* =========================
+/* =========================================================
    PAGE HEADER
-========================= */
+========================================================= */
 
 .page-header {
   margin-bottom: 24px;
@@ -20,86 +25,575 @@
   display: flex;
   align-items: center;
   flex-wrap: wrap;
+
   gap: 9px;
 
-  margin-bottom: 10px;
+  margin-bottom: 11px;
 
-  color: #718096;
+  color: #627d98;
 
-  font-size: 12px;
+  font-size: 13px;
+  line-height: 1.4;
 }
 
 .breadcrumb i {
-  color: #a0aec0;
-
-  font-size: 9px;
+  color: #9aa5b1;
+  font-size: 10px;
 }
 
 .breadcrumb strong {
-  color: #2d3748;
-
-  font-weight: 600;
+  color: #102a43;
+  font-weight: 700;
 }
 
 .title-row {
   display: flex;
-  align-items: flex-start;
+  align-items: flex-end;
   justify-content: space-between;
-  gap: 20px;
+
+  gap: 24px;
+}
+
+.title-row > div {
+  min-width: 0;
 }
 
 .page-header h1 {
   margin: 0;
 
-  color: #111827;
+  color: #102a43;
 
-  font-size: 28px;
+  font-size: 30px;
   font-weight: 700;
+
   line-height: 1.2;
+  letter-spacing: -0.02em;
 }
 
 .page-header p {
-  margin: 7px 0 0;
+  margin: 8px 0 0;
 
-  color: #718096;
+  color: #627d98;
 
   font-size: 14px;
+  line-height: 1.5;
 }
 
-/* =========================
+/* =========================================================
+   BUTTONS
+========================================================= */
+
+.primary-button,
+.secondary-button,
+.reset-password-button {
+  min-height: 42px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 8px;
+
+  padding: 9px 16px;
+
+  border-radius: 9px;
+
+  font-family: inherit;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  line-height: 1;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.15s ease;
+}
+
+.primary-button i,
+.secondary-button i,
+.reset-password-button i {
+  font-size: 13px;
+}
+
+/* =========================================================
+   PRIMARY BUTTON
+========================================================= */
+
+.primary-button {
+  border: 1px solid #cf102d;
+
+  background: #cf102d;
+
+  color: #ffffff;
+
+  box-shadow: 0 2px 5px rgba(207, 16, 45, 0.12);
+}
+
+.primary-button:hover:not(:disabled) {
+  background: #b80e28;
+
+  border-color: #b80e28;
+
+  box-shadow: 0 5px 12px rgba(207, 16, 45, 0.18);
+
+  transform: translateY(-1px);
+}
+
+.primary-button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+/* =========================================================
+   SECONDARY BUTTON
+========================================================= */
+
+.secondary-button {
+  border: 1px solid #f2d9dc;
+
+  background: #ffffff;
+
+  color: #334e68;
+}
+
+.secondary-button:hover:not(:disabled) {
+  border-color: #cf102d;
+
+  background: #fff1f3;
+
+  color: #cf102d;
+
+  box-shadow: 0 3px 8px rgba(207, 16, 45, 0.08);
+
+  transform: translateY(-1px);
+}
+
+.secondary-button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+/* =========================================================
+   RESET PASSWORD BUTTON
+========================================================= */
+
+.reset-password-button {
+  border: 1px solid #f2d9dc;
+
+  background: #fdebed;
+
+  color: #cf102d;
+}
+
+.reset-password-button:hover:not(:disabled) {
+  border-color: #e9aeb4;
+
+  background: #f9d9dc;
+
+  color: #b80e28;
+
+  box-shadow: 0 3px 8px rgba(207, 16, 45, 0.1);
+
+  transform: translateY(-1px);
+}
+
+.reset-password-button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+/* =========================================================
+   DISABLED BUTTONS
+========================================================= */
+
+.primary-button:disabled,
+.secondary-button:disabled,
+.reset-password-button:disabled {
+  opacity: 0.55;
+
+  cursor: not-allowed;
+
+  transform: none;
+
+  box-shadow: none;
+}
+
+/* =========================================================
    FORM CARD
-========================= */
+========================================================= */
 
 .form-card {
   overflow: hidden;
 
+  width: 100%;
+
   background: #ffffff;
 
-  border: 1px solid #e5e7eb;
-  border-radius: 10px;
+  border: 1px solid #f2d9dc;
 
-  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+  border-radius: 14px;
+
+  box-shadow: 0 2px 6px rgba(16, 24, 40, 0.04);
+
+  box-sizing: border-box;
 }
 
-/* =========================
-   FORM SECTION
-========================= */
+/* =========================================================
+   FORM SECTIONS
+========================================================= */
 
 .form-section {
-  padding: 24px;
+  padding: 24px 26px;
 
-  border-bottom: 1px solid #edf0f4;
+  border-bottom: 1px solid #f5d9dc;
+
+  background: #ffffff;
 }
+
+.form-section:last-of-type {
+  border-bottom: none;
+}
+
+/* =========================================================
+   SECTION HEADER
+========================================================= */
 
 .section-header {
   display: flex;
   align-items: flex-start;
-  gap: 12px;
 
-  margin-bottom: 20px;
+  gap: 14px;
+
+  margin-bottom: 22px;
 }
 
+.section-header > div:last-child {
+  min-width: 0;
+}
+
+/* =========================================================
+   SECTION ICON
+========================================================= */
+
 .section-icon {
+  width: 44px;
+  height: 44px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  border-radius: 10px;
+
+  background: #fdebed;
+
+  color: #cf102d;
+
+  font-size: 18px;
+
+  box-shadow: inset 0 0 0 1px #f6d2d5;
+}
+
+/* =========================================================
+   SECTION TEXT
+========================================================= */
+
+.section-header h2 {
+  margin: 1px 0 6px;
+
+  color: #102a43;
+
+  font-size: 17px;
+  font-weight: 700;
+
+  line-height: 1.3;
+}
+
+.section-header p {
+  margin: 0;
+
+  color: #627d98;
+
+  font-size: 13px;
+
+  line-height: 1.5;
+}
+
+/* =========================================================
+   FORM GRID
+========================================================= */
+
+.form-grid {
+  display: grid;
+
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  gap: 20px 22px;
+}
+
+/* =========================================================
+   FORM FIELD
+========================================================= */
+
+.form-field {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+}
+
+/* =========================================================
+   LABEL
+========================================================= */
+
+.form-field label {
+  display: block;
+
+  margin-bottom: 8px;
+
+  color: #334e68;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  line-height: 1.4;
+}
+
+.form-field label span {
+  margin-left: 2px;
+
+  color: #cf102d;
+
+  font-weight: 700;
+}
+
+/* =========================================================
+   INPUTS + SELECTS
+========================================================= */
+
+.form-field input,
+.form-field select {
+  width: 100%;
+
+  min-height: 46px;
+
+  box-sizing: border-box;
+
+  padding: 10px 13px;
+
+  border: 1px solid #e3d7da;
+
+  border-radius: 8px;
+
+  outline: none;
+
+  background: #ffffff;
+
+  color: #243b53;
+
+  font-family: inherit;
+
+  font-size: 14px;
+
+  line-height: 1.4;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+}
+
+.form-field input::placeholder {
+  color: #9aa5b1;
+
+  opacity: 1;
+}
+
+.form-field input:hover,
+.form-field select:hover {
+  border-color: #e9aeb4;
+}
+
+.form-field input:focus,
+.form-field select:focus {
+  border-color: #cf102d;
+
+  box-shadow: 0 0 0 3px rgba(207, 16, 45, 0.08);
+
+  background: #ffffff;
+}
+
+/* =========================================================
+   SELECT
+========================================================= */
+
+.form-field select {
+  cursor: pointer;
+}
+
+/* =========================================================
+   SMALL HELP TEXT
+========================================================= */
+
+.form-field small {
+  margin-top: 6px;
+
+  color: #829ab1;
+
+  font-size: 12px;
+
+  line-height: 1.45;
+}
+
+/* =========================================================
+   INPUT WITH SUFFIX
+========================================================= */
+
+.input-with-suffix {
+  position: relative;
+
+  display: flex;
+  align-items: center;
+}
+
+.input-with-suffix input {
+  padding-right: 45px;
+}
+
+.input-with-suffix > span {
+  position: absolute;
+
+  right: 13px;
+
+  color: #829ab1;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  pointer-events: none;
+}
+
+/* =========================================================
+   RESET PASSWORD SECTION
+========================================================= */
+
+.password-section {
+  background: #fffafb;
+}
+
+.password-reset-content {
+  display: grid;
+
+  grid-template-columns: minmax(0, 1fr) auto;
+
+  align-items: end;
+
+  gap: 20px;
+}
+
+.password-field {
+  min-width: 0;
+}
+
+.password-action {
+  display: flex;
+  align-items: flex-end;
+
+  padding-bottom: 22px;
+}
+
+/* =========================================================
+   PASSWORD INPUT
+========================================================= */
+
+.password-input-wrapper {
+  position: relative;
+
+  width: 100%;
+}
+
+.password-input-wrapper input {
+  padding-right: 48px;
+}
+
+.password-toggle {
+  position: absolute;
+
+  top: 50%;
+  right: 7px;
+
+  width: 34px;
+  height: 34px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  transform: translateY(-50%);
+
+  border: none;
+  border-radius: 7px;
+
+  background: transparent;
+
+  color: #829ab1;
+
+  font-size: 14px;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+.password-toggle:hover:not(:disabled) {
+  background: #fdebed;
+
+  color: #cf102d;
+}
+
+.password-toggle:disabled {
+  opacity: 0.5;
+
+  cursor: not-allowed;
+}
+
+/* =========================================================
+   PASSWORD MESSAGES
+========================================================= */
+
+.password-message {
+  margin-top: 18px;
+}
+
+/* =========================================================
+   INFO SECTION
+========================================================= */
+
+.info-section {
+  display: flex;
+  align-items: flex-start;
+
+  gap: 13px;
+
+  margin: 22px 26px 0;
+
+  padding: 16px 18px;
+
+  border: 1px solid #f2d9dc;
+
+  border-radius: 10px;
+
+  background: #fff8f8;
+}
+
+.info-icon {
   width: 36px;
   height: 36px;
 
@@ -111,181 +605,11 @@
 
   border-radius: 8px;
 
-  background: #eff6ff;
-  color: #2563eb;
+  background: #fdebed;
 
-  font-size: 14px;
-}
-
-.section-header h2 {
-  margin: 1px 0 5px;
-
-  color: #1e293b;
+  color: #cf102d;
 
   font-size: 15px;
-  font-weight: 700;
-}
-
-.section-header p {
-  margin: 0;
-
-  color: #718096;
-
-  font-size: 12px;
-  line-height: 1.5;
-}
-
-/* =========================
-   FORM GRID
-========================= */
-
-.form-grid {
-  display: grid;
-
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-
-  gap: 18px 20px;
-}
-
-/* =========================
-   FORM FIELD
-========================= */
-
-.form-field {
-  min-width: 0;
-}
-
-.form-field label {
-  display: block;
-
-  margin-bottom: 7px;
-
-  color: #334155;
-
-  font-size: 12px;
-  font-weight: 600;
-}
-
-.form-field label span {
-  color: #dc2626;
-}
-
-.form-field input,
-.form-field select {
-  width: 100%;
-  min-height: 40px;
-
-  padding: 9px 11px;
-
-  box-sizing: border-box;
-
-  border: 1px solid #dbe2ea;
-  border-radius: 7px;
-
-  background: #ffffff;
-  color: #334155;
-
-  font-family: inherit;
-  font-size: 13px;
-
-  outline: none;
-
-  transition:
-    border-color 0.2s ease,
-    box-shadow 0.2s ease,
-    background 0.2s ease;
-}
-
-.form-field input::placeholder {
-  color: #a0aec0;
-}
-
-.form-field input:focus,
-.form-field select:focus {
-  border-color: #93c5fd;
-
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.08);
-}
-
-.form-field input:hover,
-.form-field select:hover {
-  border-color: #cbd5e1;
-}
-
-.form-field small {
-  display: block;
-
-  margin-top: 6px;
-
-  color: #94a3b8;
-
-  font-size: 11px;
-  line-height: 1.4;
-}
-
-/* =========================
-   INPUT WITH SUFFIX
-========================= */
-
-.input-with-suffix {
-  position: relative;
-}
-
-.input-with-suffix input {
-  padding-right: 38px;
-}
-
-.input-with-suffix > span {
-  position: absolute;
-
-  top: 50%;
-  right: 12px;
-
-  transform: translateY(-50%);
-
-  color: #64748b;
-
-  font-size: 12px;
-  font-weight: 600;
-
-  pointer-events: none;
-}
-
-/* =========================
-   INFORMATION SECTION
-========================= */
-
-.info-section {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-
-  margin: 20px 24px;
-
-  padding: 14px 15px;
-
-  border: 1px solid #dbeafe;
-  border-radius: 8px;
-
-  background: #f8fbff;
-}
-
-.info-icon {
-  width: 34px;
-  height: 34px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  flex-shrink: 0;
-
-  border-radius: 7px;
-
-  background: #eff6ff;
-  color: #2563eb;
-
-  font-size: 13px;
 }
 
 .info-section strong {
@@ -293,147 +617,114 @@
 
   margin: 1px 0 5px;
 
-  color: #334155;
+  color: #102a43;
 
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
 }
 
 .info-section p {
   margin: 0;
 
-  color: #64748b;
-
-  font-size: 11px;
-  line-height: 1.6;
-}
-
-/* =========================
-   ERROR MESSAGE
-========================= */
-
-.error-message {
-  display: flex;
-  align-items: flex-start;
-  gap: 9px;
-
-  margin: 0 24px 20px;
-
-  padding: 11px 13px;
-
-  border: 1px solid #fecaca;
-  border-radius: 7px;
-
-  background: #fef2f2;
-  color: #b91c1c;
+  color: #627d98;
 
   font-size: 12px;
+
+  line-height: 1.55;
+}
+
+/* =========================================================
+   MESSAGES
+========================================================= */
+
+.error-message,
+.success-message {
+  display: flex;
+  align-items: flex-start;
+
+  gap: 10px;
+
+  margin: 18px 26px 0;
+
+  padding: 12px 14px;
+
+  border-radius: 8px;
+
+  font-size: 13px;
+
   line-height: 1.5;
 }
 
-.error-message i {
-  margin-top: 2px;
+.error-message {
+  border: 1px solid #fecaca;
 
-  flex-shrink: 0;
+  background: #fff5f5;
 
-  font-size: 12px;
+  color: #b91c1c;
 }
 
-/* =========================
+.success-message {
+  border: 1px solid #bbf7d0;
+
+  background: #f0fdf4;
+
+  color: #15803d;
+}
+
+.error-message i,
+.success-message i {
+  flex-shrink: 0;
+
+  margin-top: 2px;
+
+  font-size: 14px;
+}
+
+/* =========================================================
    FORM ACTIONS
-========================= */
+========================================================= */
 
 .form-actions {
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 9px;
 
-  padding: 18px 24px;
+  gap: 10px;
 
-  background: #fafbfc;
+  margin-top: 22px;
+
+  padding: 20px 26px;
+
+  border-top: 1px solid #f5d9dc;
+
+  background: #fffafb;
 }
 
-/* =========================
-   BUTTONS
-========================= */
-
-.primary-button,
-.secondary-button {
-  min-height: 38px;
-
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-
-  padding: 9px 17px;
-
-  border-radius: 7px;
-
-  font-family: inherit;
-  font-size: 13px;
-  font-weight: 600;
-
-  cursor: pointer;
-
-  transition:
-    background 0.2s ease,
-    border-color 0.2s ease,
-    box-shadow 0.2s ease,
-    color 0.2s ease,
-    opacity 0.2s ease;
-}
-
-.primary-button {
-  border: none;
-
-  background: #2563eb;
-  color: #ffffff;
-}
-
-.primary-button:hover:not(:disabled) {
-  background: #1d4ed8;
-
-  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.18);
-}
-
-.secondary-button {
-  border: 1px solid #dbe2ea;
-
-  background: #ffffff;
-  color: #334155;
-}
-
-.secondary-button:hover:not(:disabled) {
-  border-color: #bfdbfe;
-
-  background: #eff6ff;
-
-  color: #2563eb;
-}
-
-.primary-button:disabled,
-.secondary-button:disabled {
-  cursor: not-allowed;
-
-  opacity: 0.6;
-}
-
-/* =========================
+/* =========================================================
    BUTTON SPINNER
-========================= */
+========================================================= */
 
 .button-spinner {
   width: 14px;
   height: 14px;
 
+  display: inline-block;
+
+  flex-shrink: 0;
+
   border: 2px solid rgba(255, 255, 255, 0.35);
+
   border-top-color: #ffffff;
 
   border-radius: 50%;
 
   animation: button-spin 0.7s linear infinite;
+}
+
+.reset-password-button .button-spinner {
+  border-color: rgba(207, 16, 45, 0.25);
+
+  border-top-color: #cf102d;
 }
 
 @keyframes button-spin {
@@ -442,102 +733,161 @@
   }
 }
 
-/* =========================
-   STATE CARD
-========================= */
+/* =========================================================
+   LOADING / ERROR STATE
+========================================================= */
 
 .state-card {
   min-height: 360px;
 
   display: flex;
   flex-direction: column;
+
   align-items: center;
   justify-content: center;
 
-  padding: 30px 20px;
+  padding: 35px 25px;
 
   box-sizing: border-box;
 
-  border: 1px solid #e5e7eb;
-  border-radius: 10px;
+  border: 1px solid #f2d9dc;
+
+  border-radius: 14px;
 
   background: #ffffff;
 
   text-align: center;
+
+  box-shadow: 0 2px 6px rgba(16, 24, 40, 0.04);
 }
 
 .state-card h3 {
-  margin: 14px 0 6px;
+  margin: 16px 0 7px;
 
-  color: #1e293b;
+  color: #102a43;
 
-  font-size: 15px;
+  font-size: 18px;
+  font-weight: 700;
 }
 
 .state-card p {
-  max-width: 430px;
+  max-width: 450px;
 
-  margin: 0 0 18px;
+  margin: 0 0 20px;
 
-  color: #718096;
+  color: #627d98;
 
-  font-size: 12px;
+  font-size: 13px;
+
   line-height: 1.6;
 }
 
+/* =========================================================
+   STATE ICON
+========================================================= */
+
 .state-icon {
-  width: 46px;
-  height: 46px;
+  width: 52px;
+  height: 52px;
 
   display: flex;
   align-items: center;
   justify-content: center;
 
-  border-radius: 10px;
+  border-radius: 11px;
 
-  background: #eff6ff;
-  color: #2563eb;
+  background: #fdebed;
 
-  font-size: 19px;
+  color: #cf102d;
+
+  font-size: 21px;
+
+  box-shadow: inset 0 0 0 1px #f6d2d5;
 }
 
 .error-icon {
-  background: #fef2f2;
+  background: #fdebed;
 
-  color: #dc2626;
+  color: #cf102d;
 }
 
-.loading-spinner {
-  width: 28px;
-  height: 28px;
+/* =========================================================
+   LOADING SPINNER
+========================================================= */
 
-  border: 3px solid #e5e7eb;
-  border-top-color: #2563eb;
+.loading-spinner {
+  width: 34px;
+  height: 34px;
+
+  border: 3px solid #f6d2d5;
+
+  border-top-color: #cf102d;
 
   border-radius: 50%;
 
-  animation: spin 0.8s linear infinite;
+  animation: edit-page-spin 0.8s linear infinite;
 }
 
-@keyframes spin {
+@keyframes edit-page-spin {
   to {
     transform: rotate(360deg);
   }
 }
 
-/* =========================
-   RESPONSIVE
-========================= */
+/* =========================================================
+   FOCUS ACCESSIBILITY
+========================================================= */
+
+.primary-button:focus-visible,
+.secondary-button:focus-visible,
+.reset-password-button:focus-visible,
+.password-toggle:focus-visible {
+  outline: none;
+
+  box-shadow:
+    0 0 0 3px rgba(207, 16, 45, 0.1),
+    0 0 0 1px #cf102d;
+}
+
+/* =========================================================
+   RESPONSIVE — TABLET
+========================================================= */
 
 @media (max-width: 900px) {
   .edit-practitioner-page {
-    padding: 24px 24px 35px;
+    padding: 24px 22px 35px;
   }
 
-  .form-grid {
-    grid-template-columns: 1fr;
+  .title-row {
+    align-items: flex-start;
+
+    flex-direction: column;
+
+    gap: 16px;
+  }
+
+  .title-row > .secondary-button {
+    width: auto;
+  }
+
+  .form-section {
+    padding: 22px;
+  }
+
+  .info-section {
+    margin-left: 22px;
+    margin-right: 22px;
+  }
+
+  .form-actions {
+    padding-left: 22px;
+    padding-right: 22px;
   }
 }
+
+/* =========================================================
+   RESPONSIVE — MOBILE
+========================================================= */
 
 @media (max-width: 768px) {
   .edit-practitioner-page {
@@ -545,166 +895,160 @@
   }
 
   .page-header h1 {
-    font-size: 24px;
+    font-size: 26px;
   }
 
-  .title-row {
-    flex-direction: column;
-    align-items: stretch;
+  .page-header p {
+    font-size: 13px;
   }
 
   .title-row > .secondary-button {
     width: 100%;
   }
 
-  .form-section {
-    padding: 20px;
+  .form-grid {
+    grid-template-columns: 1fr;
+
+    gap: 18px;
   }
 
-  .info-section {
-    margin: 18px 20px;
+  .password-reset-content {
+    grid-template-columns: 1fr;
+
+    gap: 16px;
   }
 
-  .form-actions {
-    padding: 16px 20px;
-  }
-}
-
-@media (max-width: 520px) {
-  .edit-practitioner-page {
-    padding: 16px 12px 25px;
+  .password-action {
+    padding-bottom: 0;
   }
 
-  .form-section {
-    padding: 17px 15px;
-  }
-
-  .section-header {
-    gap: 9px;
-  }
-
-  .section-icon {
-    width: 32px;
-    height: 32px;
-
-    font-size: 12px;
-  }
-
-  .info-section {
-    margin: 16px 15px;
-
-    padding: 13px;
+  .reset-password-button {
+    width: 100%;
   }
 
   .form-actions {
     flex-direction: column-reverse;
 
     align-items: stretch;
-
-    padding: 15px;
   }
 
-  .form-actions button {
+  .form-actions .primary-button,
+  .form-actions .secondary-button {
     width: 100%;
   }
-
-  .state-card {
-    min-height: 320px;
-  }
-}
-/* ============================================================
-   RESET PASSWORD
-============================================================ */
-
-.password-section {
-  margin-top: 24px;
 }
 
-.password-reset-content {
-  display: flex;
-  align-items: flex-end;
-  gap: 20px;
-}
+/* =========================================================
+   RESPONSIVE — SMALL MOBILE
+========================================================= */
 
-.password-field {
-  flex: 1;
-  max-width: 520px;
-}
-
-.password-input-wrapper {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-.password-input-wrapper input {
-  width: 100%;
-  padding-right: 46px;
-}
-
-.password-toggle {
-  position: absolute;
-  right: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-
-  border: none;
-  background: transparent;
-
-  cursor: pointer;
-
-  padding: 6px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.password-toggle:disabled {
-  cursor: not-allowed;
-  opacity: 0.5;
-}
-
-.password-action {
-  display: flex;
-  align-items: center;
-}
-
-.reset-password-button {
-  white-space: nowrap;
-}
-
-.password-message {
-  margin-top: 16px;
-}
-
-.success-message {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-
-  padding: 12px 16px;
-
-  border-radius: 8px;
-
-  margin-top: 16px;
-}
-@media (max-width: 768px) {
-  .password-reset-content {
-    flex-direction: column;
-    align-items: stretch;
+@media (max-width: 520px) {
+  .edit-practitioner-page {
+    padding: 16px 12px 25px;
   }
 
-  .password-field {
-    max-width: none;
+  .breadcrumb {
+    font-size: 12px;
+
+    gap: 7px;
   }
 
-  .password-action {
-    width: 100%;
+  .page-header h1 {
+    font-size: 23px;
   }
 
+  .page-header p {
+    font-size: 12px;
+  }
+
+  .form-card {
+    border-radius: 12px;
+  }
+
+  .form-section {
+    padding: 18px 15px;
+  }
+
+  .section-header {
+    gap: 11px;
+
+    margin-bottom: 18px;
+  }
+
+  .section-icon {
+    width: 40px;
+    height: 40px;
+
+    border-radius: 9px;
+
+    font-size: 16px;
+  }
+
+  .section-header h2 {
+    font-size: 15px;
+  }
+
+  .section-header p {
+    font-size: 12px;
+  }
+
+  .form-field label {
+    font-size: 12px;
+  }
+
+  .form-field input,
+  .form-field select {
+    min-height: 44px;
+
+    padding: 9px 12px;
+
+    font-size: 13px;
+  }
+
+  .form-field small {
+    font-size: 11px;
+  }
+
+  .info-section {
+    margin: 18px 15px 0;
+
+    padding: 14px;
+  }
+
+  .info-icon {
+    width: 34px;
+    height: 34px;
+
+    font-size: 14px;
+  }
+
+  .info-section strong {
+    font-size: 12px;
+  }
+
+  .info-section p {
+    font-size: 11px;
+  }
+
+  .error-message,
+  .success-message {
+    margin-left: 15px;
+    margin-right: 15px;
+
+    font-size: 12px;
+  }
+
+  .form-actions {
+    margin-top: 18px;
+
+    padding: 16px 15px;
+  }
+
+  .primary-button,
+  .secondary-button,
   .reset-password-button {
-    width: 100%;
-    justify-content: center;
+    min-height: 42px;
+
+    font-size: 12px;
   }
 }

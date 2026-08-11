@@ -1,32 +1,44 @@
-<!-- Mobile Overlay -->
+<!-- =====================================================
+     MOBILE OVERLAY
+===================================================== -->
+
 @if (isOpen) {
   <div class="sidebar-overlay" (click)="onCloseSidebar()"></div>
 }
 
-<!-- Sidebar -->
+<!-- =====================================================
+     SIDEBAR
+===================================================== -->
+
 <aside class="sidebar" [class.sidebar-open]="isOpen">
-  <!-- Logo -->
+  <!-- ===================================================
+       LOGO
+  ==================================================== -->
+
   <div class="sidebar-logo">
     <div class="logo-container">
-      <div class="logo-icon">
-        <i class="fa-solid fa-heart-pulse"></i>
-      </div>
+      <img
+        src="images/jqz-homecare-logo.png"
+        alt="JQZ By Qalandars - Clinics & Home-Care Services"
+        class="logo-image"
+      />
 
-      <div class="logo-text">
-        <h1>JQZ HomeCare</h1>
-        <p>Admin Portal</p>
-      </div>
+      <p class="logo-subtitle">Admin Portal</p>
     </div>
   </div>
 
-  <!-- Menu -->
-  <nav class="sidebar-menu">
-    @for (item of menuItems; track item.label) {
+  <!-- ===================================================
+       NAVIGATION
+  ==================================================== -->
+
+  <nav class="sidebar-menu" aria-label="Main navigation">
+    @for (item of menuItems; track item.route) {
       <button
         type="button"
         class="menu-item"
-        [class.active]="item.active"
-        (click)="onMenuItemClick()"
+        [class.active]="isActive(item.route)"
+        [attr.aria-current]="isActive(item.route) ? 'page' : null"
+        (click)="onMenuItemClick(item.route)"
       >
         <i [class]="item.icon"></i>
 

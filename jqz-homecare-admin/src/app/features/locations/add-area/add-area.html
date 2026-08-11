@@ -1,227 +1,161 @@
-<div class="min-h-full bg-slate-50 px-4 py-6 sm:px-6 lg:px-8">
-  <div class="mx-auto max-w-5xl">
-    <!-- =========================
-         BREADCRUMB
-    ========================== -->
+<!-- add-area.html -->
+<div class="add-area-page bg-[#fff8f8] p-8">
+  <!-- Breadcrumb -->
+  <div class="mb-6 flex items-center gap-2 text-sm">
+    <span class="font-medium text-[#627d98]">Locations</span>
+    <i class="fa-solid fa-chevron-right text-[10px] text-[#9aa5b1]"></i>
+    <span class="font-medium text-[#627d98]">Areas</span>
+    <i class="fa-solid fa-chevron-right text-[10px] text-[#9aa5b1]"></i>
+    <span class="font-semibold text-[#102a43]">Add Area</span>
+  </div>
 
-    <div class="mb-6 flex items-center gap-2 text-sm">
-      <span class="font-medium text-slate-500"> Locations </span>
-
-      <i class="fa-solid fa-chevron-right text-[10px] text-slate-400"></i>
-
-      <span class="font-medium text-slate-500"> Areas </span>
-
-      <i class="fa-solid fa-chevron-right text-[10px] text-slate-400"></i>
-
-      <span class="font-semibold text-slate-800"> Add Area </span>
-    </div>
-
-    <!-- =========================
-         PAGE HEADER
-    ========================== -->
-
-    <div class="mb-8 flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+  <!-- Header -->
+  <div class="mb-8 flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+    <div class="flex items-start gap-4">
+      <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#fdebed]">
+        <i class="fa-solid fa-location-dot text-2xl text-[#cf102d]"></i>
+      </div>
       <div>
-        <div class="mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-blue-50">
-          <i class="fa-solid fa-location-dot text-xl text-blue-600"></i>
-        </div>
-
-        <h1 class="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">Add Area</h1>
-
-        <p class="mt-2 text-sm text-slate-500 sm:text-base">
-          Add a new area and assign it to a city.
+        <h1 class="text-3xl font-bold tracking-tight text-[#102a43]">Add Area</h1>
+        <p class="mt-2 text-[15px] leading-6 text-[#627d98]">
+          Create a new healthcare area and assign it to a city.
         </p>
       </div>
-
-      <button
-        type="button"
-        class="inline-flex w-fit items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
-        (click)="cancel()"
-        [disabled]="isSubmitting"
-      >
-        <i class="fa-solid fa-arrow-left text-xs"></i>
-
-        Back to Areas
-      </button>
     </div>
 
-    <!-- =========================
-         FORM CARD
-    ========================== -->
+    <button
+      type="button"
+      (click)="cancel()"
+      [disabled]="isSubmitting"
+      class="inline-flex items-center gap-2 rounded-xl border border-[#f2d9dc] bg-white px-5 py-3 text-sm font-semibold text-[#526581] shadow-sm transition-all duration-200 hover:border-[#cf102d] hover:bg-[#fff4f5] hover:text-[#cf102d] disabled:cursor-not-allowed disabled:opacity-50"
+    >
+      <i class="fa-solid fa-arrow-left"></i>
+      Back to Areas
+    </button>
+  </div>
 
-    <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-      <!-- CARD HEADER -->
+  <!-- Card -->
+  <div
+    class="overflow-hidden rounded-2xl border border-[#f2dcdc] bg-white shadow-[0_8px_28px_rgba(15,23,42,0.06)]"
+  >
+    <div class="border-b border-[#f5d9dc] px-7 py-6">
+      <div class="flex items-start gap-4">
+        <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-[#fdebed]">
+          <i class="fa-solid fa-map-location-dot text-lg text-[#cf102d]"></i>
+        </div>
+        <div>
+          <h2 class="text-xl font-bold text-[#102a43]">Area Information</h2>
+          <p class="mt-1 text-sm text-[#627d98]">Enter the details of the healthcare area.</p>
+        </div>
+      </div>
+    </div>
 
-      <div class="border-b border-slate-100 px-5 py-5 sm:px-7">
-        <div class="flex items-start gap-4">
-          <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-blue-50">
-            <i class="fa-solid fa-map-location-dot text-lg text-blue-600"></i>
+    @if (errorMessage) {
+      <div
+        class="mx-7 mt-6 flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3"
+      >
+        <i class="fa-solid fa-circle-exclamation mt-0.5 text-red-600"></i>
+        <span class="text-sm font-medium text-red-700">{{ errorMessage }}</span>
+      </div>
+    }
+
+    <form (ngSubmit)="submit()">
+      <div class="space-y-7 px-7 py-7">
+        <div>
+          <label for="areaName" class="mb-2 block text-sm font-semibold text-[#243b53]">
+            Area Name <span class="text-[#cf102d]">*</span>
+          </label>
+          <div class="relative">
+            <i
+              class="fa-solid fa-location-dot absolute left-4 top-1/2 -translate-y-1/2 text-[#cf102d]"
+            ></i>
+            <input
+              id="areaName"
+              type="text"
+              name="areaName"
+              [(ngModel)]="areaName"
+              placeholder="Enter area name"
+              autocomplete="off"
+              [disabled]="isSubmitting"
+              class="h-12 w-full rounded-xl border border-[#d9dde5] bg-white pl-11 pr-4 text-sm text-[#102a43] outline-none transition-all duration-200 placeholder:text-[#94a3b8] hover:border-[#cf102d] focus:border-[#cf102d] focus:ring-4 focus:ring-[#cf102d]/10 disabled:cursor-not-allowed disabled:bg-slate-50"
+            />
           </div>
+          <p class="mt-2 text-xs text-[#7b8794]">Enter the official name of the healthcare area.</p>
+        </div>
 
-          <div>
-            <h2 class="text-base font-semibold text-slate-900">Area Information</h2>
+        <div>
+          <label for="cityId" class="mb-2 block text-sm font-semibold text-[#243b53]">
+            City <span class="text-[#cf102d]">*</span>
+          </label>
+          <div class="relative">
+            <i class="fa-solid fa-city absolute left-4 top-1/2 -translate-y-1/2 text-[#cf102d]"></i>
+            <select
+              id="cityId"
+              name="cityId"
+              [(ngModel)]="selectedCityId"
+              [disabled]="isSubmitting || isLoadingCities || cities.length === 0"
+              class="h-12 w-full appearance-none rounded-xl border border-[#d9dde5] bg-white pl-11 pr-11 text-sm text-[#102a43] outline-none transition-all duration-200 hover:border-[#cf102d] focus:border-[#cf102d] focus:ring-4 focus:ring-[#cf102d]/10 disabled:cursor-not-allowed disabled:bg-slate-50"
+            >
+              @if (isLoadingCities) {
+                <option value="">Loading cities...</option>
+              } @else if (cities.length === 0) {
+                <option value="">No cities available</option>
+              } @else {
+                <option value="">Select a city</option>
+                @for (city of cities; track city.id) {
+                  <option [value]="city.id">{{ city.name }}</option>
+                }
+              }
+            </select>
+            <i
+              class="fa-solid fa-chevron-down pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-xs text-[#94a3b8]"
+            ></i>
+          </div>
+          <p class="mt-2 text-xs text-[#7b8794]">Select the city this area belongs to.</p>
+        </div>
 
-            <p class="mt-1 text-sm text-slate-500">Enter the details below to add a new area.</p>
+        <div class="rounded-xl border border-[#f6d2d5] bg-[#fff6f7] px-4 py-3">
+          <div class="flex items-start gap-3">
+            <i class="fa-solid fa-circle-info mt-0.5 text-[#cf102d]"></i>
+
+            <p class="text-xs leading-5 text-[#7b8794]">
+              Make sure the area name is correct and the appropriate city is selected before
+              creating the area.
+            </p>
           </div>
         </div>
       </div>
 
-      <!-- =========================
-           FORM
-      ========================== -->
-
-      <form (ngSubmit)="submit()">
-        <div class="grid gap-6 px-5 py-6 sm:px-7 md:grid-cols-2">
-          <!-- =========================
-               AREA NAME
-          ========================== -->
-
-          <div class="md:col-span-1">
-            <label for="areaName" class="mb-2 block text-sm font-semibold text-slate-700">
-              Area Name
-
-              <span class="text-red-500">*</span>
-            </label>
-
-            <div class="relative">
-              <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
-                <i class="fa-solid fa-location-dot text-sm text-slate-400"></i>
-              </div>
-
-              <input
-                id="areaName"
-                name="areaName"
-                type="text"
-                [(ngModel)]="areaName"
-                placeholder="Enter area name"
-                autocomplete="off"
-                [disabled]="isSubmitting"
-                class="w-full rounded-lg border border-slate-300 bg-white py-3 pl-10 pr-4 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 hover:border-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 disabled:cursor-not-allowed disabled:bg-slate-50"
-              />
-            </div>
-
-            <p class="mt-2 text-xs text-slate-500">Enter the official name of the area.</p>
-          </div>
-
-          <!-- =========================
-               CITY
-          ========================== -->
-
-          <div>
-            <label for="cityId" class="mb-2 block text-sm font-semibold text-slate-700">
-              City
-
-              <span class="text-red-500">*</span>
-            </label>
-
-            <div class="relative">
-              <div
-                class="pointer-events-none absolute inset-y-0 left-0 z-10 flex items-center pl-3.5"
-              >
-                <i class="fa-solid fa-city text-sm text-slate-400"></i>
-              </div>
-
-              <select
-                id="cityId"
-                name="cityId"
-                [(ngModel)]="selectedCityId"
-                [disabled]="isSubmitting || isLoadingCities || cities.length === 0"
-                class="w-full appearance-none rounded-lg border border-slate-300 bg-white py-3 pl-10 pr-10 text-sm text-slate-900 outline-none transition hover:border-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 disabled:cursor-not-allowed disabled:bg-slate-50"
-              >
-                @if (isLoadingCities) {
-                  <option value="">Loading cities...</option>
-                } @else if (cities.length === 0) {
-                  <option value="">No cities available</option>
-                } @else {
-                  <option value="">Select a city</option>
-
-                  @for (city of cities; track city.id) {
-                    <option [value]="city.id">
-                      {{ city.name }}
-                    </option>
-                  }
-                }
-              </select>
-
-              <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3.5">
-                <i class="fa-solid fa-chevron-down text-xs text-slate-400"></i>
-              </div>
-            </div>
-
-            <p class="mt-2 text-xs text-slate-500">Select the city this area belongs to.</p>
-          </div>
-
-          <!-- =========================
-               ERROR
-          ========================== -->
-
-          @if (errorMessage) {
-            <div
-              class="flex items-start gap-3 rounded-lg border border-red-200 bg-red-50 px-4 py-3 md:col-span-2"
-            >
-              <i class="fa-solid fa-circle-exclamation mt-0.5 text-sm text-red-600"></i>
-
-              <p class="text-sm font-medium text-red-700">
-                {{ errorMessage }}
-              </p>
-            </div>
-          }
-        </div>
-
-        <!-- =========================
-             FORM FOOTER
-        ========================== -->
-
-        <div
-          class="flex flex-col-reverse gap-3 border-t border-slate-100 bg-slate-50/70 px-5 py-5 sm:flex-row sm:justify-end sm:px-7"
+      <div
+        class="flex flex-col-reverse gap-3 border-t border-[#f5d9dc] bg-[#fffafb] px-7 py-6 sm:flex-row sm:justify-end"
+      >
+        <button
+          type="button"
+          (click)="cancel()"
+          [disabled]="isSubmitting"
+          class="inline-flex h-12 items-center justify-center rounded-xl border border-[#f2d9dc] bg-white px-6 text-sm font-semibold text-[#526581] transition-all duration-200 hover:border-[#cf102d] hover:bg-[#fff4f5] hover:text-[#cf102d] disabled:cursor-not-allowed disabled:opacity-60"
         >
-          <button
-            type="button"
-            class="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
-            (click)="cancel()"
-            [disabled]="isSubmitting"
-          >
-            Cancel
-          </button>
+          <i class="fa-solid fa-xmark mr-2"></i>Cancel
+        </button>
 
-          <button
-            type="submit"
-            class="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-500/20 disabled:cursor-not-allowed disabled:opacity-50"
-            [disabled]="
-              isSubmitting ||
-              isLoadingCities ||
-              cities.length === 0 ||
-              !areaName.trim() ||
-              !selectedCityId
-            "
-          >
-            @if (isSubmitting) {
-              <span
-                class="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white"
-              ></span>
-
-              Adding...
-            } @else {
-              <i class="fa-solid fa-plus text-xs"></i>
-
-              Add Area
-            }
-          </button>
-        </div>
-      </form>
-    </div>
-
-    <!-- =========================
-         HELP TEXT
-    ========================== -->
-
-    <div class="mt-5 flex items-start gap-3 rounded-xl border border-blue-100 bg-blue-50 px-4 py-3">
-      <i class="fa-solid fa-circle-info mt-0.5 text-sm text-blue-600"></i>
-
-      <p class="text-xs leading-5 text-blue-700">
-        Make sure the area name is correct and the appropriate city is selected before adding the
-        area.
-      </p>
-    </div>
+        <button
+          type="submit"
+          [disabled]="
+            isSubmitting ||
+            isLoadingCities ||
+            cities.length === 0 ||
+            !areaName.trim() ||
+            !selectedCityId
+          "
+          class="inline-flex h-12 items-center justify-center rounded-xl bg-[#cf102d] px-6 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-[#b80e28] hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          @if (isSubmitting) {
+            <i class="fa-solid fa-spinner fa-spin mr-2"></i>Creating...
+          } @else {
+            <i class="fa-solid fa-plus mr-2"></i>Add Area
+          }
+        </button>
+      </div>
+    </form>
   </div>
 </div>

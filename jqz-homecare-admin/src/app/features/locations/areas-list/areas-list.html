@@ -1,10 +1,11 @@
 <div class="areas-page">
-  <!-- =========================
+  <!-- =====================================================
        PAGE HEADER
-  ========================== -->
+  ====================================================== -->
 
   <div class="page-header">
     <div class="page-header-left">
+      <!-- Breadcrumb -->
       <div class="breadcrumb">
         <span>Locations</span>
 
@@ -13,60 +14,85 @@
         <strong>Areas</strong>
       </div>
 
+      <!-- Title -->
       <h1>Areas</h1>
 
       <p>Manage areas available in the system.</p>
     </div>
 
+    <!-- Add Area -->
     <div class="page-header-actions">
       <button type="button" class="primary-button" (click)="addArea()" [disabled]="isLoading">
         <i class="fa-solid fa-plus"></i>
+
         Add Area
       </button>
     </div>
   </div>
 
-  <!-- =========================
-       SUMMARY CARD
-  ========================== -->
-
-  <div class="summary-card">
-    <div class="summary-content">
-      <span class="summary-label"> Total Areas </span>
-
-      <strong class="summary-value">
-        {{ areas.length }}
-      </strong>
-    </div>
-
-    <div class="summary-icon">
-      <i class="fa-solid fa-location-dot"></i>
-    </div>
-  </div>
-
-  <!-- =========================
+  <!-- =====================================================
        AREA LIST CARD
-  ========================== -->
+  ====================================================== -->
 
   <div class="table-card">
-    <!-- CARD HEADER -->
+    <!-- ===================================================
+         CARD HEADER
+    ==================================================== -->
 
     <div class="table-header">
-      <div>
+      <div class="table-header-content">
         <h2>All Areas</h2>
 
         <p>View and manage areas registered in the system.</p>
       </div>
 
-      <span class="area-count">
-        {{ areas.length }}
-        {{ areas.length === 1 ? 'Area' : 'Areas' }}
-      </span>
+      <!-- Area Count -->
+      @if (!isLoading && errorMessage === '' && areas.length > 0) {
+        <span class="area-count">
+          {{ filteredAreas.length }}
+          {{ filteredAreas.length === 1 ? 'Area' : 'Areas' }}
+        </span>
+      }
     </div>
 
-    <!-- =========================
+    <!-- ===================================================
+         SEARCH
+    ==================================================== -->
+
+    @if (!isLoading && errorMessage === '' && areas.length > 0) {
+      <div class="search-container">
+        <div class="search-box">
+          <!-- Search Icon -->
+          <i class="fa-solid fa-magnifying-glass"></i>
+
+          <!-- Search Input -->
+          <input
+            type="text"
+            placeholder="Search areas..."
+            [value]="searchTerm"
+            (input)="onSearch($event)"
+            aria-label="Search areas"
+          />
+
+          <!-- Clear Search -->
+          @if (searchTerm.trim() !== '') {
+            <button
+              type="button"
+              class="clear-search"
+              title="Clear search"
+              aria-label="Clear search"
+              (click)="clearSearch()"
+            >
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- ===================================================
          LOADING STATE
-    ========================== -->
+    ==================================================== -->
 
     @if (isLoading) {
       <div class="state-container">
@@ -78,9 +104,9 @@
       </div>
     }
 
-    <!-- =========================
+    <!-- ===================================================
          ERROR STATE
-    ========================== -->
+    ==================================================== -->
 
     @else if (errorMessage !== '') {
       <div class="state-container error-state">
@@ -102,9 +128,9 @@
       </div>
     }
 
-    <!-- =========================
+    <!-- ===================================================
          EMPTY STATE
-    ========================== -->
+    ==================================================== -->
 
     @else if (areas.length === 0) {
       <div class="state-container">
@@ -124,13 +150,39 @@
       </div>
     }
 
-    <!-- =========================
+    <!-- ===================================================
+         NO SEARCH RESULTS
+    ==================================================== -->
+
+    @else if (filteredAreas.length === 0) {
+      <div class="state-container">
+        <div class="state-icon">
+          <i class="fa-solid fa-magnifying-glass"></i>
+        </div>
+
+        <h3>No matching areas</h3>
+
+        <p>
+          No areas match
+          <strong>"{{ searchTerm }}"</strong>. Try a different search term.
+        </p>
+
+        <button type="button" class="secondary-button" (click)="clearSearch()">
+          <i class="fa-solid fa-xmark"></i>
+
+          Clear Search
+        </button>
+      </div>
+    }
+
+    <!-- ===================================================
          AREA TABLE
-    ========================== -->
+    ==================================================== -->
 
     @else {
       <div class="table-wrapper">
         <table>
+          <!-- TABLE HEAD -->
           <thead>
             <tr>
               <th>#</th>
@@ -143,23 +195,30 @@
             </tr>
           </thead>
 
+          <!-- TABLE BODY -->
           <tbody>
-            @for (area of areas; track area.id; let i = $index) {
+            @for (area of filteredAreas; track area.id; let i = $index) {
               <tr>
-                <!-- INDEX -->
+                <!-- =====================================
+                     INDEX
+                ====================================== -->
 
                 <td class="index-cell">
                   {{ i + 1 }}
                 </td>
 
-                <!-- AREA NAME -->
+                <!-- =====================================
+                     AREA NAME
+                ====================================== -->
 
                 <td>
                   <div class="area-name-cell">
+                    <!-- Area Icon -->
                     <div class="area-avatar">
                       <i class="fa-solid fa-location-dot"></i>
                     </div>
 
+                    <!-- Area Information -->
                     <div>
                       <strong>
                         {{ area.name }}
@@ -170,14 +229,18 @@
                   </div>
                 </td>
 
-                <!-- CITY -->
+                <!-- =====================================
+                     CITY
+                ====================================== -->
 
                 <td>
                   <div class="city-cell">
+                    <!-- City Icon -->
                     <div class="city-avatar">
                       <i class="fa-solid fa-city"></i>
                     </div>
 
+                    <!-- City Information -->
                     <div>
                       <strong>
                         {{ area.cityName || area.cityId }}
@@ -188,26 +251,28 @@
                   </div>
                 </td>
 
-                <!-- ACTIONS -->
+                <!-- =====================================
+                     ACTIONS
+                ====================================== -->
 
                 <td class="actions-cell">
-                  <!-- EDIT -->
-
+                  <!-- Edit -->
                   <button
                     type="button"
                     class="icon-button edit-button"
                     title="Edit Area"
+                    aria-label="Edit Area"
                     (click)="editArea(area.id)"
                   >
                     <i class="fa-solid fa-pen"></i>
                   </button>
 
-                  <!-- DELETE -->
-
+                  <!-- Delete -->
                   <button
                     type="button"
                     class="icon-button delete-button"
                     title="Delete Area"
+                    aria-label="Delete Area"
                     (click)="deleteArea(area.id)"
                   >
                     <i class="fa-solid fa-trash"></i>

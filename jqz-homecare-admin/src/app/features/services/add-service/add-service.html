@@ -1,39 +1,56 @@
 <div class="add-service-page">
-  <!-- PAGE HEADER -->
+  <!-- =====================================================
+       PAGE HEADER
+  ====================================================== -->
+
   <div class="page-header">
     <div class="header-content">
       <div>
         <h1>Add Service</h1>
 
-        <p>Create a new healthcare service for the clinic.</p>
+        <p>Create a new healthcare service.</p>
       </div>
     </div>
   </div>
 
-  <!-- FORM CARD -->
-  <div class="form-card">
-    <div class="form-header">
-      <div>
-        <h3>Service Information</h3>
+  <!-- =====================================================
+       FORM CARD
+  ====================================================== -->
 
-        <p>Enter the details for the new healthcare service.</p>
+  <div class="form-card">
+    <!-- ===============================================
+         CARD HEADER
+    ================================================ -->
+
+    <div class="form-card-header">
+      <div>
+        <h2>Service Information</h2>
+
+        <p>Enter the details of the healthcare service.</p>
       </div>
     </div>
 
-    <!-- ERROR MESSAGE -->
+    <!-- ===============================================
+         ERROR MESSAGE
+    ================================================ -->
+
     @if (errorMessage) {
-      <div class="error-message">
+      <div class="form-error-message">
         <i class="fa-solid fa-triangle-exclamation"></i>
 
-        <span>
-          {{ errorMessage }}
-        </span>
+        <span>{{ errorMessage }}</span>
       </div>
     }
 
-    <!-- FORM -->
-    <form (ngSubmit)="createService()">
-      <!-- SERVICE NAME -->
+    <!-- ===============================================
+         FORM
+    ================================================ -->
+
+    <form (ngSubmit)="createService()" novalidate>
+      <!-- ===========================================
+           SERVICE NAME
+      ============================================ -->
+
       <div class="form-group">
         <label for="serviceName">
           Service Name
@@ -49,10 +66,13 @@
           [disabled]="isSaving"
         />
 
-        <small> Enter the name of the healthcare service. </small>
+        <small>Enter the name of the healthcare service.</small>
       </div>
 
-      <!-- SERVICE CATEGORY -->
+      <!-- ===========================================
+           SERVICE CATEGORY
+      ============================================ -->
+
       <div class="form-group">
         <label for="serviceCategory">
           Service Category
@@ -84,12 +104,17 @@
 
         @if (categoryErrorMessage) {
           <div class="field-error">
-            <span>
-              {{ categoryErrorMessage }}
-            </span>
+            <span>{{ categoryErrorMessage }}</span>
 
-            <button type="button" (click)="loadCategories()" [disabled]="isLoadingCategories">
-              Try Again
+            <button
+              type="button"
+              class="secondary-button"
+              (click)="loadCategories()"
+              [disabled]="isLoadingCategories"
+            >
+              <i class="fa-solid fa-rotate-right"></i>
+
+              <span>Try Again</span>
             </button>
           </div>
         } @else if (!isLoadingCategories && categories.length === 0) {
@@ -101,15 +126,18 @@
         }
       </div>
 
-      <!-- DESCRIPTION -->
+      <!-- ===========================================
+           DESCRIPTION
+      ============================================ -->
+
       <div class="form-group">
         <label for="description"> Description </label>
 
         <textarea
           id="description"
+          rows="5"
           name="description"
           [(ngModel)]="description"
-          rows="5"
           placeholder="Enter service description"
           [disabled]="isSaving"
         ></textarea>
@@ -117,12 +145,15 @@
         <small> Provide a short description of the service. </small>
       </div>
 
-      <!-- FORM ACTIONS -->
+      <!-- ===========================================
+           FORM ACTIONS
+      ============================================ -->
+
       <div class="form-actions">
-        <button type="button" class="secondary-button" (click)="cancel()" [disabled]="isSaving">
+        <button type="button" class="cancel-button" (click)="cancel()" [disabled]="isSaving">
           <i class="fa-solid fa-xmark"></i>
 
-          <span> Cancel </span>
+          <span>Cancel</span>
         </button>
 
         <button
@@ -133,11 +164,11 @@
           @if (isSaving) {
             <i class="fa-solid fa-spinner fa-spin"></i>
 
-            <span> Creating... </span>
+            <span>Creating...</span>
           } @else {
             <i class="fa-solid fa-plus"></i>
 
-            <span> Create Service </span>
+            <span>Create Service</span>
           }
         </button>
       </div>

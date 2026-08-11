@@ -1,5 +1,16 @@
+/* =====================================================
+   SHARED COMPONENTS
+   JQZ HOMECARE - CHERRY RED THEME
+===================================================== */
+
+/* =====================================================
+   CARD
+===================================================== */
+
 .card {
   background: var(--surface-color);
+
+  border: 1px solid var(--border-color);
 
   border-radius: var(--radius);
 
@@ -7,14 +18,73 @@
 
   padding: 20px;
 }
+
+/* =====================================================
+   PRIMARY BUTTON
+===================================================== */
+
 .primary-btn {
+  display: inline-flex;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 8px;
+
   background: var(--primary-color);
 
-  color: white;
+  color: #ffffff;
 
   border: none;
 
   border-radius: 8px;
 
+  padding: 10px 18px;
+
+  font-size: 14px;
+
+  font-weight: 600;
+
   cursor: pointer;
+
+  transition:
+    background-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+/* =====================================================
+   PRIMARY BUTTON - HOVER
+===================================================== */
+
+.primary-btn:hover {
+  background: var(--primary-hover);
+
+  box-shadow: 0 4px 12px rgba(193, 18, 31, 0.25);
+
+  transform: translateY(-1px);
+}
+
+/* =====================================================
+   PRIMARY BUTTON - ACTIVE
+===================================================== */
+
+.primary-btn:active {
+  background: var(--primary-dark);
+
+  transform: translateY(0);
+}
+
+/* =====================================================
+   PRIMARY BUTTON - DISABLED
+===================================================== */
+
+.primary-btn:disabled {
+  opacity: 0.6;
+
+  cursor: not-allowed;
+
+  box-shadow: none;
+
+  transform: none;
 }

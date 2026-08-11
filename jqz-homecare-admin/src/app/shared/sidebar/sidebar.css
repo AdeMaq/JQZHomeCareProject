@@ -1,5 +1,6 @@
 /* =====================================================
    SIDEBAR
+   JQZ HOMECARE - LIGHT CHERRY RED THEME
 ===================================================== */
 
 :host {
@@ -12,6 +13,7 @@
 
 .sidebar {
   position: fixed;
+
   top: 0;
   left: 0;
 
@@ -21,11 +23,18 @@
   display: flex;
   flex-direction: column;
 
-  color: white;
+  color: var(--text-primary);
 
-  background: linear-gradient(to bottom, #1d4ed8, #2563eb, #06b6d4);
+  /*
+    Very light Cherry Red background.
+    Keeps the sidebar bright and comfortable
+    while maintaining the brand identity.
+  */
+  background: linear-gradient(to bottom, #fff7f7 0%, #fff3f4 50%, #ffedef 100%);
 
-  box-shadow: 10px 0 30px rgba(0, 0, 0, 0.15);
+  border-right: 1px solid #f8d9dc;
+
+  box-shadow: 6px 0 24px rgba(193, 18, 31, 0.06);
 
   z-index: 1000;
 
@@ -37,51 +46,63 @@
 }
 
 /* =====================================================
-   LOGO
+   LOGO SECTION
 ===================================================== */
 
 .sidebar-logo {
-  padding: 32px;
+  padding: 24px 24px 20px;
 
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  border-bottom: 1px solid #f5d7da;
 }
 
 .logo-container {
   display: flex;
+
+  flex-direction: column;
+
   align-items: center;
-  gap: 12px;
+
+  gap: 10px;
+
+  text-align: center;
 }
 
-.logo-icon {
-  width: 48px;
-  height: 48px;
+/* =====================================================
+   JQZ LOGO
+===================================================== */
 
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.logo-image {
+  display: block;
 
-  border-radius: 50%;
+  width: 170px;
 
-  background: rgba(255, 255, 255, 0.15);
+  max-width: 100%;
+
+  height: auto;
+
+  object-fit: contain;
+
+  /*
+    White logo background blends naturally
+    with the light sidebar.
+  */
+  border-radius: 4px;
 }
 
-.logo-icon i {
-  font-size: 24px;
-  color: #6ee7b7;
-}
+/* =====================================================
+   ADMIN PORTAL LABEL
+===================================================== */
 
-.logo-text h1 {
+.logo-subtitle {
   margin: 0;
 
-  font-size: 20px;
-  font-weight: 700;
-}
+  color: var(--primary-color);
 
-.logo-text p {
-  margin: 0;
+  font-size: 13px;
 
-  font-size: 14px;
-  color: #dbeafe;
+  font-weight: 600;
+
+  letter-spacing: 0.3px;
 }
 
 /* =====================================================
@@ -91,29 +112,38 @@
 .sidebar-menu {
   flex: 1;
 
-  padding: 24px 16px;
+  padding: 24px 14px;
 
   overflow-y: auto;
 }
+
+/* =====================================================
+   MENU ITEM
+===================================================== */
 
 .menu-item {
   width: 100%;
 
   display: flex;
+
   align-items: center;
 
   gap: 16px;
 
   margin-bottom: 8px;
-  padding: 16px 20px;
+
+  padding: 14px 18px;
 
   border: none;
+
   border-radius: 12px;
 
-  color: white;
+  color: #374151;
+
   background: transparent;
 
-  font-size: 16px;
+  font-size: 15px;
+
   font-weight: 500;
 
   text-align: left;
@@ -123,33 +153,98 @@
   transition:
     background-color 0.2s ease,
     color 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+/* =====================================================
+   MENU ICON
+===================================================== */
+
+.menu-item i {
+  width: 22px;
+
+  min-width: 22px;
+
+  font-size: 17px;
+
+  color: var(--primary-color);
+
+  text-align: center;
+
+  transition:
+    color 0.2s ease,
     transform 0.2s ease;
 }
 
-.menu-item i {
-  width: 20px;
-
-  font-size: 18px;
-
-  text-align: center;
-}
+/* =====================================================
+   MENU HOVER
+===================================================== */
 
 .menu-item:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--primary-color);
+
+  background-color: rgba(193, 18, 31, 0.07);
 
   transform: translateX(2px);
 }
 
-.menu-item.active {
-  color: #1d4ed8;
+.menu-item:hover i {
+  color: var(--primary-color);
 
-  background-color: white;
+  transform: scale(1.05);
 }
 
+/* =====================================================
+   ACTIVE MENU ITEM
+===================================================== */
+
+.menu-item.active {
+  color: var(--primary-color);
+
+  background-color: #ffffff;
+
+  box-shadow: 0 4px 12px rgba(193, 18, 31, 0.08);
+
+  font-weight: 600;
+}
+
+.menu-item.active i {
+  color: var(--primary-color);
+}
+
+/* =====================================================
+   ACTIVE MENU HOVER
+===================================================== */
+
 .menu-item.active:hover {
-  background-color: white;
+  color: var(--primary-color);
+
+  background-color: #ffffff;
 
   transform: none;
+}
+
+/* =====================================================
+   SIDEBAR SCROLLBAR
+===================================================== */
+
+.sidebar-menu::-webkit-scrollbar {
+  width: 5px;
+}
+
+.sidebar-menu::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar-menu::-webkit-scrollbar-thumb {
+  background-color: rgba(193, 18, 31, 0.18);
+
+  border-radius: 10px;
+}
+
+.sidebar-menu::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(193, 18, 31, 0.3);
 }
 
 /* =====================================================
@@ -161,7 +256,7 @@
 
   inset: 0;
 
-  background-color: rgba(0, 0, 0, 0.45);
+  background-color: rgba(31, 41, 55, 0.4);
 
   z-index: 999;
 
@@ -182,7 +277,7 @@
   .sidebar.sidebar-open {
     transform: translateX(0);
 
-    box-shadow: 10px 0 30px rgba(0, 0, 0, 0.25);
+    box-shadow: 8px 0 24px rgba(193, 18, 31, 0.12);
   }
 }
 

@@ -1,14 +1,15 @@
 <div class="add-city-page">
   <!-- Page Header -->
+
   <div class="page-header">
     <div class="breadcrumb">
       <span>Locations</span>
 
-      <span class="breadcrumb-separator">/</span>
+      <i class="fa-solid fa-chevron-right"></i>
 
       <span>Cities</span>
 
-      <span class="breadcrumb-separator">/</span>
+      <i class="fa-solid fa-chevron-right"></i>
 
       <strong>Add City</strong>
     </div>
@@ -18,7 +19,10 @@
     <p>Add a new city to the system.</p>
   </div>
 
-  <!-- Form Card -->
+  <!-- =========================
+     FORM CARD
+========================== -->
+
   <div class="form-card">
     <div class="form-header">
       <div class="form-icon">
@@ -33,10 +37,15 @@
     </div>
 
     <form (ngSubmit)="submit()">
+      <!-- =========================
+     FORM BODY
+========================== -->
+
       <div class="form-body">
         <div class="form-group">
           <label for="cityName">
             City Name
+
             <span>*</span>
           </label>
 
@@ -63,6 +72,9 @@
           </div>
         }
       </div>
+      <!-- =========================
+     FORM FOOTER
+========================== -->
 
       <div class="form-footer">
         <button type="button" class="cancel-button" (click)="cancel()" [disabled]="isSubmitting">

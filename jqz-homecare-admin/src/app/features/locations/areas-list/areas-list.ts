@@ -16,19 +16,33 @@ export class AreasList implements OnInit {
   private readonly router = inject(Router);
   private readonly cdr = inject(ChangeDetectorRef);
 
-  // =========================
+  // =====================================================
   // COMPONENT STATE
-  // =========================
+  // =====================================================
 
   areas: Area[] = [];
+
+  /*
+   * Filtered list displayed in the table.
+   *
+   * Initially this will contain all areas.
+   * When the user searches, this array will contain
+   * only the matching areas.
+   */
+  filteredAreas: Area[] = [];
+
+  /*
+   * Current search text.
+   */
+  searchTerm = '';
 
   isLoading = true;
 
   errorMessage = '';
 
-  // =========================
+  // =====================================================
   // COMPONENT INITIALIZATION
-  // =========================
+  // =====================================================
 
   ngOnInit(): void {
     console.log('=================================');
@@ -38,9 +52,9 @@ export class AreasList implements OnInit {
     this.loadAreas();
   }
 
-  // =========================
+  // =====================================================
   // LOAD AREAS
-  // =========================
+  // =====================================================
 
   loadAreas(): void {
     this.isLoading = true;
@@ -52,15 +66,20 @@ export class AreasList implements OnInit {
     console.log('=================================');
 
     /*
+     * Reset search when the list is loaded again.
+     */
+    this.searchTerm = '';
+
+    /*
      * Make sure the loading state is rendered
      * immediately before the API request completes.
      */
     this.cdr.detectChanges();
 
     this.cityAreaService.getAreas().subscribe({
-      // =========================
+      // =====================================================
       // SUCCESS
-      // =========================
+      // =====================================================
 
       next: (response: Area[]) => {
         console.log('=================================');
@@ -75,18 +94,17 @@ export class AreasList implements OnInit {
         this.areas = Array.isArray(response) ? response : [];
 
         /*
+         * Initially display all areas.
+         */
+        this.filteredAreas = [...this.areas];
+
+        /*
          * API request has finished.
          */
         this.isLoading = false;
 
         /*
-         * IMPORTANT:
-         *
          * Force Angular to update the template.
-         *
-         * This prevents the page from remaining stuck
-         * on "Loading areas..." even though the API has
-         * already returned the data.
          */
         this.cdr.detectChanges();
 
@@ -95,13 +113,14 @@ export class AreasList implements OnInit {
         console.log('LOAD AREAS: isLoading:', this.isLoading);
         console.log('LOAD AREAS: areas:', this.areas);
         console.log('LOAD AREAS: areas.length:', this.areas.length);
+        console.log('LOAD AREAS: filteredAreas.length:', this.filteredAreas.length);
         console.log('LOAD AREAS: errorMessage:', this.errorMessage);
         console.log('=================================');
       },
 
-      // =========================
+      // =====================================================
       // ERROR
-      // =========================
+      // =====================================================
 
       error: (error) => {
         console.error('=================================');
@@ -113,9 +132,10 @@ export class AreasList implements OnInit {
         console.error('=================================');
 
         /*
-         * Clear the existing list when the request fails.
+         * Clear the existing lists when the request fails.
          */
         this.areas = [];
+        this.filteredAreas = [];
 
         /*
          * Display a useful error message.
@@ -142,9 +162,61 @@ export class AreasList implements OnInit {
     });
   }
 
-  // =========================
+  // =====================================================
+  // SEARCH AREAS
+  // =====================================================
+
+  onSearch(event: Event): void {
+    const input = event.target as HTMLInputElement;
+
+    this.searchTerm = input.value;
+
+    const term = this.searchTerm.trim().toLowerCase();
+
+    /*
+     * If the search box is empty,
+     * show all areas again.
+     */
+    if (term === '') {
+      this.filteredAreas = [...this.areas];
+      return;
+    }
+
+    /*
+     * Filter areas by area name.
+     */
+    this.filteredAreas = this.areas.filter((area) => area.name.toLowerCase().includes(term));
+
+    /*
+     * Update the UI immediately.
+     */
+    this.cdr.detectChanges();
+  }
+
+  // =====================================================
+  // CLEAR SEARCH
+  // =====================================================
+
+  clearSearch(): void {
+    /*
+     * Clear the search text.
+     */
+    this.searchTerm = '';
+
+    /*
+     * Restore the complete area list.
+     */
+    this.filteredAreas = [...this.areas];
+
+    /*
+     * Update the UI.
+     */
+    this.cdr.detectChanges();
+  }
+
+  // =====================================================
   // ADD AREA
-  // =========================
+  // =====================================================
 
   addArea(): void {
     console.log('ADD AREA clicked');
@@ -152,9 +224,9 @@ export class AreasList implements OnInit {
     this.router.navigate(['/areas/add']);
   }
 
-  // =========================
+  // =====================================================
   // EDIT AREA
-  // =========================
+  // =====================================================
 
   editArea(id: string): void {
     console.log('=================================');
@@ -165,9 +237,9 @@ export class AreasList implements OnInit {
     this.router.navigate(['/areas', id, 'edit']);
   }
 
-  // =========================
+  // =====================================================
   // DELETE AREA
-  // =========================
+  // =====================================================
 
   deleteArea(id: string): void {
     console.log('=================================');
@@ -199,9 +271,9 @@ export class AreasList implements OnInit {
      * Call the backend API.
      */
     this.cityAreaService.deleteArea(id).subscribe({
-      // =========================
+      // =====================================================
       // DELETE SUCCESS
-      // =========================
+      // =====================================================
 
       next: () => {
         console.log('=================================');
@@ -210,14 +282,20 @@ export class AreasList implements OnInit {
         console.log('=================================');
 
         /*
-         * Remove the deleted area from the existing array.
+         * Remove the deleted area from the main array.
          *
-         * We do NOT call loadAreas() here.
+         * We do NOT call loadAreas().
          *
          * Therefore the loading state will not appear
          * again after deleting an area.
          */
         this.areas = this.areas.filter((currentArea) => currentArea.id !== id);
+
+        /*
+         * Also remove the deleted area from the
+         * currently displayed filtered list.
+         */
+        this.filteredAreas = this.filteredAreas.filter((currentArea) => currentArea.id !== id);
 
         /*
          * Update the UI immediately.
@@ -226,11 +304,12 @@ export class AreasList implements OnInit {
 
         console.log('Remaining areas:', this.areas);
         console.log('Remaining area count:', this.areas.length);
+        console.log('Remaining filtered area count:', this.filteredAreas.length);
       },
 
-      // =========================
+      // =====================================================
       // DELETE ERROR
-      // =========================
+      // =====================================================
 
       error: (error) => {
         console.error('=================================');

@@ -1,25 +1,35 @@
-/* =========================
+/* =========================================================
+   MANAGE PRACTITIONER AREAS
+   JQZ HOMECARE — CHERRY RED THEME
+========================================================= */
+
+/* =========================================================
    PAGE
-========================= */
+========================================================= */
 
 .manage-areas-page {
   width: 100%;
-  padding: 28px 32px 40px;
+  min-height: 100%;
+
+  padding: 32px 32px 44px;
+
   box-sizing: border-box;
+
+  background: #fff8f8;
 }
 
-/* =========================
+/* =========================================================
    PAGE HEADER
-========================= */
+========================================================= */
 
 .page-header {
   display: flex;
-  align-items: flex-end;
+  align-items: flex-start;
   justify-content: space-between;
 
   gap: 24px;
 
-  margin-bottom: 24px;
+  margin-bottom: 28px;
 }
 
 .page-header-left {
@@ -33,66 +43,75 @@
 
   gap: 9px;
 
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 
-  color: #718096;
+  color: #627d98;
 
-  font-size: 12px;
+  font-size: 13px;
+  font-weight: 500;
 }
 
 .breadcrumb i {
-  color: #a0aec0;
+  color: #9aa5b1;
 
-  font-size: 9px;
+  font-size: 10px;
 }
 
 .breadcrumb strong {
-  color: #2d3748;
+  color: #102a43;
+
+  font-weight: 700;
 }
 
 .page-header h1 {
   margin: 0;
 
-  color: #111827;
+  color: #102a43;
 
-  font-size: 28px;
+  font-size: 30px;
   font-weight: 700;
 
-  line-height: 1.2;
+  line-height: 1.25;
+
+  letter-spacing: -0.02em;
 }
 
 .page-header p {
-  margin: 7px 0 0;
+  margin: 8px 0 0;
 
-  color: #718096;
+  color: #627d98;
 
   font-size: 14px;
+
+  line-height: 1.55;
 }
 
-/* =========================
+/* =========================================================
    BUTTONS
-========================= */
+========================================================= */
 
 .primary-button,
 .secondary-button,
 .assign-button,
 .remove-button {
-  min-height: 36px;
+  min-height: 42px;
 
   display: inline-flex;
   align-items: center;
   justify-content: center;
 
-  gap: 7px;
+  gap: 8px;
 
-  padding: 8px 14px;
+  padding: 10px 17px;
 
-  border-radius: 7px;
+  border-radius: 9px;
 
   font-family: inherit;
 
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
+
+  line-height: 1;
 
   cursor: pointer;
 
@@ -100,66 +119,107 @@
     background 0.2s ease,
     border-color 0.2s ease,
     color 0.2s ease,
-    box-shadow 0.2s ease;
+    box-shadow 0.2s ease,
+    transform 0.15s ease;
 }
 
-.primary-button {
-  border: none;
+.primary-button i,
+.secondary-button i,
+.assign-button i,
+.remove-button i {
+  font-size: 13px;
+}
 
-  background: #2563eb;
+/* =========================================================
+   PRIMARY BUTTON
+========================================================= */
+
+.primary-button {
+  border: 1px solid #cf102d;
+
+  background: #cf102d;
 
   color: #ffffff;
+
+  box-shadow: 0 2px 5px rgba(207, 16, 45, 0.12);
 }
 
 .primary-button:hover:not(:disabled) {
-  background: #1d4ed8;
+  border-color: #b80e28;
 
-  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.18);
+  background: #b80e28;
+
+  color: #ffffff;
+
+  box-shadow: 0 5px 12px rgba(207, 16, 45, 0.18);
+
+  transform: translateY(-1px);
 }
 
+.primary-button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+/* =========================================================
+   SECONDARY BUTTON
+========================================================= */
+
 .secondary-button {
-  border: 1px solid #dbe2ea;
+  border: 1px solid #f2d9dc;
 
   background: #ffffff;
 
-  color: #334155;
+  color: #526581;
 }
 
 .secondary-button:hover:not(:disabled) {
-  border-color: #bfdbfe;
+  border-color: #cf102d;
 
-  background: #eff6ff;
+  background: #fff4f5;
 
-  color: #2563eb;
+  color: #cf102d;
+
+  box-shadow: 0 3px 8px rgba(207, 16, 45, 0.08);
 }
+
+.secondary-button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+/* =========================================================
+   DISABLED BUTTONS
+========================================================= */
 
 .primary-button:disabled,
 .secondary-button:disabled,
 .assign-button:disabled,
 .remove-button:disabled {
-  opacity: 0.6;
+  opacity: 0.55;
 
   cursor: not-allowed;
 }
 
-/* =========================
-   MESSAGES
-========================= */
+/* =========================================================
+   SUCCESS / ERROR MESSAGES
+========================================================= */
 
 .success-message,
 .error-message {
   display: flex;
   align-items: center;
 
-  gap: 9px;
+  gap: 11px;
 
-  padding: 11px 14px;
+  padding: 13px 16px;
 
-  margin-bottom: 16px;
+  margin-bottom: 18px;
 
-  border-radius: 7px;
+  border-radius: 9px;
 
-  font-size: 12px;
+  font-size: 13px;
+  font-weight: 500;
+
+  line-height: 1.5;
 }
 
 .success-message {
@@ -181,25 +241,27 @@
 .success-message i,
 .error-message i {
   flex-shrink: 0;
+
+  font-size: 16px;
 }
 
-/* =========================
-   LAYOUT
-========================= */
+/* =========================================================
+   MAIN LAYOUT
+========================================================= */
 
 .areas-layout {
   display: grid;
 
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
 
-  gap: 20px;
+  gap: 24px;
 
   align-items: start;
 }
 
-/* =========================
-   CARD
-========================= */
+/* =========================================================
+   AREA CARD
+========================================================= */
 
 .areas-card {
   overflow: hidden;
@@ -208,26 +270,28 @@
 
   background: #ffffff;
 
-  border: 1px solid #e5e7eb;
+  border: 1px solid #f2d9dc;
 
-  border-radius: 10px;
+  border-radius: 14px;
 
-  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+  box-shadow: 0 2px 6px rgba(16, 24, 40, 0.04);
 }
 
-/* =========================
+/* =========================================================
    CARD HEADER
-========================= */
+========================================================= */
 
 .card-header {
   display: flex;
   align-items: flex-start;
 
-  gap: 12px;
+  gap: 14px;
 
-  padding: 18px 20px;
+  padding: 20px 22px;
 
-  border-bottom: 1px solid #edf0f4;
+  border-bottom: 1px solid #f5d9dc;
+
+  background: #ffffff;
 }
 
 .card-header > div:nth-child(2) {
@@ -235,27 +299,33 @@
 }
 
 .card-header h2 {
-  margin: 1px 0 5px;
+  margin: 1px 0 6px;
 
-  color: #1e293b;
+  color: #102a43;
 
-  font-size: 15px;
+  font-size: 17px;
   font-weight: 700;
+
+  line-height: 1.35;
 }
 
 .card-header p {
   margin: 0;
 
-  color: #718096;
+  color: #627d98;
 
-  font-size: 11px;
+  font-size: 13px;
 
   line-height: 1.5;
 }
 
+/* =========================================================
+   SECTION ICONS
+========================================================= */
+
 .section-icon {
-  width: 35px;
-  height: 35px;
+  width: 42px;
+  height: 42px;
 
   display: flex;
   align-items: center;
@@ -263,58 +333,69 @@
 
   flex-shrink: 0;
 
-  border-radius: 8px;
+  border-radius: 10px;
 
-  font-size: 13px;
+  background: #fdebed;
+
+  color: #cf102d;
+
+  font-size: 17px;
 }
 
-.assigned-icon {
-  background: #eff6ff;
-
-  color: #2563eb;
-}
-
+.assigned-icon,
 .available-icon {
-  background: #f0fdf4;
+  background: #fdebed;
 
-  color: #16a34a;
+  color: #cf102d;
 }
+
+/* =========================================================
+   AREA COUNT
+========================================================= */
 
 .area-count {
   margin-left: auto;
 
   flex-shrink: 0;
 
-  padding: 5px 9px;
+  padding: 7px 11px;
 
   border-radius: 999px;
 
-  background: #f1f5f9;
+  background: #fdebed;
 
-  color: #64748b;
+  color: #cf102d;
 
-  font-size: 10px;
-  font-weight: 600;
+  font-size: 12px;
+  font-weight: 700;
+
+  line-height: 1;
+
+  white-space: nowrap;
 }
 
-/* =========================
+/* =========================================================
    CARD CONTENT
-========================= */
+========================================================= */
 
 .card-content {
-  padding: 14px 20px 20px;
+  padding: 18px 22px 22px;
 }
 
-/* =========================
+/* =========================================================
    ASSIGNED LIST
-========================= */
+========================================================= */
 
 .assigned-list {
   display: flex;
   flex-direction: column;
 
-  gap: 9px;
+  gap: 11px;
 }
+
+/* =========================================================
+   AREA ITEM
+========================================================= */
 
 .assigned-area,
 .available-area {
@@ -322,42 +403,53 @@
   align-items: center;
   justify-content: space-between;
 
-  gap: 12px;
+  gap: 14px;
 
   min-width: 0;
 
-  padding: 11px;
+  padding: 13px;
 
   border: 1px solid #e2e8f0;
 
-  border-radius: 8px;
+  border-radius: 10px;
 
   background: #ffffff;
 
   transition:
     border-color 0.2s ease,
-    background 0.2s ease;
+    background 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .assigned-area:hover,
 .available-area:hover {
-  border-color: #bfdbfe;
+  border-color: #e9aeb4;
 
-  background: #f8fbff;
+  background: #fff8f8;
+
+  box-shadow: 0 3px 8px rgba(207, 16, 45, 0.05);
 }
+
+/* =========================================================
+   AREA MAIN
+========================================================= */
 
 .area-main {
   display: flex;
   align-items: center;
 
-  gap: 10px;
+  gap: 12px;
 
   min-width: 0;
 }
 
+/* =========================================================
+   AREA ICON
+========================================================= */
+
 .area-icon {
-  width: 34px;
-  height: 34px;
+  width: 40px;
+  height: 40px;
 
   display: flex;
   align-items: center;
@@ -365,14 +457,18 @@
 
   flex-shrink: 0;
 
-  border-radius: 7px;
+  border-radius: 9px;
 
-  background: #eff6ff;
+  background: #fdebed;
 
-  color: #2563eb;
+  color: #cf102d;
 
-  font-size: 12px;
+  font-size: 16px;
 }
+
+/* =========================================================
+   AREA INFORMATION
+========================================================= */
 
 .area-info {
   min-width: 0;
@@ -383,64 +479,84 @@
 
   overflow: hidden;
 
-  color: #334155;
+  color: #243b53;
 
-  font-size: 12px;
-  font-weight: 600;
+  font-size: 14px;
+  font-weight: 650;
+
+  line-height: 1.4;
 
   text-overflow: ellipsis;
+
   white-space: nowrap;
 }
 
 .area-info span {
   display: block;
 
-  margin-top: 3px;
+  margin-top: 5px;
 
   overflow: hidden;
 
-  color: #94a3b8;
+  color: #7b8794;
 
-  font-size: 10px;
+  font-size: 12px;
+
+  line-height: 1.4;
 
   text-overflow: ellipsis;
+
   white-space: nowrap;
 }
 
 .area-info span i {
-  margin-right: 4px;
+  margin-right: 5px;
 
-  font-size: 8px;
+  color: #cf102d;
+
+  font-size: 11px;
 }
 
-/* =========================
-   REMOVE
-========================= */
+/* =========================================================
+   REMOVE BUTTON
+========================================================= */
 
 .remove-button {
   flex-shrink: 0;
 
-  border: 1px solid #fecaca;
+  border: 1px solid #f2d9dc;
 
   background: #ffffff;
 
-  color: #dc2626;
+  color: #cf102d;
 }
 
 .remove-button:hover:not(:disabled) {
-  background: #fef2f2;
+  border-color: #cf102d;
 
-  border-color: #fca5a5;
+  background: #fdebed;
+
+  color: #b80e28;
+
+  box-shadow: 0 3px 8px rgba(207, 16, 45, 0.1);
+
+  transform: translateY(-1px);
 }
 
-/* =========================
+.remove-button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+/* =========================================================
    SEARCH
-========================= */
+========================================================= */
 
 .search-container {
-  padding: 14px 20px;
+  padding: 17px 22px;
 
-  border-bottom: 1px solid #edf0f4;
+  border-bottom: 1px solid #f5d9dc;
+
+  background: #fffafb;
 }
 
 .search-box {
@@ -453,11 +569,11 @@
 .search-box > i {
   position: absolute;
 
-  left: 12px;
+  left: 14px;
 
-  color: #94a3b8;
+  color: #cf102d;
 
-  font-size: 12px;
+  font-size: 15px;
 
   pointer-events: none;
 }
@@ -465,86 +581,103 @@
 .search-box input {
   width: 100%;
 
+  height: 44px;
+
   box-sizing: border-box;
 
-  padding: 9px 36px 9px 34px;
+  padding: 0 42px 0 40px;
 
-  border: 1px solid #dbe2ea;
+  border: 1px solid #e3d7da;
 
-  border-radius: 7px;
+  border-radius: 9px;
 
   outline: none;
 
-  color: #1e293b;
+  background: #ffffff;
+
+  color: #243b53;
 
   font-family: inherit;
 
-  font-size: 12px;
+  font-size: 13px;
 
   transition:
     border-color 0.2s ease,
-    box-shadow 0.2s ease;
+    box-shadow 0.2s ease,
+    background 0.2s ease;
 }
 
 .search-box input::placeholder {
-  color: #94a3b8;
+  color: #9aa5b1;
 }
 
 .search-box input:focus {
-  border-color: #2563eb;
+  border-color: #cf102d;
 
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.08);
+  box-shadow: 0 0 0 4px rgba(207, 16, 45, 0.08);
+
+  background: #ffffff;
 }
+
+/* =========================================================
+   CLEAR SEARCH
+========================================================= */
 
 .clear-search {
   position: absolute;
 
-  right: 7px;
+  right: 8px;
 
-  width: 25px;
-  height: 25px;
+  width: 29px;
+  height: 29px;
 
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
 
   border: none;
 
-  border-radius: 5px;
+  border-radius: 7px;
 
   background: transparent;
 
   color: #94a3b8;
 
   cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+.clear-search i {
+  font-size: 13px;
 }
 
 .clear-search:hover {
-  background: #f1f5f9;
+  background: #fdebed;
 
-  color: #475569;
+  color: #cf102d;
 }
 
-/* =========================
+/* =========================================================
    AVAILABLE AREA LIST
-========================= */
+========================================================= */
 
 .available-area-list {
-  max-height: 520px;
+  max-height: 540px;
 
   overflow-y: auto;
 
-  padding: 14px 20px 20px;
+  padding: 18px 22px 22px;
 
   box-sizing: border-box;
-}
 
-.available-area-list {
   scrollbar-width: thin;
 }
 
 .available-area {
-  margin-bottom: 8px;
+  margin-bottom: 10px;
 }
 
 .available-area:last-child {
@@ -552,61 +685,81 @@
 }
 
 .available-area.assigned {
-  background: #f8fafc;
+  background: #fff8f8;
 
-  border-color: #e2e8f0;
+  border-color: #f6d2d5;
 }
 
-/* =========================
+/* =========================================================
    ASSIGNED BADGE
-========================= */
+========================================================= */
 
 .assigned-badge {
   display: inline-flex;
   align-items: center;
 
-  gap: 5px;
+  gap: 6px;
 
   flex-shrink: 0;
 
-  padding: 5px 8px;
+  padding: 7px 10px;
 
   border-radius: 999px;
 
-  background: #f0fdf4;
+  background: #fdebed;
 
-  color: #15803d;
+  color: #cf102d;
 
-  font-size: 10px;
-  font-weight: 600;
+  font-size: 11px;
+  font-weight: 700;
+
+  line-height: 1;
 }
 
-/* =========================
+.assigned-badge i {
+  font-size: 11px;
+}
+
+/* =========================================================
    ASSIGN BUTTON
-========================= */
+========================================================= */
 
 .assign-button {
   flex-shrink: 0;
 
-  border: 1px solid #bfdbfe;
+  min-height: 38px;
 
-  background: #eff6ff;
+  padding: 8px 13px;
 
-  color: #2563eb;
+  border: 1px solid #f2d9dc;
+
+  background: #fdebed;
+
+  color: #cf102d;
 }
 
 .assign-button:hover:not(:disabled) {
-  border-color: #93c5fd;
+  border-color: #cf102d;
 
-  background: #dbeafe;
+  background: #cf102d;
+
+  color: #ffffff;
+
+  box-shadow: 0 3px 8px rgba(207, 16, 45, 0.14);
+
+  transform: translateY(-1px);
 }
 
-/* =========================
+.assign-button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+/* =========================================================
    EMPTY STATE
-========================= */
+========================================================= */
 
 .empty-state {
-  min-height: 180px;
+  min-height: 200px;
 
   display: flex;
   flex-direction: column;
@@ -614,133 +767,152 @@
   align-items: center;
   justify-content: center;
 
-  padding: 25px 15px;
+  padding: 30px 18px;
 
   text-align: center;
 }
 
 .empty-state.compact {
-  min-height: 220px;
+  min-height: 240px;
 }
 
+/* =========================================================
+   EMPTY ICON
+========================================================= */
+
 .empty-icon {
-  width: 42px;
-  height: 42px;
+  width: 52px;
+  height: 52px;
 
   display: flex;
   align-items: center;
   justify-content: center;
 
-  border-radius: 9px;
+  border-radius: 12px;
 
-  background: #f1f5f9;
+  background: #fdebed;
 
-  color: #94a3b8;
+  color: #cf102d;
 
-  font-size: 16px;
+  font-size: 20px;
 }
 
 .empty-state h3 {
-  margin: 12px 0 5px;
+  margin: 15px 0 6px;
 
-  color: #334155;
+  color: #243b53;
 
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 700;
+
+  line-height: 1.4;
 }
 
 .empty-state p {
-  max-width: 320px;
+  max-width: 340px;
 
   margin: 0;
 
-  color: #94a3b8;
-
-  font-size: 11px;
-
-  line-height: 1.5;
-}
-
-.empty-state .secondary-button {
-  margin-top: 13px;
-}
-
-/* =========================
-   STATE CARD
-========================= */
-
-.state-card {
-  min-height: 360px;
-
-  display: flex;
-  flex-direction: column;
-
-  align-items: center;
-  justify-content: center;
-
-  padding: 30px 20px;
-
-  border: 1px solid #e5e7eb;
-
-  border-radius: 10px;
-
-  background: #ffffff;
-
-  text-align: center;
-
-  box-sizing: border-box;
-}
-
-.state-card h3 {
-  margin: 14px 0 6px;
-
-  color: #1e293b;
-
-  font-size: 15px;
-}
-
-.state-card p {
-  max-width: 430px;
-
-  margin: 0 0 18px;
-
-  color: #718096;
+  color: #7b8794;
 
   font-size: 12px;
 
   line-height: 1.6;
 }
 
+.empty-state .secondary-button {
+  margin-top: 16px;
+}
+
+/* =========================================================
+   STATE CARD
+========================================================= */
+
+.state-card {
+  min-height: 380px;
+
+  display: flex;
+  flex-direction: column;
+
+  align-items: center;
+  justify-content: center;
+
+  padding: 35px 24px;
+
+  box-sizing: border-box;
+
+  border: 1px solid #f2d9dc;
+
+  border-radius: 14px;
+
+  background: #ffffff;
+
+  text-align: center;
+
+  box-shadow: 0 2px 6px rgba(16, 24, 40, 0.04);
+}
+
+.state-card h3 {
+  margin: 16px 0 7px;
+
+  color: #102a43;
+
+  font-size: 17px;
+  font-weight: 700;
+
+  line-height: 1.4;
+}
+
+.state-card p {
+  max-width: 460px;
+
+  margin: 0 0 20px;
+
+  color: #627d98;
+
+  font-size: 13px;
+
+  line-height: 1.6;
+}
+
+/* =========================================================
+   STATE ICON
+========================================================= */
+
 .state-icon {
-  width: 46px;
-  height: 46px;
+  width: 54px;
+  height: 54px;
 
   display: flex;
   align-items: center;
   justify-content: center;
 
-  border-radius: 10px;
+  border-radius: 12px;
 
-  background: #eff6ff;
+  background: #fdebed;
 
-  color: #2563eb;
+  color: #cf102d;
 
-  font-size: 19px;
+  font-size: 21px;
 }
 
 .error-icon {
-  background: #fef2f2;
+  background: #fdebed;
 
-  color: #dc2626;
+  color: #cf102d;
 }
 
+/* =========================================================
+   LOADING SPINNER
+========================================================= */
+
 .loading-spinner {
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
 
-  border: 3px solid #e5e7eb;
+  border: 3px solid #f6d2d5;
 
-  border-top-color: #2563eb;
+  border-top-color: #cf102d;
 
   border-radius: 50%;
 
@@ -753,20 +925,37 @@
   }
 }
 
-/* =========================
+/* =========================================================
    FOOTER
-========================= */
+========================================================= */
 
 .page-footer {
   display: flex;
+
   justify-content: flex-end;
 
-  padding-top: 18px;
+  padding-top: 20px;
 }
 
-/* =========================
-   RESPONSIVE
-========================= */
+/* =========================================================
+   FOCUS STATES
+========================================================= */
+
+.primary-button:focus-visible,
+.secondary-button:focus-visible,
+.assign-button:focus-visible,
+.remove-button:focus-visible,
+.clear-search:focus-visible {
+  outline: none;
+
+  box-shadow:
+    0 0 0 3px rgba(207, 16, 45, 0.12),
+    0 0 0 1px #cf102d;
+}
+
+/* =========================================================
+   RESPONSIVE — TABLET
+========================================================= */
 
 @media (max-width: 1000px) {
   .areas-layout {
@@ -774,15 +963,23 @@
   }
 }
 
+/* =========================================================
+   RESPONSIVE — TABLET / MOBILE
+========================================================= */
+
 @media (max-width: 768px) {
   .manage-areas-page {
-    padding: 20px 16px 30px;
+    padding: 24px 20px 34px;
   }
 
   .page-header {
     align-items: flex-start;
 
     flex-direction: column;
+
+    gap: 18px;
+
+    margin-bottom: 24px;
   }
 
   .page-header > .secondary-button {
@@ -790,39 +987,143 @@
   }
 
   .page-header h1 {
-    font-size: 24px;
+    font-size: 26px;
   }
-}
 
-@media (max-width: 520px) {
-  .manage-areas-page {
-    padding: 16px 12px 25px;
+  .page-header p {
+    font-size: 13px;
+  }
+
+  .areas-layout {
+    gap: 18px;
   }
 
   .card-header {
-    padding: 16px;
+    padding: 18px 20px;
   }
 
   .card-content {
-    padding: 12px 15px 15px;
+    padding: 16px 20px 20px;
   }
 
   .search-container {
-    padding: 12px 15px;
+    padding: 15px 20px;
   }
 
   .available-area-list {
-    padding: 12px 15px 15px;
+    padding: 16px 20px 20px;
+  }
+}
+
+/* =========================================================
+   RESPONSIVE — SMALL MOBILE
+========================================================= */
+
+@media (max-width: 520px) {
+  .manage-areas-page {
+    padding: 20px 14px 28px;
+  }
+
+  .breadcrumb {
+    gap: 7px;
+
+    margin-bottom: 10px;
+
+    font-size: 12px;
+  }
+
+  .page-header h1 {
+    font-size: 23px;
+  }
+
+  .page-header p {
+    font-size: 12px;
+  }
+
+  .card-header {
+    gap: 11px;
+
+    padding: 16px;
+  }
+
+  .section-icon {
+    width: 38px;
+    height: 38px;
+
+    border-radius: 9px;
+
+    font-size: 15px;
+  }
+
+  .card-header h2 {
+    font-size: 15px;
+  }
+
+  .card-header p {
+    font-size: 11px;
+  }
+
+  .area-count {
+    padding: 6px 9px;
+
+    font-size: 11px;
+  }
+
+  .card-content {
+    padding: 14px 15px 17px;
+  }
+
+  .search-container {
+    padding: 13px 15px;
+  }
+
+  .search-box input {
+    height: 42px;
+
+    font-size: 12px;
+  }
+
+  .available-area-list {
+    padding: 13px 15px 17px;
   }
 
   .assigned-area,
   .available-area {
     align-items: flex-start;
+
+    padding: 12px;
+
+    gap: 10px;
+  }
+
+  .area-main {
+    gap: 10px;
+  }
+
+  .area-icon {
+    width: 36px;
+    height: 36px;
+
+    border-radius: 8px;
+
+    font-size: 14px;
+  }
+
+  .area-info strong {
+    font-size: 13px;
+  }
+
+  .area-info span {
+    font-size: 11px;
   }
 
   .remove-button,
   .assign-button {
-    padding: 7px 9px;
+    min-height: 36px;
+
+    padding: 8px 10px;
+
+    font-size: 12px;
   }
 
   .remove-button {
@@ -830,7 +1131,63 @@
   }
 
   .remove-button i {
+    font-size: 14px;
+  }
+
+  .assigned-badge {
+    padding: 6px 8px;
+
+    font-size: 10px;
+  }
+
+  .assigned-badge i {
+    font-size: 10px;
+  }
+
+  .empty-state {
+    min-height: 180px;
+
+    padding: 26px 15px;
+  }
+
+  .empty-state.compact {
+    min-height: 210px;
+  }
+
+  .empty-icon {
+    width: 46px;
+    height: 46px;
+
+    font-size: 18px;
+  }
+
+  .empty-state h3 {
+    font-size: 14px;
+  }
+
+  .empty-state p {
     font-size: 11px;
+  }
+
+  .state-card {
+    min-height: 340px;
+
+    padding: 30px 18px;
+  }
+
+  .state-icon {
+    width: 50px;
+    height: 50px;
+
+    font-size: 20px;
+  }
+
+  .state-card h3 {
+    font-size: 15px;
+  }
+
+  .state-card p {
+    font-size: 12px;
   }
 
   .page-footer {

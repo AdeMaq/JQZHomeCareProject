@@ -1,14 +1,22 @@
 <div class="edit-service-page">
-  <!-- PAGE HEADER -->
-  <div class="page-header">
-    <div>
-      <h1>Edit Service</h1>
+  <!-- =====================================================
+       PAGE HEADER
+  ====================================================== -->
 
-      <p>Update the details of this healthcare service.</p>
+  <div class="page-header">
+    <div class="header-content">
+      <div>
+        <h1>Edit Service</h1>
+
+        <p>Update the details of this healthcare service.</p>
+      </div>
     </div>
   </div>
 
-  <!-- LOADING -->
+  <!-- =====================================================
+       LOADING STATE
+  ====================================================== -->
+
   @if (isLoading) {
     <div class="state-card">
       <i class="fa-solid fa-spinner fa-spin"></i>
@@ -17,7 +25,10 @@
     </div>
   }
 
-  <!-- ERROR -->
+  <!-- =====================================================
+       ERROR STATE
+  ====================================================== -->
+
   @else if (errorMessage && !isLoading) {
     <div class="state-card error-state">
       <i class="fa-solid fa-triangle-exclamation"></i>
@@ -28,15 +39,22 @@
 
       <button type="button" class="secondary-button" (click)="loadService()">
         <i class="fa-solid fa-rotate-right"></i>
-        Try Again
+
+        <span>Try Again</span>
       </button>
     </div>
   }
 
-  <!-- FORM -->
+  <!-- =====================================================
+       FORM
+  ====================================================== -->
+
   @else {
     <div class="form-card">
-      <!-- CARD HEADER -->
+      <!-- ===============================================
+           CARD HEADER
+      ================================================ -->
+
       <div class="form-card-header">
         <div>
           <h2>Service Information</h2>
@@ -45,9 +63,39 @@
         </div>
       </div>
 
-      <!-- FORM BODY -->
+      <!-- ===============================================
+           SUCCESS MESSAGE
+      ================================================ -->
+
+      @if (successMessage) {
+        <div class="success-message">
+          <i class="fa-solid fa-circle-check"></i>
+
+          <span>{{ successMessage }}</span>
+        </div>
+      }
+
+      <!-- ===============================================
+           ERROR MESSAGE
+      ================================================ -->
+
+      @if (errorMessage) {
+        <div class="form-error-message">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+
+          <span>{{ errorMessage }}</span>
+        </div>
+      }
+
+      <!-- ===============================================
+           FORM
+      ================================================ -->
+
       <form [formGroup]="serviceForm" (ngSubmit)="updateService()" novalidate>
-        <!-- SERVICE NAME -->
+        <!-- ===========================================
+             SERVICE NAME
+        ============================================ -->
+
         <div class="form-group">
           <label for="serviceName">
             Service Name
@@ -59,6 +107,7 @@
             type="text"
             formControlName="name"
             placeholder="Enter service name"
+            [disabled]="isSaving"
           />
 
           <small> Enter the name of the healthcare service. </small>
@@ -76,14 +125,17 @@
           }
         </div>
 
-        <!-- SERVICE CATEGORY -->
+        <!-- ===========================================
+             SERVICE CATEGORY
+        ============================================ -->
+
         <div class="form-group">
           <label for="serviceCategory">
             Service Category
             <span class="required">*</span>
           </label>
 
-          <select id="serviceCategory" formControlName="serviceCategoryId">
+          <select id="serviceCategory" formControlName="serviceCategoryId" [disabled]="isSaving">
             <option value="" disabled>Select a service category</option>
 
             @for (category of categories; track category.id) {
@@ -100,7 +152,10 @@
           }
         </div>
 
-        <!-- DESCRIPTION -->
+        <!-- ===========================================
+             DESCRIPTION
+        ============================================ -->
+
         <div class="form-group">
           <label for="description"> Description </label>
 
@@ -109,44 +164,32 @@
             rows="5"
             formControlName="description"
             placeholder="Enter service description"
+            [disabled]="isSaving"
           ></textarea>
 
           <small> Provide a short description of the service. </small>
         </div>
 
-        <!-- SUCCESS -->
-        @if (successMessage) {
-          <div class="success-message">
-            <i class="fa-solid fa-circle-check"></i>
+        <!-- ===========================================
+             FORM ACTIONS
+        ============================================ -->
 
-            {{ successMessage }}
-          </div>
-        }
-
-        <!-- ERROR -->
-        @if (errorMessage) {
-          <div class="form-error-message">
-            <i class="fa-solid fa-triangle-exclamation"></i>
-
-            {{ errorMessage }}
-          </div>
-        }
-
-        <!-- ACTIONS -->
         <div class="form-actions">
           <button type="button" class="cancel-button" (click)="cancel()" [disabled]="isSaving">
             <i class="fa-solid fa-xmark"></i>
 
-            Cancel
+            <span>Cancel</span>
           </button>
 
           <button type="submit" class="primary-button" [disabled]="isSaving">
             @if (isSaving) {
               <i class="fa-solid fa-spinner fa-spin"></i>
-              Updating...
+
+              <span>Updating...</span>
             } @else {
               <i class="fa-solid fa-check"></i>
-              Update Service
+
+              <span>Update Service</span>
             }
           </button>
         </div>

@@ -49,48 +49,46 @@
 
   @else {
     <div class="page-header">
-      <div class="page-header-left">
-        <!-- BREADCRUMB -->
+      <!-- =========================
+       BREADCRUMB
+  ========================== -->
 
-        <div class="breadcrumb">
-          <span>Practitioners</span>
+      <div class="breadcrumb">
+        <span>Practitioners</span>
 
-          <i class="fa-solid fa-chevron-right"></i>
+        <i class="fa-solid fa-chevron-right"></i>
 
-          <strong>
-            {{ practitioner.name }}
-          </strong>
+        <strong>
+          {{ practitioner.name }}
+        </strong>
+      </div>
+
+      <!-- =========================
+       TITLE + ACTIONS
+  ========================== -->
+
+      <div class="title-row">
+        <div class="page-title-content">
+          <h1>Practitioner Profile</h1>
+
+          <p>
+            View practitioner information, professional details, performance, and assigned service
+            areas.
+          </p>
         </div>
 
-        <!-- TITLE -->
+        <div class="header-actions">
+          <button type="button" class="primary-button" (click)="editPractitioner()">
+            <i class="fa-solid fa-pen-to-square"></i>
 
-        <div class="title-row">
-          <div>
-            <h1>Practitioner Profile</h1>
+            Edit Practitioner
+          </button>
 
-            <p>
-              View practitioner information, professional details, performance, and assigned service
-              areas.
-            </p>
-          </div>
+          <button type="button" class="secondary-button" (click)="goBack()">
+            <i class="fa-solid fa-arrow-left"></i>
 
-          <div class="header-actions">
-            <!-- EDIT -->
-
-            <button type="button" class="primary-button" (click)="editPractitioner()">
-              <i class="fa-solid fa-pen-to-square"></i>
-
-              Edit Practitioner
-            </button>
-
-            <!-- BACK -->
-
-            <button type="button" class="secondary-button" (click)="goBack()">
-              <i class="fa-solid fa-arrow-left"></i>
-
-              Back to Practitioners
-            </button>
-          </div>
+            Back to Practitioners
+          </button>
         </div>
       </div>
     </div>

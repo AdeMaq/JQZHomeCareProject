@@ -4,23 +4,23 @@
   ========================== -->
 
   <div class="page-header">
-    <div class="page-header-left">
-      <div class="breadcrumb">
-        <span>Management</span>
+    <!-- <div class="page-header-left"> -->
+    <div class="breadcrumb">
+      <span>Management</span>
 
-        <i class="fa-solid fa-chevron-right"></i>
+      <i class="fa-solid fa-chevron-right"></i>
 
-        <span>Practitioners</span>
+      <span>Practitioners</span>
 
-        <i class="fa-solid fa-chevron-right"></i>
+      <i class="fa-solid fa-chevron-right"></i>
 
-        <strong>Add Practitioner</strong>
-      </div>
-
-      <h1>Add Practitioner</h1>
-
-      <p>Add a new practitioner to the system.</p>
+      <strong>Add Practitioner</strong>
     </div>
+
+    <h1>Add Practitioner</h1>
+
+    <p>Add a new practitioner to the system.</p>
+    <!-- </div> -->
   </div>
 
   <!-- =========================
@@ -331,7 +331,6 @@
 
             <span> No areas are currently available. </span>
           </div>
-
         } @else {
           <!-- =========================
                AREA TOOLBAR
@@ -445,7 +444,6 @@
                 Clear Search
               </button>
             </div>
-
           } @else {
             <!-- =========================
                  AREA CARDS
@@ -557,8 +555,8 @@
       }
 
       <!-- =========================
-           FORM ACTIONS
-      ========================== -->
+     FORM ACTIONS
+========================== -->
 
       <div class="form-actions">
         <!-- CANCEL -->
@@ -567,14 +565,13 @@
           Cancel
         </button>
 
-        <!-- SUBMIT -->
+        <!-- ADD PRACTITIONER -->
 
         <button type="submit" class="primary-button" [disabled]="isSubmitting">
           @if (isSubmitting) {
             <span class="button-spinner"></span>
 
             Creating...
-
           } @else {
             <i class="fa-solid fa-plus"></i>
 

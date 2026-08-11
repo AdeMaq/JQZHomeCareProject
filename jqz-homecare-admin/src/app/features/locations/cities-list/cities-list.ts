@@ -16,11 +16,31 @@ export class CitiesList implements OnInit {
   private readonly router = inject(Router);
   private readonly cdr = inject(ChangeDetectorRef);
 
+  // =====================================================
+  // CITIES
+  // =====================================================
+
   cities: City[] = [];
+
+  // =====================================================
+  // SEARCH
+  // =====================================================
+
+  searchTerm = '';
+
+  filteredCities: City[] = [];
+
+  // =====================================================
+  // PAGE STATE
+  // =====================================================
 
   isLoading = false;
 
   errorMessage = '';
+
+  // =====================================================
+  // INITIALIZATION
+  // =====================================================
 
   ngOnInit(): void {
     console.log('=================================');
@@ -30,6 +50,10 @@ export class CitiesList implements OnInit {
     this.loadCities();
   }
 
+  // =====================================================
+  // LOAD CITIES
+  // =====================================================
+
   loadCities(): void {
     console.log('=== LOADING CITIES ===');
 
@@ -37,8 +61,10 @@ export class CitiesList implements OnInit {
     this.errorMessage = '';
 
     /*
-     * Immediately update the UI so the loading state appears.
+     * Clear the current search while loading.
      */
+    this.searchTerm = '';
+
     this.cdr.detectChanges();
 
     this.cityAreaService.getCities().subscribe({
@@ -50,19 +76,15 @@ export class CitiesList implements OnInit {
 
         console.log('CITY COUNT:', this.cities.length);
 
+        /*
+         * Initially all cities are displayed.
+         */
+        this.filteredCities = [...this.cities];
+
         this.isLoading = false;
 
         console.log('IS LOADING:', this.isLoading);
 
-        /*
-         * IMPORTANT:
-         *
-         * The API response is arriving correctly,
-         * but the UI was not being refreshed.
-         *
-         * Force Angular to run change detection after
-         * updating cities and isLoading.
-         */
         this.cdr.detectChanges();
       },
 
@@ -71,23 +93,71 @@ export class CitiesList implements OnInit {
         console.error(error);
 
         this.cities = [];
+        this.filteredCities = [];
 
         this.errorMessage =
           error?.error?.message ?? error?.message ?? 'Unable to load cities. Please try again.';
 
         this.isLoading = false;
 
-        /*
-         * Update the UI after the API error.
-         */
         this.cdr.detectChanges();
       },
     });
   }
 
+  // =====================================================
+  // SEARCH CITIES
+  // =====================================================
+
+  onSearch(event: Event): void {
+    const input = event.target as HTMLInputElement;
+
+    this.searchTerm = input.value;
+
+    const searchValue = this.searchTerm.trim().toLowerCase();
+
+    /*
+     * If search box is empty,
+     * display all cities.
+     */
+    if (searchValue === '') {
+      this.filteredCities = [...this.cities];
+      return;
+    }
+
+    /*
+     * Filter cities by city name.
+     */
+    this.filteredCities = this.cities.filter((city) =>
+      city.name.toLowerCase().includes(searchValue),
+    );
+
+    this.cdr.detectChanges();
+  }
+
+  // =====================================================
+  // CLEAR SEARCH
+  // =====================================================
+
+  clearSearch(): void {
+    this.searchTerm = '';
+
+    this.filteredCities = [...this.cities];
+
+    this.cdr.detectChanges();
+  }
+
+  // =====================================================
+  // ADD CITY
+  // =====================================================
+
   addCity(): void {
     this.router.navigate(['/cities/add']);
   }
+
+  // =====================================================
+  // EDIT CITY
+  // =====================================================
 
   editCity(id: string): void {
     console.log('=================================');
@@ -104,8 +174,13 @@ export class CitiesList implements OnInit {
      *
      * /cities/{id}/edit
      */
+
     this.router.navigate(['/cities', id, 'edit']);
   }
+
+  // =====================================================
+  // DELETE CITY
+  // =====================================================
 
   deleteCity(id: string): void {
     const city = this.cities.find((x) => x.id === id);
@@ -134,19 +209,17 @@ export class CitiesList implements OnInit {
         console.log('=== CITY DELETED SUCCESSFULLY ===');
 
         /*
-         * Remove the city from the existing array.
-         *
-         * We do NOT call loadCities() here.
-         * Therefore the loading screen will NOT appear
-         * again after deleting a city.
+         * Remove the city from the original array.
          */
         this.cities = this.cities.filter((city) => city.id !== id);
 
+        /*
+         * Also remove it from the currently displayed list.
+         */
+        this.filteredCities = this.filteredCities.filter((city) => city.id !== id);
+
         console.log('REMAINING CITIES:', this.cities.length);
 
-        /*
-         * Update the UI immediately.
-         */
         this.cdr.detectChanges();
       },
 
@@ -154,10 +227,6 @@ export class CitiesList implements OnInit {
         console.error('=== DELETE CITY ERROR ===');
         console.error(error);
 
-        /*
-         * Do not modify the cities array when the backend
-         * reports that deletion failed.
-         */
         const message =
           error?.error?.message ?? error?.message ?? 'Unable to delete city. Please try again.';
 

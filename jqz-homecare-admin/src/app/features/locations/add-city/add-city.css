@@ -1,15 +1,22 @@
+/* =====================================================
+   ADD CITY PAGE
+   JQZ HOMECARE - CHERRY RED THEME
+===================================================== */
+
 .add-city-page {
-  padding: 28px 22px 40px;
-  max-width: 1100px;
-  margin: 0 auto;
+  width: 100%;
+  min-height: 100%;
+  padding: 28px;
+  box-sizing: border-box;
+  background: #fff8f8;
 }
 
-/* =========================
-   HEADER
-========================= */
+/* =====================================================
+   PAGE HEADER
+===================================================== */
 
 .page-header {
-  margin-bottom: 24px;
+  margin-bottom: 28px;
 }
 
 .breadcrumb {
@@ -17,82 +24,92 @@
   align-items: center;
   gap: 9px;
   margin-bottom: 10px;
-  font-size: 13px;
-  color: #7b8798;
+  color: #627d98;
+  font-size: 12px;
+}
+
+.breadcrumb i {
+  font-size: 9px;
+  color: #a0aec0;
 }
 
 .breadcrumb strong {
-  color: #344054;
-}
-
-.breadcrumb-separator {
-  color: #b5becb;
+  color: #102a43;
 }
 
 .page-header h1 {
   margin: 0;
-  color: #101828;
-  font-size: 28px;
+  color: #102a43;
+  font-size: 34px;
   font-weight: 700;
+  line-height: 1.2;
 }
 
 .page-header > p {
-  margin: 7px 0 0;
-  color: #667085;
-  font-size: 14px;
+  margin: 8px 0 0;
+  color: #627d98;
+  font-size: 15px;
+  line-height: 1.6;
 }
 
-/* =========================
+/* =====================================================
    FORM CARD
-========================= */
+===================================================== */
 
 .form-card {
-  background: #ffffff;
-  border: 1px solid #e6eaf0;
-  border-radius: 10px;
   overflow: hidden;
-  box-shadow: 0 1px 3px rgba(16, 24, 40, 0.04);
+  background: #ffffff;
+  border: 1px solid #f2d9dc;
+  border-radius: 18px;
+  box-shadow: 0 12px 35px rgba(16, 42, 67, 0.08);
 }
 
+/* =====================================================
+   FORM HEADER
+===================================================== */
+
 .form-header {
-  padding: 20px 22px;
+  min-height: 80px;
   display: flex;
   align-items: center;
   gap: 13px;
-  border-bottom: 1px solid #edf0f4;
+  padding: 24px;
+  border-bottom: 1px solid #f5d9dc;
+  box-sizing: border-box;
 }
 
 .form-icon {
-  width: 42px;
-  height: 42px;
-  border-radius: 9px;
-  background: #edf3ff;
-  color: #2864e8;
+  width: 46px;
+  height: 46px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 17px;
+  flex-shrink: 0;
+  border-radius: 12px;
+  background: #fff4f5;
+  color: #cf102d;
+  font-size: 19px;
 }
 
 .form-header h2 {
   margin: 0;
-  color: #101828;
-  font-size: 16px;
+  color: #102a43;
+  font-size: 20px;
   font-weight: 700;
 }
 
 .form-header p {
   margin: 5px 0 0;
-  color: #667085;
-  font-size: 13px;
+  color: #627d98;
+  font-size: 14px;
 }
 
-/* =========================
+/* =====================================================
    FORM BODY
-========================= */
+===================================================== */
 
 .form-body {
-  padding: 24px 22px;
+  padding: 28px 24px;
 }
 
 .form-group {
@@ -102,121 +119,146 @@
 .form-group label {
   display: block;
   margin-bottom: 8px;
-  color: #344054;
+  color: #102a43;
   font-size: 13px;
   font-weight: 600;
 }
 
 .form-group label span {
-  color: #d92d20;
+  color: #cf102d;
 }
 
 .form-group input {
   width: 100%;
-  height: 44px;
-  padding: 0 13px;
+  height: 48px;
+  padding: 0 14px;
   box-sizing: border-box;
-  border: 1px solid #d0d5dd;
-  border-radius: 7px;
+  border: 1px solid #d9aeb3;
+  border-radius: 10px;
   background: #ffffff;
-  color: #101828;
+  color: #102a43;
   outline: none;
   font-family: inherit;
   font-size: 14px;
-  transition: 0.2s ease;
+  transition:
+    border-color 0.25s ease,
+    box-shadow 0.25s ease,
+    background 0.25s ease;
 }
 
 .form-group input::placeholder {
-  color: #98a2b3;
+  color: #94a3b8;
 }
 
 .form-group input:focus {
-  border-color: #2864e8;
-  box-shadow: 0 0 0 3px rgba(40, 100, 232, 0.1);
+  border-color: #cf102d;
+  box-shadow: 0 0 0 3px rgba(207, 16, 45, 0.1);
 }
 
 .form-group input:disabled {
-  background: #f9fafb;
+  background: #fff8f8;
   cursor: not-allowed;
 }
 
 .form-group small {
   display: block;
   margin-top: 7px;
-  color: #667085;
+  color: #627d98;
   font-size: 12px;
+  line-height: 1.5;
 }
 
-/* =========================
+/* =====================================================
    ERROR
-========================= */
+===================================================== */
 
 .error-message {
   max-width: 650px;
-  margin-top: 18px;
-  padding: 11px 13px;
+  margin-top: 20px;
+  padding: 12px 14px;
   display: flex;
   align-items: center;
   gap: 9px;
-  border: 1px solid #fecdca;
-  border-radius: 7px;
-  background: #fff6f5;
-  color: #b42318;
+  border: 1px solid #f2c4c9;
+  border-radius: 10px;
+  background: #fff4f5;
+  color: #b91c1c;
   font-size: 13px;
+  line-height: 1.5;
 }
 
 .error-message i {
+  color: #b91c1c;
   font-size: 15px;
+  flex-shrink: 0;
 }
 
-/* =========================
-   FOOTER
-========================= */
+/* =====================================================
+   FORM FOOTER
+===================================================== */
 
 .form-footer {
-  padding: 17px 22px;
+  padding: 18px 24px;
   display: flex;
   align-items: center;
   justify-content: flex-end;
   gap: 10px;
-  border-top: 1px solid #edf0f4;
-  background: #fcfcfd;
+  border-top: 1px solid #f5d9dc;
+  background: #fffafa;
 }
+
+/* =====================================================
+   FORM BUTTONS
+===================================================== */
 
 .cancel-button,
 .submit-button {
-  min-height: 40px;
-  padding: 0 16px;
-  border-radius: 7px;
+  min-height: 44px;
+  padding: 0 18px;
+  border-radius: 10px;
   font-family: inherit;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  transition: 0.2s ease;
+  transition:
+    background 0.25s ease,
+    border-color 0.25s ease,
+    color 0.25s ease,
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
 }
 
 .cancel-button {
-  border: 1px solid #d0d5dd;
+  border: 1px solid #d9aeb3;
   background: #ffffff;
-  color: #344054;
+  color: #334e68;
 }
 
-.cancel-button:hover {
-  background: #f9fafb;
+.cancel-button:hover:not(:disabled) {
+  background: #fff8f8;
+  border-color: #c98f95;
 }
 
 .submit-button {
-  border: 1px solid #2864e8;
-  background: #2864e8;
+  border: 1px solid #cf102d;
+  background: #cf102d;
   color: #ffffff;
 }
 
-.submit-button:hover {
-  background: #1e55cf;
+.submit-button:hover:not(:disabled) {
+  background: #b80e28;
+  border-color: #b80e28;
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px rgba(207, 16, 45, 0.18);
+}
+
+.cancel-button:active:not(:disabled),
+.submit-button:active:not(:disabled) {
+  transform: translateY(0);
 }
 
 .cancel-button:disabled,
@@ -225,13 +267,13 @@
   cursor: not-allowed;
 }
 
-/* =========================
+/* =====================================================
    BUTTON SPINNER
-========================= */
+===================================================== */
 
 .button-spinner {
-  width: 14px;
-  height: 14px;
+  width: 15px;
+  height: 15px;
   border: 2px solid rgba(255, 255, 255, 0.4);
   border-top-color: #ffffff;
   border-radius: 50%;
@@ -244,17 +286,84 @@
   }
 }
 
-/* =========================
+/* =====================================================
    RESPONSIVE
-========================= */
+===================================================== */
 
-@media (max-width: 700px) {
+@media (max-width: 992px) {
   .add-city-page {
-    padding: 20px 14px 30px;
+    padding: 22px;
+  }
+
+  .page-header h1 {
+    font-size: 30px;
+  }
+
+  .form-header {
+    padding: 22px;
+  }
+
+  .form-body {
+    padding: 24px 22px;
+  }
+
+  .form-footer {
+    padding: 17px 22px;
+  }
+}
+
+@media (max-width: 768px) {
+  .add-city-page {
+    padding: 18px;
+  }
+
+  .page-header h1 {
+    font-size: 28px;
+  }
+
+  .form-header {
+    align-items: flex-start;
+    padding: 20px;
+  }
+
+  .form-body {
+    padding: 22px 20px;
+  }
+
+  .form-footer {
+    padding: 16px 20px;
+  }
+
+  .form-group {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .add-city-page {
+    padding: 14px;
+  }
+
+  .form-card {
+    border-radius: 14px;
   }
 
   .form-header {
     padding: 18px;
+  }
+
+  .form-icon {
+    width: 42px;
+    height: 42px;
+    font-size: 17px;
+  }
+
+  .form-header h2 {
+    font-size: 18px;
+  }
+
+  .form-header p {
+    font-size: 13px;
   }
 
   .form-body {
@@ -263,5 +372,15 @@
 
   .form-footer {
     padding: 15px 18px;
+    flex-direction: column-reverse;
+  }
+
+  .cancel-button,
+  .submit-button {
+    width: 100%;
+  }
+
+  .error-message {
+    align-items: flex-start;
   }
 }

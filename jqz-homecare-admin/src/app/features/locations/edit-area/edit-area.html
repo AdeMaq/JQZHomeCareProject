@@ -1,314 +1,304 @@
-<div class="min-h-full bg-slate-50 px-4 py-6 sm:px-6 lg:px-8">
-  <div class="mx-auto max-w-5xl">
-    <!-- =========================
-         BREADCRUMB
-    ========================== -->
+<!-- edit-area.html -->
 
-    <div class="mb-6 flex items-center gap-2 text-sm">
-      <span class="font-medium text-slate-500"> Locations </span>
+<div class="edit-area-page bg-[#fff8f8] p-8">
+  <!-- =========================
+       BREADCRUMB
+  ========================== -->
 
-      <i class="fa-solid fa-chevron-right text-[10px] text-slate-400"></i>
+  <div class="mb-6 flex items-center gap-2 text-sm">
+    <span class="font-medium text-[#627d98]"> Locations </span>
 
-      <span class="font-medium text-slate-500"> Areas </span>
+    <i class="fa-solid fa-chevron-right text-[10px] text-[#9aa5b1]"></i>
 
-      <i class="fa-solid fa-chevron-right text-[10px] text-slate-400"></i>
+    <span class="font-medium text-[#627d98]"> Areas </span>
 
-      <span class="font-semibold text-slate-800"> Edit Area </span>
-    </div>
+    <i class="fa-solid fa-chevron-right text-[10px] text-[#9aa5b1]"></i>
 
-    <!-- =========================
-         PAGE HEADER
-    ========================== -->
+    <span class="font-semibold text-[#102a43]"> Edit Area </span>
+  </div>
 
-    <div class="mb-8 flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
-      <div>
-        <div class="mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-blue-50">
-          <i class="fa-solid fa-pen-to-square text-xl text-blue-600"></i>
-        </div>
+  <!-- =========================
+       PAGE HEADER
+  ========================== -->
 
-        <h1 class="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">Edit Area</h1>
-
-        <p class="mt-2 text-sm text-slate-500 sm:text-base">
-          Update the details of the selected area.
-        </p>
+  <div class="mb-8 flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+    <div class="flex items-start gap-4">
+      <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#fdebed]">
+        <i class="fa-solid fa-pen-to-square text-2xl text-[#cf102d]"></i>
       </div>
 
-      <button
-        type="button"
-        class="inline-flex w-fit items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
-        (click)="cancel()"
-        [disabled]="isSubmitting"
-      >
-        <i class="fa-solid fa-arrow-left text-xs"></i>
+      <div>
+        <h1 class="text-3xl font-bold tracking-tight text-[#102a43]">Edit Area</h1>
 
-        Back to Areas
-      </button>
+        <p class="mt-2 text-[15px] leading-6 text-[#627d98]">
+          Update the details of the selected healthcare area.
+        </p>
+      </div>
     </div>
 
-    <!-- =========================================================
-         IMPORTANT STATE ORDER
-         
-         1. AREA EXISTS       -> SHOW FORM
-         2. NO AREA + LOADING -> SHOW LOADING
-         3. NO AREA + ERROR   -> SHOW ERROR
-    ========================================================== -->
+    <button
+      type="button"
+      (click)="cancel()"
+      [disabled]="isSubmitting"
+      class="inline-flex items-center gap-2 rounded-xl border border-[#f2d9dc] bg-white px-5 py-3 text-sm font-semibold text-[#526581] shadow-sm transition-all duration-200 hover:border-[#cf102d] hover:bg-[#fff4f5] hover:text-[#cf102d] disabled:cursor-not-allowed disabled:opacity-50"
+    >
+      <i class="fa-solid fa-arrow-left"></i>
 
-    <!-- =========================
-         EDIT FORM
-    ========================== -->
+      Back to Areas
+    </button>
+  </div>
 
-    @if (area) {
-      <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-        <!-- =========================
-             CARD HEADER
-        ========================== -->
+  <!-- =========================================================
+       FORM STATE
+  ========================================================== -->
 
-        <div class="border-b border-slate-100 px-5 py-5 sm:px-7">
-          <div class="flex items-start gap-4">
-            <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-blue-50">
-              <i class="fa-solid fa-map-location-dot text-lg text-blue-600"></i>
-            </div>
+  @if (area) {
+    <div class="overflow-hidden rounded-2xl border border-[#f2d9dc] bg-white shadow-sm">
+      <!-- =========================
+           CARD HEADER
+      ========================== -->
 
-            <div>
-              <h2 class="text-base font-semibold text-slate-900">Area Information</h2>
+      <div class="border-b border-[#f5d9dc] px-5 py-5 sm:px-7">
+        <div class="flex items-start gap-4">
+          <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#fdebed]">
+            <i class="fa-solid fa-map-location-dot text-lg text-[#cf102d]"></i>
+          </div>
 
-              <p class="mt-1 text-sm text-slate-500">
-                Update the information below and save your changes.
-              </p>
-            </div>
+          <div>
+            <h2 class="text-base font-semibold text-[#102a43]">Area Information</h2>
+
+            <p class="mt-1 text-sm text-[#627d98]">
+              Update the information below and save your changes.
+            </p>
           </div>
         </div>
-
-        <!-- =========================
-             FORM
-        ========================== -->
-
-        <form (ngSubmit)="submit()">
-          <div class="grid gap-6 px-5 py-6 sm:px-7 md:grid-cols-2">
-            <!-- =========================
-                 AREA NAME
-            ========================== -->
-
-            <div>
-              <label for="areaName" class="mb-2 block text-sm font-semibold text-slate-700">
-                Area Name
-
-                <span class="text-red-500">*</span>
-              </label>
-
-              <div class="relative">
-                <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
-                  <i class="fa-solid fa-location-dot text-sm text-slate-400"></i>
-                </div>
-
-                <input
-                  id="areaName"
-                  name="areaName"
-                  type="text"
-                  [(ngModel)]="areaName"
-                  placeholder="Enter area name"
-                  autocomplete="off"
-                  [disabled]="isSubmitting"
-                  class="w-full rounded-lg border border-slate-300 bg-white py-3 pl-10 pr-4 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 hover:border-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 disabled:cursor-not-allowed disabled:bg-slate-50"
-                />
-              </div>
-
-              <p class="mt-2 text-xs text-slate-500">Update the official name of the area.</p>
-            </div>
-
-            <!-- =========================
-                 CITY
-            ========================== -->
-
-            <div>
-              <label for="cityId" class="mb-2 block text-sm font-semibold text-slate-700">
-                City
-
-                <span class="text-red-500">*</span>
-              </label>
-
-              <div class="relative">
-                <div
-                  class="pointer-events-none absolute inset-y-0 left-0 z-10 flex items-center pl-3.5"
-                >
-                  <i class="fa-solid fa-city text-sm text-slate-400"></i>
-                </div>
-
-                <select
-                  id="cityId"
-                  name="cityId"
-                  [ngModel]="selectedCityId"
-                  disabled
-                  class="w-full appearance-none rounded-lg border border-slate-300 bg-slate-50 py-3 pl-10 pr-10 text-sm text-slate-700 outline-none disabled:cursor-not-allowed"
-                >
-                  @if (isLoadingCities) {
-                    <option value="">Loading city...</option>
-                  } @else {
-                    <option [value]="selectedCityId">
-                      {{ selectedCityName || selectedCityId }}
-                    </option>
-                  }
-                </select>
-
-                <div
-                  class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3.5"
-                >
-                  <i class="fa-solid fa-lock text-xs text-slate-400"></i>
-                </div>
-              </div>
-
-              <p class="mt-2 text-xs text-slate-500">
-                The assigned city cannot be changed while editing an area.
-              </p>
-            </div>
-
-            <!-- =========================
-                 ERROR INSIDE FORM
-            ========================== -->
-
-            @if (errorMessage) {
-              <div
-                class="flex items-start gap-3 rounded-lg border border-red-200 bg-red-50 px-4 py-3 md:col-span-2"
-              >
-                <i class="fa-solid fa-circle-exclamation mt-0.5 text-sm text-red-600"></i>
-
-                <p class="text-sm font-medium text-red-700">
-                  {{ errorMessage }}
-                </p>
-              </div>
-            }
-          </div>
-
-          <!-- =========================
-               FORM FOOTER
-          ========================== -->
-
-          <div
-            class="flex flex-col-reverse gap-3 border-t border-slate-100 bg-slate-50/70 px-5 py-5 sm:flex-row sm:justify-end sm:px-7"
-          >
-            <!-- CANCEL -->
-
-            <button
-              type="button"
-              class="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
-              (click)="cancel()"
-              [disabled]="isSubmitting"
-            >
-              Cancel
-            </button>
-
-            <!-- UPDATE -->
-
-            <button
-              type="submit"
-              class="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-500/20 disabled:cursor-not-allowed disabled:opacity-50"
-              [disabled]="isSubmitting || !areaName.trim()"
-            >
-              @if (isSubmitting) {
-                <span
-                  class="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white"
-                ></span>
-
-                Updating...
-              } @else {
-                <i class="fa-solid fa-floppy-disk text-xs"></i>
-
-                Update Area
-              }
-            </button>
-          </div>
-        </form>
       </div>
 
       <!-- =========================
-           HELP TEXT
+           FORM
       ========================== -->
 
-      <div
-        class="mt-5 flex items-start gap-3 rounded-xl border border-blue-100 bg-blue-50 px-4 py-3"
-      >
-        <i class="fa-solid fa-circle-info mt-0.5 text-sm text-blue-600"></i>
-
-        <p class="text-xs leading-5 text-blue-700">
-          Make sure the area name is correct before saving your changes.
-        </p>
-      </div>
-    }
-
-    <!-- =========================
-         LOADING STATE
-         
-         Only displayed when:
-         area = null
-         AND
-         isLoadingArea = true
-    ========================== -->
-
-    @else if (isLoadingArea) {
-      <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-        <div class="flex min-h-[320px] flex-col items-center justify-center px-5 py-10">
+      <form (ngSubmit)="submit()">
+        @if (errorMessage) {
           <div
-            class="h-8 w-8 animate-spin rounded-full border-4 border-slate-200 border-t-blue-600"
-          ></div>
+            class="mx-7 mt-6 flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3"
+          >
+            <i class="fa-solid fa-circle-exclamation mt-0.5 text-red-600"></i>
 
-          <h3 class="mt-4 text-sm font-semibold text-slate-800">Loading area...</h3>
+            <span class="text-sm font-medium text-red-700">
+              {{ errorMessage }}
+            </span>
+          </div>
+        }
 
-          <p class="mt-1 text-xs text-slate-500">Please wait while we load the area information.</p>
+        <div class="space-y-7 px-7 py-7">
+          <!-- =========================
+               AREA NAME
+          ========================== -->
+
+          <div>
+            <label for="areaName" class="mb-2 block text-sm font-semibold text-[#243b53]">
+              Area Name
+
+              <span class="text-[#cf102d]"> * </span>
+            </label>
+
+            <div class="relative">
+              <i
+                class="fa-solid fa-location-dot absolute left-4 top-1/2 -translate-y-1/2 text-[#cf102d]"
+              ></i>
+
+              <input
+                id="areaName"
+                type="text"
+                name="areaName"
+                [(ngModel)]="areaName"
+                placeholder="Enter area name"
+                autocomplete="off"
+                [disabled]="isSubmitting"
+                class="h-12 w-full rounded-xl border border-[#d9dde5] bg-white pl-11 pr-4 text-sm text-[#102a43] outline-none transition-all duration-200 placeholder:text-[#94a3b8] hover:border-[#cf102d] focus:border-[#cf102d] focus:ring-4 focus:ring-[#cf102d]/10 disabled:cursor-not-allowed disabled:bg-slate-50"
+              />
+            </div>
+
+            <p class="mt-2 text-xs text-[#7b8794]">
+              Update the official name of the healthcare area.
+            </p>
+          </div>
+
+          <!-- =========================
+               CITY
+          ========================== -->
+
+          <div>
+            <label for="cityId" class="mb-2 block text-sm font-semibold text-[#243b53]">
+              City
+
+              <span class="text-[#cf102d]"> * </span>
+            </label>
+
+            <div class="relative">
+              <i
+                class="fa-solid fa-city absolute left-4 top-1/2 -translate-y-1/2 text-[#cf102d]"
+              ></i>
+
+              <select
+                id="cityId"
+                name="cityId"
+                [ngModel]="selectedCityId"
+                disabled
+                class="h-12 w-full appearance-none rounded-xl border border-[#d9dde5] bg-slate-50 pl-11 pr-11 text-sm text-[#526581] outline-none disabled:cursor-not-allowed"
+              >
+                @if (isLoadingCities) {
+                  <option value="">Loading city...</option>
+                } @else {
+                  <option [value]="selectedCityId">
+                    {{ selectedCityName || selectedCityId }}
+                  </option>
+                }
+              </select>
+
+              <i
+                class="fa-solid fa-lock pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-xs text-[#94a3b8]"
+              ></i>
+            </div>
+
+            <p class="mt-2 text-xs text-[#7b8794]">
+              The assigned city cannot be changed while editing an area.
+            </p>
+          </div>
+
+          <!-- =========================
+               INFORMATION BOX
+          ========================== -->
+
+          <div class="rounded-xl border border-[#f6d2d5] bg-[#fff6f7] px-4 py-3">
+            <div class="flex items-start gap-3">
+              <i class="fa-solid fa-circle-info mt-0.5 text-[#cf102d]"></i>
+
+              <p class="text-xs leading-5 text-[#7b8794]">
+                Make sure the area name is correct before saving your changes.
+              </p>
+            </div>
+          </div>
         </div>
-      </div>
-    }
+
+        <!-- =========================
+             FORM FOOTER
+        ========================== -->
+
+        <div
+          class="flex flex-col-reverse gap-3 border-t border-[#f5d9dc] bg-[#fffafb] px-7 py-6 sm:flex-row sm:justify-end"
+        >
+          <!-- CANCEL -->
+
+          <button
+            type="button"
+            (click)="cancel()"
+            [disabled]="isSubmitting"
+            class="inline-flex h-12 items-center justify-center rounded-xl border border-[#f2d9dc] bg-white px-6 text-sm font-semibold text-[#526581] transition-all duration-200 hover:border-[#cf102d] hover:bg-[#fff4f5] hover:text-[#cf102d] disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            <i class="fa-solid fa-xmark mr-2"></i>
+
+            Cancel
+          </button>
+
+          <!-- UPDATE -->
+
+          <button
+            type="submit"
+            [disabled]="isSubmitting || !areaName.trim()"
+            class="inline-flex h-12 items-center justify-center rounded-xl bg-[#cf102d] px-6 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-[#b80e28] hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            @if (isSubmitting) {
+              <i class="fa-solid fa-spinner fa-spin mr-2"></i>
+
+              Updating...
+            } @else {
+              <i class="fa-solid fa-floppy-disk mr-2"></i>
+
+              Update Area
+            }
+          </button>
+        </div>
+      </form>
+    </div>
 
     <!-- =========================
-         ERROR STATE
-         
-         Only displayed when:
-         area = null
-         AND
-         isLoadingArea = false
-         AND
-         errorMessage exists
+         HELP TEXT
     ========================== -->
 
-    @else if (errorMessage) {
-      <div class="overflow-hidden rounded-2xl border border-red-200 bg-white shadow-sm">
-        <div class="flex min-h-[320px] flex-col items-center justify-center px-5 py-10 text-center">
-          <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-red-50">
-            <i class="fa-solid fa-triangle-exclamation text-lg text-red-600"></i>
-          </div>
+    <div
+      class="mt-5 flex items-start gap-3 rounded-xl border border-[#f6d2d5] bg-[#fff6f7] px-4 py-3"
+    >
+      <i class="fa-solid fa-circle-info mt-0.5 text-[#cf102d]"></i>
 
-          <h3 class="mt-4 text-base font-semibold text-slate-900">Unable to load area</h3>
+      <p class="text-xs leading-5 text-[#7b8794]">
+        Review the updated area information carefully before saving your changes.
+      </p>
+    </div>
+  }
 
-          <p class="mt-2 max-w-md text-sm leading-6 text-slate-500">
-            {{ errorMessage }}
-          </p>
+  <!-- =========================
+       LOADING STATE
+  ========================== -->
 
-          <div class="mt-5 flex flex-col gap-3 sm:flex-row">
-            <!-- RETRY -->
+  @else if (isLoadingArea) {
+    <div class="overflow-hidden rounded-2xl border border-[#f2d9dc] bg-white shadow-sm">
+      <div class="flex min-h-[320px] flex-col items-center justify-center px-5 py-10">
+        <div
+          class="h-8 w-8 animate-spin rounded-full border-4 border-[#f6d2d5] border-t-[#cf102d]"
+        ></div>
 
-            <button
-              type="button"
-              class="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700"
-              (click)="retry()"
-            >
-              <i class="fa-solid fa-rotate-right text-xs"></i>
+        <h3 class="mt-4 text-sm font-semibold text-[#102a43]">Loading area...</h3>
 
-              Try Again
-            </button>
+        <p class="mt-1 text-xs text-[#627d98]">Please wait while we load the area information.</p>
+      </div>
+    </div>
+  }
 
-            <!-- BACK -->
+  <!-- =========================
+       ERROR STATE
+  ========================== -->
 
-            <button
-              type="button"
-              class="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50"
-              (click)="cancel()"
-            >
-              <i class="fa-solid fa-arrow-left text-xs"></i>
+  @else if (errorMessage) {
+    <div class="overflow-hidden rounded-2xl border border-red-200 bg-white shadow-sm">
+      <div class="flex min-h-[320px] flex-col items-center justify-center px-5 py-10 text-center">
+        <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-red-50">
+          <i class="fa-solid fa-triangle-exclamation text-lg text-red-600"></i>
+        </div>
 
-              Back to Areas
-            </button>
-          </div>
+        <h3 class="mt-4 text-base font-semibold text-[#102a43]">Unable to load area</h3>
+
+        <p class="mt-2 max-w-md text-sm leading-6 text-[#627d98]">
+          {{ errorMessage }}
+        </p>
+
+        <div class="mt-5 flex flex-col gap-3 sm:flex-row">
+          <!-- RETRY -->
+
+          <button
+            type="button"
+            (click)="retry()"
+            class="inline-flex items-center justify-center gap-2 rounded-xl bg-[#cf102d] px-5 py-3 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-[#b80e28]"
+          >
+            <i class="fa-solid fa-rotate-right text-xs"></i>
+
+            Try Again
+          </button>
+
+          <!-- BACK -->
+
+          <button
+            type="button"
+            (click)="cancel()"
+            class="inline-flex items-center justify-center gap-2 rounded-xl border border-[#f2d9dc] bg-white px-5 py-3 text-sm font-semibold text-[#526581] transition-all duration-200 hover:border-[#cf102d] hover:bg-[#fff4f5] hover:text-[#cf102d]"
+          >
+            <i class="fa-solid fa-arrow-left text-xs"></i>
+
+            Back to Areas
+          </button>
         </div>
       </div>
-    }
-  </div>
+    </div>
+  }
 </div>

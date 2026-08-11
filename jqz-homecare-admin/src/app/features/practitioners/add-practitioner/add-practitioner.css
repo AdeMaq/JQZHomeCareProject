@@ -1,9 +1,14 @@
 .add-practitioner-page {
   width: 100%;
-  padding: 28px 32px 40px;
-  box-sizing: border-box;
-}
 
+  min-height: 100%;
+
+  padding: 28px 32px 40px;
+
+  box-sizing: border-box;
+
+  background: #fff8f8;
+}
 /* =========================
    PAGE HEADER
 ========================= */
@@ -12,49 +17,67 @@
   margin-bottom: 24px;
 }
 
-.page-header-left {
-  min-width: 0;
-}
+/* =========================
+   BREADCRUMB
+========================= */
 
 .breadcrumb {
   display: flex;
+
   align-items: center;
+
   flex-wrap: wrap;
+
   gap: 9px;
 
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 
   color: #718096;
+
   font-size: 12px;
 }
 
 .breadcrumb i {
   color: #a0aec0;
+
   font-size: 9px;
 }
 
 .breadcrumb strong {
   color: #2d3748;
+
+  font-weight: 600;
 }
+
+/* =========================
+   PAGE TITLE
+========================= */
 
 .page-header h1 {
   margin: 0;
 
-  color: #111827;
+  color: #102a43;
 
   font-size: 28px;
+
   font-weight: 700;
+
   line-height: 1.2;
 }
+
+/* =========================
+   PAGE DESCRIPTION
+========================= */
 
 .page-header p {
   margin: 7px 0 0;
 
   color: #718096;
 
-  font-size: 14px;
-}
+  font-size: 13px;
 
+  line-height: 1.5;
+}
 /* =========================
    FORM CARD
 ========================= */
@@ -65,6 +88,7 @@
   background: #ffffff;
 
   border: 1px solid #e5e7eb;
+
   border-radius: 10px;
 
   box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
@@ -84,9 +108,15 @@
   border-bottom: none;
 }
 
+/* =========================
+   SECTION HEADER
+========================= */
+
 .section-header {
   display: flex;
+
   align-items: flex-start;
+
   gap: 12px;
 
   margin-bottom: 22px;
@@ -94,18 +124,22 @@
 
 .section-icon {
   width: 36px;
+
   height: 36px;
 
   display: flex;
+
   align-items: center;
+
   justify-content: center;
 
   flex-shrink: 0;
 
   border-radius: 8px;
 
-  background: #eff6ff;
-  color: #2563eb;
+  background: #fdebed;
+
+  color: #cf102d;
 
   font-size: 14px;
 }
@@ -116,6 +150,7 @@
   color: #1e293b;
 
   font-size: 15px;
+
   font-weight: 700;
 }
 
@@ -125,9 +160,9 @@
   color: #718096;
 
   font-size: 12px;
+
   line-height: 1.5;
 }
-
 /* =========================
    FORM GRID
 ========================= */
@@ -148,8 +183,13 @@
   min-width: 0;
 
   display: flex;
+
   flex-direction: column;
 }
+
+/* =========================
+   FORM LABEL
+========================= */
 
 .form-group label {
   margin-bottom: 7px;
@@ -157,12 +197,17 @@
   color: #334155;
 
   font-size: 12px;
+
   font-weight: 600;
 }
 
 .form-group label span {
-  color: #dc2626;
+  color: #cf102d;
 }
+
+/* =========================
+   FORM INPUTS
+========================= */
 
 .form-group input,
 .form-group select {
@@ -175,14 +220,17 @@
   box-sizing: border-box;
 
   border: 1px solid #dbe2ea;
+
   border-radius: 7px;
 
   outline: none;
 
   background: #ffffff;
+
   color: #1e293b;
 
   font-family: inherit;
+
   font-size: 13px;
 
   transition:
@@ -194,12 +242,20 @@
   color: #94a3b8;
 }
 
+/* =========================
+   INPUT FOCUS
+========================= */
+
 .form-group input:focus,
 .form-group select:focus {
-  border-color: #2563eb;
+  border-color: #cf102d;
 
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.08);
+  box-shadow: 0 0 0 3px rgba(207, 16, 45, 0.08);
 }
+
+/* =========================
+   INVALID INPUT
+========================= */
 
 .form-group input.invalid,
 .form-group select.invalid {
@@ -208,8 +264,14 @@
 
 .form-group input.invalid:focus,
 .form-group select.invalid:focus {
+  border-color: #dc2626;
+
   box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.08);
 }
+
+/* =========================
+   VALIDATION
+========================= */
 
 .error-text {
   margin-top: 5px;
@@ -226,7 +288,6 @@
 
   font-size: 11px;
 }
-
 /* =========================
    PERCENTAGE
 ========================= */
@@ -266,6 +327,48 @@
 }
 
 /* =========================
+   PERCENTAGE
+========================= */
+
+.percentage-input {
+  position: relative;
+
+  display: flex;
+
+  align-items: center;
+}
+
+.percentage-input input {
+  padding-right: 38px;
+}
+
+.percentage-input span {
+  position: absolute;
+
+  right: 13px;
+
+  color: #64748b;
+
+  font-size: 13px;
+
+  pointer-events: none;
+}
+
+/* =========================
+   AREAS TOOLBAR
+========================= */
+
+.areas-toolbar {
+  display: flex;
+
+  align-items: center;
+
+  gap: 12px;
+
+  margin-bottom: 12px;
+}
+
+/* =========================
    AREA SEARCH
 ========================= */
 
@@ -273,14 +376,17 @@
   position: relative;
 
   flex: 1;
+
   min-width: 0;
 
   display: flex;
+
   align-items: center;
 }
 
 .area-search > i {
   position: absolute;
+
   left: 13px;
 
   color: #64748b;
@@ -300,14 +406,17 @@
   box-sizing: border-box;
 
   border: 1px solid #dbe2ea;
+
   border-radius: 7px;
 
   outline: none;
 
   background: #ffffff;
+
   color: #1e293b;
 
   font-family: inherit;
+
   font-size: 13px;
 
   transition:
@@ -320,32 +429,37 @@
 }
 
 .area-search input:focus {
-  border-color: #2563eb;
+  border-color: #cf102d;
 
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.08);
+  box-shadow: 0 0 0 3px rgba(207, 16, 45, 0.08);
 }
-
 /* =========================
    CLEAR SEARCH
 ========================= */
 
 .clear-search-button {
   position: absolute;
+
   right: 8px;
 
   width: 25px;
+
   height: 25px;
 
   display: flex;
+
   align-items: center;
+
   justify-content: center;
 
   padding: 0;
 
   border: none;
+
   border-radius: 5px;
 
   background: transparent;
+
   color: #94a3b8;
 
   cursor: pointer;
@@ -356,8 +470,9 @@
 }
 
 .clear-search-button:hover {
-  background: #f1f5f9;
-  color: #475569;
+  background: #fdebed;
+
+  color: #cf102d;
 }
 
 /* =========================
@@ -366,7 +481,9 @@
 
 .area-actions {
   display: flex;
+
   align-items: center;
+
   gap: 8px;
 
   flex-shrink: 0;
@@ -376,20 +493,27 @@
   min-height: 38px;
 
   display: inline-flex;
+
   align-items: center;
+
   justify-content: center;
+
   gap: 6px;
 
   padding: 8px 12px;
 
   border: 1px solid #dbe2ea;
+
   border-radius: 7px;
 
   background: #ffffff;
+
   color: #334155;
 
   font-family: inherit;
+
   font-size: 12px;
+
   font-weight: 600;
 
   cursor: pointer;
@@ -402,11 +526,11 @@
 }
 
 .area-action-button:hover:not(:disabled) {
-  border-color: #bfdbfe;
+  border-color: #f6b8bf;
 
-  background: #eff6ff;
+  background: #fdebed;
 
-  color: #2563eb;
+  color: #cf102d;
 }
 
 .area-action-button.clear:hover:not(:disabled) {
@@ -426,15 +550,17 @@
 .area-action-button i {
   font-size: 11px;
 }
-
 /* =========================
    AREA RESULT INFO
 ========================= */
 
 .area-result-info {
   display: flex;
+
   align-items: center;
+
   justify-content: space-between;
+
   gap: 15px;
 
   margin-bottom: 12px;
@@ -459,7 +585,7 @@
 }
 
 .area-result-info .selected-count i {
-  color: #2563eb;
+  color: #cf102d;
 }
 
 /* =========================
@@ -482,7 +608,9 @@
   position: relative;
 
   display: flex;
+
   align-items: center;
+
   gap: 12px;
 
   min-width: 0;
@@ -490,6 +618,7 @@
   padding: 13px;
 
   border: 1px solid #e2e8f0;
+
   border-radius: 8px;
 
   background: #ffffff;
@@ -503,23 +632,24 @@
 }
 
 .area-option:hover {
-  border-color: #bfdbfe;
+  border-color: #f6b8bf;
 
-  background: #f8fbff;
+  background: #fff8f8;
 }
 
 .area-option.selected {
-  border-color: #93c5fd;
+  border-color: #ee7b7d;
 
-  background: #eff6ff;
+  background: #fdebed;
 
-  box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.04);
+  box-shadow: 0 0 0 1px rgba(207, 16, 45, 0.04);
 }
 
 .area-option input {
   position: absolute;
 
   width: 1px;
+
   height: 1px;
 
   opacity: 0;
@@ -533,15 +663,19 @@
 
 .area-checkbox {
   width: 18px;
+
   height: 18px;
 
   display: flex;
+
   align-items: center;
+
   justify-content: center;
 
   flex-shrink: 0;
 
   border: 1px solid #cbd5e1;
+
   border-radius: 4px;
 
   background: #ffffff;
@@ -556,13 +690,13 @@
 }
 
 .area-option:hover .area-checkbox {
-  border-color: #93c5fd;
+  border-color: #ee7b7d;
 }
 
 .area-option.selected .area-checkbox {
-  border-color: #2563eb;
+  border-color: #cf102d;
 
-  background: #2563eb;
+  background: #cf102d;
 }
 
 /* =========================
@@ -581,9 +715,11 @@
   color: #334155;
 
   font-size: 12px;
+
   font-weight: 600;
 
   text-overflow: ellipsis;
+
   white-space: nowrap;
 }
 
@@ -602,17 +738,19 @@
 
   font-size: 9px;
 }
-
 /* =========================
    AREA PAGINATION
 ========================= */
 
 .area-pagination {
   display: flex;
+
   align-items: center;
+
   justify-content: space-between;
 
   margin-top: 16px;
+
   padding-top: 14px;
 
   border-top: 1px solid #edf0f4;
@@ -624,8 +762,11 @@
 
 .pagination-pages {
   display: flex;
+
   align-items: center;
+
   justify-content: center;
+
   gap: 5px;
 }
 
@@ -638,17 +779,23 @@
   height: 34px;
 
   display: inline-flex;
+
   align-items: center;
+
   justify-content: center;
 
   border: 1px solid #dbe2ea;
+
   border-radius: 6px;
 
   background: #ffffff;
+
   color: #475569;
 
   font-family: inherit;
+
   font-size: 12px;
+
   font-weight: 600;
 
   cursor: pointer;
@@ -676,11 +823,11 @@
 }
 
 .pagination-button:hover:not(:disabled) {
-  border-color: #bfdbfe;
+  border-color: #f6b8bf;
 
-  background: #eff6ff;
+  background: #fdebed;
 
-  color: #2563eb;
+  color: #cf102d;
 }
 
 /* =========================
@@ -694,11 +841,11 @@
 }
 
 .pagination-page:hover:not(.active) {
-  border-color: #bfdbfe;
+  border-color: #f6b8bf;
 
-  background: #eff6ff;
+  background: #fdebed;
 
-  color: #2563eb;
+  color: #cf102d;
 }
 
 /* =========================
@@ -706,12 +853,13 @@
 ========================= */
 
 .pagination-page.active {
-  border-color: #2563eb;
+  border-color: #cf102d;
 
-  background: #2563eb;
+  background: #cf102d;
+
   color: #ffffff;
 
-  box-shadow: 0 2px 5px rgba(37, 99, 235, 0.16);
+  box-shadow: 0 2px 5px rgba(207, 16, 45, 0.16);
 
   cursor: default;
 }
@@ -727,7 +875,6 @@
 
   background: #f8fafc;
 }
-
 /* =========================
    EMPTY AREAS
 ========================= */
@@ -846,7 +993,9 @@
 
 .form-actions {
   display: flex;
+  align-items: center;
   justify-content: flex-end;
+
   gap: 10px;
 
   padding: 18px 24px;
@@ -867,6 +1016,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+
   gap: 8px;
 
   padding: 9px 17px;
@@ -883,32 +1033,51 @@
     background 0.2s ease,
     border-color 0.2s ease,
     box-shadow 0.2s ease,
+    color 0.2s ease,
     opacity 0.2s ease;
 }
+
+/* =========================
+   ADD PRACTITIONER
+========================= */
 
 .primary-button {
   border: none;
 
-  background: #2563eb;
+  background: #cf102d;
+
   color: #ffffff;
 }
 
 .primary-button:hover:not(:disabled) {
-  background: #1d4ed8;
+  background: #b80e28;
 
-  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.18);
+  box-shadow: 0 4px 10px rgba(207, 16, 45, 0.18);
 }
+
+/* =========================
+   CANCEL
+========================= */
 
 .secondary-button {
   border: 1px solid #dbe2ea;
 
   background: #ffffff;
+
   color: #334155;
 }
 
 .secondary-button:hover:not(:disabled) {
   background: #f8fafc;
+
+  border-color: #cbd5e1;
+
+  color: #1e293b;
 }
+
+/* =========================
+   DISABLED
+========================= */
 
 .primary-button:disabled,
 .secondary-button:disabled {
@@ -916,7 +1085,6 @@
 
   cursor: not-allowed;
 }
-
 /* =========================
    BUTTON SPINNER
 ========================= */
@@ -1083,7 +1251,6 @@
   .section-icon {
     width: 32px;
     height: 32px;
-
     font-size: 12px;
   }
 
@@ -1109,7 +1276,6 @@
 
   .pagination-button {
     width: 34px;
-
     padding: 0;
   }
 
@@ -1124,11 +1290,1115 @@
 
   .form-actions {
     flex-direction: column-reverse;
-
     padding: 15px;
   }
 
   .form-actions button {
     width: 100%;
+  }
+}
+
+/* ============================================================
+   PRACTITIONER TYPOGRAPHY STANDARD
+   PATCH 1
+   ============================================================ */
+
+/* =========================
+   PAGE HEADER
+========================= */
+
+.page-header h1 {
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.page-header p {
+  margin-top: 8px;
+
+  color: #64748b;
+
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+/* =========================
+   BREADCRUMB
+========================= */
+
+.breadcrumb {
+  gap: 10px;
+
+  margin-bottom: 11px;
+
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.breadcrumb i {
+  font-size: 10px;
+}
+
+/* =========================
+   SECTION HEADER
+========================= */
+
+.section-header h2 {
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.section-header p {
+  margin-top: 6px;
+
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* =========================
+   FORM LABELS
+========================= */
+
+.form-group label {
+  margin-bottom: 8px;
+
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.form-group label span {
+  font-size: 13px;
+}
+
+/* =========================
+   FORM INPUTS
+========================= */
+
+.form-group input,
+.form-group select {
+  min-height: 44px;
+
+  padding: 10px 13px;
+
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.form-group input::placeholder,
+.form-group select::placeholder {
+  font-size: 13px;
+}
+
+/* =========================
+   AREA INFORMATION
+========================= */
+
+.area-info strong {
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.area-info span {
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+/* =========================
+   EMPTY AREA STATE
+========================= */
+
+.empty-areas {
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.no-area-results strong {
+  font-size: 14px;
+}
+
+.no-area-results > span {
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+/* =========================
+   FORM ERROR
+========================= */
+
+.form-error {
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* =========================
+   GENERAL BUTTON TEXT
+========================= */
+
+.primary-button,
+.secondary-button,
+.area-action-button,
+.manage-areas-button {
+  font-size: 13px;
+}
+
+/* ============================================================
+   PRACTITIONER ICON STANDARD
+   PATCH 2
+   ============================================================ */
+
+/* =========================
+   SECTION ICONS
+========================= */
+
+.section-icon {
+  width: 42px;
+  height: 42px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  border-radius: 10px;
+
+  background: #fdebed;
+  color: #cf102d;
+
+  font-size: 17px;
+
+  box-shadow: 0 2px 6px rgba(207, 16, 45, 0.08);
+}
+
+.section-icon i {
+  font-size: 17px;
+}
+
+/* =========================
+   FORM / FIELD ICONS
+========================= */
+
+.form-icon,
+.field-icon,
+.input-icon {
+  width: 38px;
+  height: 38px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  border-radius: 8px;
+
+  background: #fdebed;
+  color: #cf102d;
+
+  font-size: 15px;
+}
+
+.form-icon i,
+.field-icon i,
+.input-icon i {
+  font-size: 15px;
+}
+
+/* =========================
+   AREA SEARCH ICON
+========================= */
+
+.area-search > i {
+  font-size: 15px;
+  color: #64748b;
+}
+
+/* =========================
+   AREA ACTION ICONS
+========================= */
+
+.area-action-button i {
+  font-size: 13px;
+}
+
+.area-action-button {
+  gap: 7px;
+}
+
+/* =========================
+   BUTTON ICONS
+========================= */
+
+.primary-button i,
+.secondary-button i,
+.manage-areas-button i {
+  font-size: 14px;
+
+  line-height: 1;
+}
+
+.primary-button,
+.secondary-button,
+.manage-areas-button {
+  gap: 8px;
+}
+
+/* =========================
+   EMPTY STATE ICON
+========================= */
+
+.no-area-results-icon {
+  width: 46px;
+  height: 46px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin-bottom: 12px;
+
+  border-radius: 10px;
+
+  background: #fdebed;
+  color: #cf102d;
+
+  font-size: 17px;
+
+  box-shadow: 0 2px 6px rgba(207, 16, 45, 0.08);
+}
+
+.no-area-results-icon i {
+  font-size: 17px;
+}
+
+/* =========================
+   ERROR ICON
+========================= */
+
+.form-error i {
+  flex-shrink: 0;
+
+  margin-top: 2px;
+
+  font-size: 15px;
+}
+
+/* =========================
+   REQUIRED FIELD INDICATOR
+========================= */
+
+.form-group label span {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+/* =========================
+   MOBILE ICON STANDARD
+========================= */
+
+@media (max-width: 768px) {
+  .section-icon {
+    width: 40px;
+    height: 40px;
+
+    border-radius: 9px;
+
+    font-size: 16px;
+  }
+
+  .section-icon i {
+    font-size: 16px;
+  }
+
+  .form-icon,
+  .field-icon,
+  .input-icon {
+    width: 36px;
+    height: 36px;
+
+    font-size: 14px;
+  }
+
+  .form-icon i,
+  .field-icon i,
+  .input-icon i {
+    font-size: 14px;
+  }
+
+  .area-action-button i {
+    font-size: 13px;
+  }
+
+  .primary-button i,
+  .secondary-button i,
+  .manage-areas-button i {
+    font-size: 14px;
+  }
+
+  .no-area-results-icon {
+    width: 44px;
+    height: 44px;
+
+    font-size: 16px;
+  }
+
+  .no-area-results-icon i {
+    font-size: 16px;
+  }
+}
+
+/* ============================================================
+   PATCH 3 — ADD PRACTITIONER PAGE REFINEMENT
+   ============================================================ */
+
+/* =========================
+   PAGE SPACING
+========================= */
+
+.add-practitioner-page {
+  padding: 32px 36px 44px;
+}
+
+/* =========================
+   PAGE HEADER
+========================= */
+
+.page-header {
+  margin-bottom: 28px;
+}
+
+.breadcrumb {
+  gap: 10px;
+  margin-bottom: 11px;
+
+  font-size: 13px;
+}
+
+.breadcrumb i {
+  font-size: 10px;
+}
+
+.page-header h1 {
+  font-size: 30px;
+  line-height: 1.2;
+}
+
+.page-header p {
+  margin-top: 8px;
+
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+/* =========================
+   FORM CARD
+========================= */
+
+.form-card {
+  border-radius: 12px;
+
+  box-shadow:
+    0 1px 3px rgba(15, 23, 42, 0.04),
+    0 4px 12px rgba(15, 23, 42, 0.03);
+}
+
+/* =========================
+   FORM SECTIONS
+========================= */
+
+.section {
+  padding: 28px;
+}
+
+.section-header {
+  gap: 14px;
+  margin-bottom: 25px;
+}
+
+/* =========================
+   SECTION ICONS
+========================= */
+
+.section-icon {
+  width: 42px;
+  height: 42px;
+
+  border-radius: 10px;
+
+  background: #fdebed;
+  color: #cf102d;
+
+  font-size: 17px;
+
+  box-shadow: 0 2px 6px rgba(207, 16, 45, 0.08);
+}
+
+.section-icon i {
+  font-size: 17px;
+}
+
+/* =========================
+   SECTION TEXT
+========================= */
+
+.section-header h2 {
+  margin: 2px 0 6px;
+
+  color: #1e293b;
+
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.section-header p {
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+/* =========================
+   FORM GRID
+========================= */
+
+.form-grid {
+  column-gap: 24px;
+  row-gap: 22px;
+}
+
+/* =========================
+   FORM GROUP
+========================= */
+
+.form-group label {
+  margin-bottom: 8px;
+
+  color: #334155;
+
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.form-group label span {
+  color: #cf102d;
+
+  font-size: 13px;
+  font-weight: 700;
+}
+
+/* =========================
+   INPUTS + SELECTS
+========================= */
+
+.form-group input,
+.form-group select {
+  min-height: 44px;
+
+  padding: 10px 13px;
+
+  border: 1px solid #d7dee8;
+  border-radius: 8px;
+
+  font-size: 14px;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+}
+
+.form-group input::placeholder {
+  color: #9aa6b5;
+
+  font-size: 13px;
+}
+
+.form-group input:hover,
+.form-group select:hover {
+  border-color: #cbd5e1;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  border-color: #cf102d;
+
+  box-shadow: 0 0 0 3px rgba(207, 16, 45, 0.08);
+}
+
+/* =========================
+   INVALID INPUT
+========================= */
+
+.form-group input.invalid,
+.form-group select.invalid {
+  border-color: #dc2626;
+}
+
+.form-group input.invalid:focus,
+.form-group select.invalid:focus {
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.08);
+}
+
+/* =========================
+   FORM HELPERS
+========================= */
+
+.error-text,
+.helper-text {
+  font-size: 12px;
+
+  line-height: 1.45;
+}
+
+.error-text {
+  margin-top: 6px;
+
+  color: #dc2626;
+}
+
+.helper-text {
+  margin-top: 6px;
+
+  color: #94a3b8;
+}
+
+/* =========================
+   PERCENTAGE INPUT
+========================= */
+
+.percentage-input span {
+  right: 14px;
+
+  color: #64748b;
+
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* =========================
+   AREA TOOLBAR
+========================= */
+
+.areas-toolbar {
+  gap: 14px;
+
+  margin-bottom: 14px;
+}
+
+/* =========================
+   AREA SEARCH
+========================= */
+
+.area-search > i {
+  left: 14px;
+
+  font-size: 15px;
+}
+
+.area-search input {
+  height: 44px;
+
+  padding: 10px 40px 10px 38px;
+
+  border-radius: 8px;
+
+  font-size: 14px;
+}
+
+.area-search input::placeholder {
+  font-size: 13px;
+}
+
+.area-search input:focus {
+  border-color: #cf102d;
+
+  box-shadow: 0 0 0 3px rgba(207, 16, 45, 0.08);
+}
+
+/* =========================
+   AREA ACTION BUTTONS
+========================= */
+
+.area-action-button {
+  min-height: 42px;
+
+  padding: 9px 14px;
+
+  border-radius: 8px;
+
+  font-size: 13px;
+}
+
+.area-action-button i {
+  font-size: 13px;
+}
+
+/* =========================
+   AREA RESULT INFO
+========================= */
+
+.area-result-info {
+  margin-bottom: 14px;
+
+  font-size: 12px;
+}
+
+.area-result-info .selected-count i {
+  color: #cf102d;
+}
+
+/* =========================
+   AREAS GRID
+========================= */
+
+.areas-grid {
+  gap: 14px;
+}
+
+/* =========================
+   AREA OPTION
+========================= */
+
+.area-option {
+  gap: 13px;
+
+  padding: 15px;
+
+  border-radius: 9px;
+}
+
+.area-option:hover {
+  border-color: #e9aeb4;
+
+  background: #fff8f8;
+}
+
+.area-option.selected {
+  border-color: #e9aeb4;
+
+  background: #fff8f8;
+
+  box-shadow: 0 0 0 1px rgba(207, 16, 45, 0.04);
+}
+
+/* =========================
+   AREA CHECKBOX
+========================= */
+
+.area-checkbox {
+  width: 20px;
+  height: 20px;
+
+  border-radius: 5px;
+
+  font-size: 11px;
+}
+
+.area-option:hover .area-checkbox {
+  border-color: #e9aeb4;
+}
+
+.area-option.selected .area-checkbox {
+  border-color: #cf102d;
+
+  background: #cf102d;
+}
+
+/* =========================
+   AREA INFORMATION
+========================= */
+
+.area-info strong {
+  font-size: 13px;
+}
+
+.area-info span {
+  margin-top: 5px;
+
+  font-size: 12px;
+}
+
+.area-info i {
+  font-size: 10px;
+}
+
+/* =========================
+   EMPTY AREAS
+========================= */
+
+.empty-areas {
+  gap: 10px;
+
+  padding: 18px;
+
+  border-radius: 9px;
+
+  background: #fff8f8;
+
+  color: #64748b;
+
+  font-size: 13px;
+}
+
+.empty-areas i {
+  color: #cf102d;
+
+  font-size: 15px;
+}
+
+/* =========================
+   NO SEARCH RESULTS
+========================= */
+
+.no-area-results {
+  min-height: 200px;
+
+  padding: 28px 22px;
+
+  border-radius: 9px;
+}
+
+.no-area-results-icon {
+  width: 46px;
+  height: 46px;
+
+  margin-bottom: 13px;
+
+  border-radius: 10px;
+
+  background: #fdebed;
+  color: #cf102d;
+
+  font-size: 17px;
+
+  box-shadow: 0 2px 6px rgba(207, 16, 45, 0.08);
+}
+
+.no-area-results strong {
+  font-size: 14px;
+}
+
+.no-area-results > span {
+  margin-top: 6px;
+
+  font-size: 12px;
+}
+
+/* =========================
+   API ERROR
+========================= */
+
+.form-error {
+  gap: 10px;
+
+  margin: 22px 28px 0;
+
+  padding: 13px 15px;
+
+  border-radius: 8px;
+
+  font-size: 13px;
+}
+
+.form-error i {
+  margin-top: 2px;
+
+  font-size: 15px;
+}
+
+/* =========================
+   FORM ACTIONS
+========================= */
+
+.form-actions {
+  gap: 12px;
+
+  padding: 20px 28px;
+
+  background: #fffafa;
+}
+
+/* =========================
+   PRIMARY + SECONDARY BUTTONS
+========================= */
+
+.primary-button,
+.secondary-button {
+  min-height: 42px;
+
+  padding: 10px 18px;
+
+  border-radius: 8px;
+
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.primary-button {
+  background: #cf102d;
+  color: #ffffff;
+
+  box-shadow: 0 2px 5px rgba(207, 16, 45, 0.12);
+}
+
+.primary-button:hover:not(:disabled) {
+  background: #b80e28;
+
+  box-shadow: 0 4px 10px rgba(207, 16, 45, 0.18);
+}
+
+.secondary-button {
+  border-color: #f6d2d5;
+
+  background: #ffffff;
+
+  color: #334155;
+}
+
+.secondary-button:hover:not(:disabled) {
+  border-color: #e9aeb4;
+
+  background: #fdebed;
+
+  color: #cf102d;
+}
+
+.primary-button i,
+.secondary-button i {
+  font-size: 14px;
+}
+
+/* =========================
+   BUTTON SPINNER
+========================= */
+
+.button-spinner {
+  width: 15px;
+  height: 15px;
+
+  border-width: 2px;
+}
+
+/* =========================
+   LOADING / STATE CARD
+========================= */
+
+.state-card {
+  min-height: 340px;
+
+  padding: 36px 24px;
+
+  border-radius: 12px;
+}
+
+.state-card h3 {
+  margin: 16px 0 7px;
+
+  font-size: 16px;
+}
+
+.state-card p {
+  margin-bottom: 20px;
+
+  font-size: 13px;
+}
+
+.state-icon {
+  width: 50px;
+  height: 50px;
+
+  border-radius: 11px;
+
+  background: #fdebed;
+  color: #cf102d;
+
+  font-size: 20px;
+}
+
+.error-icon {
+  background: #fdebed;
+
+  color: #cf102d;
+}
+
+.loading-spinner {
+  width: 30px;
+  height: 30px;
+
+  border-top-color: #cf102d;
+}
+
+/* ============================================================
+   RESPONSIVE — PATCH 3
+   ============================================================ */
+
+@media (max-width: 900px) {
+  .add-practitioner-page {
+    padding: 28px 24px 36px;
+  }
+
+  .section {
+    padding: 24px;
+  }
+
+  .form-grid {
+    column-gap: 20px;
+    row-gap: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .add-practitioner-page {
+    padding: 22px 18px 32px;
+  }
+
+  .page-header {
+    margin-bottom: 22px;
+  }
+
+  .page-header h1 {
+    font-size: 27px;
+  }
+
+  .page-header p {
+    font-size: 14px;
+  }
+
+  .section {
+    padding: 22px;
+  }
+
+  .section-header {
+    gap: 12px;
+    margin-bottom: 22px;
+  }
+
+  .section-icon {
+    width: 40px;
+    height: 40px;
+
+    border-radius: 9px;
+
+    font-size: 16px;
+  }
+
+  .section-icon i {
+    font-size: 16px;
+  }
+
+  .section-header h2 {
+    font-size: 16px;
+  }
+
+  .section-header p {
+    font-size: 12px;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+
+    row-gap: 20px;
+  }
+
+  .form-actions {
+    padding: 18px 22px;
+  }
+}
+
+@media (max-width: 520px) {
+  .add-practitioner-page {
+    padding: 18px 12px 28px;
+  }
+
+  .page-header {
+    margin-bottom: 18px;
+  }
+
+  .breadcrumb {
+    font-size: 12px;
+  }
+
+  .page-header h1 {
+    font-size: 24px;
+  }
+
+  .page-header p {
+    font-size: 13px;
+  }
+
+  .section {
+    padding: 19px 16px;
+  }
+
+  .section-header {
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .section-icon {
+    width: 38px;
+    height: 38px;
+
+    font-size: 15px;
+  }
+
+  .section-icon i {
+    font-size: 15px;
+  }
+
+  .section-header h2 {
+    font-size: 15px;
+  }
+
+  .section-header p {
+    font-size: 12px;
+  }
+
+  .form-group label {
+    font-size: 13px;
+  }
+
+  .form-group input,
+  .form-group select {
+    min-height: 44px;
+
+    font-size: 14px;
+  }
+
+  .area-search input {
+    height: 44px;
+  }
+
+  .areas-grid {
+    gap: 10px;
+  }
+
+  .area-option {
+    padding: 13px;
+  }
+
+  .form-error {
+    margin: 18px 16px 0;
+  }
+
+  .form-actions {
+    flex-direction: column-reverse;
+
+    gap: 10px;
+
+    padding: 16px;
+  }
+
+  .form-actions button {
+    width: 100%;
+  }
+
+  .primary-button,
+  .secondary-button {
+    min-height: 44px;
+
+    font-size: 14px;
   }
 }

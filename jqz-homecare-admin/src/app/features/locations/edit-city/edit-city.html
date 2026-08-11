@@ -1,47 +1,193 @@
-<div class="add-city-page">
+<!-- edit-city.html -->
+<div class="edit-city-page bg-[#fff8f8] p-8">
+  <!-- =========================
+       BREADCRUMB
+  ========================== -->
+
+  <div class="mb-6 flex items-center gap-2 text-sm">
+    <span class="font-medium text-[#627d98]"> Locations </span>
+
+    <i class="fa-solid fa-chevron-right text-[10px] text-[#9aa5b1]"></i>
+
+    <span class="font-medium text-[#627d98]"> Cities </span>
+
+    <i class="fa-solid fa-chevron-right text-[10px] text-[#9aa5b1]"></i>
+
+    <span class="font-semibold text-[#102a43]"> Edit City </span>
+  </div>
+
   <!-- =========================
        PAGE HEADER
   ========================== -->
 
-  <div class="page-header">
-    <div class="breadcrumb">
-      <span>Locations</span>
+  <div class="mb-7 flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+    <div>
+      <h1 class="text-3xl font-bold tracking-tight text-[#102a43]">Edit City</h1>
 
-      <span class="breadcrumb-separator">/</span>
-
-      <span>Cities</span>
-
-      <span class="breadcrumb-separator">/</span>
-
-      <strong>Edit City</strong>
+      <p class="mt-2 text-[15px] leading-6 text-[#627d98]">Update the city information.</p>
     </div>
 
-    <h1>Edit City</h1>
+    <!-- BACK TO CITIES -->
 
-    <p>Update the city information.</p>
+    <button
+      type="button"
+      (click)="cancel()"
+      [disabled]="isSubmitting"
+      class="inline-flex items-center gap-2 self-start rounded-xl border border-[#f2d9dc] bg-white px-5 py-3 text-sm font-semibold text-[#526581] shadow-sm transition-all duration-200 hover:border-[#cf102d] hover:bg-[#fff4f5] hover:text-[#cf102d] disabled:cursor-not-allowed disabled:opacity-50 sm:self-center"
+    >
+      <i class="fa-solid fa-arrow-left"></i>
+
+      Back to Cities
+    </button>
   </div>
 
   <!-- =========================
-       ERROR STATE
+       MAIN CONTENT
   ========================== -->
 
-  @if (errorMessage && !isLoading) {
-    <div class="form-card">
-      <div class="state-container">
-        <div class="error-icon">
-          <i class="fa-solid fa-circle-exclamation"></i>
+  @if (!isLoading && !errorMessage) {
+    <div class="overflow-hidden rounded-2xl border border-[#f2d9dc] bg-white shadow-sm">
+      <!-- =========================
+           FORM HEADER
+      ========================== -->
+
+      <div class="border-b border-[#f5d9dc] px-5 py-5 sm:px-7">
+        <div class="flex items-start gap-4">
+          <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#fdebed]">
+            <i class="fa-solid fa-city text-lg text-[#cf102d]"></i>
+          </div>
+
+          <div>
+            <h2 class="text-base font-semibold text-[#102a43]">City Information</h2>
+
+            <p class="mt-1 text-sm text-[#627d98]">
+              Update the information below and save your changes.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- =========================
+           FORM
+      ========================== -->
+
+      <form (ngSubmit)="submit()">
+        <!-- ERROR -->
+
+        @if (errorMessage) {
+          <div
+            class="mx-7 mt-6 flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3"
+          >
+            <i class="fa-solid fa-circle-exclamation mt-0.5 text-red-600"></i>
+
+            <span class="text-sm font-medium text-red-700">
+              {{ errorMessage }}
+            </span>
+          </div>
+        }
+
+        <!-- FORM BODY -->
+
+        <div class="space-y-7 px-7 py-7">
+          <!-- =========================
+               CITY NAME
+          ========================== -->
+
+          <div>
+            <label for="cityName" class="mb-2 block text-sm font-semibold text-[#243b53]">
+              City Name
+
+              <span class="text-[#cf102d]"> * </span>
+            </label>
+
+            <div class="relative">
+              <i
+                class="fa-solid fa-city absolute left-4 top-1/2 -translate-y-1/2 text-[#cf102d]"
+              ></i>
+
+              <input
+                id="cityName"
+                name="cityName"
+                type="text"
+                [(ngModel)]="cityName"
+                placeholder="Enter city name"
+                autocomplete="off"
+                [disabled]="isSubmitting"
+                class="h-12 w-full rounded-xl border border-[#d9dde5] bg-white pl-11 pr-4 text-sm text-[#102a43] outline-none transition-all duration-200 placeholder:text-[#94a3b8] hover:border-[#cf102d] focus:border-[#cf102d] focus:ring-4 focus:ring-[#cf102d]/10 disabled:cursor-not-allowed disabled:bg-slate-50"
+              />
+            </div>
+
+            <p class="mt-2 text-xs text-[#7b8794]">Update the official name of the city.</p>
+          </div>
+
+          <!-- =========================
+               INFORMATION BOX
+          ========================== -->
+
+          <div class="rounded-xl border border-[#f6d2d5] bg-[#fff6f7] px-4 py-3">
+            <div class="flex items-start gap-3">
+              <i class="fa-solid fa-circle-info mt-0.5 text-[#cf102d]"></i>
+
+              <p class="text-xs leading-5 text-[#7b8794]">
+                Make sure the city name is correct before saving your changes.
+              </p>
+            </div>
+          </div>
         </div>
 
-        <h3>Unable to load city</h3>
+        <!-- =========================
+             FORM FOOTER
+        ========================== -->
 
-        <p>{{ errorMessage }}</p>
+        <div
+          class="flex flex-col-reverse gap-3 border-t border-[#f5d9dc] bg-[#fffafb] px-7 py-6 sm:flex-row sm:justify-end"
+        >
+          <!-- CANCEL -->
 
-        <button type="button" class="submit-button" (click)="loadCity()">
-          <i class="fa-solid fa-rotate-right"></i>
+          <button
+            type="button"
+            (click)="cancel()"
+            [disabled]="isSubmitting"
+            class="inline-flex h-12 items-center justify-center rounded-xl border border-[#f2d9dc] bg-white px-6 text-sm font-semibold text-[#526581] transition-all duration-200 hover:border-[#cf102d] hover:bg-[#fff4f5] hover:text-[#cf102d] disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            <i class="fa-solid fa-xmark mr-2"></i>
 
-          Try Again
-        </button>
-      </div>
+            Cancel
+          </button>
+
+          <!-- UPDATE -->
+
+          <button
+            type="submit"
+            [disabled]="isSubmitting || !cityName.trim()"
+            class="inline-flex h-12 items-center justify-center rounded-xl bg-[#cf102d] px-6 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-[#b80e28] hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            @if (isSubmitting) {
+              <i class="fa-solid fa-spinner fa-spin mr-2"></i>
+
+              Updating...
+            } @else {
+              <i class="fa-solid fa-floppy-disk mr-2"></i>
+
+              Update City
+            }
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- =========================
+         HELP TEXT
+    ========================== -->
+
+    <div
+      class="mt-5 flex items-start gap-3 rounded-xl border border-[#f6d2d5] bg-[#fff6f7] px-4 py-3"
+    >
+      <i class="fa-solid fa-circle-info mt-0.5 text-[#cf102d]"></i>
+
+      <p class="text-xs leading-5 text-[#7b8794]">
+        Review the updated city information carefully before saving your changes.
+      </p>
     </div>
   }
 
@@ -49,98 +195,63 @@
        LOADING STATE
   ========================== -->
 
-  @else if (isLoading && !cityName) {
-    <div class="form-card">
-      <div class="state-container">
-        <div class="loading-spinner"></div>
+  @else if (isLoading) {
+    <div class="overflow-hidden rounded-2xl border border-[#f2d9dc] bg-white shadow-sm">
+      <div class="flex min-h-[320px] flex-col items-center justify-center px-5 py-10">
+        <div
+          class="h-8 w-8 animate-spin rounded-full border-4 border-[#f6d2d5] border-t-[#cf102d]"
+        ></div>
 
-        <h3>Loading city...</h3>
+        <h3 class="mt-4 text-sm font-semibold text-[#102a43]">Loading city...</h3>
 
-        <p>Please wait while we load the city information.</p>
+        <p class="mt-1 text-xs text-[#627d98]">Please wait while we load the city information.</p>
       </div>
     </div>
   }
 
   <!-- =========================
-       EDIT FORM
+       ERROR STATE
   ========================== -->
 
   @else {
-    <div class="form-card">
-      <!-- FORM HEADER -->
-
-      <div class="form-header">
-        <div class="form-icon">
-          <i class="fa-solid fa-city"></i>
+    <div class="overflow-hidden rounded-2xl border border-red-200 bg-white shadow-sm">
+      <div class="flex min-h-[320px] flex-col items-center justify-center px-5 py-10 text-center">
+        <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-red-50">
+          <i class="fa-solid fa-triangle-exclamation text-lg text-red-600"></i>
         </div>
 
-        <div>
-          <h2>City Information</h2>
+        <h3 class="mt-4 text-base font-semibold text-[#102a43]">Unable to load city</h3>
 
-          <p>Update the details below.</p>
+        <p class="mt-2 max-w-md text-sm leading-6 text-[#627d98]">
+          {{ errorMessage }}
+        </p>
+
+        <div class="mt-5 flex flex-col gap-3 sm:flex-row">
+          <!-- RETRY -->
+
+          <button
+            type="button"
+            (click)="loadCity()"
+            class="inline-flex items-center justify-center gap-2 rounded-xl bg-[#cf102d] px-5 py-3 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-[#b80e28]"
+          >
+            <i class="fa-solid fa-rotate-right text-xs"></i>
+
+            Try Again
+          </button>
+
+          <!-- BACK -->
+
+          <button
+            type="button"
+            (click)="cancel()"
+            class="inline-flex items-center justify-center gap-2 rounded-xl border border-[#f2d9dc] bg-white px-5 py-3 text-sm font-semibold text-[#526581] transition-all duration-200 hover:border-[#cf102d] hover:bg-[#fff4f5] hover:text-[#cf102d]"
+          >
+            <i class="fa-solid fa-arrow-left text-xs"></i>
+
+            Back to Cities
+          </button>
         </div>
       </div>
-
-      <!-- FORM -->
-
-      <form (ngSubmit)="submit()">
-        <div class="form-body">
-          <!-- CITY NAME -->
-
-          <div class="form-group">
-            <label for="cityName">
-              City Name
-
-              <span>*</span>
-            </label>
-
-            <input
-              id="cityName"
-              name="cityName"
-              type="text"
-              [(ngModel)]="cityName"
-              placeholder="Enter city name"
-              autocomplete="off"
-              [disabled]="isSubmitting"
-            />
-
-            <small> Enter the official name of the city. </small>
-          </div>
-
-          <!-- ERROR -->
-
-          @if (errorMessage) {
-            <div class="error-message">
-              <i class="fa-solid fa-circle-exclamation"></i>
-
-              <span>
-                {{ errorMessage }}
-              </span>
-            </div>
-          }
-        </div>
-
-        <!-- FORM FOOTER -->
-
-        <div class="form-footer">
-          <button type="button" class="cancel-button" (click)="cancel()" [disabled]="isSubmitting">
-            Cancel
-          </button>
-
-          <button type="submit" class="submit-button" [disabled]="isSubmitting || !cityName.trim()">
-            @if (isSubmitting) {
-              <span class="button-spinner"></span>
-
-              Saving...
-
-            } @else {
-              <i class="fa-solid fa-check"></i>
-
-              Save Changes
-            }
-          </button>
-        </div>
-      </form>
     </div>
   }
 </div>

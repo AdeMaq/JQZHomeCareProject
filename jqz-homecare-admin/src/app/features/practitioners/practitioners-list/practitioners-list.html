@@ -27,26 +27,8 @@
       >
         <i class="fa-solid fa-plus"></i>
 
-        Add Practitioner
+        <span>Add Practitioner</span>
       </button>
-    </div>
-  </div>
-
-  <!-- =========================
-       SUMMARY
-  ========================== -->
-
-  <div class="summary-card">
-    <div class="summary-content">
-      <span class="summary-label">Total Practitioners</span>
-
-      <strong class="summary-value">
-        {{ practitioners.length }}
-      </strong>
-    </div>
-
-    <div class="summary-icon">
-      <i class="fa-solid fa-user-doctor"></i>
     </div>
   </div>
 
@@ -64,11 +46,13 @@
         <p>View practitioners and their assigned services.</p>
       </div>
 
-      <span class="practitioner-count">
-        {{ filteredPractitioners.length }}
+      @if (!isLoading && !errorMessage) {
+        <span class="practitioner-count">
+          {{ filteredPractitioners.length }}
 
-        {{ filteredPractitioners.length === 1 ? 'Practitioner' : 'Practitioners' }}
-      </span>
+          {{ filteredPractitioners.length === 1 ? 'Practitioner' : 'Practitioners' }}
+        </span>
+      }
     </div>
 
     <!-- =========================
@@ -205,17 +189,13 @@
           <tbody>
             @for (practitioner of filteredPractitioners; track practitioner.id; let i = $index) {
               <tr>
-                <!-- =========================
-                     INDEX
-                ========================== -->
+                <!-- INDEX -->
 
                 <td class="index-cell">
                   {{ i + 1 }}
                 </td>
 
-                <!-- =========================
-                     PRACTITIONER
-                ========================== -->
+                <!-- PRACTITIONER -->
 
                 <td>
                   <div class="practitioner-cell">
@@ -235,9 +215,7 @@
                   </div>
                 </td>
 
-                <!-- =========================
-                     CONTACT
-                ========================== -->
+                <!-- CONTACT -->
 
                 <td>
                   <div class="contact-cell">
@@ -245,13 +223,11 @@
                       {{ practitioner.phone || '-' }}
                     </strong>
 
-                    <span>Phone</span>
+                    <span> Phone </span>
                   </div>
                 </td>
 
-                <!-- =========================
-                     SERVICE
-                ========================== -->
+                <!-- SERVICE -->
 
                 <td>
                   <div class="service-cell">
@@ -265,9 +241,7 @@
                   </div>
                 </td>
 
-                <!-- =========================
-                     EDUCATION
-                ========================== -->
+                <!-- EDUCATION -->
 
                 <td>
                   <span class="education-text">
@@ -275,10 +249,7 @@
                   </span>
                 </td>
 
-                <!-- =========================
-                     AREAS
-                     CLICK -> MANAGE AREAS
-                ========================== -->
+                <!-- AREAS -->
 
                 <td>
                   <button
@@ -293,9 +264,7 @@
                   </button>
                 </td>
 
-                <!-- =========================
-                     PRIORITY
-                ========================== -->
+                <!-- PRIORITY -->
 
                 <td>
                   <span class="priority-badge">
@@ -303,9 +272,7 @@
                   </span>
                 </td>
 
-                <!-- =========================
-                     VISITS
-                ========================== -->
+                <!-- VISITS -->
 
                 <td>
                   <div class="visit-summary">
@@ -320,9 +287,7 @@
                   </div>
                 </td>
 
-                <!-- =========================
-                     ACTIONS
-                ========================== -->
+                <!-- ACTIONS -->
 
                 <td class="actions-cell">
                   <button

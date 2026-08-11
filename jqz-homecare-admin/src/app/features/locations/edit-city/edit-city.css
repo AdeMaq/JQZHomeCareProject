@@ -2,94 +2,96 @@
    PAGE
 ========================= */
 
-.add-city-page {
+/* .add-city-page {
   width: 100%;
+  min-height: 100%;
   padding: 28px 32px 40px;
   box-sizing: border-box;
-}
+  background: #fff8f8;
+} */
 
 /* =========================
    PAGE HEADER
 ========================= */
 
-.page-header {
+/* .page-header {
   margin-bottom: 24px;
 }
 
 .breadcrumb {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 9px;
   margin-bottom: 10px;
 
-  color: #667085;
-  font-size: 13px;
-  font-weight: 500;
+  color: #627d98;
+  font-size: 12px;
+}
+
+.breadcrumb i {
+  font-size: 9px;
+  color: #a0aec0;
 }
 
 .breadcrumb strong {
-  color: #101828;
+  color: #102a43;
   font-weight: 600;
 }
 
-.breadcrumb-separator {
-  color: #98a2b3;
-}
-
 .page-header h1 {
-  margin: 0 0 6px;
+  margin: 0;
 
-  color: #101828;
-  font-size: 26px;
-  line-height: 1.25;
+  color: #102a43;
+  font-size: 28px;
   font-weight: 700;
+  line-height: 1.2;
 }
 
 .page-header p {
-  margin: 0;
+  margin: 7px 0 0;
 
-  color: #667085;
+  color: #627d98;
   font-size: 14px;
-  line-height: 1.5;
-}
+  line-height: 1.6;
+} */
 
 /* =========================
    FORM CARD
 ========================= */
 
-.form-card {
+/* .form-card {
   width: 100%;
   max-width: 900px;
 
   margin: 0 auto;
 
+  overflow: hidden;
+
   background: #ffffff;
 
-  border: 1px solid #e4e7ec;
-  border-radius: 10px;
+  border: 1px solid #f2d9dc;
+  border-radius: 18px;
 
-  box-shadow: 0 2px 6px rgba(16, 24, 40, 0.04);
-
-  overflow: hidden;
-}
+  box-shadow: 0 12px 35px rgba(16, 42, 67, 0.08);
+} */
 
 /* =========================
    FORM HEADER
 ========================= */
 
-.form-header {
+/* .form-header {
   display: flex;
   align-items: center;
   gap: 14px;
 
   padding: 22px 24px;
 
-  border-bottom: 1px solid #eaecf0;
+  border-bottom: 1px solid #f5d9dc;
 }
 
 .form-icon {
-  width: 42px;
-  height: 42px;
+  width: 44px;
+  height: 44px;
 
   display: flex;
   align-items: center;
@@ -97,43 +99,41 @@
 
   flex-shrink: 0;
 
-  background: #eff4ff;
+  border-radius: 11px;
 
-  border-radius: 9px;
-
-  color: #2864e8;
+  background: #fff4f5;
+  color: #cf102d;
 
   font-size: 18px;
 }
 
 .form-header h2 {
-  margin: 0 0 4px;
+  margin: 0 0 5px;
 
-  color: #101828;
-  font-size: 17px;
+  color: #102a43;
+  font-size: 18px;
   font-weight: 700;
 }
 
 .form-header p {
   margin: 0;
 
-  color: #667085;
+  color: #627d98;
   font-size: 13px;
-}
-
+} */
 /* =========================
    FORM BODY
 ========================= */
 
-.form-body {
+/* .form-body {
   padding: 26px 24px;
-}
+} */
 
 /* =========================
    FORM GROUP
 ========================= */
 
-.form-group {
+/* .form-group {
   display: flex;
   flex-direction: column;
 
@@ -152,7 +152,7 @@
 .form-group label span {
   margin-left: 3px;
 
-  color: #d92d20;
+  color: #cf102d;
 }
 
 .form-group input {
@@ -185,9 +185,9 @@
 }
 
 .form-group input:focus {
-  border-color: #2864e8;
+  border-color: #cf102d;
 
-  box-shadow: 0 0 0 3px rgba(40, 100, 232, 0.12);
+  box-shadow: 0 0 0 3px rgba(207, 16, 45, 0.12);
 }
 
 .form-group input:disabled {
@@ -205,13 +205,13 @@
 
   font-size: 12px;
   line-height: 1.4;
-}
+} */
 
 /* =========================
    ERROR MESSAGE
 ========================= */
 
-.error-message {
+/* .error-message {
   display: flex;
   align-items: center;
   gap: 9px;
@@ -219,9 +219,9 @@
   margin-top: 18px;
   padding: 11px 13px;
 
-  background: #fef3f2;
+  background: #fff4f5;
 
-  border: 1px solid #fecdca;
+  border: 1px solid #f2d9dc;
   border-radius: 7px;
 
   color: #b42318;
@@ -233,13 +233,13 @@
   flex-shrink: 0;
 
   font-size: 15px;
-}
+} */
 
 /* =========================
    FORM FOOTER
 ========================= */
 
-.form-footer {
+/* .form-footer {
   display: flex;
   align-items: center;
   justify-content: flex-end;
@@ -247,16 +247,16 @@
 
   padding: 18px 24px;
 
-  background: #f9fafb;
+  background: #fff8f8;
 
-  border-top: 1px solid #eaecf0;
-}
+  border-top: 1px solid #f2d9dc;
+} */
 
 /* =========================
    BUTTONS
 ========================= */
 
-.cancel-button,
+/* .cancel-button,
 .submit-button {
   height: 40px;
 
@@ -290,21 +290,21 @@
 }
 
 .cancel-button:hover:not(:disabled) {
-  background: #f9fafb;
+  background: #fff8f8;
 }
 
 .submit-button {
-  background: #2864e8;
+  background: #cf102d;
 
-  border: 1px solid #2864e8;
+  border: 1px solid #cf102d;
 
   color: #ffffff;
 }
 
 .submit-button:hover:not(:disabled) {
-  background: #1f55c7;
+  background: #b80e28;
 
-  border-color: #1f55c7;
+  border-color: #b80e28;
 }
 
 .cancel-button:disabled,
@@ -312,13 +312,12 @@
   opacity: 0.6;
 
   cursor: not-allowed;
-}
-
+} */
 /* =========================
    BUTTON SPINNER
 ========================= */
 
-.button-spinner {
+/* .button-spinner {
   width: 14px;
   height: 14px;
 
@@ -328,13 +327,13 @@
   border-radius: 50%;
 
   animation: spin 0.7s linear infinite;
-}
+} */
 
 /* =========================
    LOADING STATE
 ========================= */
 
-.state-container {
+/* .state-container {
   min-height: 260px;
 
   padding: 60px 20px;
@@ -353,7 +352,7 @@
 .state-container h3 {
   margin: 16px 0 6px;
 
-  color: #101828;
+  color: #102a43;
 
   font-size: 16px;
   font-weight: 700;
@@ -364,33 +363,33 @@
 
   margin: 0;
 
-  color: #667085;
+  color: #627d98;
 
   font-size: 13px;
   line-height: 1.5;
-}
+} */
 
 /* =========================
    LOADING SPINNER
 ========================= */
 
-.loading-spinner {
+/* .loading-spinner {
   width: 30px;
   height: 30px;
 
-  border: 3px solid #e4e7ec;
-  border-top-color: #2864e8;
+  border: 3px solid #f2d9dc;
+  border-top-color: #cf102d;
 
   border-radius: 50%;
 
   animation: spin 0.7s linear infinite;
-}
+} */
 
 /* =========================
    ERROR ICON
 ========================= */
 
-.error-icon {
+/* .error-icon {
   width: 42px;
   height: 42px;
 
@@ -400,20 +399,20 @@
 
   margin-bottom: 2px;
 
-  background: #fef3f2;
+  background: #fff4f5;
 
   border-radius: 50%;
 
-  color: #d92d20;
+  color: #cf102d;
 
   font-size: 18px;
-}
+} */
 
 /* =========================
    ANIMATION
 ========================= */
 
-@keyframes spin {
+/* @keyframes spin {
   from {
     transform: rotate(0deg);
   }
@@ -421,13 +420,13 @@
   to {
     transform: rotate(360deg);
   }
-}
+} */
 
 /* =========================
    RESPONSIVE
 ========================= */
 
-@media (max-width: 768px) {
+/* @media (max-width: 768px) {
   .add-city-page {
     padding: 22px 18px 30px;
   }
@@ -483,4 +482,80 @@
   .submit-button {
     width: 100%;
   }
+} */
+
+/* =========================
+   EDIT CITY PAGE
+========================= */
+
+.edit-city-page {
+  width: 100%;
+  min-height: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden;
+}
+
+/* =========================
+   TABLET / LAPTOP
+========================= */
+
+@media (max-width: 1024px) {
+  .edit-city-page {
+    padding: 24px !important;
+  }
+}
+
+/* =========================
+   TABLET
+========================= */
+
+@media (max-width: 768px) {
+  .edit-city-page {
+    padding: 20px !important;
+  }
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 640px) {
+  .edit-city-page {
+    padding: 18px 14px !important;
+  }
+
+  .edit-city-page h1 {
+    font-size: 1.75rem;
+    line-height: 1.25;
+  }
+}
+
+/* =========================
+   SMALL MOBILE
+========================= */
+
+@media (max-width: 480px) {
+  .edit-city-page {
+    padding: 16px 12px !important;
+  }
+}
+
+/* =========================
+   INPUT
+========================= */
+
+.edit-city-page input {
+  box-sizing: border-box;
+}
+
+/* =========================
+   BUTTONS
+========================= */
+
+.edit-city-page button {
+  font-family: inherit;
+}
+
+.edit-city-page button:disabled {
+  cursor: not-allowed;
 }

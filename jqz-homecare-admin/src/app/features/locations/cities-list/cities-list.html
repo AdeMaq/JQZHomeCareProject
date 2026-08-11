@@ -1,10 +1,11 @@
 <div class="cities-page">
-  <!-- =========================
+  <!-- =====================================================
        PAGE HEADER
-  ========================== -->
+  ====================================================== -->
 
   <div class="page-header">
     <div class="page-header-left">
+      <!-- Breadcrumb -->
       <div class="breadcrumb">
         <span>Locations</span>
 
@@ -13,51 +14,39 @@
         <strong>Cities</strong>
       </div>
 
+      <!-- Page Title -->
       <h1>Cities</h1>
 
       <p>Manage cities available in the system.</p>
     </div>
 
+    <!-- Add City Button -->
     <div class="page-header-actions">
-      <button type="button" class="primary-button" (click)="addCity()">
+      <button type="button" class="primary-button" (click)="addCity()" [disabled]="isLoading">
         <i class="fa-solid fa-plus"></i>
+
         Add City
       </button>
     </div>
   </div>
 
-  <!-- =========================
-       SUMMARY CARD
-  ========================== -->
-
-  <div class="summary-card">
-    <div class="summary-content">
-      <span class="summary-label"> Total Cities </span>
-
-      <strong class="summary-value">
-        {{ cities.length }}
-      </strong>
-    </div>
-
-    <div class="summary-icon">
-      <i class="fa-solid fa-city"></i>
-    </div>
-  </div>
-
-  <!-- =========================
-       CITY LIST CARD
-  ========================== -->
+  <!-- =====================================================
+       TABLE CARD
+  ====================================================== -->
 
   <div class="table-card">
-    <!-- CARD HEADER -->
+    <!-- ===================================================
+         TABLE HEADER
+    ==================================================== -->
 
     <div class="table-header">
-      <div>
+      <div class="table-header-content">
         <h2>All Cities</h2>
 
         <p>View and manage cities registered in the system.</p>
       </div>
 
+      <!-- Total Cities -->
       <span class="city-count">
         {{ cities.length }}
 
@@ -65,9 +54,44 @@
       </span>
     </div>
 
-    <!-- =========================
-         LOADING
-    ========================== -->
+    <!-- ===================================================
+         SEARCH
+    ==================================================== -->
+
+    @if (!isLoading && errorMessage === '' && cities.length > 0) {
+      <div class="search-container">
+        <div class="search-box">
+          <!-- Search Icon -->
+          <i class="fa-solid fa-magnifying-glass"></i>
+
+          <!-- Search Input -->
+          <input
+            type="text"
+            placeholder="Search cities..."
+            [value]="searchTerm"
+            (input)="onSearch($event)"
+            aria-label="Search cities"
+          />
+
+          <!-- Clear Search -->
+          @if (searchTerm.trim() !== '') {
+            <button
+              type="button"
+              class="clear-search"
+              title="Clear search"
+              aria-label="Clear search"
+              (click)="clearSearch()"
+            >
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- ===================================================
+         LOADING STATE
+    ==================================================== -->
 
     @if (isLoading) {
       <div class="state-container">
@@ -79,11 +103,11 @@
       </div>
     }
 
-    <!-- =========================
-         ERROR
-    ========================== -->
+    <!-- ===================================================
+         ERROR STATE
+    ==================================================== -->
 
-    @else if (errorMessage) {
+    @else if (errorMessage !== '') {
       <div class="state-container error-state">
         <div class="state-icon error-icon">
           <i class="fa-solid fa-triangle-exclamation"></i>
@@ -97,14 +121,15 @@
 
         <button type="button" class="primary-button retry-button" (click)="loadCities()">
           <i class="fa-solid fa-rotate-right"></i>
+
           Try Again
         </button>
       </div>
     }
 
-    <!-- =========================
-         EMPTY
-    ========================== -->
+    <!-- ===================================================
+         EMPTY STATE
+    ==================================================== -->
 
     @else if (cities.length === 0) {
       <div class="state-container">
@@ -118,21 +143,52 @@
 
         <button type="button" class="primary-button" (click)="addCity()">
           <i class="fa-solid fa-plus"></i>
+
           Add City
         </button>
       </div>
     }
 
-    <!-- =========================
+    <!-- ===================================================
+         NO SEARCH RESULTS
+    ==================================================== -->
+
+    @else if (filteredCities.length === 0) {
+      <div class="state-container">
+        <div class="state-icon">
+          <i class="fa-solid fa-magnifying-glass"></i>
+        </div>
+
+        <h3>No matching cities</h3>
+
+        <p>
+          No cities match
+
+          <strong> "{{ searchTerm }}" </strong>. Try a different search term.
+        </p>
+
+        <button type="button" class="secondary-button" (click)="clearSearch()">
+          <i class="fa-solid fa-xmark"></i>
+
+          Clear Search
+        </button>
+      </div>
+    }
+
+    <!-- ===================================================
          CITY TABLE
-    ========================== -->
+    ==================================================== -->
 
     @else {
       <div class="table-wrapper">
         <table>
+          <!-- =================================================
+               TABLE HEAD
+          ================================================== -->
+
           <thead>
             <tr>
-              <th>#</th>
+              <th class="index-column">#</th>
 
               <th>City Name</th>
 
@@ -140,20 +196,36 @@
             </tr>
           </thead>
 
+          <!-- =================================================
+               TABLE BODY
+          ================================================== -->
+
           <tbody>
-            @for (city of cities; track city.id; let i = $index) {
+            @for (city of filteredCities; track city.id; let i = $index) {
               <tr>
+                <!-- =========================================
+                     INDEX
+                ========================================== -->
+
                 <td class="index-cell">
                   {{ i + 1 }}
                 </td>
 
+                <!-- =========================================
+                     CITY NAME
+                ========================================== -->
+
                 <td>
                   <div class="city-name-cell">
+                    <!-- City Icon -->
+
                     <div class="city-avatar">
                       <i class="fa-solid fa-city"></i>
                     </div>
 
-                    <div>
+                    <!-- City Information -->
+
+                    <div class="city-information">
                       <strong>
                         {{ city.name }}
                       </strong>
@@ -163,24 +235,30 @@
                   </div>
                 </td>
 
+                <!-- =========================================
+                     ACTIONS
+                ========================================== -->
+
                 <td class="actions-cell">
-                  <!-- EDIT -->
+                  <!-- Edit -->
 
                   <button
                     type="button"
                     class="icon-button edit-button"
                     title="Edit City"
+                    aria-label="Edit City"
                     (click)="editCity(city.id)"
                   >
                     <i class="fa-solid fa-pen"></i>
                   </button>
 
-                  <!-- DELETE -->
+                  <!-- Delete -->
 
                   <button
                     type="button"
                     class="icon-button delete-button"
                     title="Delete City"
+                    aria-label="Delete City"
                     (click)="deleteCity(city.id)"
                   >
                     <i class="fa-solid fa-trash"></i>

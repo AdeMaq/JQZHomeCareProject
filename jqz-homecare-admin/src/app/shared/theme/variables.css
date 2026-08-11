@@ -1,48 +1,86 @@
 :root {
-  /* Primary */
+  /* =====================================================
+     JQZ HOMECARE - CHERRY RED BRAND THEME
+  ===================================================== */
 
-  --primary-color: #2563eb;
-  --primary-hover: #1d4ed8;
+  /* Primary Brand */
 
-  /* Background */
+  --primary-color: #c1121f;
+  --primary-hover: #a50e1a;
+  --primary-dark: #8b0a14;
 
-  --background-color: #f5f7fb;
+  /* Primary Soft Backgrounds */
+
+  --primary-light: #fce7e9;
+  --primary-soft: #fff5f5;
+
+  /* =====================================================
+     BACKGROUND
+  ===================================================== */
+
+  --background-color: #f8fafc;
   --surface-color: #ffffff;
 
-  /* Text */
+  /* =====================================================
+     TEXT
+  ===================================================== */
 
-  --text-primary: #1f2937;
-  --text-secondary: #6b7280;
+  --text-primary: #1e293b;
+  --text-secondary: #64748b;
 
-  /* Border */
+  /* =====================================================
+     BORDER
+  ===================================================== */
 
-  --border-color: #e5e7eb;
+  --border-color: #e2e8f0;
 
-  /* Success */
+  /* =====================================================
+     STATUS COLORS
+
+     These remain separate from the brand color.
+  ===================================================== */
 
   --success-color: #22c55e;
-
-  /* Warning */
-
   --warning-color: #f59e0b;
+  --danger-color: #dc2626;
+  --info-color: #3b82f6;
 
-  /* Danger */
-
-  --danger-color: #ef4444;
-
-  /* Sidebar */
+  /* =====================================================
+     SIDEBAR
+  ===================================================== */
 
   --sidebar-width: 240px;
 
-  /* Navbar */
+  --sidebar-start: #8b0a14;
+  --sidebar-primary: #c1121f;
+  --sidebar-end: #d62839;
+
+  /* =====================================================
+     NAVBAR
+  ===================================================== */
 
   --navbar-height: 70px;
 
-  /* Radius */
+  /* =====================================================
+     RADIUS
+  ===================================================== */
 
   --radius: 12px;
 
-  /* Shadow */
+  /* =====================================================
+     SHADOW
+  ===================================================== */
 
   --card-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+
+  /* =====================================================
+     BRAND
+
+     Useful when we need to distinguish the official
+     JQZ brand color from general UI colors.
+  ===================================================== */
+
+  --brand-color: #c1121f;
+  --brand-hover: #a50e1a;
+  --brand-light: #fce7e9;
 }

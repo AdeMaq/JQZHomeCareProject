@@ -1,449 +1,690 @@
+/* =====================================================
+   CITIES LIST PAGE
+   JQZ HOMECARE - LIGHT CHERRY RED THEME
+===================================================== */
+
+/* =====================================================
+   PAGE
+===================================================== */
+
 .cities-page {
   width: 100%;
-  padding: 28px 32px 40px;
+  min-height: 100%;
+
+  padding: 28px;
+
   box-sizing: border-box;
+
+  background: #fff8f8;
 }
 
-/* =========================
+/* =====================================================
    PAGE HEADER
-========================= */
+===================================================== */
 
 .page-header {
   display: flex;
-  justify-content: space-between;
+
   align-items: flex-end;
+
+  justify-content: space-between;
+
   gap: 24px;
-  margin-bottom: 24px;
+
+  margin-bottom: 28px;
 }
 
 .page-header-left {
   min-width: 0;
 }
 
+/* =====================================================
+   BREADCRUMB
+===================================================== */
+
 .breadcrumb {
   display: flex;
+
   align-items: center;
+
   gap: 9px;
+
   margin-bottom: 10px;
 
-  color: #718096;
+  color: #627d98;
+
   font-size: 12px;
 }
 
 .breadcrumb i {
-  font-size: 9px;
   color: #a0aec0;
+
+  font-size: 9px;
 }
 
 .breadcrumb strong {
-  color: #2d3748;
+  color: #102a43;
 }
+
+/* =====================================================
+   PAGE TITLE
+===================================================== */
 
 .page-header h1 {
   margin: 0;
-  color: #111827;
-  font-size: 28px;
+
+  color: #102a43;
+
+  font-size: 34px;
+
   font-weight: 700;
+
   line-height: 1.2;
 }
 
 .page-header p {
-  margin: 7px 0 0;
-  color: #718096;
-  font-size: 14px;
+  margin: 8px 0 0;
+
+  color: #627d98;
+
+  font-size: 15px;
+
+  line-height: 1.6;
 }
 
-/* =========================
-   BUTTONS
-========================= */
+/* =====================================================
+   PAGE HEADER BUTTON
+===================================================== */
 
 .primary-button {
   display: inline-flex;
+
   align-items: center;
+
   justify-content: center;
+
   gap: 8px;
 
+  height: 48px;
+
+  padding: 0 22px;
+
   border: none;
-  border-radius: 7px;
 
-  padding: 10px 17px;
+  border-radius: 12px;
 
-  background: #2563eb;
+  background: #cf102d;
+
   color: #ffffff;
 
-  font-size: 13px;
+  font-family: inherit;
+
+  font-size: 14px;
+
   font-weight: 600;
 
   cursor: pointer;
 
   transition:
-    background 0.2s ease,
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
+    background-color 0.25s ease,
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
 }
 
 .primary-button:hover:not(:disabled) {
-  background: #1d4ed8;
-  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.18);
+  background: #b80e28;
+
+  transform: translateY(-2px);
+
+  box-shadow: 0 10px 22px rgba(207, 16, 45, 0.18);
 }
 
 .primary-button:active:not(:disabled) {
-  transform: translateY(1px);
+  transform: translateY(0);
 }
 
 .primary-button:disabled {
   opacity: 0.6;
+
   cursor: not-allowed;
 }
 
-/* =========================
-   SUMMARY CARD
-========================= */
-
-.summary-card {
-  min-height: 105px;
-
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-
-  padding: 20px;
-
-  margin-bottom: 20px;
-
-  background: #ffffff;
-
-  border: 1px solid #e5e7eb;
-  border-radius: 10px;
-
-  box-sizing: border-box;
-
-  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
-}
-
-.summary-content {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.summary-label {
-  color: #718096;
-  font-size: 12px;
-}
-
-.summary-value {
-  color: #111827;
-  font-size: 25px;
-  font-weight: 700;
-}
-
-.summary-icon {
-  width: 40px;
-  height: 40px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  border-radius: 9px;
-
-  background: #eff6ff;
-  color: #2563eb;
-
-  font-size: 17px;
-}
-
-/* =========================
+/* =====================================================
    TABLE CARD
-========================= */
+===================================================== */
 
 .table-card {
+  width: 100%;
+
   overflow: hidden;
 
   background: #ffffff;
 
-  border: 1px solid #e5e7eb;
-  border-radius: 10px;
+  border: 1px solid #f2d9dc;
 
-  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+  border-radius: 18px;
+
+  box-shadow: 0 12px 35px rgba(16, 42, 67, 0.08);
 }
 
+/* =====================================================
+   TABLE HEADER
+===================================================== */
+
 .table-header {
-  min-height: 75px;
+  min-height: 80px;
 
   display: flex;
+
   align-items: center;
+
   justify-content: space-between;
 
   gap: 20px;
 
-  padding: 17px 20px;
+  padding: 24px;
 
-  border-bottom: 1px solid #edf0f4;
+  border-bottom: 1px solid #f5d9dc;
 
   box-sizing: border-box;
 }
 
+.table-header-content {
+  min-width: 0;
+}
+
 .table-header h2 {
-  margin: 0 0 5px;
+  margin: 0 0 6px;
 
-  color: #111827;
+  color: #102a43;
 
-  font-size: 15px;
+  font-size: 20px;
+
   font-weight: 700;
 }
 
 .table-header p {
   margin: 0;
 
-  color: #718096;
+  color: #627d98;
 
-  font-size: 12px;
+  font-size: 14px;
+
+  line-height: 1.5;
 }
 
-.city-count {
+/* =====================================================
+   CITY COUNT
+===================================================== */
+
+/* .city-count {
   flex-shrink: 0;
 
-  color: #718096;
+  color: #102a43;
 
-  font-size: 12px;
-  font-weight: 500;
+  font-size: 13px;
+
+  font-weight: 600;
+} */
+.city-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 7px 12px;
+
+  border: 1px solid #f6d2d5;
+  border-radius: 999px;
+
+  background: #fdebed;
+  color: #cf102d;
+
+  font-size: 14px;
+  font-weight: 700;
 }
 
-/* =========================
-   TABLE
-========================= */
+/* =====================================================
+   SEARCH CONTAINER
+   IMPORTANT:
+   Search is intentionally aligned LEFT.
+===================================================== */
+
+.search-container {
+  width: 100%;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: flex-start;
+
+  padding: 14px 20px;
+
+  box-sizing: border-box;
+
+  background: #ffffff;
+
+  border-bottom: 1px solid #f5d9dc;
+}
+
+/* =====================================================
+   SEARCH BOX
+===================================================== */
+
+.search-box {
+  width: 452px;
+
+  max-width: 100%;
+
+  height: 38px;
+
+  display: flex;
+
+  align-items: center;
+
+  padding: 0 12px;
+
+  box-sizing: border-box;
+
+  background: #ffffff;
+
+  border: 1px solid #d9e2ec;
+
+  border-radius: 8px;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.search-box:focus-within {
+  border-color: #cf102d;
+
+  box-shadow: 0 0 0 3px rgba(207, 16, 45, 0.08);
+}
+
+/* =====================================================
+   SEARCH ICON
+===================================================== */
+
+.search-box > i {
+  flex-shrink: 0;
+
+  margin-right: 9px;
+
+  color: #cf102d;
+
+  font-size: 13px;
+}
+
+/* =====================================================
+   SEARCH INPUT
+===================================================== */
+
+.search-box input {
+  flex: 1;
+
+  width: 100%;
+
+  min-width: 0;
+
+  padding: 0;
+
+  border: none;
+
+  outline: none;
+
+  background: transparent;
+
+  color: #102a43;
+
+  font-family: inherit;
+
+  font-size: 12px;
+}
+
+.search-box input::placeholder {
+  color: #9fb3c8;
+}
+
+/* =====================================================
+   CLEAR SEARCH
+===================================================== */
+
+.clear-search {
+  width: 24px;
+
+  height: 24px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  margin-left: 6px;
+
+  padding: 0;
+
+  border: none;
+
+  border-radius: 6px;
+
+  background: transparent;
+
+  color: #829ab1;
+
+  cursor: pointer;
+
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.clear-search:hover {
+  background: #fff4f5;
+
+  color: #cf102d;
+}
+
+/* =====================================================
+   TABLE WRAPPER
+===================================================== */
 
 .table-wrapper {
   width: 100%;
+
   overflow-x: auto;
 }
 
+/* =====================================================
+   TABLE
+===================================================== */
+
 table {
   width: 100%;
+
   min-width: 650px;
 
   border-collapse: collapse;
 }
 
+/* =====================================================
+   TABLE HEAD
+===================================================== */
+
 thead {
-  background: #f8fafc;
+  background: #fff8f8;
 }
 
 th {
-  padding: 13px 16px;
+  padding: 15px 18px;
 
-  color: #64748b;
+  color: #102a43;
 
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid #f2d9dc;
 
   text-align: left;
 
-  font-size: 11px;
+  font-size: 12px;
+
   font-weight: 700;
 
   text-transform: uppercase;
+
   letter-spacing: 0.03em;
 }
 
+/* =====================================================
+   TABLE BODY
+===================================================== */
+
 td {
-  padding: 14px 16px;
+  padding: 16px 18px;
 
-  color: #334155;
+  color: #334e68;
 
-  border-bottom: 1px solid #f1f5f9;
+  border-bottom: 1px solid #f5e7e8;
 
-  font-size: 13px;
+  font-size: 14px;
 }
 
 tbody tr {
-  transition: background 0.15s ease;
+  transition: background-color 0.2s ease;
 }
 
 tbody tr:hover {
-  background: #f8fafc;
+  background: #fff8f8;
 }
 
 tbody tr:last-child td {
   border-bottom: none;
 }
 
+/* =====================================================
+   INDEX
+===================================================== */
+
+.index-column {
+  width: 55px;
+}
+
 .index-cell {
-  width: 50px;
+  width: 55px;
 
   color: #94a3b8;
 
   font-weight: 600;
 }
 
-/* =========================
-   CITY NAME
-========================= */
+/* =====================================================
+   CITY NAME CELL
+===================================================== */
 
 .city-name-cell {
   display: flex;
+
   align-items: center;
-  gap: 11px;
+
+  gap: 12px;
 }
 
+/* =====================================================
+   CITY AVATAR
+===================================================== */
+
 .city-avatar {
-  width: 34px;
-  height: 34px;
+  width: 38px;
+
+  height: 38px;
 
   display: flex;
+
   align-items: center;
+
   justify-content: center;
 
   flex-shrink: 0;
 
-  border-radius: 8px;
+  border-radius: 10px;
 
-  background: #eff6ff;
-  color: #2563eb;
+  background: #fff4f5;
 
-  font-size: 13px;
+  color: #cf102d;
+
+  font-size: 15px;
+}
+
+/* =====================================================
+   CITY INFORMATION
+===================================================== */
+
+.city-information {
+  min-width: 0;
 }
 
 .city-name-cell strong {
   display: block;
 
-  color: #1e293b;
+  color: #102a43;
 
-  font-size: 13px;
+  font-size: 14px;
+
   font-weight: 600;
+
+  line-height: 1.4;
 }
 
 .city-name-cell span {
   display: block;
 
-  margin-top: 2px;
+  margin-top: 3px;
 
   color: #94a3b8;
 
-  font-size: 11px;
+  font-size: 12px;
 }
 
-.city-id {
-  display: inline-block;
-
-  max-width: 260px;
-
-  overflow: hidden;
-
-  color: #64748b;
-
-  font-family: monospace;
-  font-size: 11px;
-
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-/* =========================
+/* =====================================================
    ACTIONS
-========================= */
+===================================================== */
 
 .actions-column {
-  width: 110px;
+  width: 120px;
+
   text-align: right;
 }
 
 .actions-cell {
   text-align: right;
+
   white-space: nowrap;
 }
 
+/* =====================================================
+   ACTION ICON BUTTON
+===================================================== */
+
 .icon-button {
-  width: 32px;
-  height: 32px;
+  width: 36px;
+
+  height: 36px;
 
   display: inline-flex;
+
   align-items: center;
+
   justify-content: center;
 
-  margin-left: 5px;
+  margin-left: 6px;
+
+  padding: 0;
 
   border: 1px solid transparent;
-  border-radius: 6px;
+
+  border-radius: 10px;
 
   background: transparent;
 
   cursor: pointer;
 
   transition:
-    background 0.2s ease,
-    color 0.2s ease,
-    border-color 0.2s ease;
+    background-color 0.25s ease,
+    color 0.25s ease,
+    border-color 0.25s ease,
+    transform 0.2s ease;
 }
 
+/* =====================================================
+   EDIT BUTTON
+===================================================== */
+
 .edit-button {
-  color: #2563eb;
+  color: #cf102d;
 }
 
 .edit-button:hover {
-  background: #eff6ff;
-  border-color: #dbeafe;
+  background: #fff4f5;
+
+  border-color: #f2d9dc;
+
+  transform: translateY(-1px);
 }
 
+/* =====================================================
+   DELETE BUTTON
+===================================================== */
+
 .delete-button {
-  color: #dc2626;
+  color: #b91c1c;
 }
 
 .delete-button:hover {
   background: #fef2f2;
-  border-color: #fee2e2;
+
+  border-color: #fecaca;
+
+  transform: translateY(-1px);
 }
 
-/* =========================
+/* =====================================================
    STATES
-========================= */
+===================================================== */
 
 .state-container {
   min-height: 260px;
 
   display: flex;
+
   flex-direction: column;
+
   align-items: center;
+
   justify-content: center;
 
-  padding: 30px 20px;
-
-  text-align: center;
+  padding: 40px 20px;
 
   box-sizing: border-box;
+
+  text-align: center;
 }
 
 .state-container h3 {
-  margin: 14px 0 6px;
+  margin: 16px 0 8px;
 
-  color: #1e293b;
+  color: #102a43;
 
-  font-size: 14px;
+  font-size: 20px;
+
   font-weight: 700;
 }
 
 .state-container p {
   max-width: 420px;
 
-  margin: 0 0 17px;
+  margin: 0 0 22px;
 
-  color: #718096;
+  color: #627d98;
 
-  font-size: 12px;
-  line-height: 1.6;
+  font-size: 14px;
+
+  line-height: 1.7;
 }
 
-/* =========================
+/* =====================================================
    LOADING SPINNER
-========================= */
+===================================================== */
 
 .loading-spinner {
-  width: 27px;
-  height: 27px;
+  width: 34px;
 
-  border: 3px solid #e5e7eb;
-  border-top-color: #2563eb;
+  height: 34px;
+
+  border: 3px solid #f2d9dc;
+
+  border-top-color: #cf102d;
 
   border-radius: 50%;
 
@@ -456,47 +697,134 @@ tbody tr:last-child td {
   }
 }
 
-/* =========================
+/* =====================================================
    STATE ICON
-========================= */
+===================================================== */
 
 .state-icon {
-  width: 46px;
-  height: 46px;
+  width: 52px;
+
+  height: 52px;
 
   display: flex;
+
   align-items: center;
+
   justify-content: center;
 
-  border-radius: 10px;
+  border-radius: 14px;
 
-  background: #eff6ff;
-  color: #2563eb;
+  background: #fff4f5;
 
-  font-size: 19px;
+  color: #cf102d;
+
+  font-size: 22px;
 }
+
+/* =====================================================
+   ERROR STATE
+===================================================== */
 
 .error-icon {
   background: #fef2f2;
-  color: #dc2626;
+
+  color: #b91c1c;
 }
+
+/* =====================================================
+   RETRY BUTTON
+===================================================== */
 
 .retry-button {
-  margin-top: 2px;
+  margin-top: 4px;
 }
 
-/* =========================
-   RESPONSIVE
-========================= */
+/* =====================================================
+   SECONDARY BUTTON
+===================================================== */
+
+.secondary-button {
+  display: inline-flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 8px;
+
+  min-height: 42px;
+
+  padding: 0 18px;
+
+  border: 1px solid #f2d9dc;
+
+  border-radius: 10px;
+
+  background: #ffffff;
+
+  color: #cf102d;
+
+  font-family: inherit;
+
+  font-size: 13px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.secondary-button:hover {
+  background: #fff4f5;
+
+  border-color: #cf102d;
+
+  transform: translateY(-1px);
+}
+
+/* =====================================================
+   RESPONSIVE - TABLET
+===================================================== */
+
+@media (max-width: 992px) {
+  .cities-page {
+    padding: 22px;
+  }
+
+  .page-header h1 {
+    font-size: 30px;
+  }
+
+  .table-header {
+    padding: 22px;
+  }
+
+  .search-container {
+    padding: 14px 18px;
+  }
+}
+
+/* =====================================================
+   RESPONSIVE - MOBILE
+===================================================== */
 
 @media (max-width: 768px) {
   .cities-page {
-    padding: 20px 16px 30px;
+    padding: 18px;
   }
+
+  /* Page Header */
 
   .page-header {
     align-items: flex-start;
+
     flex-direction: column;
+
+    gap: 18px;
   }
 
   .page-header-actions {
@@ -508,37 +836,92 @@ tbody tr:last-child td {
   }
 
   .page-header h1 {
-    font-size: 24px;
+    font-size: 28px;
   }
 
-  .summary-card {
-    min-height: 95px;
-  }
+  /* Table Header */
 
   .table-header {
     align-items: flex-start;
+
     flex-direction: column;
+
+    gap: 10px;
+
+    padding: 20px;
   }
 
   .city-count {
     align-self: flex-start;
   }
-}
 
-@media (max-width: 520px) {
-  .cities-page {
-    padding: 16px 12px 25px;
+  /* Search */
+
+  .search-container {
+    padding: 14px 16px;
   }
 
-  .summary-card {
-    padding: 16px;
+  .search-box {
+    width: 100%;
+  }
+
+  /* Action Buttons */
+
+  .icon-button {
+    width: 34px;
+
+    height: 34px;
+  }
+}
+
+/* =====================================================
+   RESPONSIVE - SMALL MOBILE
+===================================================== */
+
+@media (max-width: 480px) {
+  .cities-page {
+    padding: 14px;
+  }
+
+  .page-header h1 {
+    font-size: 25px;
+  }
+
+  .page-header p {
+    font-size: 13px;
   }
 
   .table-header {
-    padding: 15px;
+    padding: 18px;
+  }
+
+  .table-header h2 {
+    font-size: 18px;
+  }
+
+  .table-header p {
+    font-size: 13px;
+  }
+
+  .search-container {
+    padding: 12px 14px;
+  }
+
+  .search-box {
+    height: 38px;
   }
 
   .state-container {
     min-height: 230px;
+
+    padding: 30px 16px;
+  }
+
+  .state-container h3 {
+    font-size: 18px;
+  }
+
+  .state-container p {
+    font-size: 13px;
   }
 }

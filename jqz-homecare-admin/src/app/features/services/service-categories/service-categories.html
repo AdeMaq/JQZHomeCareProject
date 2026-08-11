@@ -11,8 +11,8 @@
     </div>
 
     <button type="button" class="primary-button" (click)="openAddForm()" [disabled]="isSaving">
-      <span class="button-icon">+</span>
-      Add Category
+      <i class="fa-solid fa-plus"></i>
+      <span>Add Category</span>
     </button>
   </div>
 
@@ -22,13 +22,17 @@
 
   @if (successMessage) {
     <div class="alert success-alert">
-      <span class="alert-icon">✓</span>
+      <span class="alert-icon">
+        <i class="fa-solid fa-circle-check"></i>
+      </span>
 
       <span>
         {{ successMessage }}
       </span>
 
-      <button type="button" class="alert-close" (click)="successMessage = ''">×</button>
+      <button type="button" class="alert-close" (click)="successMessage = ''">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
     </div>
   }
 
@@ -38,13 +42,17 @@
 
   @if (errorMessage) {
     <div class="alert error-alert">
-      <span class="alert-icon">!</span>
+      <span class="alert-icon">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+      </span>
 
       <span>
         {{ errorMessage }}
       </span>
 
-      <button type="button" class="alert-close" (click)="errorMessage = ''">×</button>
+      <button type="button" class="alert-close" (click)="errorMessage = ''">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
     </div>
   }
 
@@ -70,7 +78,7 @@
         </div>
 
         <button type="button" class="close-button" (click)="closeForm()" [disabled]="isSaving">
-          ×
+          <i class="fa-solid fa-xmark"></i>
         </button>
       </div>
 
@@ -106,6 +114,7 @@
             <span class="spinner"></span>
 
             {{ isEditMode ? 'Updating...' : 'Creating...' }}
+
           } @else {
             {{ isEditMode ? 'Update Category' : 'Create Category' }}
           }
@@ -128,14 +137,11 @@
 
       <span class="category-count">
         {{ categories.length }}
-
         {{ categories.length === 1 ? 'category' : 'categories' }}
       </span>
     </div>
 
-    <!-- =========================
-         INITIAL LOADING
-    ========================== -->
+    <!-- LOADING -->
 
     @if (isLoading && categories.length === 0) {
       <div class="loading-state">
@@ -145,25 +151,27 @@
       </div>
     }
 
-    <!-- =========================
-         EMPTY STATE
-    ========================== -->
+    <!-- EMPTY -->
 
     @else if (!isLoading && categories.length === 0) {
       <div class="empty-state">
-        <div class="empty-icon">📁</div>
+        <div class="empty-icon">
+          <i class="fa-solid fa-layer-group"></i>
+        </div>
 
         <h3>No service categories found</h3>
 
         <p>Create your first service category to get started.</p>
 
-        <button type="button" class="primary-button" (click)="openAddForm()">+ Add Category</button>
+        <button type="button" class="primary-button" (click)="openAddForm()">
+          <i class="fa-solid fa-plus"></i>
+
+          <span>Add Category</span>
+        </button>
       </div>
     }
 
-    <!-- =========================
-         CATEGORY TABLE
-    ========================== -->
+    <!-- TABLE -->
 
     @else {
       <div class="table-container">
@@ -181,7 +189,9 @@
               <tr>
                 <td>
                   <div class="category-name-cell">
-                    <div class="category-icon">✚</div>
+                    <div class="category-icon">
+                      <i class="fa-solid fa-layer-group"></i>
+                    </div>
 
                     <span>
                       {{ category.name }}
@@ -191,28 +201,24 @@
 
                 <td class="actions-column">
                   <div class="actions">
-                    <!-- EDIT -->
-
                     <button
                       type="button"
                       class="action-button edit-button"
-                      title="Edit category"
+                      title="Edit Category"
                       (click)="openEditForm(category)"
                       [disabled]="isDeleting || isSaving"
                     >
-                      ✎
+                      <i class="fa-solid fa-pen"></i>
                     </button>
-
-                    <!-- DELETE -->
 
                     <button
                       type="button"
                       class="action-button delete-button"
-                      title="Delete category"
+                      title="Delete Category"
                       (click)="deleteCategory(category)"
                       [disabled]="isDeleting || isSaving"
                     >
-                      🗑
+                      <i class="fa-solid fa-trash"></i>
                     </button>
                   </div>
                 </td>

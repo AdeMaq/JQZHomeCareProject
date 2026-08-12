@@ -108,6 +108,8 @@ export interface UpdatePractitionerRequest {
   priority: number;
 
   sharePercentage: number;
+
+  areaIds: string[];
 }
 
 // =========================

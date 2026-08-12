@@ -2,6 +2,8 @@ import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
+import { AuthService } from '../../../core/services/auth.service';
+
 import {
   Practitioner,
   PractitionerService,
@@ -22,6 +24,7 @@ export class EditPractitioner implements OnInit {
   private readonly router = inject(Router);
   private readonly practitionerService = inject(PractitionerService);
   private readonly changeDetector = inject(ChangeDetectorRef);
+  private readonly authService = inject(AuthService);
 
   // ============================================================
   // BASIC DATA
@@ -48,6 +51,8 @@ export class EditPractitioner implements OnInit {
   // ============================================================
   // RESET PASSWORD STATES
   // ============================================================
+
+  canResetPassword = false;
 
   isResettingPassword = false;
 
@@ -85,6 +90,8 @@ export class EditPractitioner implements OnInit {
   // ============================================================
 
   ngOnInit(): void {
+    this.setResetPasswordPermission();
+
     console.log('=================================');
     console.log('EDIT PRACTITIONER INITIALIZED');
     console.log('=================================');
@@ -109,6 +116,37 @@ export class EditPractitioner implements OnInit {
 
     this.loadPractitioner(id);
     this.loadServices();
+  }
+
+  // ============================================================
+  // RESET PASSWORD PERMISSION
+  // ============================================================
+
+  private setResetPasswordPermission(): void {
+    const role = localStorage.getItem('role');
+
+    /*
+     * Backend UserRole enum:
+     *
+     * SuperAdmin       = 0
+     * MiddlePowerAdmin = 1
+     * SimpleAdmin      = 2
+     * Practitioner     = 3
+     *
+     * localStorage stores the numeric enum value as a string.
+     *
+     * Therefore:
+     *
+     * "0" = SuperAdmin
+     * "1" = MiddlePowerAdmin
+     * "2" = SimpleAdmin
+     * "3" = Practitioner
+     */
+
+    this.canResetPassword = role === '0' || role === '1';
+
+    console.log('Logged-in admin role:', role);
+    console.log('Can reset practitioner password:', this.canResetPassword);
   }
 
   // ============================================================
@@ -147,6 +185,7 @@ export class EditPractitioner implements OnInit {
           this.isLoading = false;
 
           console.log('Practitioner assigned:', this.practitioner);
+
           console.log('Form populated:', this.form);
 
           this.changeDetector.detectChanges();
@@ -283,6 +322,14 @@ export class EditPractitioner implements OnInit {
       priority: Number(this.form.priority),
 
       sharePercentage: Number(this.form.sharePercentage),
+
+      /*
+       * Preserve the practitioner's currently assigned areas.
+       *
+       * Areas are managed separately from this edit page,
+       * but areaIds are required by UpdatePractitionerRequest.
+       */
+      areaIds: this.practitioner?.areas?.map((area) => area.id) ?? [],
     };
 
     console.log('=================================');
@@ -325,6 +372,16 @@ export class EditPractitioner implements OnInit {
     this.resetPasswordError = '';
     this.resetPasswordSuccess = '';
 
+    // ==========================================================
+    // FRONTEND PERMISSION CHECK
+    // ==========================================================
+
+    if (!this.canResetPassword) {
+      this.resetPasswordError = 'You do not have permission to reset this practitioner password.';
+
+      return;
+    }
+
     const newPassword = this.passwordForm.newPassword.trim();
 
     // ==========================================================
@@ -333,11 +390,13 @@ export class EditPractitioner implements OnInit {
 
     if (!newPassword) {
       this.resetPasswordError = 'New password is required.';
+
       return;
     }
 
     if (newPassword.length < 8) {
       this.resetPasswordError = 'Password must be at least 8 characters.';
+
       return;
     }
 

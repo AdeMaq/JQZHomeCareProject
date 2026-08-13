@@ -55,9 +55,9 @@
 
       @if (!isLoading && !errorMessage) {
         <span class="package-count">
-          {{ packages.length }}
+          {{ filteredPackages.length }}
 
-          {{ packages.length === 1 ? 'Package' : 'Packages' }}
+          {{ filteredPackages.length === 1 ? 'Package' : 'Packages' }}
         </span>
       }
     </div>
@@ -78,7 +78,7 @@
           <input
             type="text"
             class="search-input"
-            placeholder="Search packages..."
+            placeholder="Search packages, services, or visits..."
             [value]="searchTerm"
             (input)="onSearchChange($any($event.target).value)"
           />
@@ -109,7 +109,11 @@
             (change)="onServiceFilterChange($any($event.target).value)"
             [disabled]="isLoadingServices"
           >
+            <!-- ALL SERVICES -->
+
             <option value="">All Services</option>
+
+            <!-- AVAILABLE SERVICES -->
 
             @for (service of services; track service.id) {
               <option [value]="service.id">
@@ -219,7 +223,7 @@
     }
 
     <!-- ===================================================
-         NO SEARCH RESULTS
+         NO FILTER / SEARCH RESULTS
     ==================================================== -->
 
     @else if (filteredPackages.length === 0) {
@@ -230,7 +234,7 @@
 
         <h3>No packages found</h3>
 
-        <p>No packages match your current search or filter.</p>
+        <p>No packages match your current search or service filter.</p>
 
         <button type="button" class="secondary-button" (click)="clearServiceFilter()">
           <i class="fa-solid fa-filter-circle-xmark"></i>

@@ -77,7 +77,7 @@
           [disabled]="isSaving"
         />
 
-        <small> Enter the name of the healthcare package. </small>
+        <small>Enter the name of the healthcare package.</small>
       </div>
 
       <!-- ================================================
@@ -95,7 +95,7 @@
           <div class="loading-field">
             <i class="fa-solid fa-spinner fa-spin"></i>
 
-            <span> Loading services... </span>
+            <span>Loading services...</span>
           </div>
         } @else {
           <select
@@ -128,7 +128,7 @@
             >
               <i class="fa-solid fa-rotate-right"></i>
 
-              <span> Try Again </span>
+              <span>Try Again</span>
             </button>
           </div>
         } @else if (!isLoadingServices && services.length === 0) {
@@ -136,7 +136,7 @@
             No services are available. Please create a service first.
           </small>
         } @else {
-          <small> Select the healthcare service included in this package. </small>
+          <small>Select the healthcare service included in this package.</small>
         }
       </div>
 
@@ -167,7 +167,7 @@
             [disabled]="isSaving"
           />
 
-          <small> Enter the total number of visits included in this package. </small>
+          <small>Enter the total number of visits included in this package.</small>
         </div>
 
         <!-- ==============================================
@@ -182,7 +182,7 @@
           </label>
 
           <div class="input-with-prefix">
-            <span class="input-prefix"> PKR </span>
+            <span class="input-prefix">PKR</span>
 
             <input
               id="amount"
@@ -196,7 +196,7 @@
             />
           </div>
 
-          <small> Enter the total amount charged for this package. </small>
+          <small>Enter the total amount charged for this package.</small>
         </div>
       </div>
 
@@ -223,7 +223,7 @@
           ============================================= -->
 
           <div class="calculation-item">
-            <span class="calculation-label"> Visits </span>
+            <span class="calculation-label">Visits</span>
 
             <strong>
               {{ numberOfVisits || 0 }}
@@ -235,7 +235,7 @@
           ============================================= -->
 
           <div class="calculation-item">
-            <span class="calculation-label"> Package Amount </span>
+            <span class="calculation-label">Package Amount</span>
 
             <strong> PKR {{ amount || 0 | number: '1.2-2' }} </strong>
           </div>
@@ -245,37 +245,10 @@
           ============================================= -->
 
           <div class="calculation-item highlight">
-            <span class="calculation-label"> Price Per Visit </span>
+            <span class="calculation-label">Price Per Visit</span>
 
             <strong> PKR {{ pricePerVisit | number: '1.2-2' }} </strong>
           </div>
-
-          <!-- ============================================
-               SAVINGS
-          ============================================= -->
-
-          <div class="calculation-item savings">
-            <span class="calculation-label"> Savings </span>
-
-            <strong> PKR {{ savings | number: '1.2-2' }} </strong>
-          </div>
-        </div>
-      </div>
-
-      <!-- ================================================
-           SAVINGS INFORMATION
-      ================================================= -->
-
-      <div class="info-message">
-        <i class="fa-solid fa-circle-info"></i>
-
-        <div>
-          <strong> About Savings </strong>
-
-          <p>
-            Savings are calculated by the backend. Since the current service configuration does not
-            contain a fixed standalone visit rate, savings may currently be shown as PKR 0.00.
-          </p>
         </div>
       </div>
 
@@ -289,7 +262,7 @@
         <button type="button" class="cancel-button" (click)="cancel()" [disabled]="isSaving">
           <i class="fa-solid fa-xmark"></i>
 
-          <span> Cancel </span>
+          <span>Cancel</span>
         </button>
 
         <!-- CREATE -->
@@ -302,11 +275,11 @@
           @if (isSaving) {
             <i class="fa-solid fa-spinner fa-spin"></i>
 
-            <span> Creating... </span>
+            <span>Creating...</span>
           } @else {
             <i class="fa-solid fa-plus"></i>
 
-            <span> Create Package </span>
+            <span>Create Package</span>
           }
         </button>
       </div>

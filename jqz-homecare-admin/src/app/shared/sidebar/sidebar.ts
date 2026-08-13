@@ -1,5 +1,4 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-
 import { CommonModule } from '@angular/common';
 import { Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
@@ -12,54 +11,114 @@ import { filter } from 'rxjs/operators';
   styleUrl: './sidebar.css',
 })
 export class Sidebar {
+  /*
+   * =====================================================
+   * INPUTS / OUTPUTS
+   * =====================================================
+   */
+
+  /*
+   * Mobile sidebar state.
+   *
+   * Controlled by AdminLayout.
+   */
   @Input() isOpen = false;
 
+  /*
+   * Emits when the mobile sidebar should be closed.
+   */
   @Output() closeSidebar = new EventEmitter<void>();
 
   /*
+   * Emits whenever the desktop sidebar changes between
+   * expanded and collapsed.
+   *
+   * false = expanded
+   * true  = collapsed
+   */
+  @Output() collapsedChange = new EventEmitter<boolean>();
+
+  /*
    * =====================================================
-   * SIDEBAR MENU ITEMS
+   * DESKTOP SIDEBAR STATE
    * =====================================================
-   *
-   * These routes match app.routes.ts.
-   *
-   * Dashboard
-   * Services
-   * Cities
-   * Areas
-   * Practitioners
-   *
    */
 
-  menuItems = [
+  isCollapsed = false;
+
+  /*
+   * =====================================================
+   * SIDEBAR MENU
+   * =====================================================
+   *
+   * Application workflow:
+   *
+   * Overview
+   *   Dashboard
+   *
+   * Healthcare
+   *   Services
+   *   Packages
+   *   Practitioners
+   *
+   * Locations
+   *   Cities
+   *   Areas
+   */
+
+  menuSections = [
     {
-      icon: 'fa-solid fa-house',
-      label: 'Dashboard',
-      route: '/dashboard',
+      label: 'Overview',
+
+      items: [
+        {
+          icon: 'fa-solid fa-house',
+          label: 'Dashboard',
+          route: '/dashboard',
+        },
+      ],
     },
 
     {
-      icon: 'fa-solid fa-briefcase',
-      label: 'Services',
-      route: '/services',
+      label: 'Healthcare',
+
+      items: [
+        {
+          icon: 'fa-solid fa-briefcase-medical',
+          label: 'Services',
+          route: '/services',
+        },
+
+        {
+          icon: 'fa-solid fa-box-open',
+          label: 'Packages',
+          route: '/packages',
+        },
+
+        {
+          icon: 'fa-solid fa-user-doctor',
+          label: 'Practitioners',
+          route: '/practitioners',
+        },
+      ],
     },
 
     {
-      icon: 'fa-solid fa-city',
-      label: 'Cities',
-      route: '/cities',
-    },
+      label: 'Locations',
 
-    {
-      icon: 'fa-solid fa-location-dot',
-      label: 'Areas',
-      route: '/areas',
-    },
+      items: [
+        {
+          icon: 'fa-solid fa-city',
+          label: 'Cities',
+          route: '/cities',
+        },
 
-    {
-      icon: 'fa-solid fa-user-doctor',
-      label: 'Practitioners',
-      route: '/practitioners',
+        {
+          icon: 'fa-solid fa-location-dot',
+          label: 'Areas',
+          route: '/areas',
+        },
+      ],
     },
   ];
 
@@ -71,19 +130,15 @@ export class Sidebar {
 
   currentRoute = '';
 
+  /*
+   * =====================================================
+   * CONSTRUCTOR
+   * =====================================================
+   */
+
   constructor(private router: Router) {
-    /*
-     * Get the current route immediately when
-     * the sidebar is created.
-     */
     this.currentRoute = this.router.url;
 
-    /*
-     * Listen for route changes.
-     *
-     * This ensures the active sidebar item changes
-     * automatically whenever navigation happens.
-     */
     this.router.events
       .pipe(filter((event) => event instanceof NavigationEnd))
       .subscribe((event) => {
@@ -95,7 +150,24 @@ export class Sidebar {
 
   /*
    * =====================================================
-   * CLOSE MOBILE SIDEBAR
+   * DESKTOP SIDEBAR TOGGLE
+   * =====================================================
+   *
+   * Hamburger button:
+   *
+   * Expanded  -> Collapsed
+   * Collapsed -> Expanded
+   */
+
+  toggleSidebar(): void {
+    this.isCollapsed = !this.isCollapsed;
+
+    this.collapsedChange.emit(this.isCollapsed);
+  }
+
+  /*
+   * =====================================================
+   * MOBILE SIDEBAR CLOSE
    * =====================================================
    */
 
@@ -110,17 +182,10 @@ export class Sidebar {
    */
 
   onMenuItemClick(route: string): void {
-    /*
-     * Navigate to the selected page.
-     */
     this.router.navigate([route]);
 
     /*
-     * Close sidebar on mobile.
-     *
-     * On desktop this has no harmful effect because
-     * the parent component controls whether the sidebar
-     * is actually visible.
+     * Close mobile drawer after navigation.
      */
     this.closeSidebar.emit();
   }
@@ -132,24 +197,16 @@ export class Sidebar {
    */
 
   isActive(route: string): boolean {
-    /*
-     * Exact match:
-     *
-     * /services
-     * /cities
-     * /areas
-     * /practitioners
-     *
-     * OR child route:
-     *
-     * /services/123/edit
-     * /cities/123/edit
-     * /areas/123/edit
-     * /practitioners/123
-     * /practitioners/123/edit
-     * /practitioners/123/areas
-     */
-
     return this.currentRoute === route || this.currentRoute.startsWith(`${route}/`);
+  }
+
+  /*
+   * =====================================================
+   * ACTIVE SECTION
+   * =====================================================
+   */
+
+  isSectionActive(items: { route: string }[]): boolean {
+    return items.some((item) => this.isActive(item.route));
   }
 }

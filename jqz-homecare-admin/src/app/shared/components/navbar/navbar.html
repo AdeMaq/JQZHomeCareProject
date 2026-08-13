@@ -1,13 +1,35 @@
 <nav class="navbar">
-  <div class="navbar-spacer"></div>
+  <!-- =================================================
+       LEFT SIDE
+  ================================================== -->
+
+  <div class="navbar-left">
+    <!-- Mobile / Tablet Hamburger -->
+
+    <button
+      type="button"
+      class="mobile-menu-button"
+      aria-label="Open navigation"
+      title="Open navigation"
+      (click)="onMenuToggle()"
+    >
+      <i class="fa-solid fa-bars"></i>
+    </button>
+  </div>
+
+  <!-- =================================================
+       RIGHT SIDE
+  ================================================== -->
 
   <div class="navbar-actions">
     <!-- Notification -->
+
     <button type="button" class="notification-button" aria-label="Notifications">
       <i class="fa-regular fa-bell"></i>
     </button>
 
     <!-- Profile -->
+
     <div class="profile-container">
       <div class="profile-avatar">A</div>
 
@@ -21,10 +43,11 @@
     </div>
 
     <!-- Logout -->
+
     <button type="button" class="logout-button" (click)="logout()">
       <i class="fa-solid fa-right-from-bracket"></i>
 
-      <span>Logout</span>
+      <span> Logout </span>
     </button>
   </div>
 </nav>

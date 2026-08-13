@@ -1,13 +1,25 @@
-<div class="admin-layout">
-  <!-- Sidebar -->
-  <app-sidebar></app-sidebar>
+<div class="admin-layout" [class.sidebar-collapsed-layout]="isSidebarCollapsed">
+  <!-- =================================================
+       SIDEBAR
+  ================================================== -->
 
-  <!-- Right Side -->
+  <app-sidebar
+    [isOpen]="isMobileSidebarOpen"
+    (closeSidebar)="closeMobileSidebar()"
+    (collapsedChange)="onSidebarCollapsedChange($event)"
+  ></app-sidebar>
+
+  <!-- =================================================
+       MAIN AREA
+  ================================================== -->
+
   <div class="admin-main">
     <!-- Navbar -->
-    <app-navbar></app-navbar>
+
+    <app-navbar (menuToggle)="toggleMobileSidebar()"></app-navbar>
 
     <!-- Main Content -->
+
     <main class="admin-content">
       <router-outlet></router-outlet>
     </main>

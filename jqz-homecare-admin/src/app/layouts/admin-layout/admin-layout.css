@@ -4,42 +4,56 @@
 
 :host {
   display: block;
+
   min-height: 100vh;
 }
 
 /* =====================================================
-   DESKTOP LAYOUT
+   MAIN LAYOUT
 ===================================================== */
 
 .admin-layout {
-  display: flex;
   width: 100%;
+
   min-height: 100vh;
-  overflow: hidden;
-  background-color: #f3f4f6;
+
+  background: #f3f4f6;
+
+  overflow-x: hidden;
 }
 
 /* =====================================================
-   SIDEBAR HOST
-===================================================== */
-
-app-sidebar {
-  flex: 0 0 18rem;
-  width: 18rem;
-  height: 100vh;
-}
-
-/* =====================================================
-   MAIN CONTENT AREA
+   MAIN AREA
 ===================================================== */
 
 .admin-main {
   display: flex;
-  flex: 1 1 auto;
+
   flex-direction: column;
-  min-width: 0;
+
+  width: calc(100% - 288px);
+
   min-height: 100vh;
+
+  margin-left: 288px;
+
+  min-width: 0;
+
   overflow: hidden;
+
+  transition:
+    width 0.28s ease,
+    margin-left 0.28s ease;
+}
+
+/* =====================================================
+   COLLAPSED SIDEBAR LAYOUT
+===================================================== */
+
+.admin-layout.sidebar-collapsed-layout .admin-main {
+  width: calc(100% - 78px);
+
+  margin-left: 78px;
 }
 
 /* =====================================================
@@ -48,19 +62,39 @@ app-sidebar {
 
 .admin-content {
   flex: 1 1 auto;
+
   min-width: 0;
+
   min-height: 0;
+
   padding: 24px;
+
   overflow-x: hidden;
+
   overflow-y: auto;
-  background-color: #f9fafb;
+
+  box-sizing: border-box;
+
+  background: #f9fafb;
 }
 
 /* =====================================================
    TABLET
 ===================================================== */
 
-@media (max-width: 1024px) {
+@media (max-width: 1024px) and (min-width: 769px) {
+  .admin-main {
+    width: calc(100% - 250px);
+
+    margin-left: 250px;
+  }
+
+  .admin-layout.sidebar-collapsed-layout .admin-main {
+    width: calc(100% - 72px);
+
+    margin-left: 72px;
+  }
+
   .admin-content {
     padding: 20px;
   }
@@ -72,26 +106,40 @@ app-sidebar {
 
 @media (max-width: 768px) {
   .admin-layout {
-    display: block;
+    width: 100%;
+
     min-height: 100vh;
+
     overflow-x: hidden;
   }
 
-  app-sidebar {
-    display: none;
-  }
+  /*
+   * Mobile sidebar becomes an overlay drawer.
+   *
+   * Therefore the main content takes the complete
+   * viewport width.
+   */
 
-  .admin-main {
+  .admin-main,
+  .admin-layout.sidebar-collapsed-layout .admin-main {
     width: 100%;
+
+    margin-left: 0;
+
     min-height: 100vh;
+
     overflow: visible;
   }
 
   .admin-content {
     width: 100%;
-    min-height: calc(100vh - 64px);
+
+    min-height: calc(100vh - 70px);
+
     padding: 16px;
+
     overflow-x: hidden;
+
     overflow-y: auto;
   }
 }
@@ -103,5 +151,7 @@ app-sidebar {
 @media (max-width: 480px) {
   .admin-content {
     padding: 12px;
+
+    min-height: calc(100vh - 70px);
   }
 }

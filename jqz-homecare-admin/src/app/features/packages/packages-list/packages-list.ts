@@ -27,17 +27,47 @@ export class PackagesList implements OnInit {
   // COMPONENT STATE
   // =========================================================
 
+  /**
+   * Complete package list returned by the API.
+   *
+   * IMPORTANT:
+   * We keep the complete package list in memory and perform
+   * searching and service filtering locally.
+   *
+   * This prevents the service dropdown and table data from
+   * getting out of sync after changing the service filter.
+   */
   packages: Package[] = [];
 
+  /**
+   * Available services used by the service dropdown.
+   */
   services: PackageServiceOption[] = [];
 
+  /**
+   * Current search text.
+   */
   searchTerm = '';
 
+  /**
+   * Currently selected service ID.
+   *
+   * Empty string means:
+   * "All Services"
+   */
   selectedServiceId = '';
+
+  // =========================================================
+  // LOADING STATE
+  // =========================================================
 
   isLoading = false;
 
   isLoadingServices = false;
+
+  // =========================================================
+  // ERROR STATE
+  // =========================================================
 
   errorMessage = '';
 
@@ -52,6 +82,13 @@ export class PackagesList implements OnInit {
     console.log('PACKAGES LIST INITIALIZED');
     console.log('=================================');
 
+    /*
+     * Load both datasets independently.
+     *
+     * Packages are loaded WITHOUT a service filter.
+     *
+     * Service filtering will be performed locally.
+     */
     this.loadServices();
 
     this.loadPackages();
@@ -72,57 +109,71 @@ export class PackagesList implements OnInit {
 
     this.cdr.detectChanges();
 
-    this.packageService.getServices().subscribe({
-      // =====================================================
-      // SUCCESS
-      // =====================================================
+    this.packageService
+      .getServices()
+      .pipe(
+        finalize(() => {
+          this.isLoadingServices = false;
 
-      next: (response: PackageServiceOption[]) => {
-        console.log('=================================');
-        console.log('GET SERVICES SUCCESS');
-        console.log('SERVICES RESPONSE:', response);
-        console.log('=================================');
+          console.log('=================================');
+          console.log('LOAD PACKAGE SERVICES FINISHED');
+          console.log('=================================');
 
-        this.services = Array.isArray(response) ? response : [];
+          console.log('FINAL SERVICE COUNT:', this.services.length);
 
-        this.isLoadingServices = false;
+          console.log('FINAL isLoadingServices:', this.isLoadingServices);
 
-        console.log('SERVICES:', this.services);
+          this.cdr.detectChanges();
+        }),
+      )
+      .subscribe({
+        // =====================================================
+        // SUCCESS
+        // =====================================================
 
-        console.log('SERVICE COUNT:', this.services.length);
+        next: (response: PackageServiceOption[]) => {
+          console.log('=================================');
+          console.log('GET SERVICES SUCCESS');
+          console.log('SERVICES RESPONSE:', response);
+          console.log('=================================');
 
-        console.log('isLoadingServices:', this.isLoadingServices);
+          this.services = Array.isArray(response) ? response : [];
 
-        this.cdr.detectChanges();
-      },
+          console.log('SERVICES:', this.services);
 
-      // =====================================================
-      // ERROR
-      // =====================================================
+          console.log('SERVICE COUNT:', this.services.length);
 
-      error: (error) => {
-        console.error('=================================');
-        console.error('ERROR LOADING SERVICES');
-        console.error('ERROR:', error);
-        console.error('STATUS:', error?.status);
-        console.error('ERROR BODY:', error?.error);
-        console.error('=================================');
+          this.cdr.detectChanges();
+        },
 
-        this.services = [];
+        // =====================================================
+        // ERROR
+        // =====================================================
 
-        this.isLoadingServices = false;
+        error: (error) => {
+          console.error('=================================');
+          console.error('ERROR LOADING SERVICES');
+          console.error('=================================');
 
-        this.serviceErrorMessage =
-          error?.error?.message ??
-          error?.error?.title ??
-          error?.message ??
-          'Unable to load services. Please try again.';
+          console.error('ERROR:', error);
+          console.error('STATUS:', error?.status);
+          console.error('ERROR BODY:', error?.error);
 
-        console.log('SERVICE ERROR MESSAGE:', this.serviceErrorMessage);
+          console.error('=================================');
 
-        this.cdr.detectChanges();
-      },
-    });
+          this.services = [];
+
+          this.serviceErrorMessage =
+            error?.error?.message ??
+            error?.error?.title ??
+            error?.message ??
+            'Unable to load services. Please try again.';
+
+          console.error('SERVICE ERROR MESSAGE:', this.serviceErrorMessage);
+
+          this.cdr.detectChanges();
+        },
+      });
   }
 
   // =========================================================
@@ -131,42 +182,33 @@ export class PackagesList implements OnInit {
 
   loadPackages(): void {
     console.log('=================================');
-    console.log('LOAD PACKAGES STARTED');
+    console.log('LOAD ALL PACKAGES STARTED');
     console.log('=================================');
 
-    // =====================================================
-    // START LOADING
-    // =====================================================
-
+    /*
+     * IMPORTANT:
+     *
+     * Always request the COMPLETE package list.
+     *
+     * We intentionally do NOT pass selectedServiceId here.
+     *
+     * Service filtering is handled locally by the
+     * filteredPackages getter.
+     */
     this.isLoading = true;
 
     this.errorMessage = '';
 
-    console.log('PACKAGE LOADING STATE:', this.isLoading);
-
     this.cdr.detectChanges();
 
-    // =====================================================
-    // SERVICE FILTER
-    // =====================================================
-
-    const serviceId = this.selectedServiceId || undefined;
-
-    console.log('SELECTED SERVICE ID:', serviceId);
-
-    // =====================================================
-    // API REQUEST
-    // =====================================================
-
     this.packageService
-      .getPackages(serviceId)
+      .getPackages()
       .pipe(
         finalize(() => {
           console.log('=================================');
           console.log('PACKAGE REQUEST FINISHED');
           console.log('=================================');
 
-          // Always stop loading.
           this.isLoading = false;
 
           console.log('FINAL isLoading:', this.isLoading);
@@ -174,6 +216,10 @@ export class PackagesList implements OnInit {
           console.log('FINAL packages.length:', this.packages.length);
 
           console.log('FINAL filteredPackages.length:', this.filteredPackages.length);
+
+          console.log('FINAL selectedServiceId:', this.selectedServiceId);
+
+          console.log('FINAL searchTerm:', this.searchTerm);
 
           this.cdr.detectChanges();
         }),
@@ -185,11 +231,14 @@ export class PackagesList implements OnInit {
 
         next: (response: Package[]) => {
           console.log('=================================');
-          console.log('GET PACKAGES SUCCESS');
+          console.log('GET ALL PACKAGES SUCCESS');
           console.log('PACKAGES RESPONSE:', response);
           console.log('IS ARRAY:', Array.isArray(response));
           console.log('=================================');
 
+          /*
+           * Store the complete package list.
+           */
           this.packages = Array.isArray(response) ? response : [];
 
           this.errorMessage = '';
@@ -198,15 +247,10 @@ export class PackagesList implements OnInit {
           console.log('PACKAGE STATE UPDATED');
           console.log('=================================');
 
-          console.log('isLoading before finalize:', this.isLoading);
-
           console.log('packages.length:', this.packages.length);
 
           console.log('filteredPackages.length:', this.filteredPackages.length);
 
-          console.log('errorMessage:', this.errorMessage);
-
-          // Update the template immediately.
           this.cdr.detectChanges();
         },
 
@@ -220,9 +264,7 @@ export class PackagesList implements OnInit {
           console.error('=================================');
 
           console.error('ERROR:', error);
-
           console.error('STATUS:', error?.status);
-
           console.error('ERROR BODY:', error?.error);
 
           console.error('=================================');
@@ -235,7 +277,7 @@ export class PackagesList implements OnInit {
             error?.message ??
             'Unable to load packages. Please try again.';
 
-          console.log('PACKAGE ERROR MESSAGE:', this.errorMessage);
+          console.error('PACKAGE ERROR MESSAGE:', this.errorMessage);
 
           this.cdr.detectChanges();
         },
@@ -246,19 +288,78 @@ export class PackagesList implements OnInit {
   // FILTERED PACKAGES
   // =========================================================
 
+  /**
+   * Returns packages after applying:
+   *
+   * 1. Service filter
+   * 2. Search filter
+   *
+   * Both filters work together.
+   */
   get filteredPackages(): Package[] {
     const search = this.searchTerm.trim().toLowerCase();
 
-    if (!search) {
-      return this.packages;
-    }
+    const selectedServiceId = this.selectedServiceId.trim();
 
     return this.packages.filter((packageItem) => {
+      // =====================================================
+      // SERVICE FILTER
+      // =====================================================
+
+      /*
+       * If selectedServiceId is empty, all services are
+       * allowed.
+       *
+       * Otherwise only packages belonging to the selected
+       * service are returned.
+       */
+      const matchesService = !selectedServiceId || packageItem.serviceId === selectedServiceId;
+
+      if (!matchesService) {
+        return false;
+      }
+
+      // =====================================================
+      // SEARCH FILTER
+      // =====================================================
+
+      /*
+       * No search text means the package automatically
+       * matches the search condition.
+       */
+      if (!search) {
+        return true;
+      }
+
       const packageName = packageItem.name?.toLowerCase() ?? '';
 
       const serviceName = packageItem.serviceName?.toLowerCase() ?? '';
 
-      return packageName.includes(search) || serviceName.includes(search);
+      /*
+       * Convert number of visits to a string so the user can
+       * search by visit count.
+       *
+       * Example:
+       *
+       * Package:
+       * "Family Care"
+       * Visits: 10
+       *
+       * Searching:
+       * "family" -> matches
+       * "care"   -> matches
+       * "10"     -> matches
+       */
+      const numberOfVisits =
+        packageItem.numberOfVisits !== null && packageItem.numberOfVisits !== undefined
+          ? String(packageItem.numberOfVisits)
+          : '';
+
+      return (
+        packageName.includes(search) ||
+        serviceName.includes(search) ||
+        numberOfVisits.includes(search)
+      );
     });
   }
 
@@ -267,8 +368,16 @@ export class PackagesList implements OnInit {
   // =========================================================
 
   onSearchChange(value: string): void {
+    console.log('SEARCH CHANGED:', value);
+
     this.searchTerm = value;
 
+    /*
+     * No API request is required.
+     *
+     * filteredPackages automatically recalculates because
+     * searchTerm has changed.
+     */
     this.cdr.detectChanges();
   }
 
@@ -277,6 +386,8 @@ export class PackagesList implements OnInit {
   // =========================================================
 
   clearSearch(): void {
+    console.log('CLEARING SEARCH');
+
     this.searchTerm = '';
 
     this.cdr.detectChanges();
@@ -287,27 +398,74 @@ export class PackagesList implements OnInit {
   // =========================================================
 
   onServiceFilterChange(value: string): void {
-    console.log('SERVICE FILTER CHANGED:', value);
+    console.log('=================================');
+    console.log('SERVICE FILTER CHANGED');
+    console.log('NEW SERVICE ID:', value);
+    console.log('=================================');
 
+    /*
+     * Store the selected service ID.
+     *
+     * IMPORTANT:
+     * We do NOT call loadPackages().
+     *
+     * The complete package list is already loaded and the
+     * filteredPackages getter handles the filtering locally.
+     */
     this.selectedServiceId = value;
 
-    this.searchTerm = '';
+    /*
+     * We intentionally DO NOT clear searchTerm here.
+     *
+     * This allows the user to combine:
+     *
+     * Service filter + Search
+     *
+     * Example:
+     *
+     * Service = Physiotherapy
+     * Search = "5"
+     *
+     * Result = Physiotherapy packages containing 5 visits.
+     */
 
-    this.loadPackages();
+    console.log('SELECTED SERVICE ID:', this.selectedServiceId);
+
+    console.log('FILTERED PACKAGE COUNT:', this.filteredPackages.length);
+
+    this.cdr.detectChanges();
   }
 
   // =========================================================
-  // CLEAR SERVICE FILTER
+  // CLEAR ALL FILTERS
   // =========================================================
 
   clearServiceFilter(): void {
-    console.log('CLEARING SERVICE FILTER');
+    console.log('=================================');
+    console.log('CLEARING PACKAGE FILTERS');
+    console.log('=================================');
 
+    /*
+     * Empty service ID means "All Services".
+     */
     this.selectedServiceId = '';
 
+    /*
+     * Clear search as well because this button is now
+     * responsible for clearing ALL active filters.
+     */
     this.searchTerm = '';
 
-    this.loadPackages();
+    console.log('SELECTED SERVICE ID:', this.selectedServiceId);
+
+    console.log('SEARCH TERM:', this.searchTerm);
+
+    console.log('FILTERED PACKAGE COUNT:', this.filteredPackages.length);
+
+    /*
+     * No API request is required.
+     */
+    this.cdr.detectChanges();
   }
 
   // =========================================================
@@ -325,9 +483,11 @@ export class PackagesList implements OnInit {
   // =========================================================
 
   editPackage(packageItem: Package): void {
+    console.log('=================================');
     console.log('EDIT PACKAGE CLICKED');
-
     console.log('PACKAGE ID:', packageItem.id);
+    console.log('PACKAGE NAME:', packageItem.name);
+    console.log('=================================');
 
     this.router.navigate(['/packages', packageItem.id, 'edit']);
   }
@@ -337,11 +497,11 @@ export class PackagesList implements OnInit {
   // =========================================================
 
   deletePackage(packageItem: Package): void {
+    console.log('=================================');
     console.log('DELETE PACKAGE CLICKED');
-
     console.log('PACKAGE ID:', packageItem.id);
-
     console.log('PACKAGE NAME:', packageItem.name);
+    console.log('=================================');
 
     const confirmed = window.confirm(`Are you sure you want to delete "${packageItem.name}"?`);
 
@@ -373,11 +533,17 @@ export class PackagesList implements OnInit {
           console.log('PACKAGE ID:', packageItem.id);
           console.log('=================================');
 
+          /*
+           * Remove the deleted package from the complete
+           * in-memory package list.
+           */
           this.packages = this.packages.filter(
             (currentPackage) => currentPackage.id !== packageItem.id,
           );
 
           console.log('REMAINING PACKAGES:', this.packages.length);
+
+          console.log('REMAINING FILTERED PACKAGES:', this.filteredPackages.length);
 
           this.cdr.detectChanges();
         },
@@ -389,9 +555,12 @@ export class PackagesList implements OnInit {
         error: (error) => {
           console.error('=================================');
           console.error('ERROR DELETING PACKAGE');
+          console.error('=================================');
+
           console.error('ERROR:', error);
           console.error('STATUS:', error?.status);
           console.error('ERROR BODY:', error?.error);
+
           console.error('=================================');
 
           const message =

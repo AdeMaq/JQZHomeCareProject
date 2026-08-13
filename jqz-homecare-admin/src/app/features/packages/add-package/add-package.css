@@ -532,12 +532,16 @@ form {
 
 /* =====================================================
    CALCULATION GRID
+   THREE ITEMS ONLY:
+   1. VISITS
+   2. PACKAGE AMOUNT
+   3. PRICE PER VISIT
 ===================================================== */
 
 .calculation-grid {
   display: grid;
 
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 
   gap: 12px;
 }
@@ -606,18 +610,6 @@ form {
 
 .calculation-item.highlight strong {
   color: #ffffff;
-}
-
-/* =====================================================
-   SAVINGS
-===================================================== */
-
-.calculation-item.savings {
-  background: #fffafa;
-}
-
-.calculation-item.savings strong {
-  color: #cf102d;
 }
 
 /* =====================================================
@@ -862,8 +854,18 @@ form {
     margin-right: 24px;
   }
 
+  /*
+     Keep three pricing columns on tablet
+     while there is still enough horizontal space.
+  */
   .calculation-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+
+    gap: 10px;
+  }
+
+  .calculation-item {
+    padding: 13px 14px;
   }
 }
 
@@ -948,8 +950,11 @@ form {
     gap: 12px;
   }
 
+  /*
+     Two columns on mobile/tablet-sized screens.
+  */
   .calculation-grid {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
 
     gap: 10px;
   }
@@ -962,6 +967,14 @@ form {
 
   .calculation-item strong {
     font-size: 15px;
+  }
+
+  /*
+     Make the highlighted Price Per Visit
+     span the full width when there are two columns.
+  */
+  .calculation-item.highlight {
+    grid-column: 1 / -1;
   }
 
   .info-message {
@@ -1072,6 +1085,9 @@ form {
     font-size: 11px;
   }
 
+  /*
+     One column on very small screens.
+  */
   .calculation-grid {
     grid-template-columns: 1fr;
 
@@ -1080,6 +1096,14 @@ form {
 
   .calculation-item {
     min-height: 68px;
+  }
+
+  /*
+     Reset the highlighted card span from the
+     two-column mobile layout.
+  */
+  .calculation-item.highlight {
+    grid-column: auto;
   }
 
   .calculation-item strong {

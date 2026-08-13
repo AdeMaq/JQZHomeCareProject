@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 import { Router } from '@angular/router';
 
 @Component({
@@ -9,7 +9,33 @@ import { Router } from '@angular/router';
   styleUrl: './navbar.css',
 })
 export class Navbar {
+  /*
+   * =====================================================
+   * MOBILE MENU EVENT
+   * =====================================================
+   *
+   * Sends the hamburger click to AdminLayout.
+   */
+
+  @Output() menuToggle = new EventEmitter<void>();
+
   constructor(private router: Router) {}
+
+  /*
+   * =====================================================
+   * MOBILE HAMBURGER
+   * =====================================================
+   */
+
+  onMenuToggle(): void {
+    this.menuToggle.emit();
+  }
+
+  /*
+   * =====================================================
+   * LOGOUT
+   * =====================================================
+   */
 
   logout(): void {
     if (typeof window !== 'undefined') {

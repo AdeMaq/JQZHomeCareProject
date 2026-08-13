@@ -1,0 +1,315 @@
+<div class="add-package-page">
+  <!-- =====================================================
+       PAGE HEADER
+  ====================================================== -->
+
+  <div class="page-header">
+    <div class="header-content">
+      <div>
+        <div class="breadcrumb">
+          <span>Packages</span>
+
+          <i class="fa-solid fa-chevron-right"></i>
+
+          <span>Add Package</span>
+        </div>
+
+        <h1>Add Package</h1>
+
+        <p>Create a new healthcare package for patients.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- =====================================================
+       FORM CARD
+  ====================================================== -->
+
+  <div class="form-card">
+    <!-- ===================================================
+         CARD HEADER
+    ==================================================== -->
+
+    <div class="form-card-header">
+      <div>
+        <h2>Package Information</h2>
+
+        <p>Enter the details of the healthcare package.</p>
+      </div>
+    </div>
+
+    <!-- ===================================================
+         ERROR MESSAGE
+    ==================================================== -->
+
+    @if (errorMessage) {
+      <div class="form-error-message">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+
+        <span>
+          {{ errorMessage }}
+        </span>
+      </div>
+    }
+
+    <!-- ===================================================
+         FORM
+    ==================================================== -->
+
+    <form (ngSubmit)="createPackage()" novalidate>
+      <!-- ================================================
+           PACKAGE NAME
+      ================================================= -->
+
+      <div class="form-group">
+        <label for="packageName">
+          Package Name
+
+          <span class="required">*</span>
+        </label>
+
+        <input
+          id="packageName"
+          type="text"
+          name="packageName"
+          [(ngModel)]="packageName"
+          placeholder="Enter package name"
+          [disabled]="isSaving"
+        />
+
+        <small> Enter the name of the healthcare package. </small>
+      </div>
+
+      <!-- ================================================
+           SERVICE
+      ================================================= -->
+
+      <div class="form-group">
+        <label for="serviceId">
+          Service
+
+          <span class="required">*</span>
+        </label>
+
+        @if (isLoadingServices) {
+          <div class="loading-field">
+            <i class="fa-solid fa-spinner fa-spin"></i>
+
+            <span> Loading services... </span>
+          </div>
+        } @else {
+          <select
+            id="serviceId"
+            name="serviceId"
+            [(ngModel)]="serviceId"
+            [disabled]="isSaving || services.length === 0"
+          >
+            <option value="">Select a service</option>
+
+            @for (service of services; track service.id) {
+              <option [value]="service.id">
+                {{ service.name }}
+              </option>
+            }
+          </select>
+        }
+
+        @if (serviceErrorMessage) {
+          <div class="field-error">
+            <span>
+              {{ serviceErrorMessage }}
+            </span>
+
+            <button
+              type="button"
+              class="secondary-button"
+              (click)="loadServices()"
+              [disabled]="isLoadingServices"
+            >
+              <i class="fa-solid fa-rotate-right"></i>
+
+              <span> Try Again </span>
+            </button>
+          </div>
+        } @else if (!isLoadingServices && services.length === 0) {
+          <small class="warning-text">
+            No services are available. Please create a service first.
+          </small>
+        } @else {
+          <small> Select the healthcare service included in this package. </small>
+        }
+      </div>
+
+      <!-- ================================================
+           PACKAGE DETAILS ROW
+      ================================================= -->
+
+      <div class="form-row">
+        <!-- ==============================================
+             NUMBER OF VISITS
+        =============================================== -->
+
+        <div class="form-group">
+          <label for="numberOfVisits">
+            Number of Visits
+
+            <span class="required">*</span>
+          </label>
+
+          <input
+            id="numberOfVisits"
+            type="number"
+            name="numberOfVisits"
+            [(ngModel)]="numberOfVisits"
+            min="1"
+            step="1"
+            placeholder="Enter number of visits"
+            [disabled]="isSaving"
+          />
+
+          <small> Enter the total number of visits included in this package. </small>
+        </div>
+
+        <!-- ==============================================
+             AMOUNT
+        =============================================== -->
+
+        <div class="form-group">
+          <label for="amount">
+            Package Amount
+
+            <span class="required">*</span>
+          </label>
+
+          <div class="input-with-prefix">
+            <span class="input-prefix"> PKR </span>
+
+            <input
+              id="amount"
+              type="number"
+              name="amount"
+              [(ngModel)]="amount"
+              min="0.01"
+              step="0.01"
+              placeholder="Enter package amount"
+              [disabled]="isSaving"
+            />
+          </div>
+
+          <small> Enter the total amount charged for this package. </small>
+        </div>
+      </div>
+
+      <!-- ================================================
+           PRICE PER VISIT PREVIEW
+      ================================================= -->
+
+      <div class="calculation-card">
+        <div class="calculation-header">
+          <div class="calculation-icon">
+            <i class="fa-solid fa-calculator"></i>
+          </div>
+
+          <div>
+            <h3>Package Pricing</h3>
+
+            <p>Pricing is calculated automatically from the package amount and number of visits.</p>
+          </div>
+        </div>
+
+        <div class="calculation-grid">
+          <!-- ============================================
+               NUMBER OF VISITS
+          ============================================= -->
+
+          <div class="calculation-item">
+            <span class="calculation-label"> Visits </span>
+
+            <strong>
+              {{ numberOfVisits || 0 }}
+            </strong>
+          </div>
+
+          <!-- ============================================
+               PACKAGE AMOUNT
+          ============================================= -->
+
+          <div class="calculation-item">
+            <span class="calculation-label"> Package Amount </span>
+
+            <strong> PKR {{ amount || 0 | number: '1.2-2' }} </strong>
+          </div>
+
+          <!-- ============================================
+               PRICE PER VISIT
+          ============================================= -->
+
+          <div class="calculation-item highlight">
+            <span class="calculation-label"> Price Per Visit </span>
+
+            <strong> PKR {{ pricePerVisit | number: '1.2-2' }} </strong>
+          </div>
+
+          <!-- ============================================
+               SAVINGS
+          ============================================= -->
+
+          <div class="calculation-item savings">
+            <span class="calculation-label"> Savings </span>
+
+            <strong> PKR {{ savings | number: '1.2-2' }} </strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================================================
+           SAVINGS INFORMATION
+      ================================================= -->
+
+      <div class="info-message">
+        <i class="fa-solid fa-circle-info"></i>
+
+        <div>
+          <strong> About Savings </strong>
+
+          <p>
+            Savings are calculated by the backend. Since the current service configuration does not
+            contain a fixed standalone visit rate, savings may currently be shown as PKR 0.00.
+          </p>
+        </div>
+      </div>
+
+      <!-- ================================================
+           FORM ACTIONS
+      ================================================= -->
+
+      <div class="form-actions">
+        <!-- CANCEL -->
+
+        <button type="button" class="cancel-button" (click)="cancel()" [disabled]="isSaving">
+          <i class="fa-solid fa-xmark"></i>
+
+          <span> Cancel </span>
+        </button>
+
+        <!-- CREATE -->
+
+        <button
+          type="submit"
+          class="primary-button"
+          [disabled]="isSaving || isLoadingServices || services.length === 0"
+        >
+          @if (isSaving) {
+            <i class="fa-solid fa-spinner fa-spin"></i>
+
+            <span> Creating... </span>
+          } @else {
+            <i class="fa-solid fa-plus"></i>
+
+            <span> Create Package </span>
+          }
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

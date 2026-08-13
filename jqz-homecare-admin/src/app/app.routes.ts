@@ -20,6 +20,11 @@ import { AddService } from './features/services/add-service/add-service';
 import { EditService } from './features/services/edit-service/edit-service';
 import { ServiceCategories } from './features/services/service-categories/service-categories';
 
+// Packages
+import { PackagesList } from './features/packages/packages-list/packages-list';
+import { AddPackage } from './features/packages/add-package/add-package';
+import { EditPackage } from './features/packages/edit-package/edit-package';
+
 // Cities
 import { CitiesList } from './features/locations/cities-list/cities-list';
 import { AddCity } from './features/locations/add-city/add-city';
@@ -124,6 +129,25 @@ export const routes: Routes = [
       {
         path: 'services',
         component: ServicesList,
+      },
+
+      // =========================
+      // PACKAGES
+      // =========================
+
+      {
+        path: 'packages/add',
+        component: AddPackage,
+      },
+
+      {
+        path: 'packages/:id/edit',
+        component: EditPackage,
+      },
+
+      {
+        path: 'packages',
+        component: PackagesList,
       },
 
       // =========================

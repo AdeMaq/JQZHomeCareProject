@@ -14,7 +14,6 @@ namespace JQZHomeCareProject.Application.DTOs
         public int NumberOfVisits { get; set; }
         public decimal Amount { get; set; }
         public decimal PricePerVisit { get; set; } 
-        public decimal Savings { get; set; } 
     }
 
     public class CreatePackageDto

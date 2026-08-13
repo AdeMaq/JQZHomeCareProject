@@ -86,14 +86,6 @@ namespace JQZHomeCareProject.Application.Services
             var pricePerVisit = package.NumberOfVisits > 0
                 ? package.Amount / package.NumberOfVisits
                 : 0m;
-            // NOTE (doc gap): Savings is defined as "Amount vs. Service's
-            // standalone per-visit rate x NumberOfVisits", but the Service
-            // entity carries no stored per-visit rate — standalone visit
-            // pricing is set ad hoc per-visit by admin (CreateVisitDto.AmountDue),
-            // not fixed on Service. There's no baseline to diff against yet,
-            // so Savings is left at 0 until that's resolved (e.g. add a
-            // StandaloneRate to Service, or pass a reference rate in explicitly).
-            var savings = 0m;
 
             return new PackageDto
             {
@@ -104,7 +96,6 @@ namespace JQZHomeCareProject.Application.Services
                 NumberOfVisits = package.NumberOfVisits,
                 Amount = package.Amount,
                 PricePerVisit = pricePerVisit,
-                Savings = savings
             };
         }
     }

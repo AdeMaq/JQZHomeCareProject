@@ -1,0 +1,331 @@
+<div class="edit-package-page">
+  <!-- =====================================================
+       PAGE HEADER
+  ====================================================== -->
+
+  <div class="page-header">
+    <div class="header-content">
+      <div>
+        <h1>Edit Package</h1>
+
+        <p>Update the details of this healthcare package.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- =====================================================
+       LOADING STATE
+  ====================================================== -->
+
+  @if (isLoading) {
+    <div class="loading-card">
+      <div class="loading-spinner">
+        <i class="fa-solid fa-spinner fa-spin"></i>
+      </div>
+
+      <div>
+        <h3>Loading Package</h3>
+
+        <p>Please wait while the package details are being loaded.</p>
+      </div>
+    </div>
+  }
+
+  <!-- =====================================================
+       LOADING FINISHED
+  ====================================================== -->
+
+  @else {
+    <!-- ===================================================
+         ERROR STATE
+    ==================================================== -->
+
+    @if (errorMessage && !packageLoaded) {
+      <div class="error-card">
+        <div class="error-icon">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+        </div>
+
+        <div class="error-content">
+          <h3>Unable to Load Package</h3>
+
+          <p>
+            {{ errorMessage }}
+          </p>
+
+          <button type="button" class="secondary-button" (click)="loadPackage()">
+            <i class="fa-solid fa-rotate-right"></i>
+
+            <span> Try Again </span>
+          </button>
+        </div>
+      </div>
+    }
+
+    <!-- ===================================================
+         PACKAGE FORM
+    ==================================================== -->
+
+    @else if (packageLoaded) {
+      <div class="form-card">
+        <!-- ===============================================
+             CARD HEADER
+        ================================================ -->
+
+        <div class="form-card-header">
+          <div>
+            <h2>Package Information</h2>
+
+            <p>Update the details of the healthcare package.</p>
+          </div>
+        </div>
+
+        <!-- ===============================================
+             FORM ERROR
+        ================================================ -->
+
+        @if (errorMessage) {
+          <div class="form-error-message">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+
+            <span>
+              {{ errorMessage }}
+            </span>
+          </div>
+        }
+
+        <!-- ===============================================
+             SUCCESS MESSAGE
+        ================================================ -->
+
+        @if (successMessage) {
+          <div class="form-success-message">
+            <i class="fa-solid fa-circle-check"></i>
+
+            <span>
+              {{ successMessage }}
+            </span>
+          </div>
+        }
+
+        <!-- ===============================================
+             FORM
+        ================================================ -->
+
+        <form (ngSubmit)="updatePackage()" novalidate>
+          <!-- =============================================
+               PACKAGE NAME
+          ============================================== -->
+
+          <div class="form-group">
+            <label for="packageName">
+              Package Name
+
+              <span class="required"> * </span>
+            </label>
+
+            <input
+              id="packageName"
+              type="text"
+              name="packageName"
+              [(ngModel)]="packageName"
+              placeholder="Enter package name"
+              [disabled]="isSaving"
+            />
+
+            <small> Enter the name of the healthcare package. </small>
+          </div>
+
+          <!-- =============================================
+               SERVICE
+          ============================================== -->
+
+          <div class="form-group">
+            <label for="serviceName"> Service </label>
+
+            <div class="readonly-field">
+              <div class="readonly-field-icon">
+                <i class="fa-solid fa-stethoscope"></i>
+              </div>
+
+              <div class="readonly-field-content">
+                <span class="readonly-field-value">
+                  {{ serviceName || 'Service not available' }}
+                </span>
+              </div>
+
+              <div class="readonly-badge">Read-only</div>
+            </div>
+
+            <small> The service cannot be changed while editing a package. </small>
+          </div>
+
+          <!-- =============================================
+               NUMBER OF VISITS
+          ============================================== -->
+
+          <div class="form-group">
+            <label for="numberOfVisits">
+              Number of Visits
+
+              <span class="required"> * </span>
+            </label>
+
+            <input
+              id="numberOfVisits"
+              type="number"
+              name="numberOfVisits"
+              [(ngModel)]="numberOfVisits"
+              (ngModelChange)="calculateValues()"
+              min="1"
+              step="1"
+              placeholder="Enter number of visits"
+              [disabled]="isSaving"
+            />
+
+            <small> Enter the number of visits included in this package. </small>
+          </div>
+
+          <!-- =============================================
+               AMOUNT
+          ============================================== -->
+
+          <div class="form-group">
+            <label for="amount">
+              Amount
+
+              <span class="required"> * </span>
+            </label>
+
+            <div class="amount-input-wrapper">
+              <span class="currency-prefix"> PKR </span>
+
+              <input
+                id="amount"
+                type="number"
+                name="amount"
+                [(ngModel)]="amount"
+                (ngModelChange)="calculateValues()"
+                min="0.01"
+                step="0.01"
+                placeholder="Enter package amount"
+                [disabled]="isSaving"
+              />
+            </div>
+
+            <small> Enter the total amount charged for this package. </small>
+          </div>
+
+          <!-- =============================================
+               CALCULATED VALUES
+          ============================================== -->
+
+          <div class="calculated-section">
+            <div class="calculated-section-header">
+              <div>
+                <h3>Package Summary</h3>
+
+                <p>These values are calculated automatically.</p>
+              </div>
+
+              <i class="fa-solid fa-calculator"></i>
+            </div>
+
+            <!-- ===========================================
+                 PRICE PER VISIT
+            ============================================ -->
+
+            <div class="calculated-card">
+              <div class="calculated-card-icon">
+                <i class="fa-solid fa-money-bill-wave"></i>
+              </div>
+
+              <div class="calculated-card-content">
+                <span class="calculated-card-label"> Price Per Visit </span>
+
+                <strong>
+                  PKR
+                  {{ pricePerVisit | number: '1.2-2' }}
+                </strong>
+
+                <small> Total package amount divided by number of visits. </small>
+              </div>
+            </div>
+          </div>
+
+          <!-- =============================================
+               INFORMATION BOX
+          ============================================== -->
+
+          <div class="info-box">
+            <div class="info-box-icon">
+              <i class="fa-solid fa-circle-info"></i>
+            </div>
+
+            <div class="info-box-content">
+              <strong> Package Pricing </strong>
+
+              <p>
+                Price per visit is calculated automatically from the package amount and number of
+                visits.
+              </p>
+            </div>
+          </div>
+
+          <!-- =============================================
+               FORM ACTIONS
+          ============================================== -->
+
+          <div class="form-actions">
+            <!-- CANCEL -->
+
+            <button type="button" class="cancel-button" (click)="cancel()" [disabled]="isSaving">
+              <i class="fa-solid fa-xmark"></i>
+
+              <span> Cancel </span>
+            </button>
+
+            <!-- UPDATE -->
+
+            <button type="submit" class="primary-button" [disabled]="isSaving">
+              @if (isSaving) {
+                <i class="fa-solid fa-spinner fa-spin"></i>
+
+                <span> Updating... </span>
+
+              } @else {
+                <i class="fa-solid fa-floppy-disk"></i>
+
+                <span> Update Package </span>
+              }
+            </button>
+          </div>
+        </form>
+      </div>
+    }
+
+    <!-- ===================================================
+         FALLBACK STATE
+    ==================================================== -->
+
+    @else {
+      <div class="error-card">
+        <div class="error-icon">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+        </div>
+
+        <div class="error-content">
+          <h3>Package Could Not Be Loaded</h3>
+
+          <p>The package information is not available.</p>
+
+          <button type="button" class="secondary-button" (click)="loadPackage()">
+            <i class="fa-solid fa-rotate-right"></i>
+
+            <span> Try Again </span>
+          </button>
+        </div>
+      </div>
+    }
+  }
+</div>

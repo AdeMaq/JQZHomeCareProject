@@ -1,0 +1,381 @@
+<div class="packages-page">
+  <!-- =====================================================
+       PAGE HEADER
+  ====================================================== -->
+
+  <div class="page-header">
+    <div class="page-header-left">
+      <!-- BREADCRUMB -->
+
+      <div class="breadcrumb">
+        <span>Packages</span>
+
+        <i class="fa-solid fa-chevron-right"></i>
+
+        <strong>All Packages</strong>
+      </div>
+
+      <!-- TITLE -->
+
+      <h1>Packages</h1>
+
+      <p>Manage healthcare packages and their pricing.</p>
+    </div>
+
+    <!-- HEADER ACTIONS -->
+
+    <div class="page-header-actions">
+      <!-- ADD PACKAGE -->
+
+      <button type="button" class="primary-button" (click)="addPackage()" [disabled]="isLoading">
+        <i class="fa-solid fa-plus"></i>
+
+        <span>Add Package</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- =====================================================
+       PACKAGES TABLE CARD
+  ====================================================== -->
+
+  <div class="table-card">
+    <!-- ===================================================
+         TABLE HEADER
+    ==================================================== -->
+
+    <div class="table-header">
+      <div class="table-header-content">
+        <h2>All Packages</h2>
+
+        <p>View and manage healthcare packages.</p>
+      </div>
+
+      <!-- PACKAGE COUNT -->
+
+      @if (!isLoading && !errorMessage) {
+        <span class="package-count">
+          {{ packages.length }}
+
+          {{ packages.length === 1 ? 'Package' : 'Packages' }}
+        </span>
+      }
+    </div>
+
+    <!-- ===================================================
+         FILTER SECTION
+    ==================================================== -->
+
+    @if (!isLoading && !errorMessage && packages.length > 0) {
+      <div class="filter-section">
+        <!-- =================================================
+             SEARCH
+        ================================================== -->
+
+        <div class="search-wrapper">
+          <i class="fa-solid fa-magnifying-glass search-icon"></i>
+
+          <input
+            type="text"
+            class="search-input"
+            placeholder="Search packages..."
+            [value]="searchTerm"
+            (input)="onSearchChange($any($event.target).value)"
+          />
+
+          @if (searchTerm) {
+            <button
+              type="button"
+              class="clear-search-button"
+              title="Clear search"
+              (click)="clearSearch()"
+            >
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          }
+        </div>
+
+        <!-- =================================================
+             SERVICE FILTER
+        ================================================== -->
+
+        <div class="service-filter-wrapper">
+          <label for="serviceFilter" class="filter-label"> Service </label>
+
+          <select
+            id="serviceFilter"
+            class="service-filter"
+            [value]="selectedServiceId"
+            (change)="onServiceFilterChange($any($event.target).value)"
+            [disabled]="isLoadingServices"
+          >
+            <option value="">All Services</option>
+
+            @for (service of services; track service.id) {
+              <option [value]="service.id">
+                {{ service.name }}
+              </option>
+            }
+          </select>
+        </div>
+
+        <!-- =================================================
+             CLEAR FILTERS
+        ================================================== -->
+
+        @if (searchTerm || selectedServiceId) {
+          <button type="button" class="clear-filters-button" (click)="clearServiceFilter()">
+            <i class="fa-solid fa-filter-circle-xmark"></i>
+
+            <span>Clear Filters</span>
+          </button>
+        }
+      </div>
+    }
+
+    <!-- ===================================================
+         SERVICE FILTER ERROR
+    ==================================================== -->
+
+    @if (serviceErrorMessage && !isLoading) {
+      <div class="filter-error">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+
+        <span>
+          {{ serviceErrorMessage }}
+        </span>
+
+        <button
+          type="button"
+          class="retry-filter-button"
+          (click)="loadServices()"
+          [disabled]="isLoadingServices"
+        >
+          <i class="fa-solid fa-rotate-right"></i>
+
+          Try Again
+        </button>
+      </div>
+    }
+
+    <!-- ===================================================
+         LOADING STATE
+    ==================================================== -->
+
+    @if (isLoading) {
+      <div class="state-container">
+        <div class="loading-spinner"></div>
+
+        <h3>Loading packages...</h3>
+
+        <p>Please wait while we load the packages.</p>
+      </div>
+    }
+
+    <!-- ===================================================
+         ERROR STATE
+    ==================================================== -->
+
+    @else if (errorMessage !== '') {
+      <div class="state-container error-state">
+        <div class="state-icon error-icon">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+        </div>
+
+        <h3>Unable to load packages</h3>
+
+        <p>
+          {{ errorMessage }}
+        </p>
+
+        <button type="button" class="primary-button retry-button" (click)="loadPackages()">
+          <i class="fa-solid fa-rotate-right"></i>
+
+          Try Again
+        </button>
+      </div>
+    }
+
+    <!-- ===================================================
+         EMPTY STATE
+    ==================================================== -->
+
+    @else if (packages.length === 0) {
+      <div class="state-container">
+        <div class="state-icon">
+          <i class="fa-solid fa-box-open"></i>
+        </div>
+
+        <h3>No packages found</h3>
+
+        <p>There are currently no healthcare packages available. Add a package to get started.</p>
+
+        <button type="button" class="primary-button" (click)="addPackage()">
+          <i class="fa-solid fa-plus"></i>
+
+          Add Package
+        </button>
+      </div>
+    }
+
+    <!-- ===================================================
+         NO SEARCH RESULTS
+    ==================================================== -->
+
+    @else if (filteredPackages.length === 0) {
+      <div class="state-container">
+        <div class="state-icon">
+          <i class="fa-solid fa-magnifying-glass"></i>
+        </div>
+
+        <h3>No packages found</h3>
+
+        <p>No packages match your current search or filter.</p>
+
+        <button type="button" class="secondary-button" (click)="clearServiceFilter()">
+          <i class="fa-solid fa-filter-circle-xmark"></i>
+
+          Clear Filters
+        </button>
+      </div>
+    }
+
+    <!-- ===================================================
+         PACKAGES TABLE
+    ==================================================== -->
+
+    @else {
+      <div class="table-wrapper">
+        <table>
+          <!-- =================================================
+               TABLE HEADER
+          ================================================== -->
+
+          <thead>
+            <tr>
+              <th>Package Name</th>
+
+              <th>Service</th>
+
+              <th>Visits</th>
+
+              <th>Amount</th>
+
+              <th>Price / Visit</th>
+
+              <th class="actions-column">Actions</th>
+            </tr>
+          </thead>
+
+          <!-- =================================================
+               TABLE BODY
+          ================================================== -->
+
+          <tbody>
+            @for (packageItem of filteredPackages; track packageItem.id) {
+              <tr>
+                <!-- =========================================
+                     PACKAGE NAME
+                ========================================== -->
+
+                <td>
+                  <div class="package-name-cell">
+                    <div class="package-avatar">
+                      <i class="fa-solid fa-box-open"></i>
+                    </div>
+
+                    <div class="package-name-content">
+                      <strong>
+                        {{ packageItem.name }}
+                      </strong>
+
+                      <span> Package </span>
+                    </div>
+                  </div>
+                </td>
+
+                <!-- =========================================
+                     SERVICE
+                ========================================== -->
+
+                <td>
+                  <span class="service-badge">
+                    {{ packageItem.serviceName || '-' }}
+                  </span>
+                </td>
+
+                <!-- =========================================
+                     NUMBER OF VISITS
+                ========================================== -->
+
+                <td>
+                  <div class="visits-cell">
+                    <span class="visits-number">
+                      {{ packageItem.numberOfVisits }}
+                    </span>
+
+                    <span class="visits-label">
+                      {{ packageItem.numberOfVisits === 1 ? 'Visit' : 'Visits' }}
+                    </span>
+                  </div>
+                </td>
+
+                <!-- =========================================
+                     AMOUNT
+                ========================================== -->
+
+                <td>
+                  <span class="amount">
+                    PKR
+                    {{ packageItem.amount | number: '1.2-2' }}
+                  </span>
+                </td>
+
+                <!-- =========================================
+                     PRICE PER VISIT
+                ========================================== -->
+
+                <td>
+                  <span class="price-per-visit">
+                    PKR
+                    {{ packageItem.pricePerVisit | number: '1.2-2' }}
+                  </span>
+                </td>
+
+                <!-- =========================================
+                     ACTIONS
+                ========================================== -->
+
+                <td class="actions-column">
+                  <div class="row-actions">
+                    <!-- EDIT -->
+
+                    <button
+                      type="button"
+                      class="icon-button edit-button"
+                      title="Edit package"
+                      (click)="editPackage(packageItem)"
+                    >
+                      <i class="fa-solid fa-pen"></i>
+                    </button>
+
+                    <!-- DELETE -->
+
+                    <button
+                      type="button"
+                      class="icon-button delete-button"
+                      title="Delete package"
+                      (click)="deletePackage(packageItem)"
+                    >
+                      <i class="fa-solid fa-trash"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+</div>

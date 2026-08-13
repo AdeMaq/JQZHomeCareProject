@@ -1,0 +1,1240 @@
+/* =====================================================
+   EDIT PACKAGE PAGE
+   JQZ HOMECARE
+===================================================== */
+
+/* =====================================================
+   PAGE
+===================================================== */
+
+.edit-package-page {
+  width: 100%;
+  min-height: 100%;
+
+  padding: 28px;
+
+  box-sizing: border-box;
+
+  background: #fff8f8;
+}
+
+/* =====================================================
+   PAGE HEADER
+===================================================== */
+
+.page-header {
+  margin-bottom: 28px;
+}
+
+.header-content {
+  display: flex;
+
+  justify-content: space-between;
+  align-items: flex-start;
+
+  gap: 20px;
+}
+
+.page-header h1 {
+  margin: 0;
+
+  color: #102a43;
+
+  font-size: 34px;
+  font-weight: 700;
+
+  line-height: 1.2;
+}
+
+.page-header p {
+  margin-top: 8px;
+
+  color: #627d98;
+
+  font-size: 15px;
+
+  line-height: 1.6;
+}
+
+/* =====================================================
+   FORM CARD
+===================================================== */
+
+.form-card {
+  width: 100%;
+
+  background: #ffffff;
+
+  border: 1px solid #f2d9dc;
+
+  border-radius: 18px;
+
+  overflow: hidden;
+
+  box-shadow: 0 12px 35px rgba(16, 42, 67, 0.08);
+}
+
+/* =====================================================
+   CARD HEADER
+===================================================== */
+
+.form-card-header {
+  padding: 24px;
+
+  border-bottom: 1px solid #f5d9dc;
+
+  background: #ffffff;
+}
+
+.form-card-header h2 {
+  margin: 0;
+
+  color: #102a43;
+
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.form-card-header p {
+  margin-top: 6px;
+
+  color: #627d98;
+
+  font-size: 14px;
+}
+
+/* =====================================================
+   FORM
+===================================================== */
+
+form {
+  padding: 30px;
+}
+
+/* =====================================================
+   FORM GROUP
+===================================================== */
+
+.form-group {
+  margin-bottom: 26px;
+}
+
+.form-group:last-child {
+  margin-bottom: 0;
+}
+
+.form-group label {
+  display: block;
+
+  margin-bottom: 8px;
+
+  color: #243b53;
+
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.required {
+  color: #cf102d;
+
+  margin-left: 4px;
+}
+
+/* =====================================================
+   INPUTS
+===================================================== */
+
+.form-group input {
+  width: 100%;
+
+  box-sizing: border-box;
+
+  height: 48px;
+
+  padding: 0 16px;
+
+  background: #ffffff;
+
+  border: 1px solid #d9dde5;
+
+  border-radius: 12px;
+
+  color: #102a43;
+
+  font-size: 14px;
+
+  font-family: inherit;
+
+  transition:
+    border-color 0.25s ease,
+    box-shadow 0.25s ease,
+    background-color 0.25s ease;
+}
+
+.form-group input::placeholder {
+  color: #9aa5b1;
+}
+
+/* =====================================================
+   INPUT STATES
+===================================================== */
+
+.form-group input:hover {
+  border-color: #cf102d;
+}
+
+.form-group input:focus {
+  outline: none;
+
+  border-color: #cf102d;
+
+  box-shadow: 0 0 0 4px rgba(207, 16, 45, 0.1);
+}
+
+.form-group input:disabled {
+  background: #f8fafc;
+
+  color: #94a3b8;
+
+  cursor: not-allowed;
+}
+
+/* =====================================================
+   HELP TEXT
+===================================================== */
+
+.form-group small {
+  display: block;
+
+  margin-top: 8px;
+
+  color: #7b8794;
+
+  font-size: 12px;
+
+  line-height: 1.5;
+}
+
+/* =====================================================
+   READONLY SERVICE FIELD
+===================================================== */
+
+.readonly-field {
+  display: flex;
+
+  align-items: center;
+
+  gap: 12px;
+
+  min-height: 48px;
+
+  padding: 0 14px;
+
+  box-sizing: border-box;
+
+  background: #f8fafc;
+
+  border: 1px solid #e2e8f0;
+
+  border-radius: 12px;
+
+  color: #102a43;
+}
+
+.readonly-field-icon {
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  width: 34px;
+  height: 34px;
+
+  flex-shrink: 0;
+
+  border-radius: 9px;
+
+  background: #fdebed;
+
+  color: #cf102d;
+}
+
+.readonly-field-icon i {
+  font-size: 14px;
+}
+
+.readonly-field-content {
+  flex: 1;
+
+  min-width: 0;
+}
+
+.readonly-field-value {
+  display: block;
+
+  overflow: hidden;
+
+  color: #243b53;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  text-overflow: ellipsis;
+
+  white-space: nowrap;
+}
+
+.readonly-badge {
+  flex-shrink: 0;
+
+  padding: 5px 9px;
+
+  border-radius: 999px;
+
+  background: #eef2f7;
+
+  color: #627d98;
+
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* =====================================================
+   AMOUNT INPUT
+===================================================== */
+
+.amount-input-wrapper {
+  position: relative;
+
+  width: 100%;
+}
+
+.amount-input-wrapper input {
+  padding-left: 58px;
+}
+
+.currency-prefix {
+  position: absolute;
+
+  top: 50%;
+  left: 16px;
+
+  transform: translateY(-50%);
+
+  color: #627d98;
+
+  font-size: 13px;
+  font-weight: 700;
+
+  pointer-events: none;
+
+  z-index: 1;
+}
+
+/* =====================================================
+   CALCULATED SECTION
+===================================================== */
+
+.calculated-section {
+  margin-top: 8px;
+
+  margin-bottom: 26px;
+
+  padding: 22px;
+
+  background: #fffafb;
+
+  border: 1px solid #f5d9dc;
+
+  border-radius: 16px;
+}
+
+.calculated-section-header {
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 16px;
+
+  margin-bottom: 18px;
+}
+
+.calculated-section-header h3 {
+  margin: 0;
+
+  color: #102a43;
+
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.calculated-section-header p {
+  margin: 5px 0 0;
+
+  color: #7b8794;
+
+  font-size: 12px;
+
+  line-height: 1.5;
+}
+
+.calculated-section-header > i {
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  width: 40px;
+  height: 40px;
+
+  flex-shrink: 0;
+
+  border-radius: 10px;
+
+  background: #fdebed;
+
+  color: #cf102d;
+
+  font-size: 16px;
+}
+
+/* =====================================================
+   CALCULATED CARDS
+===================================================== */
+
+.calculated-card {
+  display: flex;
+
+  align-items: center;
+
+  gap: 14px;
+
+  padding: 16px;
+
+  background: #ffffff;
+
+  border: 1px solid #f2d9dc;
+
+  border-radius: 13px;
+
+  transition:
+    border-color 0.25s ease,
+    box-shadow 0.25s ease,
+    transform 0.25s ease;
+}
+
+.calculated-card + .calculated-card {
+  margin-top: 12px;
+}
+
+.calculated-card:hover {
+  border-color: #e9b9bf;
+
+  box-shadow: 0 6px 18px rgba(207, 16, 45, 0.06);
+
+  transform: translateY(-1px);
+}
+
+.calculated-card-icon {
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  width: 42px;
+  height: 42px;
+
+  flex-shrink: 0;
+
+  border-radius: 11px;
+
+  background: #fdebed;
+
+  color: #cf102d;
+}
+
+.calculated-card-icon i {
+  font-size: 16px;
+}
+
+.calculated-card-content {
+  display: flex;
+
+  flex-direction: column;
+
+  min-width: 0;
+}
+
+.calculated-card-label {
+  margin-bottom: 3px;
+
+  color: #627d98;
+
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.calculated-card-content strong {
+  color: #102a43;
+
+  font-size: 18px;
+  font-weight: 700;
+
+  line-height: 1.4;
+}
+
+.calculated-card-content small {
+  margin-top: 3px;
+
+  color: #9aa5b1;
+
+  font-size: 11px;
+
+  line-height: 1.4;
+}
+
+/* =====================================================
+   INFORMATION BOX
+===================================================== */
+
+.info-box {
+  display: flex;
+
+  align-items: flex-start;
+
+  gap: 12px;
+
+  margin-bottom: 28px;
+
+  padding: 16px 18px;
+
+  background: #fff8f8;
+
+  border: 1px solid #f2d9dc;
+
+  border-radius: 12px;
+}
+
+.info-box-icon {
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  width: 34px;
+  height: 34px;
+
+  flex-shrink: 0;
+
+  border-radius: 9px;
+
+  background: #fdebed;
+
+  color: #cf102d;
+}
+
+.info-box-icon i {
+  font-size: 15px;
+}
+
+.info-box-content {
+  flex: 1;
+}
+
+.info-box-content strong {
+  display: block;
+
+  margin-bottom: 4px;
+
+  color: #243b53;
+
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.info-box-content p {
+  margin: 0;
+
+  color: #627d98;
+
+  font-size: 12px;
+
+  line-height: 1.6;
+}
+
+/* =====================================================
+   ERROR MESSAGE
+===================================================== */
+
+.form-error-message {
+  display: flex;
+
+  align-items: center;
+
+  gap: 12px;
+
+  margin: 0 30px 24px;
+
+  padding: 16px 18px;
+
+  border-radius: 12px;
+
+  color: #b91c1c;
+
+  background: #fef2f2;
+
+  border: 1px solid #fecaca;
+
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.form-error-message i {
+  flex-shrink: 0;
+
+  font-size: 18px;
+}
+
+/* =====================================================
+   SUCCESS MESSAGE
+===================================================== */
+
+.form-success-message {
+  display: flex;
+
+  align-items: center;
+
+  gap: 12px;
+
+  margin: 0 30px 24px;
+
+  padding: 16px 18px;
+
+  border-radius: 12px;
+
+  color: #166534;
+
+  background: #f0fdf4;
+
+  border: 1px solid #bbf7d0;
+
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.form-success-message i {
+  flex-shrink: 0;
+
+  font-size: 18px;
+}
+
+/* =====================================================
+   LOADING CARD
+===================================================== */
+
+.loading-card {
+  display: flex;
+
+  align-items: center;
+
+  gap: 18px;
+
+  width: 100%;
+
+  box-sizing: border-box;
+
+  padding: 28px;
+
+  background: #ffffff;
+
+  border: 1px solid #f2d9dc;
+
+  border-radius: 18px;
+
+  box-shadow: 0 12px 35px rgba(16, 42, 67, 0.08);
+}
+
+.loading-spinner {
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  width: 48px;
+  height: 48px;
+
+  flex-shrink: 0;
+
+  border-radius: 12px;
+
+  background: #fdebed;
+
+  color: #cf102d;
+}
+
+.loading-spinner i {
+  font-size: 20px;
+}
+
+.loading-card h3 {
+  margin: 0;
+
+  color: #102a43;
+
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.loading-card p {
+  margin: 5px 0 0;
+
+  color: #627d98;
+
+  font-size: 13px;
+
+  line-height: 1.5;
+}
+
+/* =====================================================
+   ERROR CARD
+===================================================== */
+
+.error-card {
+  display: flex;
+
+  align-items: flex-start;
+
+  gap: 18px;
+
+  width: 100%;
+
+  box-sizing: border-box;
+
+  padding: 26px;
+
+  background: #ffffff;
+
+  border: 1px solid #fecaca;
+
+  border-radius: 18px;
+
+  box-shadow: 0 12px 35px rgba(16, 42, 67, 0.06);
+}
+
+.error-icon {
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  width: 48px;
+  height: 48px;
+
+  flex-shrink: 0;
+
+  border-radius: 12px;
+
+  background: #fef2f2;
+
+  color: #b91c1c;
+}
+
+.error-icon i {
+  font-size: 20px;
+}
+
+.error-content {
+  flex: 1;
+}
+
+.error-content h3 {
+  margin: 0 0 6px;
+
+  color: #102a43;
+
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.error-content p {
+  margin: 0 0 16px;
+
+  color: #627d98;
+
+  font-size: 13px;
+
+  line-height: 1.6;
+}
+
+/* =====================================================
+   FORM ACTIONS
+===================================================== */
+
+.form-actions {
+  display: flex;
+
+  justify-content: flex-end;
+
+  align-items: center;
+
+  gap: 14px;
+
+  margin-top: 36px;
+
+  padding-top: 24px;
+
+  border-top: 1px solid #f5d9dc;
+}
+
+/* =====================================================
+   BUTTONS
+===================================================== */
+
+.cancel-button,
+.primary-button,
+.secondary-button {
+  display: inline-flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 8px;
+
+  min-height: 48px;
+
+  padding: 0 22px;
+
+  border-radius: 12px;
+
+  font-family: inherit;
+
+  font-size: 14px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease,
+    border-color 0.25s ease,
+    box-shadow 0.25s ease,
+    transform 0.25s ease;
+}
+
+/* =====================================================
+   PRIMARY BUTTON
+===================================================== */
+
+.primary-button {
+  background: #cf102d;
+
+  color: #ffffff;
+
+  border: none;
+}
+
+.primary-button:hover:not(:disabled) {
+  background: #b80e28;
+
+  transform: translateY(-2px);
+
+  box-shadow: 0 10px 22px rgba(207, 16, 45, 0.18);
+}
+
+/* =====================================================
+   CANCEL BUTTON
+===================================================== */
+
+.cancel-button {
+  background: #ffffff;
+
+  color: #526581;
+
+  border: 1px solid #f2d9dc;
+}
+
+.cancel-button:hover:not(:disabled) {
+  background: #fff4f5;
+
+  color: #cf102d;
+
+  border-color: #cf102d;
+}
+
+/* =====================================================
+   SECONDARY BUTTON
+===================================================== */
+
+.secondary-button {
+  background: #ffffff;
+
+  color: #cf102d;
+
+  border: 1px solid #f2d9dc;
+}
+
+.secondary-button:hover:not(:disabled) {
+  background: #fff4f5;
+
+  border-color: #cf102d;
+}
+
+/* =====================================================
+   DISABLED BUTTONS
+===================================================== */
+
+.cancel-button:disabled,
+.primary-button:disabled,
+.secondary-button:disabled {
+  opacity: 0.6;
+
+  cursor: not-allowed;
+
+  transform: none;
+
+  box-shadow: none;
+}
+
+/* =====================================================
+   TABLET
+===================================================== */
+
+@media (max-width: 992px) {
+  .edit-package-page {
+    padding: 22px;
+  }
+
+  .page-header {
+    margin-bottom: 24px;
+  }
+
+  .page-header h1 {
+    font-size: 30px;
+  }
+
+  .page-header p {
+    font-size: 14px;
+  }
+
+  .form-card {
+    border-radius: 18px;
+  }
+
+  .form-card-header {
+    padding: 22px;
+  }
+
+  form {
+    padding: 24px;
+  }
+
+  .form-error-message,
+  .form-success-message {
+    margin-left: 24px;
+    margin-right: 24px;
+  }
+
+  .calculated-section {
+    padding: 20px;
+  }
+}
+
+/* =====================================================
+   MOBILE
+===================================================== */
+
+@media (max-width: 768px) {
+  .edit-package-page {
+    padding: 18px;
+  }
+
+  .header-content {
+    flex-direction: column;
+
+    align-items: flex-start;
+
+    gap: 16px;
+  }
+
+  .page-header {
+    margin-bottom: 22px;
+  }
+
+  .page-header h1 {
+    font-size: 28px;
+  }
+
+  .page-header p {
+    font-size: 14px;
+  }
+
+  .form-card {
+    border-radius: 16px;
+  }
+
+  .form-card-header {
+    padding: 20px;
+  }
+
+  .form-card-header h2 {
+    font-size: 20px;
+  }
+
+  form {
+    padding: 20px;
+  }
+
+  .form-group {
+    margin-bottom: 22px;
+  }
+
+  .readonly-field {
+    min-height: 46px;
+  }
+
+  .readonly-badge {
+    display: none;
+  }
+
+  .calculated-section {
+    padding: 18px;
+  }
+
+  .calculated-section-header {
+    align-items: flex-start;
+  }
+
+  .calculated-section-header > i {
+    width: 36px;
+    height: 36px;
+  }
+
+  .calculated-card {
+    padding: 14px;
+  }
+
+  .calculated-card-icon {
+    width: 38px;
+    height: 38px;
+  }
+
+  .calculated-card-content strong {
+    font-size: 16px;
+  }
+
+  .info-box {
+    padding: 14px;
+  }
+
+  .form-error-message,
+  .form-success-message {
+    margin: 18px;
+
+    margin-bottom: 0;
+
+    padding: 14px 16px;
+
+    font-size: 13px;
+  }
+
+  .loading-card {
+    padding: 22px;
+
+    border-radius: 16px;
+  }
+
+  .error-card {
+    padding: 22px;
+
+    border-radius: 16px;
+  }
+
+  .form-actions {
+    flex-direction: column-reverse;
+
+    align-items: stretch;
+
+    gap: 12px;
+  }
+
+  .cancel-button,
+  .primary-button {
+    width: 100%;
+  }
+
+  .secondary-button {
+    width: 100%;
+  }
+}
+
+/* =====================================================
+   SMALL MOBILE
+===================================================== */
+
+@media (max-width: 480px) {
+  .edit-package-page {
+    padding: 14px;
+  }
+
+  .page-header {
+    margin-bottom: 18px;
+  }
+
+  .page-header h1 {
+    font-size: 26px;
+  }
+
+  .page-header p {
+    font-size: 13px;
+  }
+
+  .form-card {
+    border-radius: 14px;
+  }
+
+  .form-card-header {
+    padding: 18px;
+  }
+
+  .form-card-header h2 {
+    font-size: 18px;
+  }
+
+  .form-card-header p {
+    font-size: 13px;
+  }
+
+  form {
+    padding: 18px;
+  }
+
+  .form-group {
+    margin-bottom: 20px;
+  }
+
+  .form-group input {
+    height: 46px;
+  }
+
+  .readonly-field {
+    min-height: 46px;
+
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .readonly-field-icon {
+    width: 32px;
+    height: 32px;
+  }
+
+  .readonly-field-value {
+    font-size: 13px;
+  }
+
+  .amount-input-wrapper input {
+    padding-left: 54px;
+  }
+
+  .currency-prefix {
+    left: 14px;
+
+    font-size: 12px;
+  }
+
+  .calculated-section {
+    padding: 16px;
+
+    border-radius: 14px;
+  }
+
+  .calculated-section-header h3 {
+    font-size: 16px;
+  }
+
+  .calculated-section-header p {
+    font-size: 11px;
+  }
+
+  .calculated-card {
+    gap: 10px;
+
+    padding: 13px;
+  }
+
+  .calculated-card-icon {
+    width: 36px;
+    height: 36px;
+  }
+
+  .calculated-card-icon i {
+    font-size: 14px;
+  }
+
+  .calculated-card-label {
+    font-size: 11px;
+  }
+
+  .calculated-card-content strong {
+    font-size: 15px;
+  }
+
+  .calculated-card-content small {
+    font-size: 10px;
+  }
+
+  .info-box {
+    gap: 10px;
+
+    padding: 13px;
+  }
+
+  .info-box-icon {
+    width: 30px;
+    height: 30px;
+  }
+
+  .info-box-content strong {
+    font-size: 12px;
+  }
+
+  .info-box-content p {
+    font-size: 11px;
+  }
+
+  .loading-card {
+    flex-direction: column;
+
+    align-items: flex-start;
+
+    padding: 20px;
+  }
+
+  .error-card {
+    flex-direction: column;
+
+    padding: 20px;
+  }
+
+  .form-error-message,
+  .form-success-message {
+    margin: 18px;
+
+    padding: 13px 14px;
+
+    font-size: 12px;
+  }
+
+  .cancel-button,
+  .primary-button,
+  .secondary-button {
+    width: 100%;
+
+    min-height: 46px;
+
+    font-size: 13px;
+  }
+}

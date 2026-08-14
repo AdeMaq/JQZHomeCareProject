@@ -1,0 +1,355 @@
+<div class="ratings-page">
+  <!-- =========================================================
+       BREADCRUMB
+  ========================================================== -->
+
+  <div class="breadcrumb">
+    <span>Ratings</span>
+
+    <i class="fa-solid fa-chevron-right"></i>
+
+    <span>Therapist of the Month</span>
+  </div>
+
+  <!-- =========================================================
+       PAGE HEADER
+  ========================================================== -->
+
+  <div class="page-header">
+    <div class="page-title-section">
+      <div class="page-title-icon">
+        <i class="fa-solid fa-star"></i>
+      </div>
+
+      <div>
+        <h1>Therapist of the Month</h1>
+
+        <p>View therapist ratings for the selected month.</p>
+      </div>
+    </div>
+
+    <button type="button" class="add-rating-button" (click)="addRating()">
+      <i class="fa-solid fa-plus"></i>
+
+      <span>Add Rating</span>
+    </button>
+  </div>
+
+  <!-- =========================================================
+       MONTH FILTER
+  ========================================================== -->
+
+  <div class="filter-card">
+    <div class="filter-header">
+      <div>
+        <h2>Rating Period</h2>
+
+        <p>Select a month to view therapist ratings.</p>
+      </div>
+
+      <i class="fa-regular fa-calendar"></i>
+    </div>
+
+    <div class="filter-controls">
+      <div class="filter-field">
+        <label for="rating-month"> Month </label>
+
+        <select id="rating-month" [(ngModel)]="selectedMonth" (change)="onMonthChange()">
+          @for (month of months; track month.value) {
+            <option [value]="month.value">
+              {{ month.label }}
+            </option>
+          }
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       THERAPIST OF THE MONTH
+  ========================================================== -->
+
+  @if (loadState === 'loaded' && therapistOfTheMonth) {
+    <div class="top-rated-card">
+      <div class="top-rated-icon">
+        <i class="fa-solid fa-trophy"></i>
+      </div>
+
+      <div class="top-rated-content">
+        <div class="top-rated-label">Therapist of the Month</div>
+
+        <div class="top-rated-name">
+          {{ getPractitionerName(therapistOfTheMonth.practitionerId) }}
+        </div>
+
+        <div class="top-rated-service">
+          {{ getPractitionerService(therapistOfTheMonth.practitionerId) }}
+        </div>
+      </div>
+
+      <div class="top-rated-score">
+        <div class="score-value">
+          {{ therapistOfTheMonth.score }}
+        </div>
+
+        <div class="score-stars">
+          @for (star of getStars(therapistOfTheMonth.score); track star) {
+            <i class="fa-solid fa-star" [class.empty-star]="star > therapistOfTheMonth.score"></i>
+          }
+        </div>
+
+        <div class="score-period">
+          {{ getSelectedMonthLabel() }}
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- =========================================================
+       ERROR MESSAGE
+  ========================================================== -->
+
+  @if (loadState === 'error') {
+    <div class="error-message">
+      <i class="fa-solid fa-circle-exclamation"></i>
+
+      <span>
+        {{ errorMessage }}
+      </span>
+    </div>
+  }
+
+  <!-- =========================================================
+       RATINGS CARD
+  ========================================================== -->
+
+  <div class="table-card">
+    <!-- =======================================================
+         TABLE HEADER
+    ======================================================== -->
+
+    <div class="table-header">
+      <div>
+        <h2>Therapist Ratings</h2>
+
+        <p>Ratings for {{ getSelectedMonthLabel() }}.</p>
+      </div>
+
+      <!-- Only display count after successful request -->
+
+      @if (loadState === 'loaded') {
+        <div class="rating-count">
+          {{ ratings.length }}
+          rating{{ ratings.length === 1 ? '' : 's' }}
+        </div>
+      }
+    </div>
+
+    <!-- =======================================================
+         LOADING STATE
+         
+         The spinner appears ONLY when:
+         
+         loadState === 'loading'
+    ======================================================== -->
+
+    @if (loadState === 'loading') {
+      <div class="loading-state">
+        <i class="fa-solid fa-spinner fa-spin"></i>
+
+        <span> Loading ratings... </span>
+      </div>
+    }
+
+    <!-- =======================================================
+         ERROR STATE
+    ======================================================== -->
+
+    @else if (loadState === 'error') {
+      <div class="empty-state">
+        <div class="empty-icon">
+          <i class="fa-solid fa-circle-exclamation"></i>
+        </div>
+
+        <h3>Unable to Load Ratings</h3>
+
+        <p>
+          {{ errorMessage }}
+        </p>
+
+        <button type="button" class="empty-action" (click)="loadRatings()">
+          <i class="fa-solid fa-rotate-right"></i>
+
+          Try Again
+        </button>
+      </div>
+    }
+
+    <!-- =======================================================
+         EMPTY STATE
+         
+         API returned:
+         
+         HTTP 200
+         []
+         
+         Therefore:
+         
+         loadState === 'loaded'
+         ratings.length === 0
+    ======================================================== -->
+
+    @else if (loadState === 'loaded' && ratings.length === 0) {
+      <div class="empty-state">
+        <div class="empty-icon">
+          <i class="fa-regular fa-star"></i>
+        </div>
+
+        <h3>No Ratings Found</h3>
+
+        <p>
+          There are no therapist ratings for
+          {{ getSelectedMonthLabel() }}.
+        </p>
+
+        <button type="button" class="empty-action" (click)="addRating()">
+          <i class="fa-solid fa-plus"></i>
+
+          Add Rating
+        </button>
+      </div>
+    }
+
+    <!-- =======================================================
+         RATINGS TABLE
+         
+         API returned ratings.
+    ======================================================== -->
+
+    @else if (loadState === 'loaded' && ratings.length > 0) {
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Therapist</th>
+
+              <th>Service</th>
+
+              <th>Rating</th>
+
+              <th>Comments</th>
+
+              <th class="actions-column">Actions</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            @for (rating of paginatedRatings; track rating.id) {
+              <tr>
+                <!-- Therapist -->
+
+                <td>
+                  <div class="therapist-cell">
+                    <div class="therapist-avatar">
+                      {{ getPractitionerName(rating.practitionerId).charAt(0).toUpperCase() }}
+                    </div>
+
+                    <div class="therapist-name">
+                      {{ getPractitionerName(rating.practitionerId) }}
+                    </div>
+                  </div>
+                </td>
+
+                <!-- Service -->
+
+                <td>
+                  <span class="service-badge">
+                    {{ getPractitionerService(rating.practitionerId) }}
+                  </span>
+                </td>
+
+                <!-- Rating -->
+
+                <td>
+                  <div class="rating-cell">
+                    <span class="rating-number"> {{ rating.score }}/5 </span>
+
+                    <div class="rating-stars">
+                      @for (star of getStars(rating.score); track star) {
+                        <i class="fa-solid fa-star" [class.empty-star]="star > rating.score"></i>
+                      }
+                    </div>
+                  </div>
+                </td>
+
+                <!-- Comments -->
+
+                <td>
+                  @if (rating.comments) {
+                    <span class="comments-text">
+                      {{ rating.comments }}
+                    </span>
+                  } @else {
+                    <span class="no-comments"> No comments </span>
+                  }
+                </td>
+
+                <!-- Actions -->
+
+                <td>
+                  <div class="actions">
+                    <button
+                      type="button"
+                      class="edit-button"
+                      title="Edit Rating"
+                      (click)="editRating(rating.id)"
+                    >
+                      <i class="fa-solid fa-pen"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <!-- =====================================================
+           PAGINATION
+      ====================================================== -->
+
+      @if (totalPages > 1) {
+        <div class="pagination">
+          <button
+            type="button"
+            class="pagination-button"
+            [disabled]="currentPage === 1"
+            (click)="previousPage()"
+          >
+            <i class="fa-solid fa-chevron-left"></i>
+          </button>
+
+          @for (page of [].constructor(totalPages); let i = $index; track i) {
+            <button
+              type="button"
+              class="pagination-button"
+              [class.active]="currentPage === i + 1"
+              (click)="goToPage(i + 1)"
+            >
+              {{ i + 1 }}
+            </button>
+          }
+
+          <button
+            type="button"
+            class="pagination-button"
+            [disabled]="currentPage === totalPages"
+            (click)="nextPage()"
+          >
+            <i class="fa-solid fa-chevron-right"></i>
+          </button>
+        </div>
+      }
+    }
+  </div>
+</div>

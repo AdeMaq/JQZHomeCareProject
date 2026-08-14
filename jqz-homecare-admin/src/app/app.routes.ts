@@ -8,44 +8,74 @@ import { AdminLayout } from './layouts/admin-layout/admin-layout';
 import { Login } from './features/auth/login/login';
 import { Dashboard } from './features/dashboard/dashboard/dashboard';
 
-// Visits
+// ============================================================
+// VISITS
+// ============================================================
+
 import { VisitsList } from './features/visits/visits-list/visits-list';
 import { AddVisit } from './features/visits/add-visit/add-visit';
 import { EditVisit } from './features/visits/edit-visit/edit-visit';
 import { VisitDetails } from './features/visits/visit-details/visit-details';
 
-// Services
+// ============================================================
+// SERVICES
+// ============================================================
+
 import { ServicesList } from './features/services/services-list/services-list';
 import { AddService } from './features/services/add-service/add-service';
 import { EditService } from './features/services/edit-service/edit-service';
 import { ServiceCategories } from './features/services/service-categories/service-categories';
 
-// Packages
+// ============================================================
+// PACKAGES
+// ============================================================
+
 import { PackagesList } from './features/packages/packages-list/packages-list';
 import { AddPackage } from './features/packages/add-package/add-package';
 import { EditPackage } from './features/packages/edit-package/edit-package';
 
-// Cities
+// ============================================================
+// CITIES
+// ============================================================
+
 import { CitiesList } from './features/locations/cities-list/cities-list';
 import { AddCity } from './features/locations/add-city/add-city';
 import { EditCity } from './features/locations/edit-city/edit-city';
 
-// Areas
+// ============================================================
+// AREAS
+// ============================================================
+
 import { AreasList } from './features/locations/areas-list/areas-list';
 import { AddArea } from './features/locations/add-area/add-area';
 import { EditArea } from './features/locations/edit-area/edit-area';
 
-// Practitioners
+// ============================================================
+// PRACTITIONERS
+// ============================================================
+
 import { PractitionersList } from './features/practitioners/practitioners-list/practitioners-list';
 import { AddPractitioner } from './features/practitioners/add-practitioner/add-practitioner';
 import { PractitionerProfile } from './features/practitioners/practitioner-profile/practitioner-profile';
 import { EditPractitioner } from './features/practitioners/edit-practitioner/edit-practitioner';
 import { MergePractitionerAreas } from './features/practitioners/merge-practitioner-areas/merge-practitioner-areas';
 
+// ============================================================
+// RATINGS
+// ============================================================
+
+import { RatingsList } from './features/ratings/ratings-list/ratings-list';
+import { AddRating } from './features/ratings/add-rating/add-rating';
+import { EditRating } from './features/ratings/edit-rating/edit-rating';
+
+// ============================================================
+// ROUTES
+// ============================================================
+
 export const routes: Routes = [
-  // =========================
+  // ============================================================
   // DEFAULT ROUTE
-  // =========================
+  // ============================================================
 
   {
     path: '',
@@ -53,9 +83,9 @@ export const routes: Routes = [
     pathMatch: 'full',
   },
 
-  // =========================
+  // ============================================================
   // AUTHENTICATION ROUTES
-  // =========================
+  // ============================================================
 
   {
     path: '',
@@ -69,9 +99,9 @@ export const routes: Routes = [
     ],
   },
 
-  // =========================
+  // ============================================================
   // ADMIN ROUTES
-  // =========================
+  // ============================================================
 
   {
     path: '',
@@ -79,18 +109,18 @@ export const routes: Routes = [
     canActivate: [authGuard],
 
     children: [
-      // =========================
+      // ========================================================
       // DASHBOARD
-      // =========================
+      // ========================================================
 
       {
         path: 'dashboard',
         component: Dashboard,
       },
 
-      // =========================
+      // ========================================================
       // VISITS
-      // =========================
+      // ========================================================
 
       {
         path: 'visits/add',
@@ -112,9 +142,9 @@ export const routes: Routes = [
         component: VisitsList,
       },
 
-      // =========================
+      // ========================================================
       // SERVICES
-      // =========================
+      // ========================================================
 
       {
         path: 'services/add',
@@ -131,9 +161,9 @@ export const routes: Routes = [
         component: ServicesList,
       },
 
-      // =========================
+      // ========================================================
       // PACKAGES
-      // =========================
+      // ========================================================
 
       {
         path: 'packages/add',
@@ -150,18 +180,18 @@ export const routes: Routes = [
         component: PackagesList,
       },
 
-      // =========================
+      // ========================================================
       // SERVICE CATEGORIES
-      // =========================
+      // ========================================================
 
       {
         path: 'service-categories',
         component: ServiceCategories,
       },
 
-      // =========================
+      // ========================================================
       // CITIES
-      // =========================
+      // ========================================================
 
       {
         path: 'cities/add',
@@ -178,9 +208,9 @@ export const routes: Routes = [
         component: CitiesList,
       },
 
-      // =========================
+      // ========================================================
       // AREAS
-      // =========================
+      // ========================================================
 
       {
         path: 'areas/add',
@@ -197,9 +227,9 @@ export const routes: Routes = [
         component: AreasList,
       },
 
-      // =========================
+      // ========================================================
       // PRACTITIONERS
-      // =========================
+      // ========================================================
 
       {
         path: 'practitioners/add',
@@ -227,12 +257,31 @@ export const routes: Routes = [
         path: 'practitioners',
         component: PractitionersList,
       },
+
+      // ========================================================
+      // RATINGS
+      // ========================================================
+
+      {
+        path: 'ratings/add',
+        component: AddRating,
+      },
+
+      {
+        path: 'ratings/:id/edit',
+        component: EditRating,
+      },
+
+      {
+        path: 'ratings',
+        component: RatingsList,
+      },
     ],
   },
 
-  // =========================
+  // ============================================================
   // FALLBACK ROUTE
-  // =========================
+  // ============================================================
 
   {
     path: '**',

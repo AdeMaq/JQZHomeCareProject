@@ -10,7 +10,9 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   if (isPlatformBrowser(platformId)) {
     const token = localStorage.getItem('token');
 
-    console.log('TOKEN IN INTERCEPTOR:', token);
+    // IMPORTANT:
+    // Never log the actual authentication token.
+    console.log('TOKEN EXISTS:', !!token);
 
     if (token) {
       req = req.clone({
@@ -19,6 +21,8 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
         },
       });
 
+      // Safe debugging message.
+      // The actual Authorization header/token is NOT printed.
       console.log('AUTHORIZATION HEADER ADDED');
     } else {
       console.log('NO TOKEN FOUND');

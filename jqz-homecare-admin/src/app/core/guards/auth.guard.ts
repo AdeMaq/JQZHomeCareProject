@@ -20,7 +20,8 @@ export const authGuard: CanActivateFn = (route, state) => {
 
   const token = localStorage.getItem('token');
 
-  console.log('TOKEN FROM GUARD:', token);
+  // IMPORTANT:
+  // Never log the actual authentication token.
   console.log('TOKEN EXISTS:', !!token);
   console.log('CURRENT URL:', window.location.href);
 

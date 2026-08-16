@@ -1,54 +1,44 @@
-/* =====================================================
+/* ============================================================
    RATINGS PAGE
-===================================================== */
-
-:host {
-  display: block;
-  width: 100%;
-}
+============================================================ */
 
 .ratings-page {
   min-height: 100%;
-  padding: 32px;
-
+  padding: 32px 40px 48px;
   background: #fff8f8;
-
-  box-sizing: border-box;
+  color: #102a43;
 }
 
-/* =====================================================
+/* ============================================================
    BREADCRUMB
-===================================================== */
+============================================================ */
 
 .breadcrumb {
   display: flex;
   align-items: center;
+  gap: 10px;
 
-  gap: 9px;
+  margin-bottom: 26px;
 
-  margin-bottom: 22px;
+  font-size: 14px;
+  font-weight: 500;
 
   color: #829ab1;
-
-  font-size: 13px;
-  font-weight: 500;
 }
 
 .breadcrumb i {
-  color: #cf102d;
-
   font-size: 10px;
+  color: #bcccdc;
 }
 
 .breadcrumb span:last-child {
   color: #102a43;
-
   font-weight: 600;
 }
 
-/* =====================================================
+/* ============================================================
    PAGE HEADER
-===================================================== */
+============================================================ */
 
 .page-header {
   display: flex;
@@ -57,19 +47,18 @@
 
   gap: 24px;
 
-  margin-bottom: 26px;
+  margin-bottom: 30px;
 }
 
 .page-title-section {
   display: flex;
   align-items: center;
-
   gap: 16px;
 }
 
 .page-title-icon {
-  width: 52px;
-  height: 52px;
+  width: 50px;
+  height: 50px;
 
   display: flex;
   align-items: center;
@@ -78,49 +67,53 @@
   border-radius: 14px;
 
   background: #fdebed;
-
   color: #cf102d;
 
-  font-size: 21px;
+  flex-shrink: 0;
 }
 
-.page-header h1 {
-  margin: 0;
+.page-title-icon i {
+  font-size: 23px;
+}
+
+.page-title-section h1 {
+  margin: 0 0 5px;
+
+  font-size: 29px;
+  line-height: 1.2;
+  font-weight: 700;
 
   color: #102a43;
-
-  font-size: 25px;
-  font-weight: 700;
 }
 
-.page-header p {
-  margin: 5px 0 0;
-
-  color: #627d98;
+.page-title-section p {
+  margin: 0;
 
   font-size: 14px;
+  line-height: 1.5;
+
+  color: #627d98;
 }
 
-/* =====================================================
+/* ============================================================
    ADD RATING BUTTON
-===================================================== */
+============================================================ */
 
 .add-rating-button {
-  height: 44px;
-
   display: inline-flex;
   align-items: center;
   justify-content: center;
 
   gap: 9px;
 
-  padding: 0 18px;
+  min-height: 46px;
 
-  border: none;
-  border-radius: 10px;
+  padding: 0 20px;
+
+  border: 0;
+  border-radius: 8px;
 
   background: #cf102d;
-
   color: #ffffff;
 
   font-size: 14px;
@@ -128,103 +121,114 @@
 
   cursor: pointer;
 
-  transition: all 0.25s ease;
+  transition:
+    background-color 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .add-rating-button:hover {
   background: #b80e28;
 
-  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(207, 16, 45, 0.18);
 
-  box-shadow: 0 8px 18px rgba(207, 16, 45, 0.18);
+  transform: translateY(-1px);
 }
 
-/* =====================================================
+.add-rating-button:active {
+  transform: translateY(0);
+}
+
+.add-rating-button i {
+  font-size: 13px;
+}
+
+/* ============================================================
    FILTER CARD
-===================================================== */
+============================================================ */
 
 .filter-card {
-  padding: 22px 24px;
+  width: 100%;
 
-  margin-bottom: 24px;
+  padding: 24px;
 
-  border: 1px solid #f1dfe1;
-  border-radius: 16px;
+  margin-bottom: 20px;
 
   background: #ffffff;
 
-  box-shadow: 0 5px 18px rgba(16, 42, 67, 0.04);
+  border: 1px solid #f6d2d5;
+
+  border-radius: 14px;
+
+  box-sizing: border-box;
 }
 
 .filter-header {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
 
-  margin-bottom: 18px;
+  margin-bottom: 20px;
 }
 
 .filter-header h2 {
-  margin: 0;
-
-  color: #102a43;
+  margin: 0 0 5px;
 
   font-size: 16px;
   font-weight: 700;
+
+  color: #102a43;
 }
 
 .filter-header p {
-  margin: 4px 0 0;
-
-  color: #829ab1;
+  margin: 0;
 
   font-size: 13px;
+
+  color: #829ab1;
 }
 
 .filter-header > i {
+  font-size: 18px;
+
   color: #cf102d;
 
-  font-size: 20px;
+  margin-top: 2px;
 }
 
-/* =====================================================
-   MONTH FILTER
-===================================================== */
-
 .filter-controls {
-  display: grid;
-
-  grid-template-columns: minmax(180px, 260px);
-
-  gap: 18px;
+  display: flex;
+  align-items: flex-end;
+  gap: 20px;
 }
 
 .filter-field {
+  width: 255px;
+
   display: flex;
   flex-direction: column;
-
-  gap: 7px;
+  gap: 8px;
 }
 
 .filter-field label {
-  color: #334e68;
-
   font-size: 13px;
   font-weight: 600;
+
+  color: #486581;
 }
 
 .filter-field select {
   width: 100%;
-  height: 44px;
+  height: 42px;
 
-  padding: 0 13px;
+  padding: 0 38px 0 14px;
 
   border: 1px solid #d9e2ec;
-  border-radius: 9px;
+  border-radius: 8px;
 
   background: #ffffff;
 
-  color: #102a43;
+  color: #243b53;
 
   font-family: inherit;
   font-size: 14px;
@@ -235,7 +239,12 @@
 
   transition:
     border-color 0.2s ease,
-    box-shadow 0.2s ease;
+    box-shadow 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.filter-field select:hover {
+  border-color: #cf102d;
 }
 
 .filter-field select:focus {
@@ -244,111 +253,196 @@
   box-shadow: 0 0 0 3px rgba(207, 16, 45, 0.08);
 }
 
-/* =====================================================
-   THERAPIST OF THE MONTH
-===================================================== */
+.filter-field select:disabled {
+  background: #f5f7fa;
+
+  color: #829ab1;
+
+  cursor: not-allowed;
+
+  opacity: 0.75;
+}
+
+/* ============================================================
+   MONTH LOADING INDICATOR
+============================================================ */
+
+.month-loading-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 10px;
+
+  min-height: 44px;
+
+  margin-bottom: 20px;
+
+  padding: 10px 16px;
+
+  border: 1px solid #f6d2d5;
+
+  border-radius: 10px;
+
+  background: #fffafb;
+
+  color: #627d98;
+
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.month-loading-indicator i {
+  color: #cf102d;
+
+  font-size: 16px;
+}
+
+/* ============================================================
+   TOP RATED CARD
+============================================================ */
 
 .top-rated-card {
   display: flex;
   align-items: center;
 
-  gap: 18px;
+  width: 100%;
 
-  padding: 22px 24px;
+  min-height: 108px;
 
   margin-bottom: 24px;
 
-  border: 1px solid #f2d1d5;
-  border-radius: 16px;
+  padding: 18px 22px;
 
-  background: linear-gradient(135deg, #fff5f6, #ffffff);
+  box-sizing: border-box;
 
-  box-shadow: 0 6px 20px rgba(207, 16, 45, 0.06);
+  background: linear-gradient(135deg, #fffafb 0%, #ffffff 55%, #fffafb 100%);
+
+  border: 1px solid #f6d2d5;
+
+  border-radius: 14px;
+
+  box-shadow: 0 3px 12px rgba(16, 42, 67, 0.025);
 }
 
-.top-rated-icon {
-  width: 58px;
-  height: 58px;
+/* ============================================================
+   TOP RATED ICON
+============================================================ */
 
-  flex-shrink: 0;
+.top-rated-icon {
+  width: 54px;
+  height: 54px;
 
   display: flex;
   align-items: center;
   justify-content: center;
 
-  border-radius: 16px;
+  margin-right: 16px;
+
+  flex-shrink: 0;
+
+  border-radius: 14px;
 
   background: #cf102d;
 
   color: #ffffff;
 
-  font-size: 22px;
-
-  box-shadow: 0 8px 18px rgba(207, 16, 45, 0.18);
+  box-shadow: 0 6px 14px rgba(207, 16, 45, 0.15);
 }
 
+.top-rated-icon i {
+  font-size: 22px;
+}
+
+/* ============================================================
+   TOP RATED CONTENT
+============================================================ */
+
 .top-rated-content {
+  min-width: 0;
+
   flex: 1;
 }
 
 .top-rated-label {
-  margin-bottom: 4px;
+  margin-bottom: 5px;
 
-  color: #cf102d;
+  font-size: 11px;
+  line-height: 1.2;
 
-  font-size: 12px;
   font-weight: 700;
 
   text-transform: uppercase;
+  letter-spacing: 0.7px;
 
-  letter-spacing: 0.5px;
+  color: #cf102d;
 }
 
 .top-rated-name {
+  margin-bottom: 5px;
+
+  font-size: 17px;
+  line-height: 1.3;
+
+  font-weight: 700;
+
   color: #102a43;
 
-  font-size: 19px;
-  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .top-rated-service {
-  margin-top: 3px;
+  font-size: 13px;
 
   color: #627d98;
 
-  font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
+/* ============================================================
+   TOP RATED SCORE
+============================================================ */
+
 .top-rated-score {
-  min-width: 150px;
+  min-width: 130px;
 
-  padding-left: 22px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
 
-  border-left: 1px solid #f1dfe1;
+  padding-left: 28px;
 
-  text-align: right;
+  border-left: 1px solid #f6d2d5;
 }
 
 .score-value {
-  color: #cf102d;
+  margin-bottom: 2px;
 
-  font-size: 27px;
-  font-weight: 800;
+  font-size: 26px;
+  line-height: 1;
+
+  font-weight: 700;
+
+  color: #cf102d;
 }
 
 .score-stars {
   display: flex;
-  justify-content: flex-end;
+  align-items: center;
 
   gap: 3px;
 
-  margin-top: 3px;
+  margin-bottom: 4px;
 }
 
 .score-stars i {
-  color: #f5b301;
-
   font-size: 13px;
+
+  color: #f2a900;
 }
 
 .score-stars i.empty-star {
@@ -356,16 +450,14 @@
 }
 
 .score-period {
-  margin-top: 5px;
+  font-size: 11px;
 
   color: #829ab1;
-
-  font-size: 11px;
 }
 
-/* =====================================================
-   ERROR
-===================================================== */
+/* ============================================================
+   ERROR MESSAGE
+============================================================ */
 
 .error-message {
   display: flex;
@@ -373,38 +465,47 @@
 
   gap: 10px;
 
-  padding: 13px 16px;
-
   margin-bottom: 20px;
 
-  border: 1px solid #f5c2c7;
-  border-radius: 10px;
+  padding: 13px 16px;
+
+  border: 1px solid #f6d2d5;
+
+  border-radius: 9px;
 
   background: #fff1f2;
 
-  color: #b42318;
+  color: #b80e28;
 
   font-size: 13px;
+  font-weight: 500;
 }
 
 .error-message i {
   font-size: 16px;
 }
 
-/* =====================================================
+/* ============================================================
    TABLE CARD
-===================================================== */
+============================================================ */
 
 .table-card {
-  overflow: hidden;
+  width: 100%;
 
-  border: 1px solid #f1e4e4;
-  border-radius: 16px;
+  overflow: hidden;
 
   background: #ffffff;
 
-  box-shadow: 0 5px 18px rgba(16, 42, 67, 0.04);
+  border: 1px solid #f6d2d5;
+
+  border-radius: 14px;
+
+  box-shadow: 0 3px 12px rgba(16, 42, 67, 0.025);
 }
+
+/* ============================================================
+   TABLE HEADER
+============================================================ */
 
 .table-header {
   display: flex;
@@ -413,299 +514,106 @@
 
   gap: 20px;
 
-  padding: 20px 22px;
+  min-height: 82px;
 
-  border-bottom: 1px solid #f1e4e4;
+  padding: 18px 20px;
+
+  box-sizing: border-box;
+
+  border-bottom: 1px solid #f1e5e6;
 }
 
 .table-header h2 {
-  margin: 0;
-
-  color: #102a43;
+  margin: 0 0 5px;
 
   font-size: 16px;
   font-weight: 700;
+
+  color: #102a43;
 }
 
 .table-header p {
-  margin: 4px 0 0;
-
-  color: #829ab1;
+  margin: 0;
 
   font-size: 13px;
+
+  color: #829ab1;
 }
 
 .rating-count {
-  padding: 6px 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 
-  border-radius: 20px;
+  min-height: 30px;
+
+  padding: 0 12px;
+
+  border-radius: 999px;
 
   background: #fdebed;
 
   color: #cf102d;
 
   font-size: 12px;
-  font-weight: 700;
-}
-
-/* =====================================================
-   TABLE
-===================================================== */
-
-.table-wrapper {
-  width: 100%;
-
-  overflow-x: auto;
-}
-
-table {
-  width: 100%;
-
-  min-width: 850px;
-
-  border-collapse: collapse;
-}
-
-thead {
-  background: #fff8f8;
-}
-
-th {
-  padding: 14px 18px;
-
-  color: #627d98;
-
-  font-size: 11px;
-  font-weight: 700;
-
-  text-align: left;
-
-  text-transform: uppercase;
-
-  letter-spacing: 0.5px;
+  font-weight: 600;
 
   white-space: nowrap;
 }
 
-td {
-  padding: 15px 18px;
-
-  border-top: 1px solid #f3eeee;
-
-  color: #334e68;
-
-  font-size: 13px;
-
-  vertical-align: middle;
-}
-
-tbody tr {
-  transition: background 0.2s ease;
-}
-
-tbody tr:hover {
-  background: #fffafb;
-}
-
-/* =====================================================
-   THERAPIST CELL
-===================================================== */
-
-.therapist-cell {
-  display: flex;
-  align-items: center;
-
-  gap: 10px;
-}
-
-.therapist-avatar {
-  width: 36px;
-  height: 36px;
-
-  flex-shrink: 0;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  border-radius: 50%;
-
-  background: #fdebed;
-
-  color: #cf102d;
-
-  font-size: 13px;
-  font-weight: 700;
-}
-
-.therapist-name {
-  color: #102a43;
-
-  font-weight: 600;
-}
-
-/* =====================================================
-   SERVICE
-===================================================== */
-
-.service-badge {
-  display: inline-flex;
-
-  padding: 5px 9px;
-
-  border-radius: 7px;
-
-  background: #f5f7fa;
-
-  color: #486581;
-
-  font-size: 12px;
-  font-weight: 500;
-}
-
-/* =====================================================
-   RATING
-===================================================== */
-
-.rating-cell {
-  display: flex;
-  align-items: center;
-
-  gap: 9px;
-}
-
-.rating-number {
-  color: #102a43;
-
-  font-size: 13px;
-  font-weight: 700;
-}
-
-.rating-stars {
-  display: flex;
-
-  gap: 2px;
-}
-
-.rating-stars i {
-  color: #f5b301;
-
-  font-size: 12px;
-}
-
-.rating-stars i.empty-star {
-  color: #d9e2ec;
-}
-
-/* =====================================================
-   COMMENTS
-===================================================== */
-
-.comments-text {
-  display: inline-block;
-
-  max-width: 280px;
-
-  color: #486581;
-
-  line-height: 1.5;
-}
-
-.no-comments {
-  color: #9fb3c8;
-
-  font-style: italic;
-}
-
-/* =====================================================
-   ACTIONS
-===================================================== */
-
-.actions-column {
-  text-align: center;
-}
-
-.actions {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  gap: 6px;
-}
-
-.edit-button {
-  width: 34px;
-  height: 34px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  border: 1px solid #f1d5d8;
-  border-radius: 8px;
-
-  background: #ffffff;
-
-  color: #cf102d;
-
-  cursor: pointer;
-
-  transition: all 0.2s ease;
-}
-
-.edit-button:hover {
-  background: #fdebed;
-
-  border-color: #cf102d;
-}
-
-/* =====================================================
-   LOADING
-===================================================== */
+/* ============================================================
+   LOADING STATE
+============================================================ */
 
 .loading-state {
-  min-height: 260px;
+  min-height: 240px;
 
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-
-  flex-direction: column;
 
   gap: 12px;
 
   color: #829ab1;
 
-  font-size: 14px;
+  font-size: 13px;
 }
 
-.loading-state i {
-  color: #cf102d;
-
-  font-size: 22px;
-}
-
-/* =====================================================
-   EMPTY STATE
-===================================================== */
-
-.empty-state {
-  min-height: 300px;
-
+.loading-spinner {
   display: flex;
   align-items: center;
   justify-content: center;
+}
 
+.loading-spinner i {
+  font-size: 25px;
+
+  color: #cf102d;
+}
+
+/* ============================================================
+   EMPTY STATE
+============================================================ */
+
+.empty-state {
+  min-height: 270px;
+
+  display: flex;
   flex-direction: column;
+  align-items: center;
+  justify-content: center;
 
-  padding: 40px 20px;
+  padding: 30px;
 
   text-align: center;
+
+  box-sizing: border-box;
 }
 
 .empty-icon {
-  width: 58px;
-  height: 58px;
+  width: 52px;
+  height: 52px;
 
   display: flex;
   align-items: center;
@@ -718,45 +626,53 @@ tbody tr:hover {
   background: #fdebed;
 
   color: #cf102d;
+}
 
-  font-size: 22px;
+.empty-icon i {
+  font-size: 20px;
+}
+
+.empty-icon.error-icon {
+  background: #fff1f2;
+
+  color: #cf102d;
 }
 
 .empty-state h3 {
-  margin: 0;
+  margin: 0 0 7px;
+
+  font-size: 16px;
+  font-weight: 700;
 
   color: #102a43;
-
-  font-size: 17px;
 }
 
 .empty-state p {
-  max-width: 400px;
+  max-width: 420px;
 
-  margin: 7px 0 18px;
-
-  color: #829ab1;
+  margin: 0 0 18px;
 
   font-size: 13px;
+  line-height: 1.5;
 
-  line-height: 1.6;
+  color: #829ab1;
 }
 
 .empty-action {
-  height: 40px;
-
   display: inline-flex;
   align-items: center;
+  justify-content: center;
 
   gap: 8px;
 
+  min-height: 38px;
+
   padding: 0 15px;
 
-  border: none;
-  border-radius: 9px;
+  border: 1px solid #cf102d;
+  border-radius: 7px;
 
   background: #cf102d;
-
   color: #ffffff;
 
   font-size: 13px;
@@ -764,40 +680,330 @@ tbody tr:hover {
 
   cursor: pointer;
 
-  transition: background 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease;
 }
 
 .empty-action:hover {
   background: #b80e28;
+
+  border-color: #b80e28;
 }
 
-/* =====================================================
+/* ============================================================
+   TABLE WRAPPER
+============================================================ */
+
+.table-wrapper {
+  width: 100%;
+
+  overflow-x: auto;
+
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ============================================================
+   TABLE
+============================================================ */
+
+.table-wrapper table {
+  width: 100%;
+
+  border-collapse: collapse;
+
+  table-layout: fixed;
+}
+
+.table-wrapper thead {
+  background: #fffafb;
+}
+
+.table-wrapper th {
+  height: 42px;
+
+  padding: 0 16px;
+
+  border-bottom: 1px solid #f1e5e6;
+
+  text-align: left;
+
+  color: #627d98;
+
+  font-size: 10px;
+  font-weight: 700;
+
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.table-wrapper td {
+  min-height: 62px;
+
+  padding: 12px 16px;
+
+  border-bottom: 1px solid #f5eeee;
+
+  vertical-align: middle;
+
+  color: #243b53;
+
+  font-size: 13px;
+}
+
+.table-wrapper tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.table-wrapper tbody tr {
+  transition: background-color 0.15s ease;
+}
+
+.table-wrapper tbody tr:hover {
+  background: #fffafb;
+}
+
+/* ============================================================
+   COLUMN WIDTHS
+============================================================ */
+
+.table-wrapper th:nth-child(1),
+.table-wrapper td:nth-child(1) {
+  width: 24%;
+}
+
+.table-wrapper th:nth-child(2),
+.table-wrapper td:nth-child(2) {
+  width: 22%;
+}
+
+.table-wrapper th:nth-child(3),
+.table-wrapper td:nth-child(3) {
+  width: 20%;
+}
+
+.table-wrapper th:nth-child(4),
+.table-wrapper td:nth-child(4) {
+  width: 24%;
+}
+
+.table-wrapper th:nth-child(5),
+.table-wrapper td:nth-child(5) {
+  width: 10%;
+}
+
+/* ============================================================
+   THERAPIST CELL
+============================================================ */
+
+.therapist-cell {
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+
+  min-width: 0;
+}
+
+.therapist-avatar {
+  width: 32px;
+  height: 32px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  border-radius: 50%;
+
+  background: #fdebed;
+
+  color: #cf102d;
+
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.therapist-info {
+  min-width: 0;
+}
+
+.therapist-name {
+  font-size: 13px;
+  font-weight: 600;
+
+  color: #102a43;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ============================================================
+   SERVICE BADGE
+============================================================ */
+
+.service-badge {
+  display: inline-flex;
+  align-items: center;
+
+  max-width: 100%;
+
+  padding: 6px 9px;
+
+  border-radius: 6px;
+
+  background: #f5f8fa;
+
+  color: #486581;
+
+  font-size: 11px;
+  font-weight: 500;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ============================================================
+   RATING CELL
+============================================================ */
+
+.rating-cell {
+  display: flex;
+  align-items: center;
+
+  gap: 9px;
+
+  white-space: nowrap;
+}
+
+.rating-number {
+  font-size: 12px;
+  font-weight: 700;
+
+  color: #102a43;
+}
+
+.rating-stars {
+  display: flex;
+  align-items: center;
+
+  gap: 2px;
+}
+
+.rating-stars i {
+  font-size: 11px;
+
+  color: #f2a900;
+}
+
+.rating-stars i.empty-star {
+  color: #d9e2ec;
+}
+
+/* ============================================================
+   COMMENTS
+============================================================ */
+
+.comments-text {
+  display: block;
+
+  max-width: 260px;
+
+  color: #486581;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.no-comments {
+  color: #bcccdc;
+
+  font-style: italic;
+}
+
+/* ============================================================
+   ACTIONS
+============================================================ */
+
+.actions-column {
+  text-align: center !important;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.edit-button {
+  width: 34px;
+  height: 34px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid #f6d2d5;
+
+  border-radius: 7px;
+
+  background: #ffffff;
+
+  color: #cf102d;
+
+  cursor: pointer;
+
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.edit-button:hover {
+  background: #fdebed;
+
+  border-color: #cf102d;
+
+  transform: translateY(-1px);
+}
+
+.edit-button i {
+  font-size: 12px;
+}
+
+/* ============================================================
    PAGINATION
-===================================================== */
+============================================================ */
 
 .pagination {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: center;
 
   gap: 6px;
 
-  padding: 14px 18px;
+  padding: 18px;
 
-  border-top: 1px solid #f3eeee;
+  border-top: 1px solid #f1e5e6;
 }
 
-.pagination-button,
-.pagination-page {
+.pagination-button {
   min-width: 34px;
   height: 34px;
 
-  display: inline-flex;
+  display: flex;
   align-items: center;
   justify-content: center;
 
-  border: 1px solid #e6dfe0;
-  border-radius: 8px;
+  padding: 0 8px;
+
+  border: 1px solid #e4e7eb;
+
+  border-radius: 7px;
 
   background: #ffffff;
 
@@ -808,19 +1014,21 @@ tbody tr:hover {
 
   cursor: pointer;
 
-  transition: all 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
 }
 
-.pagination-button:hover:not(:disabled),
-.pagination-page:hover {
+.pagination-button:hover:not(:disabled) {
   border-color: #cf102d;
 
   color: #cf102d;
 
-  background: #fdebed;
+  background: #fffafb;
 }
 
-.pagination-page.active {
+.pagination-button.active {
   border-color: #cf102d;
 
   background: #cf102d;
@@ -829,134 +1037,186 @@ tbody tr:hover {
 }
 
 .pagination-button:disabled {
-  opacity: 0.45;
+  opacity: 0.4;
 
   cursor: not-allowed;
 }
 
-/* =====================================================
-   TABLET
-===================================================== */
+/* ============================================================
+   RESPONSIVE - TABLET
+============================================================ */
 
-@media (max-width: 1024px) {
+@media (max-width: 1100px) {
   .ratings-page {
-    padding: 24px;
+    padding: 28px 28px 40px;
   }
 
-  .page-header h1 {
-    font-size: 22px;
+  .page-title-section h1 {
+    font-size: 26px;
+  }
+
+  .table-wrapper {
+    overflow-x: auto;
+  }
+
+  .table-wrapper table {
+    min-width: 850px;
   }
 }
 
-/* =====================================================
-   MOBILE
-===================================================== */
+/* ============================================================
+   RESPONSIVE - MOBILE
+============================================================ */
 
 @media (max-width: 768px) {
   .ratings-page {
-    padding: 18px;
+    padding: 20px 16px 32px;
   }
+
+  /* Page header */
 
   .page-header {
     align-items: flex-start;
-
     flex-direction: column;
+  }
+
+  .page-title-section {
+    width: 100%;
+  }
+
+  .page-title-section h1 {
+    font-size: 23px;
+  }
+
+  .page-title-section p {
+    font-size: 13px;
   }
 
   .add-rating-button {
     width: 100%;
   }
 
-  .filter-controls {
-    grid-template-columns: 1fr;
+  /* Filter */
+
+  .filter-card {
+    padding: 18px;
   }
+
+  .filter-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .filter-field {
+    width: 100%;
+  }
+
+  /* Top rated */
 
   .top-rated-card {
     align-items: flex-start;
 
     flex-wrap: wrap;
+
+    gap: 14px;
+
+    padding: 18px;
+  }
+
+  .top-rated-icon {
+    margin-right: 0;
+  }
+
+  .top-rated-content {
+    width: calc(100% - 70px);
   }
 
   .top-rated-score {
     width: 100%;
 
-    padding-top: 15px;
-    padding-left: 0;
+    min-width: 0;
 
-    border-top: 1px solid #f1dfe1;
+    align-items: flex-start;
+
+    padding: 14px 0 0;
+
     border-left: none;
 
-    text-align: left;
+    border-top: 1px solid #f6d2d5;
   }
 
-  .score-stars {
-    justify-content: flex-start;
+  /* Table */
+
+  .table-card {
+    border-radius: 12px;
   }
 
   .table-header {
     align-items: flex-start;
 
     flex-direction: column;
+
+    padding: 17px;
   }
 
-  .pagination {
-    justify-content: center;
+  .rating-count {
+    align-self: flex-start;
   }
 }
 
-/* =====================================================
-   SMALL MOBILE
-===================================================== */
+/* ============================================================
+   RESPONSIVE - SMALL MOBILE
+============================================================ */
 
 @media (max-width: 480px) {
   .ratings-page {
-    padding: 14px;
+    padding: 16px 12px 28px;
   }
 
   .breadcrumb {
-    margin-bottom: 16px;
+    margin-bottom: 18px;
+
+    font-size: 12px;
   }
 
   .page-title-section {
-    gap: 11px;
+    gap: 12px;
   }
 
   .page-title-icon {
     width: 44px;
     height: 44px;
-
-    font-size: 18px;
   }
 
-  .page-header h1 {
+  .page-title-icon i {
     font-size: 19px;
   }
 
-  .page-header p {
+  .page-title-section h1 {
+    font-size: 20px;
+  }
+
+  .page-title-section p {
     font-size: 12px;
   }
 
-  .filter-card,
-  .table-header {
-    padding: 17px;
+  .filter-card {
+    padding: 16px;
   }
 
   .top-rated-card {
-    padding: 18px;
-  }
-
-  .top-rated-icon {
-    width: 48px;
-    height: 48px;
-
-    font-size: 18px;
+    padding: 16px;
   }
 
   .top-rated-name {
-    font-size: 17px;
+    font-size: 15px;
   }
 
-  .pagination {
-    padding: 12px;
+  .score-value {
+    font-size: 23px;
+  }
+
+  .loading-state {
+    min-height: 210px;
   }
 }

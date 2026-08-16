@@ -36,7 +36,7 @@
   </div>
 
   <!-- =========================================================
-       MONTH FILTER
+       RATING PERIOD / MONTH FILTER
   ========================================================== -->
 
   <div class="filter-card">
@@ -54,9 +54,15 @@
       <div class="filter-field">
         <label for="rating-month"> Month </label>
 
-        <select id="rating-month" [(ngModel)]="selectedMonth" (change)="onMonthChange()">
+        <select
+          id="rating-month"
+          name="rating-month"
+          [(ngModel)]="selectedMonth"
+          (ngModelChange)="onMonthChange($event)"
+          [disabled]="loadState === 'loading'"
+        >
           @for (month of months; track month.value) {
-            <option [value]="month.value">
+            <option [ngValue]="month.value">
               {{ month.label }}
             </option>
           }
@@ -66,14 +72,33 @@
   </div>
 
   <!-- =========================================================
+       LOADING INDICATOR FOR MONTH CHANGE
+  ========================================================== -->
+
+  @if (loadState === 'loading') {
+    <div class="month-loading-indicator">
+      <i class="fa-solid fa-spinner fa-spin"></i>
+
+      <span>
+        Loading ratings for
+        {{ getSelectedMonthLabel() }}...
+      </span>
+    </div>
+  }
+
+  <!-- =========================================================
        THERAPIST OF THE MONTH
   ========================================================== -->
 
   @if (loadState === 'loaded' && therapistOfTheMonth) {
     <div class="top-rated-card">
+      <!-- Trophy -->
+
       <div class="top-rated-icon">
         <i class="fa-solid fa-trophy"></i>
       </div>
+
+      <!-- Practitioner information -->
 
       <div class="top-rated-content">
         <div class="top-rated-label">Therapist of the Month</div>
@@ -86,6 +111,8 @@
           {{ getPractitionerService(therapistOfTheMonth.practitionerId) }}
         </div>
       </div>
+
+      <!-- Score -->
 
       <div class="top-rated-score">
         <div class="score-value">
@@ -106,7 +133,7 @@
   }
 
   <!-- =========================================================
-       ERROR MESSAGE
+       GENERAL ERROR MESSAGE
   ========================================================== -->
 
   @if (loadState === 'error') {
@@ -120,7 +147,7 @@
   }
 
   <!-- =========================================================
-       RATINGS CARD
+       RATINGS TABLE CARD
   ========================================================== -->
 
   <div class="table-card">
@@ -132,14 +159,18 @@
       <div>
         <h2>Therapist Ratings</h2>
 
-        <p>Ratings for {{ getSelectedMonthLabel() }}.</p>
+        <p>
+          Ratings for
+          {{ getSelectedMonthLabel() }}.
+        </p>
       </div>
 
-      <!-- Only display count after successful request -->
+      <!-- Rating count -->
 
       @if (loadState === 'loaded') {
         <div class="rating-count">
           {{ ratings.length }}
+
           rating{{ ratings.length === 1 ? '' : 's' }}
         </div>
       }
@@ -147,15 +178,13 @@
 
     <!-- =======================================================
          LOADING STATE
-         
-         The spinner appears ONLY when:
-         
-         loadState === 'loading'
     ======================================================== -->
 
     @if (loadState === 'loading') {
       <div class="loading-state">
-        <i class="fa-solid fa-spinner fa-spin"></i>
+        <div class="loading-spinner">
+          <i class="fa-solid fa-spinner fa-spin"></i>
+        </div>
 
         <span> Loading ratings... </span>
       </div>
@@ -167,7 +196,7 @@
 
     @else if (loadState === 'error') {
       <div class="empty-state">
-        <div class="empty-icon">
+        <div class="empty-icon error-icon">
           <i class="fa-solid fa-circle-exclamation"></i>
         </div>
 
@@ -187,16 +216,6 @@
 
     <!-- =======================================================
          EMPTY STATE
-         
-         API returned:
-         
-         HTTP 200
-         []
-         
-         Therefore:
-         
-         loadState === 'loaded'
-         ratings.length === 0
     ======================================================== -->
 
     @else if (loadState === 'loaded' && ratings.length === 0) {
@@ -222,13 +241,15 @@
 
     <!-- =======================================================
          RATINGS TABLE
-         
-         API returned ratings.
     ======================================================== -->
 
     @else if (loadState === 'loaded' && ratings.length > 0) {
       <div class="table-wrapper">
         <table>
+          <!-- =================================================
+               TABLE HEAD
+          ================================================== -->
+
           <thead>
             <tr>
               <th>Therapist</th>
@@ -243,10 +264,16 @@
             </tr>
           </thead>
 
+          <!-- =================================================
+               TABLE BODY
+          ================================================== -->
+
           <tbody>
             @for (rating of paginatedRatings; track rating.id) {
               <tr>
-                <!-- Therapist -->
+                <!-- ===========================================
+                     THERAPIST
+                ============================================ -->
 
                 <td>
                   <div class="therapist-cell">
@@ -254,13 +281,17 @@
                       {{ getPractitionerName(rating.practitionerId).charAt(0).toUpperCase() }}
                     </div>
 
-                    <div class="therapist-name">
-                      {{ getPractitionerName(rating.practitionerId) }}
+                    <div class="therapist-info">
+                      <div class="therapist-name">
+                        {{ getPractitionerName(rating.practitionerId) }}
+                      </div>
                     </div>
                   </div>
                 </td>
 
-                <!-- Service -->
+                <!-- ===========================================
+                     SERVICE
+                ============================================ -->
 
                 <td>
                   <span class="service-badge">
@@ -268,7 +299,9 @@
                   </span>
                 </td>
 
-                <!-- Rating -->
+                <!-- ===========================================
+                     RATING
+                ============================================ -->
 
                 <td>
                   <div class="rating-cell">
@@ -282,7 +315,9 @@
                   </div>
                 </td>
 
-                <!-- Comments -->
+                <!-- ===========================================
+                     COMMENTS
+                ============================================ -->
 
                 <td>
                   @if (rating.comments) {
@@ -294,7 +329,9 @@
                   }
                 </td>
 
-                <!-- Actions -->
+                <!-- ===========================================
+                     ACTIONS
+                ============================================ -->
 
                 <td>
                   <div class="actions">
@@ -302,6 +339,7 @@
                       type="button"
                       class="edit-button"
                       title="Edit Rating"
+                      aria-label="Edit Rating"
                       (click)="editRating(rating.id)"
                     >
                       <i class="fa-solid fa-pen"></i>
@@ -320,31 +358,41 @@
 
       @if (totalPages > 1) {
         <div class="pagination">
+          <!-- Previous -->
+
           <button
             type="button"
             class="pagination-button"
             [disabled]="currentPage === 1"
             (click)="previousPage()"
+            title="Previous page"
+            aria-label="Previous page"
           >
             <i class="fa-solid fa-chevron-left"></i>
           </button>
 
-          @for (page of [].constructor(totalPages); let i = $index; track i) {
+          <!-- Page numbers -->
+
+          @for (page of [].constructor(totalPages); track $index) {
             <button
               type="button"
               class="pagination-button"
-              [class.active]="currentPage === i + 1"
-              (click)="goToPage(i + 1)"
+              [class.active]="currentPage === $index + 1"
+              (click)="goToPage($index + 1)"
             >
-              {{ i + 1 }}
+              {{ $index + 1 }}
             </button>
           }
+
+          <!-- Next -->
 
           <button
             type="button"
             class="pagination-button"
             [disabled]="currentPage === totalPages"
             (click)="nextPage()"
+            title="Next page"
+            aria-label="Next page"
           >
             <i class="fa-solid fa-chevron-right"></i>
           </button>

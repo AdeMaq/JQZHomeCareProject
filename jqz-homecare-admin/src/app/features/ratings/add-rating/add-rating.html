@@ -1,1 +1,280 @@
-<p>add-rating works!</p>
+<div class="add-rating-page">
+  <!-- =========================================================
+       BREADCRUMB
+  ========================================================== -->
+
+  <div class="breadcrumb">
+    <span>Ratings</span>
+
+    <i class="fa-solid fa-chevron-right"></i>
+
+    <span>Add Rating</span>
+  </div>
+
+  <!-- =========================================================
+       PAGE HEADER
+  ========================================================== -->
+
+  <div class="page-header">
+    <div class="page-title-section">
+      <div class="page-title-icon">
+        <i class="fa-solid fa-star"></i>
+      </div>
+
+      <div>
+        <h1>Add Rating</h1>
+
+        <p>Add a therapist rating for the selected month.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       GENERAL ERROR MESSAGE
+  ========================================================== -->
+
+  @if (errorMessage) {
+    <div class="error-message">
+      <i class="fa-solid fa-circle-exclamation"></i>
+
+      <span>
+        {{ errorMessage }}
+      </span>
+    </div>
+  }
+
+  <!-- =========================================================
+       RATING FORM
+  ========================================================== -->
+
+  <div class="form-card">
+    <div class="form-card-header">
+      <div>
+        <h2>Rating Information</h2>
+
+        <p>Enter the therapist's rating details below.</p>
+      </div>
+
+      <i class="fa-solid fa-star"></i>
+    </div>
+
+    <!-- =======================================================
+         FORM
+    ======================================================== -->
+
+    <form (ngSubmit)="saveRating()">
+      <!-- =====================================================
+           MONTH
+      ====================================================== -->
+
+      <div class="form-field">
+        <label for="month">
+          Rating Month
+          <span class="required">*</span>
+        </label>
+
+        <select
+          id="rating-month"
+          name="rating-month"
+          [(ngModel)]="selectedMonth"
+          (ngModelChange)="onMonthChange($event)"
+        >
+          @for (month of months; track month.value) {
+            <option [ngValue]="month.value">
+              {{ month.label }}
+            </option>
+          }
+        </select>
+
+        <small class="field-hint"> Future months cannot be selected. </small>
+      </div>
+
+      <!-- =====================================================
+           THERAPIST
+      ====================================================== -->
+
+      <div class="form-field">
+        <label for="practitioner">
+          Therapist
+          <span class="required">*</span>
+        </label>
+
+        <!-- ===================================================
+             LOADING
+        ==================================================== -->
+
+        @if (therapistLoadState === 'loading') {
+          <div class="loading-select">
+            <i class="fa-solid fa-spinner fa-spin"></i>
+
+            Loading therapists...
+          </div>
+        }
+
+        <!-- ===================================================
+             ERROR
+        ==================================================== -->
+
+        @else if (therapistLoadState === 'error') {
+          <div class="therapist-error-state">
+            <div class="therapist-error-text">
+              <i class="fa-solid fa-circle-exclamation"></i>
+
+              <span>
+                {{ therapistErrorMessage }}
+              </span>
+            </div>
+
+            <button
+              type="button"
+              class="retry-button"
+              [disabled]="isSaving"
+              (click)="retryLoadPractitioners()"
+            >
+              <i class="fa-solid fa-rotate-right"></i>
+
+              Retry
+            </button>
+          </div>
+        }
+
+        <!-- ===================================================
+             LOADED
+        ==================================================== -->
+
+        @else {
+          <select
+            id="practitioner"
+            name="practitioner"
+            [(ngModel)]="selectedPractitionerId"
+            [disabled]="isSaving || therapistLoadState !== 'loaded'"
+          >
+            <option value="">Select therapist</option>
+
+            @if (practitioners.length === 0) {
+              <option value="" disabled>No therapists available for this month.</option>
+            }
+
+            @for (practitioner of practitioners; track practitioner.id) {
+              <option [value]="practitioner.id">
+                {{ practitioner.name }}
+              </option>
+            }
+          </select>
+
+          @if (practitioners.length === 0) {
+            <small class="field-hint">
+              No therapists are currently available for this month.
+            </small>
+          }
+        }
+      </div>
+
+      <!-- =====================================================
+           SCORE
+      ====================================================== -->
+
+      <div class="form-field">
+        <label>
+          Rating
+          <span class="required">*</span>
+        </label>
+
+        <div class="star-selector">
+          @for (star of getStars(); track star) {
+            <button
+              type="button"
+              class="star-button"
+              [class.selected]="star <= selectedScore"
+              [disabled]="isSaving"
+              [attr.aria-label]="'Give ' + star + ' star rating'"
+              (click)="selectScore(star)"
+            >
+              <i class="fa-solid fa-star"></i>
+            </button>
+          }
+        </div>
+
+        <div class="rating-description">
+          @if (selectedScore === 0) {
+            Select a rating from 1 to 5 stars.
+          }
+
+          @if (selectedScore === 1) {
+            1 star
+          }
+
+          @if (selectedScore === 2) {
+            2 stars
+          }
+
+          @if (selectedScore === 3) {
+            3 stars
+          }
+
+          @if (selectedScore === 4) {
+            4 stars
+          }
+
+          @if (selectedScore === 5) {
+            5 stars
+          }
+        </div>
+      </div>
+
+      <!-- =====================================================
+           COMMENTS
+      ====================================================== -->
+
+      <div class="form-field">
+        <label for="comments">
+          Comments
+          <span class="optional">(Optional)</span>
+        </label>
+
+        <textarea
+          id="comments"
+          name="comments"
+          rows="5"
+          maxlength="500"
+          placeholder="Enter any comments about this rating..."
+          [(ngModel)]="comments"
+          [disabled]="isSaving"
+        ></textarea>
+
+        <small class="field-hint"> Maximum 500 characters. </small>
+      </div>
+
+      <!-- =====================================================
+           FORM FOOTER
+      ====================================================== -->
+
+      <div class="form-footer">
+        <button type="button" class="cancel-button" [disabled]="isSaving" (click)="cancel()">
+          Cancel
+        </button>
+
+        <button
+          type="submit"
+          class="save-button"
+          [disabled]="
+            isSaving ||
+            therapistLoadState === 'loading' ||
+            therapistLoadState === 'error' ||
+            practitioners.length === 0
+          "
+        >
+          @if (isSaving) {
+            <i class="fa-solid fa-spinner fa-spin"></i>
+
+            Saving...
+          } @else {
+            <i class="fa-solid fa-check"></i>
+
+            Save Rating
+          }
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

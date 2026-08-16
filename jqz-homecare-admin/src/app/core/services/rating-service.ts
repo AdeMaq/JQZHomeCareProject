@@ -2,49 +2,52 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-// =====================================================
-// RATING MODEL
-// =====================================================
+// ============================================================
+// RATING RESPONSE MODEL
+// ============================================================
 
 export interface Rating {
   id: string;
 
   practitionerId: string;
 
-  month: number;
+  /**
+   * Backend stores Rating.Month as DateTime.
+   *
+   * Example:
+   * "2026-08-01T00:00:00"
+   */
+  month: string;
 
   score: number;
 
-  comments: string;
+  comments: string | null;
 }
 
-// =====================================================
+// ============================================================
 // CREATE RATING REQUEST
-// =====================================================
+// ============================================================
 
 export interface CreateRatingRequest {
-  practitionerId: string;
-
-  month: number;
+  /**
+   * Backend RatingDto.Month is DateTime.
+   *
+   * Therefore Angular must send an ISO date string,
+   * NOT a numeric month such as 8.
+   *
+   * Example:
+   * "2026-08-01T00:00:00"
+   */
+  month: string;
 
   score: number;
 
   comments: string;
 }
 
-// =====================================================
-// UPDATE RATING REQUEST
-// =====================================================
-
-export interface UpdateRatingRequest {
-  score: number;
-
-  comments: string;
-}
-
-// =====================================================
+// ============================================================
 // RATING SERVICE
-// =====================================================
+// ============================================================
 
 @Injectable({
   providedIn: 'root',
@@ -52,64 +55,44 @@ export interface UpdateRatingRequest {
 export class RatingService {
   private readonly http = inject(HttpClient);
 
-  // ===================================================
-  // API URL
-  // ===================================================
-
   private readonly apiUrl = 'http://localhost:5212/api/Ratings';
 
-  // ===================================================
-  // GET RATINGS BY PRACTITIONER
-  // ===================================================
+  // ============================================================
+  // GET MONTHLY RATINGS
+  // ============================================================
+
+  getMonthlyRatings(year: number, month: number): Observable<Rating[]> {
+    return this.http.get<Rating[]>(`${this.apiUrl}/monthly?year=${year}&month=${month}`);
+  }
+
+  // ============================================================
+  // GET RATINGS FOR PRACTITIONER
+  // ============================================================
 
   getRatingsByPractitioner(practitionerId: string): Observable<Rating[]> {
     return this.http.get<Rating[]>(`${this.apiUrl}/practitioner/${practitionerId}`);
   }
 
-  // ===================================================
-  // GET MONTHLY RATINGS
-  // ===================================================
-  //
-  // IMPORTANT:
-  // The current backend expects:
-  //
-  // GET /api/Ratings/monthly?year=2026&month=8
-  //
-  // The UI only selects the month.
-  //
-  // Therefore, the current year is supplied internally.
-  //
-  // Once the backend teammate removes the year parameter,
-  // this method can simply send:
-  //
-  // /api/Ratings/monthly?month=8
-  //
-  // ===================================================
-
-  getMonthlyRatings(month: number): Observable<Rating[]> {
-    const currentYear = new Date().getFullYear();
-
-    return this.http.get<Rating[]>(`${this.apiUrl}/monthly`, {
-      params: {
-        year: currentYear.toString(),
-        month: month.toString(),
-      },
-    });
-  }
-
-  // ===================================================
+  // ============================================================
   // ADD RATING
-  // ===================================================
+  // ============================================================
 
-  addRating(request: CreateRatingRequest): Observable<Rating> {
-    return this.http.post<Rating>(this.apiUrl, request);
-  }
-
-  // ===================================================
-  // UPDATE RATING
-  // ===================================================
-
-  updateRating(id: string, request: UpdateRatingRequest): Observable<void> {
-    return this.http.put<void>(`${this.apiUrl}/${id}`, request);
+  /**
+   * Current backend endpoint:
+   *
+   * POST /api/Ratings/{practitionerId}
+   *
+   * The practitioner ID belongs in the URL.
+   *
+   * The request body contains:
+   *
+   * {
+   *   month: "2026-08-01T00:00:00",
+   *   score: 3,
+   *   comments: "..."
+   * }
+   */
+  addRating(practitionerId: string, request: CreateRatingRequest): Observable<void> {
+    return this.http.post<void>(`${this.apiUrl}/${practitionerId}`, request);
   }
 }

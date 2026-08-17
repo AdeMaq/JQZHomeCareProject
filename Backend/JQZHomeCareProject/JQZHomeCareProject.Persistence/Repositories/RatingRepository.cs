@@ -30,19 +30,27 @@ namespace JQZHomeCareProject.Persistence.Repositories
                 .ToListAsync();
         }
 
+        public async Task<Rating?> GetByIdAsync(Guid ratingId)
+        {
+            return await _context.Ratings
+                .Include(r => r.Practitioner)
+                .FirstOrDefaultAsync(r => r.Id == ratingId);
+        }
+
+        public async Task<IEnumerable<Rating>> GetAllAsync()
+        {
+            return await _context.Ratings
+                .Include(r => r.Practitioner)
+                .OrderByDescending(r => r.Month)
+                .ToListAsync();
+        }
+
         public async Task<IEnumerable<Rating>> GetByMonthAsync(int year, int month)
         {
             return await _context.Ratings
                 .Where(r => r.Month.Year == year && r.Month.Month == month)
                 .AsNoTracking()
                 .ToListAsync();
-        }
-
-        public async Task<Rating?> GetByIdAsync(Guid id)
-        {
-            return await _context.Ratings
-                .Include(r => r.Practitioner)
-                .FirstOrDefaultAsync(r => r.Id == id);
         }
 
         public async Task UpdateAsync(Rating rating)

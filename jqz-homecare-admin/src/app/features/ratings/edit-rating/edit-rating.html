@@ -1,1 +1,336 @@
-<p>edit-rating works!</p>
+<div class="edit-rating-page">
+  <!-- ============================================================
+       BREADCRUMB
+  ============================================================= -->
+
+  <div class="breadcrumb">
+    <span>Ratings</span>
+
+    <i class="fa-solid fa-chevron-right"></i>
+
+    <span>Edit Rating</span>
+  </div>
+
+  <!-- ============================================================
+       PAGE HEADER
+  ============================================================= -->
+
+  <div class="page-header">
+    <div class="page-title-section">
+      <div class="page-title-icon">
+        <i class="fa-solid fa-star"></i>
+      </div>
+
+      <div>
+        <h1>Edit Rating</h1>
+
+        <p>Update the therapist rating and comments.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       LOADING STATE
+  ============================================================= -->
+
+  @if (loadState === 'loading') {
+    <div class="state-card">
+      <div class="state-icon loading-icon">
+        <i class="fa-solid fa-spinner fa-spin"></i>
+      </div>
+
+      <h2>Loading Rating</h2>
+
+      <p>Please wait while the rating information is being loaded.</p>
+    </div>
+  }
+
+  <!-- ============================================================
+       ERROR STATE
+  ============================================================= -->
+
+  @else if (loadState === 'error') {
+    <div class="state-card error-state">
+      <div class="state-icon error-icon">
+        <i class="fa-solid fa-circle-exclamation"></i>
+      </div>
+
+      <h2>Unable to Load Rating</h2>
+
+      <p>
+        {{ errorMessage }}
+      </p>
+
+      <div class="state-actions">
+        <button type="button" class="secondary-button" (click)="retry()">
+          <i class="fa-solid fa-rotate-right"></i>
+
+          Try Again
+        </button>
+
+        <button type="button" class="secondary-button" (click)="cancel()">
+          <i class="fa-solid fa-arrow-left"></i>
+
+          Back to Ratings
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- ============================================================
+       EDIT FORM
+  ============================================================= -->
+
+  @else if (loadState === 'loaded') {
+    <div class="form-card">
+      <!-- ========================================================
+           FORM HEADER
+      ========================================================= -->
+
+      <div class="form-card-header">
+        <div>
+          <h2>Rating Information</h2>
+
+          <p>Update the rating score and comments below.</p>
+        </div>
+
+        <div class="form-header-icon">
+          <i class="fa-solid fa-pen-to-square"></i>
+        </div>
+      </div>
+
+      <!-- ========================================================
+           THERAPIST INFORMATION
+      ========================================================= -->
+
+      <div class="information-section">
+        <div class="information-title">
+          <i class="fa-solid fa-user"></i>
+
+          <span>Therapist Information</span>
+        </div>
+
+        <div class="information-grid">
+          <!-- ====================================================
+               THERAPIST
+          ===================================================== -->
+
+          <div class="information-item">
+            <span class="information-label"> Therapist </span>
+
+            <span class="information-value">
+              {{ practitioner?.name ?? 'Loading therapist...' }}
+            </span>
+          </div>
+
+          <!-- ====================================================
+               SERVICE
+          ===================================================== -->
+
+          <div class="information-item">
+            <span class="information-label"> Service </span>
+
+            <span class="information-value">
+              {{ practitioner?.serviceName ?? 'N/A' }}
+            </span>
+          </div>
+
+          <!-- ====================================================
+               RATING PERIOD
+          ===================================================== -->
+
+          <div class="information-item">
+            <span class="information-label"> Rating Period </span>
+
+            <span class="information-value">
+              {{ getMonthLabel() }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========================================================
+           FORM
+      ========================================================= -->
+
+      <form class="rating-form" (ngSubmit)="updateRating()">
+        <!-- ======================================================
+             RATING SCORE
+        ======================================================= -->
+
+        <div class="form-section">
+          <div class="form-section-heading">
+            <label>
+              Rating Score
+
+              <span class="required">*</span>
+            </label>
+
+            <span class="field-description"> Select a rating from 1 to 5 stars. </span>
+          </div>
+
+          <!-- ====================================================
+               STAR SELECTOR
+          ===================================================== -->
+
+          <div class="star-selector" role="radiogroup" aria-label="Rating score">
+            @for (star of getStars(); track star) {
+              <button
+                type="button"
+                class="star-button"
+                [class.selected]="star <= score"
+                [attr.aria-label]="'Rate ' + star + ' out of 5'"
+                [attr.aria-checked]="star === score"
+                [attr.title]="star + ' star' + (star === 1 ? '' : 's')"
+                (click)="selectScore(star)"
+              >
+                <i class="fa-solid fa-star"></i>
+              </button>
+            }
+          </div>
+
+          <!-- ====================================================
+               SELECTED SCORE
+          ===================================================== -->
+
+          <div class="selected-score">
+            @if (score > 0) {
+              <span class="selected-score-number"> {{ score }}/5 </span>
+
+              <span class="selected-score-label">
+                @switch (score) {
+                  @case (1) {
+                    Very Poor
+                  }
+
+                  @case (2) {
+                    Poor
+                  }
+
+                  @case (3) {
+                    Average
+                  }
+
+                  @case (4) {
+                    Good
+                  }
+
+                  @case (5) {
+                    Excellent
+                  }
+                }
+              </span>
+
+            } @else {
+              <span class="score-placeholder"> Please select a rating. </span>
+            }
+          </div>
+
+          <!-- ====================================================
+               SCORE VALIDATION
+          ===================================================== -->
+
+          @if (scoreError) {
+            <div class="field-error">
+              <i class="fa-solid fa-circle-exclamation"></i>
+
+              <span>
+                {{ scoreError }}
+              </span>
+            </div>
+          }
+        </div>
+
+        <!-- ======================================================
+             COMMENTS
+        ======================================================= -->
+
+        <div class="form-section">
+          <div class="form-section-heading">
+            <label for="rating-comments">
+              Comments
+
+              <span class="required">*</span>
+            </label>
+
+            <span class="field-description"> Add comments or feedback about this rating. </span>
+          </div>
+
+          <textarea
+            id="rating-comments"
+            name="comments"
+            rows="5"
+            maxlength="1000"
+            [(ngModel)]="comments"
+            placeholder="Enter rating comments..."
+            [disabled]="isSubmitting"
+          ></textarea>
+
+          <div class="textarea-footer">
+            <span class="textarea-hint"> Comments are required. </span>
+
+            <span class="character-count"> {{ comments.length }}/1000 </span>
+          </div>
+
+          <!-- ====================================================
+               COMMENTS VALIDATION
+          ===================================================== -->
+
+          @if (commentsError) {
+            <div class="field-error">
+              <i class="fa-solid fa-circle-exclamation"></i>
+
+              <span>
+                {{ commentsError }}
+              </span>
+            </div>
+          }
+        </div>
+
+        <!-- ======================================================
+             SUBMIT ERROR
+        ======================================================= -->
+
+        @if (submitError) {
+          <div class="submit-error">
+            <i class="fa-solid fa-circle-exclamation"></i>
+
+            <span>
+              {{ submitError }}
+            </span>
+          </div>
+        }
+
+        <!-- ======================================================
+             FORM FOOTER
+        ======================================================= -->
+
+        <div class="form-footer">
+          <button
+            type="button"
+            class="secondary-button"
+            [disabled]="isSubmitting"
+            (click)="cancel()"
+          >
+            <i class="fa-solid fa-xmark"></i>
+
+            <span>Cancel</span>
+          </button>
+
+          <button type="submit" class="primary-button" [disabled]="isSubmitting">
+            @if (isSubmitting) {
+              <i class="fa-solid fa-spinner fa-spin"></i>
+
+              <span>Updating...</span>
+
+            } @else {
+              <i class="fa-solid fa-check"></i>
+
+              <span>Update Rating</span>
+            }
+          </button>
+        </div>
+      </form>
+    </div>
+  }
+</div>

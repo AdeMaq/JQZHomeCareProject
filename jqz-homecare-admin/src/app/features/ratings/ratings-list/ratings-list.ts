@@ -493,9 +493,8 @@ export class RatingsList implements OnInit {
   // ==========================================================
 
   editRating(ratingId: string): void {
-    this.router.navigate(['/ratings/edit', ratingId]);
+    this.router.navigate(['/ratings', ratingId, 'edit']);
   }
-
   // ==========================================================
   // PAGINATED RATINGS
   // ==========================================================

@@ -45,6 +45,22 @@ namespace JQZHomeCareProject.Application.Services
             };
             await _ratingRepository.AddAsync(rating);
         }
+
+        public async Task<RatingDto> GetByIdAsync(Guid ratingId)
+        {
+            var rating = await _ratingRepository.GetByIdAsync(ratingId);
+            if (rating is null)
+                throw new NotFoundException($"Rating {ratingId} not found.");
+
+            return MapToDto(rating);
+        }
+
+        public async Task<IEnumerable<RatingDto>> GetAllAsync()
+        {
+            var ratings = await _ratingRepository.GetAllAsync();
+            return ratings.Select(MapToDto);
+        }
+
         public async Task<IEnumerable<RatingDto>> GetByPractitionerAsync(Guid practitionerId)
         {
             var ratings = await _ratingRepository.GetByPractitionerAsync(practitionerId);

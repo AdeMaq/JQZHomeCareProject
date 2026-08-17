@@ -10,7 +10,8 @@ namespace JQZHomeCareProject.Application.Common.Interfaces
         Task AddAsync(Rating rating);
         Task<IEnumerable<Rating>> GetByPractitionerAsync(Guid practitionerId);
         Task<IEnumerable<Rating>> GetByMonthAsync(int year, int month);
-        Task<Rating?> GetByIdAsync(Guid id);        
+        Task<Rating?> GetByIdAsync(Guid ratingId);
+        Task<IEnumerable<Rating>> GetAllAsync();
         Task UpdateAsync(Rating rating);
     }
 }

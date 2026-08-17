@@ -58,5 +58,19 @@ namespace JQZHomeCareProject.API.Controllers
             var rating = await _ratingService.UpdateAsync(ratingId, dto);
             return Ok(rating);
         }
+
+        [HttpGet("{id:guid}")]
+        public async Task<ActionResult<RatingDto>> GetById(Guid id)
+        {
+            var rating = await _ratingService.GetByIdAsync(id);
+            return Ok(rating);
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<RatingDto>>> GetAll()
+        {
+            var ratings = await _ratingService.GetAllAsync();
+            return Ok(ratings);
+        }
     }
 }

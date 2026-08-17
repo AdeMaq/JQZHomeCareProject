@@ -46,6 +46,22 @@ export interface CreateRatingRequest {
 }
 
 // ============================================================
+// UPDATE RATING REQUEST
+// ============================================================
+
+export interface UpdateRatingRequest {
+  /**
+   * Backend UpdateRatingDto.Score
+   */
+  score: number;
+
+  /**
+   * Backend UpdateRatingDto.Comments
+   */
+  comments: string;
+}
+
+// ============================================================
 // RATING SERVICE
 // ============================================================
 
@@ -61,6 +77,14 @@ export class RatingService {
   // GET MONTHLY RATINGS
   // ============================================================
 
+  /**
+   * Current backend endpoint:
+   *
+   * GET /api/Ratings/monthly?year={year}&month={month}
+   *
+   * Retrieves all ratings for the selected month.
+   */
+
   getMonthlyRatings(year: number, month: number): Observable<Rating[]> {
     return this.http.get<Rating[]>(`${this.apiUrl}/monthly?year=${year}&month=${month}`);
   }
@@ -69,8 +93,35 @@ export class RatingService {
   // GET RATINGS FOR PRACTITIONER
   // ============================================================
 
+  /**
+   * Current backend endpoint:
+   *
+   * GET /api/Ratings/practitioner/{practitionerId}
+   *
+   * Retrieves all ratings belonging to a practitioner.
+   */
+
   getRatingsByPractitioner(practitionerId: string): Observable<Rating[]> {
     return this.http.get<Rating[]>(`${this.apiUrl}/practitioner/${practitionerId}`);
+  }
+
+  // ============================================================
+  // GET RATING BY ID
+  // ============================================================
+
+  /**
+   * Backend endpoint:
+   *
+   * GET /api/Ratings/{ratingId}
+   *
+   * Retrieves a single rating using its ID.
+   *
+   * This is used by the Edit Rating page to load the
+   * existing rating before editing it.
+   */
+
+  getRatingById(ratingId: string): Observable<Rating> {
+    return this.http.get<Rating>(`${this.apiUrl}/${ratingId}`);
   }
 
   // ============================================================
@@ -92,7 +143,34 @@ export class RatingService {
    *   comments: "..."
    * }
    */
+
   addRating(practitionerId: string, request: CreateRatingRequest): Observable<void> {
     return this.http.post<void>(`${this.apiUrl}/${practitionerId}`, request);
+  }
+
+  // ============================================================
+  // UPDATE RATING
+  // ============================================================
+
+  /**
+   * Current backend endpoint:
+   *
+   * PUT /api/Ratings/{ratingId}
+   *
+   * The rating ID belongs in the URL.
+   *
+   * The request body contains ONLY:
+   *
+   * {
+   *   score: 4,
+   *   comments: "Updated comments"
+   * }
+   *
+   * Practitioner and month are intentionally NOT included
+   * because they cannot be changed from the Edit Rating page.
+   */
+
+  updateRating(ratingId: string, request: UpdateRatingRequest): Observable<Rating> {
+    return this.http.put<Rating>(`${this.apiUrl}/${ratingId}`, request);
   }
 }

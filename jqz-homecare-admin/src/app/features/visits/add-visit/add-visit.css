@@ -1,340 +1,887 @@
-/* ============================= */
-/* PAGE */
-/* ============================= */
+/* ============================================================
+   ADD VISIT PAGE
+============================================================ */
 
 .add-visit-page {
-  padding: 30px;
+  min-height: 100%;
+  padding: 2rem;
+  background: #fff8f8;
+  color: #102a43;
 }
 
-/* ============================= */
-/* PAGE HEADER */
-/* ============================= */
+/* ============================================================
+   BREADCRUMB
+============================================================ */
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin-bottom: 1.5rem;
+
+  font-size: 0.875rem;
+  color: #829ab1;
+}
+
+.breadcrumb i {
+  font-size: 0.7rem;
+  color: #bcccdc;
+}
+
+.breadcrumb .current {
+  color: #cf102d;
+  font-weight: 600;
+}
+
+/* ============================================================
+   PAGE HEADER
+============================================================ */
 
 .page-header {
   display: flex;
-
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.75rem;
+}
 
-  margin-bottom: 30px;
+.page-header-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.page-header-icon {
+  width: 3.25rem;
+  height: 3.25rem;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 0.85rem;
+
+  background: linear-gradient(135deg, #cf102d, #ee7b7d);
+
+  color: #ffffff;
+
+  font-size: 1.25rem;
+
+  box-shadow: 0 8px 20px rgba(207, 16, 45, 0.18);
 }
 
 .page-header h1 {
   margin: 0;
 
-  font-size: 32px;
-  font-weight: 700;
+  color: #102a43;
 
-  color: #1e293b;
+  font-size: 1.75rem;
+  line-height: 1.25;
+  font-weight: 700;
 }
 
 .page-header p {
-  margin-top: 8px;
-  margin-bottom: 0;
+  margin: 0.35rem 0 0;
 
-  font-size: 15px;
+  color: #627d98;
 
-  color: #64748b;
+  font-size: 0.9rem;
 }
 
-/* ============================= */
-/* BACK BUTTON */
-/* ============================= */
-
-.back-button {
-  padding: 11px 18px;
-
-  border: 1px solid #cbd5e1;
-
-  border-radius: 8px;
-
-  background: white;
-
-  color: #475569;
-
-  font-size: 14px;
-  font-weight: 600;
-
-  cursor: pointer;
-
-  transition: all 0.2s ease;
-}
-
-.back-button:hover {
-  background: #f8fafc;
-
-  border-color: #94a3b8;
-}
-
-/* ============================= */
-/* ERROR MESSAGE */
-/* ============================= */
-
-.error-message {
-  margin-bottom: 20px;
-
-  padding: 14px 18px;
-
-  border-radius: 8px;
-
-  background: #fee2e2;
-
-  color: #b91c1c;
-
-  font-size: 14px;
-}
-
-/* ============================= */
-/* LOADING MESSAGE */
-/* ============================= */
-
-.loading-message {
-  margin-bottom: 20px;
-
-  padding: 20px;
-
-  border-radius: 10px;
-
-  background: white;
-
-  color: #64748b;
-
-  text-align: center;
-}
-
-/* ============================= */
-/* FORM */
-/* ============================= */
+/* ============================================================
+   FORM
+============================================================ */
 
 .visit-form {
   display: flex;
-
   flex-direction: column;
+  gap: 1.5rem;
 
-  gap: 25px;
+  max-width: 1200px;
 }
 
-/* ============================= */
-/* FORM SECTION */
-/* ============================= */
+/* ============================================================
+   FORM CARD
+============================================================ */
 
-.form-section {
-  padding: 25px;
+.form-card {
+  overflow: hidden;
 
-  background: white;
+  background: #ffffff;
 
-  border-radius: 14px;
+  border: 1px solid #f6d2d5;
+  border-radius: 1rem;
 
-  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.06);
+  box-shadow: 0 4px 18px rgba(207, 16, 45, 0.05);
 }
 
-.form-section h2 {
-  margin-top: 0;
-  margin-bottom: 25px;
+/* ============================================================
+   CARD HEADER
+============================================================ */
 
-  font-size: 20px;
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+
+  padding: 1.25rem 1.5rem;
+
+  background: #fffafa;
+
+  border-bottom: 1px solid #f8e1e3;
+}
+
+.card-header-icon {
+  width: 2.5rem;
+  height: 2.5rem;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  border-radius: 0.7rem;
+
+  background: #fdebed;
+
+  color: #cf102d;
+
+  font-size: 1rem;
+}
+
+.card-header h2 {
+  margin: 0;
+
+  color: #102a43;
+
+  font-size: 1.05rem;
   font-weight: 700;
-
-  color: #1e293b;
 }
 
-/* ============================= */
-/* FORM GRID */
-/* ============================= */
+.card-header p {
+  margin: 0.25rem 0 0;
+
+  color: #829ab1;
+
+  font-size: 0.8rem;
+}
+
+/* ============================================================
+   CARD BODY
+============================================================ */
+
+.card-body {
+  padding: 1.5rem;
+}
+
+/* ============================================================
+   FORM GRID
+============================================================ */
 
 .form-grid {
   display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 
-  grid-template-columns: repeat(2, 1fr);
-
-  gap: 22px;
+  gap: 1.25rem 1.5rem;
 }
 
-/* ============================= */
-/* FORM GROUP */
-/* ============================= */
-
-.form-group {
-  display: flex;
-
-  flex-direction: column;
-
-  gap: 8px;
-}
-
-.form-group.full-width {
+.full-width {
   grid-column: 1 / -1;
 }
 
-.form-group label {
-  font-size: 14px;
+/* ============================================================
+   FORM FIELD
+============================================================ */
 
-  font-weight: 600;
-
-  color: #475569;
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
 }
 
-/* ============================= */
-/* INPUTS */
-/* ============================= */
+.form-field label {
+  color: #243b53;
 
-.form-group input,
-.form-group select,
-.form-group textarea {
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.required {
+  color: #cf102d;
+}
+
+/* ============================================================
+   INPUT WRAPPER
+============================================================ */
+
+.input-wrapper {
+  position: relative;
+
+  display: flex;
+  align-items: center;
+}
+
+.input-wrapper > i {
+  position: absolute;
+  left: 0.95rem;
+
+  z-index: 1;
+
+  color: #9fb3c8;
+
+  font-size: 0.85rem;
+
+  pointer-events: none;
+}
+
+.input-wrapper input,
+.input-wrapper select,
+.input-wrapper textarea {
   width: 100%;
 
   box-sizing: border-box;
 
-  padding: 12px 14px;
+  border: 1px solid #d9e2ec;
+  border-radius: 0.65rem;
 
-  border: 1px solid #cbd5e1;
+  background: #ffffff;
 
-  border-radius: 8px;
-
-  background: white;
-
-  color: #334155;
+  color: #102a43;
 
   font-family: inherit;
-
-  font-size: 14px;
+  font-size: 0.875rem;
 
   outline: none;
 
-  transition: all 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background-color 0.2s ease;
 }
 
-.form-group input:focus,
-.form-group select:focus,
-.form-group textarea:focus {
-  border-color: #2563eb;
+.input-wrapper input,
+.input-wrapper select {
+  height: 2.8rem;
 
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+  padding: 0 0.9rem 0 2.7rem;
 }
 
-.form-group textarea {
+.input-wrapper textarea {
+  min-height: 6rem;
+
+  padding: 0.8rem 0.9rem 0.8rem 2.7rem;
+
   resize: vertical;
 }
 
-/* ============================= */
-/* VALIDATION ERROR */
-/* ============================= */
+.input-wrapper input::placeholder,
+.input-wrapper textarea::placeholder {
+  color: #9fb3c8;
+}
+
+.input-wrapper select {
+  appearance: none;
+
+  cursor: pointer;
+
+  padding-right: 2.5rem;
+
+  background-image:
+    linear-gradient(45deg, transparent 50%, #829ab1 50%),
+    linear-gradient(135deg, #829ab1 50%, transparent 50%);
+
+  background-position:
+    calc(100% - 17px) 50%,
+    calc(100% - 12px) 50%;
+
+  background-size:
+    5px 5px,
+    5px 5px;
+
+  background-repeat: no-repeat;
+}
+
+.input-wrapper input:focus,
+.input-wrapper select:focus,
+.input-wrapper textarea:focus {
+  border-color: #cf102d;
+
+  box-shadow: 0 0 0 3px rgba(207, 16, 45, 0.08);
+
+  background: #fffdfd;
+}
+
+/* ============================================================
+   CURRENCY INPUT
+============================================================ */
+
+.currency-prefix {
+  position: absolute;
+  left: 0.9rem;
+
+  z-index: 1;
+
+  color: #627d98;
+
+  font-size: 0.75rem;
+  font-weight: 700;
+
+  pointer-events: none;
+}
+
+.currency-prefix + input {
+  padding-left: 3.2rem;
+}
+
+/* ============================================================
+   FIELD ERROR
+============================================================ */
 
 .field-error {
-  color: #dc2626;
+  color: #cf102d;
 
-  font-size: 12px;
+  font-size: 0.75rem;
+  line-height: 1.35;
 }
 
-/* ============================= */
-/* FORM ACTIONS */
-/* ============================= */
+/* ============================================================
+   PACKAGE SUMMARY
+============================================================ */
 
-.form-actions {
+.package-summary {
+  display: grid;
+
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+
+  overflow: hidden;
+
+  border: 1px solid #f6d2d5;
+  border-radius: 0.75rem;
+
+  background: #fff8f8;
+}
+
+.package-summary-item {
   display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
 
+  padding: 1rem 1.1rem;
+
+  border-right: 1px solid #f6d2d5;
+}
+
+.package-summary-item:last-child {
+  border-right: none;
+}
+
+.summary-label {
+  color: #829ab1;
+
+  font-size: 0.72rem;
+  font-weight: 500;
+}
+
+.package-summary-item strong {
+  color: #102a43;
+
+  font-size: 0.875rem;
+}
+
+/* ============================================================
+   PAYMENT INFORMATION
+============================================================ */
+
+.payment-info {
+  display: flex;
+  flex-direction: column;
+
+  margin-top: 1.25rem;
+
+  border: 1px solid #f6d2d5;
+  border-radius: 0.75rem;
+
+  background: #fff8f8;
+}
+
+.payment-info-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 0.8rem 1rem;
+
+  border-bottom: 1px solid #f6d2d5;
+
+  color: #486581;
+
+  font-size: 0.85rem;
+}
+
+.payment-info-row:last-child {
+  border-bottom: none;
+}
+
+.payment-info-row strong {
+  color: #102a43;
+}
+
+.payment-info-row.pending strong {
+  color: #cf102d;
+}
+
+/* ============================================================
+   ASSIGNMENT LIST
+============================================================ */
+
+.assignment-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* ============================================================
+   ASSIGNMENT CARD
+============================================================ */
+
+.assignment-card {
+  overflow: hidden;
+
+  border: 1px solid #f6d2d5;
+  border-radius: 0.85rem;
+
+  background: #ffffff;
+}
+
+/* ============================================================
+   ASSIGNMENT HEADER
+============================================================ */
+
+.assignment-header {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+
+  padding: 1rem 1.1rem;
+
+  background: #fff8f8;
+
+  border-bottom: 1px solid #f8e1e3;
+}
+
+.assignment-number {
+  width: 2rem;
+  height: 2rem;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  border-radius: 50%;
+
+  background: #cf102d;
+
+  color: #ffffff;
+
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.assignment-header h3 {
+  margin: 0;
+
+  color: #102a43;
+
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.assignment-header p {
+  margin: 0.2rem 0 0;
+
+  color: #829ab1;
+
+  font-size: 0.75rem;
+}
+
+/* ============================================================
+   ASSIGNMENT GRID
+============================================================ */
+
+.assignment-grid {
+  display: grid;
+
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  gap: 1rem;
+
+  padding: 1.25rem;
+}
+
+/* ============================================================
+   ASSIGNMENT WARNING
+============================================================ */
+
+.assignment-warning {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.7rem;
+
+  margin: 0 1.25rem 1.25rem;
+
+  padding: 0.8rem 0.9rem;
+
+  border: 1px solid #f6d2d5;
+  border-radius: 0.65rem;
+
+  background: #fff8f8;
+
+  color: #a61b2b;
+
+  font-size: 0.75rem;
+  line-height: 1.45;
+}
+
+.assignment-warning i {
+  margin-top: 0.1rem;
+
+  color: #cf102d;
+}
+
+/* ============================================================
+   ASSIGNMENT INFORMATION
+============================================================ */
+
+.assignment-info {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+
+  margin-top: 1.25rem;
+
+  padding: 1rem;
+
+  border: 1px solid #f6d2d5;
+  border-radius: 0.7rem;
+
+  background: #fff8f8;
+
+  color: #486581;
+}
+
+.assignment-info > i {
+  margin-top: 0.1rem;
+
+  color: #cf102d;
+}
+
+.assignment-info strong {
+  display: block;
+
+  margin-bottom: 0.2rem;
+
+  color: #102a43;
+
+  font-size: 0.8rem;
+}
+
+.assignment-info p {
+  margin: 0;
+
+  font-size: 0.75rem;
+  line-height: 1.45;
+}
+
+/* ============================================================
+   EMPTY ASSIGNMENTS
+============================================================ */
+
+.empty-assignments {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+
+  padding: 2.5rem 1rem;
+
+  text-align: center;
+}
+
+.empty-icon {
+  width: 3.5rem;
+  height: 3.5rem;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin-bottom: 0.85rem;
+
+  border-radius: 50%;
+
+  background: #fdebed;
+
+  color: #cf102d;
+
+  font-size: 1.25rem;
+}
+
+.empty-assignments h3 {
+  margin: 0;
+
+  color: #243b53;
+
+  font-size: 0.95rem;
+}
+
+.empty-assignments p {
+  margin: 0.35rem 0 0;
+
+  color: #829ab1;
+
+  font-size: 0.8rem;
+}
+
+/* ============================================================
+   FORM ALERT
+============================================================ */
+
+.form-alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.8rem;
+
+  padding: 1rem;
+
+  border-radius: 0.75rem;
+
+  font-size: 0.8rem;
+}
+
+.form-alert > i {
+  margin-top: 0.1rem;
+
+  font-size: 1rem;
+}
+
+.form-alert strong {
+  display: block;
+
+  margin-bottom: 0.25rem;
+}
+
+.form-alert p {
+  margin: 0;
+
+  line-height: 1.45;
+}
+
+.form-alert.error {
+  border: 1px solid #f2b8bf;
+
+  background: #fff1f2;
+
+  color: #a61b2b;
+}
+
+.form-alert.success {
+  border: 1px solid #b7dfc1;
+
+  background: #f1faf3;
+
+  color: #28713b;
+}
+
+/* ============================================================
+   FORM FOOTER
+============================================================ */
+
+.form-footer {
+  display: flex;
+  align-items: center;
   justify-content: flex-end;
+  gap: 0.75rem;
 
-  gap: 12px;
-
-  padding-bottom: 20px;
+  padding: 0.25rem 0 1rem;
 }
 
-/* ============================= */
-/* CANCEL BUTTON */
-/* ============================= */
+/* ============================================================
+   BUTTONS
+============================================================ */
 
-.cancel-button {
-  padding: 12px 22px;
+.btn {
+  min-height: 2.75rem;
 
-  border: 1px solid #cbd5e1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
 
-  border-radius: 8px;
-
-  background: white;
-
-  color: #475569;
-
-  font-size: 14px;
-  font-weight: 600;
-
-  cursor: pointer;
-
-  transition: all 0.2s ease;
-}
-
-.cancel-button:hover {
-  background: #f8fafc;
-}
-
-/* ============================= */
-/* SUBMIT BUTTON */
-/* ============================= */
-
-.submit-button {
-  padding: 12px 22px;
+  padding: 0 1.25rem;
 
   border: none;
+  border-radius: 0.65rem;
 
-  border-radius: 8px;
+  font-family: inherit;
 
-  background: #2563eb;
-
-  color: white;
-
-  font-size: 14px;
+  font-size: 0.85rem;
   font-weight: 600;
 
   cursor: pointer;
 
-  transition: all 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.15s ease;
 }
 
-.submit-button:hover:not(:disabled) {
-  background: #1d4ed8;
-
-  transform: translateY(-1px);
-}
-
-.submit-button:disabled {
-  background: #93c5fd;
+.btn:disabled {
+  opacity: 0.6;
 
   cursor: not-allowed;
 }
 
-/* ============================= */
-/* RESPONSIVE */
-/* ============================= */
+.btn:not(:disabled):active {
+  transform: translateY(1px);
+}
 
-@media (max-width: 800px) {
+/* ============================================================
+   SECONDARY BUTTON
+============================================================ */
+
+.btn-secondary {
+  border: 1px solid #d9e2ec;
+
+  background: #ffffff;
+
+  color: #486581;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: #f7f9fa;
+
+  border-color: #bcccdc;
+
+  color: #243b53;
+}
+
+/* ============================================================
+   PRIMARY BUTTON
+============================================================ */
+
+.btn-primary {
+  background: #cf102d;
+
+  color: #ffffff;
+
+  box-shadow: 0 5px 14px rgba(207, 16, 45, 0.18);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: #b80e28;
+
+  box-shadow: 0 7px 18px rgba(207, 16, 45, 0.24);
+}
+
+/* ============================================================
+   RESPONSIVE
+============================================================ */
+
+@media (max-width: 900px) {
   .add-visit-page {
-    padding: 20px;
+    padding: 1.5rem;
   }
 
-  .page-header {
-    align-items: flex-start;
-
-    flex-direction: column;
-
-    gap: 20px;
+  .package-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .form-grid {
+  .package-summary-item:nth-child(2) {
+    border-right: none;
+  }
+
+  .package-summary-item:nth-child(-n + 2) {
+    border-bottom: 1px solid #f6d2d5;
+  }
+}
+
+@media (max-width: 700px) {
+  .add-visit-page {
+    padding: 1rem;
+  }
+
+  .page-header h1 {
+    font-size: 1.4rem;
+  }
+
+  .page-header-icon {
+    width: 2.8rem;
+    height: 2.8rem;
+  }
+
+  .card-header {
+    padding: 1rem;
+  }
+
+  .card-body {
+    padding: 1rem;
+  }
+
+  .form-grid,
+  .assignment-grid {
     grid-template-columns: 1fr;
   }
 
-  .form-group.full-width {
+  .full-width {
     grid-column: auto;
   }
 
-  .form-actions {
-    justify-content: stretch;
-
-    flex-direction: column;
+  .package-summary {
+    grid-template-columns: 1fr;
   }
 
-  .cancel-button,
-  .submit-button {
+  .package-summary-item {
+    border-right: none;
+    border-bottom: 1px solid #f6d2d5;
+  }
+
+  .package-summary-item:last-child {
+    border-bottom: none;
+  }
+
+  .form-footer {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+
+  .btn {
     width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .breadcrumb {
+    margin-bottom: 1rem;
+  }
+
+  .page-header {
+    margin-bottom: 1.25rem;
+  }
+
+  .page-header-left {
+    align-items: flex-start;
+  }
+
+  .page-header p {
+    font-size: 0.8rem;
+  }
+
+  .assignment-header {
+    padding: 0.9rem;
+  }
+
+  .assignment-grid {
+    padding: 1rem;
   }
 }

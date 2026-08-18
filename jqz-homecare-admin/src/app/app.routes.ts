@@ -14,7 +14,6 @@ import { Dashboard } from './features/dashboard/dashboard/dashboard';
 
 import { VisitsList } from './features/visits/visits-list/visits-list';
 import { AddVisit } from './features/visits/add-visit/add-visit';
-import { EditVisit } from './features/visits/edit-visit/edit-visit';
 import { VisitDetails } from './features/visits/visit-details/visit-details';
 
 // ============================================================
@@ -125,11 +124,6 @@ export const routes: Routes = [
       {
         path: 'visits/add',
         component: AddVisit,
-      },
-
-      {
-        path: 'visits/:id/edit',
-        component: EditVisit,
       },
 
       {

@@ -1,178 +1,347 @@
+import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
-import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { PLATFORM_ID } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 
-import { Table } from '../../../shared/components/table/table';
-
-import { Visit } from './visits-list.interface';
-import { VisitsListService } from './visits-list.service';
-
-import { VisitStatus } from '../../../shared/enums/visit-status';
+import { CollectionStatus, Visit, VisitStatus } from '../visits.interface';
+import { VisitsService } from '../visits.service';
 
 @Component({
   selector: 'app-visits-list',
-
   standalone: true,
-
-  imports: [CommonModule, Table],
-
-  templateUrl: './visit-list.html',
-
+  imports: [CommonModule, FormsModule],
+  templateUrl: './visits-list.html',
   styleUrl: './visits-list.css',
 })
 export class VisitsList implements OnInit {
-  // =========================
-  // DEPENDENCIES
-  // =========================
+  private readonly visitsService = inject(VisitsService);
+  private readonly router = inject(Router);
+  private readonly cdr = inject(ChangeDetectorRef);
 
-  private visitsListService = inject(VisitsListService);
-
-  private platformId = inject(PLATFORM_ID);
-
-  private router = inject(Router);
-
-  private changeDetectorRef = inject(ChangeDetectorRef);
-
-  // =========================
-  // DATE
-  // =========================
-
-  selectedDate = '';
-
-  // =========================
-  // UI STATE
-  // =========================
-
-  isLoading = false;
-
-  errorMessage = '';
-
-  // =========================
-  // TABLE COLUMNS
-  // =========================
-
-  columns = [
-    'patientName',
-    'practitionerName',
-    'areaName',
-    'serviceName',
-    'packageName',
-    'scheduledDate',
-    'timeSlot',
-    'status',
-    'amountDue',
-  ];
-
-  // =========================
-  // VISITS
-  // =========================
+  // ============================================================
+  // DATA
+  // ============================================================
 
   visits: Visit[] = [];
 
-  // =========================
-  // INITIALIZATION
-  // =========================
+  // ============================================================
+  // UI STATE
+  // ============================================================
+
+  isLoading = false;
+  errorMessage = '';
+
+  // ============================================================
+  // FILTERS
+  // ============================================================
+
+  searchTerm = '';
+
+  selectedStatus: VisitStatus | 'All' = 'All';
+
+  selectedCollectionStatus: CollectionStatus | 'All' = 'All';
+
+  // ============================================================
+  // LIFECYCLE
+  // ============================================================
 
   ngOnInit(): void {
-    this.selectedDate = this.getTodayDate();
-
-    if (isPlatformBrowser(this.platformId)) {
-      this.loadVisits();
-    }
-  }
-
-  // =========================
-  // DATE CHANGE
-  // =========================
-
-  onDateChange(event: Event): void {
-    const input = event.target as HTMLInputElement;
-
-    this.selectedDate = input.value;
-
     this.loadVisits();
   }
 
-  // =========================
+  // ============================================================
   // LOAD VISITS
-  // =========================
+  // ============================================================
 
   loadVisits(): void {
-    this.isLoading = true;
+    console.log('=================================');
+    console.log('VISITS LIST: LOAD STARTED');
+    console.log('=================================');
 
+    this.isLoading = true;
     this.errorMessage = '';
 
-    this.visits = [];
+    this.visitsService.getAll().subscribe({
+      // ----------------------------------------------------------
+      // API SUCCESS
+      // ----------------------------------------------------------
 
-    this.visitsListService.getVisitsByDate(this.selectedDate).subscribe({
-      next: (response) => {
-        this.visits = response;
+      next: (visits) => {
+        console.log('=================================');
+        console.log('VISITS LIST: API SUCCESS');
+        console.log('VISITS RESPONSE:', visits);
+        console.log('IS ARRAY:', Array.isArray(visits));
+        console.log('VISIT COUNT:', visits?.length);
+        console.log('=================================');
 
+        // Update component state
+        this.visits = visits ?? [];
         this.isLoading = false;
 
-        this.changeDetectorRef.detectChanges();
+        console.log('IS LOADING AFTER SUCCESS:', this.isLoading);
+
+        // --------------------------------------------------------
+        // IMPORTANT
+        // --------------------------------------------------------
+        // Explicitly tell Angular to refresh the view after the
+        // asynchronous API response.
+        // This prevents the UI from remaining stuck on
+        // "Loading visits..." even though isLoading is false.
+        // --------------------------------------------------------
+
+        this.cdr.detectChanges();
+
+        console.log('VISITS LIST: VIEW UPDATED');
       },
 
-      error: (error) => {
-        console.error('Error loading visits:', error);
+      // ----------------------------------------------------------
+      // API ERROR
+      // ----------------------------------------------------------
 
-        this.visits = [];
+      error: (error) => {
+        console.error('=================================');
+        console.error('VISITS LIST: API ERROR');
+        console.error('ERROR:', error);
+        console.error('ERROR STATUS:', error?.status);
+        console.error('ERROR MESSAGE:', error?.message);
+        console.error('ERROR BODY:', error?.error);
+        console.error('=================================');
+
+        this.errorMessage = error?.error?.message || 'Unable to load visits. Please try again.';
 
         this.isLoading = false;
 
-        this.errorMessage = 'Unable to load visits. Please try again.';
+        console.log('IS LOADING AFTER ERROR:', this.isLoading);
 
-        this.changeDetectorRef.detectChanges();
+        // Make sure the error state is rendered immediately.
+        this.cdr.detectChanges();
+
+        console.log('VISITS LIST: ERROR VIEW UPDATED');
+      },
+
+      // ----------------------------------------------------------
+      // OBSERVABLE COMPLETED
+      // ----------------------------------------------------------
+
+      complete: () => {
+        console.log('VISITS LIST: OBSERVABLE COMPLETED');
       },
     });
   }
 
-  // =========================
+  // ============================================================
+  // RETRY
+  // ============================================================
+
+  retry(): void {
+    this.loadVisits();
+  }
+
+  // ============================================================
+  // FILTERED VISITS
+  // ============================================================
+
+  get filteredVisits(): Visit[] {
+    const search = this.searchTerm.trim().toLowerCase();
+
+    return this.visits.filter((visit) => {
+      // --------------------------------------------------------
+      // SEARCH
+      // --------------------------------------------------------
+
+      const matchesSearch =
+        !search ||
+        visit.patientName?.toLowerCase().includes(search) ||
+        visit.practitionerName?.toLowerCase().includes(search) ||
+        visit.serviceName?.toLowerCase().includes(search) ||
+        visit.areaName?.toLowerCase().includes(search) ||
+        visit.packageName?.toLowerCase().includes(search);
+
+      // --------------------------------------------------------
+      // STATUS
+      // --------------------------------------------------------
+
+      const matchesStatus = this.selectedStatus === 'All' || visit.status === this.selectedStatus;
+
+      // --------------------------------------------------------
+      // COLLECTION STATUS
+      // --------------------------------------------------------
+
+      const matchesCollectionStatus =
+        this.selectedCollectionStatus === 'All' ||
+        visit.collectionStatus === this.selectedCollectionStatus;
+
+      return matchesSearch && matchesStatus && matchesCollectionStatus;
+    });
+  }
+
+  // ============================================================
+  // CLEAR SEARCH
+  // ============================================================
+
+  clearSearch(): void {
+    this.searchTerm = '';
+  }
+
+  // ============================================================
+  // CLEAR ALL FILTERS
+  // ============================================================
+
+  clearFilters(): void {
+    this.searchTerm = '';
+    this.selectedStatus = 'All';
+    this.selectedCollectionStatus = 'All';
+  }
+
+  // ============================================================
+  // VIEW VISIT
+  // ============================================================
+
+  viewVisit(id: string): void {
+    this.router.navigate(['/visits', id]);
+  }
+
+  // ============================================================
   // ADD VISIT
-  // =========================
+  // ============================================================
 
   addVisit(): void {
     this.router.navigate(['/visits/add']);
   }
 
-  // =========================
-  // VISIT DETAILS
-  // =========================
+  // ============================================================
+  // STATUS CLASS
+  // ============================================================
 
-  onVisitClicked(visit: Visit): void {
-    this.router.navigate(['/visits', visit.id]);
+  getStatusClass(status: VisitStatus): string {
+    switch (status) {
+      case 'Scheduled':
+        return 'status-scheduled';
+
+      case 'Accepted':
+        return 'status-accepted';
+
+      case 'Completed':
+        return 'status-completed';
+
+      case 'Cancelled':
+        return 'status-cancelled';
+
+      default:
+        return '';
+    }
   }
 
-  // =========================
-  // SUMMARY STATISTICS
-  // =========================
+  // ============================================================
+  // COLLECTION STATUS CLASS
+  // ============================================================
 
-  getCompletedVisitsCount(): number {
-    return this.visits.filter((visit) => visit.status === VisitStatus.Completed).length;
+  getCollectionStatusClass(status: CollectionStatus): string {
+    switch (status) {
+      case 'Received':
+        return 'collection-received';
+
+      case 'Pending':
+        return 'collection-pending';
+
+      default:
+        return '';
+    }
   }
 
-  getCancelledVisitsCount(): number {
-    return this.visits.filter((visit) => visit.status === VisitStatus.Cancelled).length;
+  // ============================================================
+  // DATE FORMAT
+  // ============================================================
+
+  formatDate(date: string | null | undefined): string {
+    if (!date) {
+      return '-';
+    }
+
+    const parsedDate = new Date(date);
+
+    if (Number.isNaN(parsedDate.getTime())) {
+      return '-';
+    }
+
+    return parsedDate.toLocaleDateString('en-GB', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+    });
   }
 
-  getTotalRevenue(): number {
-    return this.visits.reduce((total, visit) => total + (visit.amountReceived ?? 0), 0);
+  // ============================================================
+  // TIME FORMAT
+  // ============================================================
+
+  formatTime(time: string | null | undefined): string {
+    if (!time) {
+      return '-';
+    }
+
+    /*
+     * Backend TimeSpan values commonly arrive as:
+     *
+     * 09:00:00
+     * 14:30:00
+     *
+     * We only display HH:mm.
+     */
+
+    const parts = time.split(':');
+
+    if (parts.length < 2) {
+      return time;
+    }
+
+    return `${parts[0]}:${parts[1]}`;
   }
 
-  // =========================
-  // DEFAULT DATE
-  // =========================
+  // ============================================================
+  // VISIT SLOT
+  // ============================================================
 
-  private getTodayDate(): string {
-    const today = new Date();
+  formatSlot(visit: Visit): string {
+    const start = this.formatTime(visit.slotStart);
+    const end = this.formatTime(visit.slotEnd);
 
-    const year = today.getFullYear();
+    if (start === '-' && end === '-') {
+      return '-';
+    }
 
-    const month = String(today.getMonth() + 1).padStart(2, '0');
+    if (start === '-') {
+      return end;
+    }
 
-    const day = String(today.getDate()).padStart(2, '0');
+    if (end === '-') {
+      return start;
+    }
 
-    return `${year}-${month}-${day}`;
+    return `${start} - ${end}`;
+  }
+
+  // ============================================================
+  // AMOUNT FORMAT
+  // ============================================================
+
+  formatAmount(amount: number | null | undefined): string {
+    const value = Number(amount ?? 0);
+
+    return value.toLocaleString('en-PK', {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 2,
+    });
+  }
+
+  // ============================================================
+  // PENDING AMOUNT
+  // ============================================================
+
+  getPendingAmount(visit: Visit): number {
+    const due = Number(visit.amountDue ?? 0);
+    const received = Number(visit.amountReceived ?? 0);
+
+    return Math.max(due - received, 0);
   }
 }

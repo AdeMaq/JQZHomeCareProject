@@ -4,7 +4,9 @@ using System.Text;
 
 namespace JQZHomeCareProject.Mobile.Models.Common
 {
-    internal class ApiErrorResponse
+    //matches Exception Handling from backend
+    public class ApiErrorResponse
     {
+        public string Message { get; set; } = string.Empty;
     }
 }

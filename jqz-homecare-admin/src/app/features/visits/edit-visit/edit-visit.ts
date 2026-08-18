@@ -1,396 +1,621 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Component, inject, OnInit } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { forkJoin } from 'rxjs';
+import { Observable } from 'rxjs';
 
-import { VisitsListService } from '../visits-list/visits-list.service';
-import { Visit, UpdateVisitRequest } from '../visits-list/visits-list.interface';
+import { Practitioner, PractitionerService } from '../../../core/services/practitioner';
 
-import { AddVisitService } from '../add-visit/add-visit.service';
-import { Area, Package, Practitioner, Service } from '../add-visit/add-visit.interface';
+import { Area, CityAreaService } from '../../../core/services/city-area';
+
+import {
+  ReassignPractitionerRequest,
+  ScheduleVisitRequest,
+  VisitsService,
+} from '../visits.service';
+
+import { Visit } from '../visits.interface';
+
+// ============================================================
+// EDIT VISIT FORM MODEL
+// ============================================================
+
+interface EditVisitForm {
+  practitionerId: string | null;
+  areaId: string | null;
+
+  scheduledDate: string | null;
+  slotStart: string | null;
+  slotEnd: string | null;
+
+  refusedBy: 'Patient' | 'Practitioner';
+  reason: string;
+}
+
+// ============================================================
+// COMPONENT
+// ============================================================
 
 @Component({
   selector: 'app-edit-visit',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+
+  imports: [CommonModule, FormsModule],
+
   templateUrl: './edit-visit.html',
   styleUrl: './edit-visit.css',
 })
 export class EditVisit implements OnInit {
-  // =====================================================
-  // DEPENDENCIES
-  // =====================================================
-
-  private readonly fb = inject(FormBuilder);
+  // ============================================================
+  // SERVICES
+  // ============================================================
 
   private readonly route = inject(ActivatedRoute);
 
   private readonly router = inject(Router);
 
-  private readonly cdr = inject(ChangeDetectorRef);
+  private readonly visitsService = inject(VisitsService);
 
-  private readonly visitsListService = inject(VisitsListService);
+  private readonly practitionerService = inject(PractitionerService);
 
-  private readonly addVisitService = inject(AddVisitService);
+  private readonly cityAreaService = inject(CityAreaService);
 
-  // =====================================================
-  // VISIT ID
-  // =====================================================
+  // ============================================================
+  // DATA
+  // ============================================================
 
-  visitId = '';
-
-  // =====================================================
-  // DROPDOWN DATA
-  // =====================================================
+  visit: Visit | null = null;
 
   practitioners: Practitioner[] = [];
 
   areas: Area[] = [];
 
-  services: Service[] = [];
+  // ============================================================
+  // ORIGINAL VALUES
+  // Used to determine what actually changed
+  // ============================================================
 
-  packages: Package[] = [];
+  private originalPractitionerId: string | null = null;
 
-  // =====================================================
-  // UI STATE
-  // =====================================================
+  private originalAreaId: string | null = null;
 
-  isLoading = true;
+  private originalScheduledDate: string | null = null;
 
-  isFormReady = false;
+  private originalSlotStart: string | null = null;
 
-  isSubmitting = false;
+  private originalSlotEnd: string | null = null;
+
+  // ============================================================
+  // LOADING STATES
+  // ============================================================
+
+  isLoading = false;
+
+  isSaving = false;
+
+  // ============================================================
+  // MESSAGES
+  // ============================================================
 
   errorMessage = '';
 
-  // =====================================================
+  successMessage = '';
+
+  // ============================================================
   // FORM
-  // =====================================================
+  // ============================================================
 
-  visitForm = this.fb.group({
-    practitionerId: ['', Validators.required],
+  form: EditVisitForm = {
+    practitionerId: null,
+    areaId: null,
 
-    areaId: ['', Validators.required],
+    scheduledDate: null,
+    slotStart: null,
+    slotEnd: null,
 
-    serviceId: ['', Validators.required],
+    refusedBy: 'Practitioner',
+    reason: '',
+  };
 
-    packageId: [''],
-
-    scheduledDate: ['', Validators.required],
-
-    timeSlot: ['', Validators.required],
-
-    amountDue: [0, [Validators.required, Validators.min(0)]],
-  });
-
-  // =====================================================
+  // ============================================================
   // INITIALIZATION
-  // =====================================================
+  // ============================================================
 
   ngOnInit(): void {
-    console.log('EDIT VISIT COMPONENT INITIALIZED');
+    const visitId = this.route.snapshot.paramMap.get('id');
 
-    this.visitId = this.route.snapshot.paramMap.get('id') ?? '';
-
-    console.log('VISIT ID:', this.visitId);
-
-    if (!this.visitId) {
-      this.errorMessage = 'Visit ID was not found.';
-
-      this.isLoading = false;
-
-      this.isFormReady = false;
-
-      this.cdr.detectChanges();
-
+    if (!visitId) {
+      this.errorMessage = 'Visit ID is missing.';
       return;
     }
 
-    this.watchPractitionerChanges();
-
-    this.watchPackageChanges();
-
-    this.loadFormData();
+    this.loadVisit(visitId);
   }
 
-  // =====================================================
-  // LOAD ALL FORM DATA
-  // =====================================================
+  // ============================================================
+  // LOAD VISIT
+  // ============================================================
 
-  loadFormData(): void {
-    console.log('LOADING EDIT PAGE DATA');
-
+  private loadVisit(id: string): void {
     this.isLoading = true;
 
-    this.isFormReady = false;
-
     this.errorMessage = '';
 
-    forkJoin({
-      practitioners: this.addVisitService.getPractitioners(),
+    this.visitsService.getById(id).subscribe({
+      next: (visit) => {
+        this.visit = visit;
 
-      services: this.addVisitService.getServices(),
+        this.populateForm(visit);
 
-      packages: this.addVisitService.getPackages(),
-
-      visit: this.visitsListService.getVisitById(this.visitId),
-    }).subscribe({
-      next: (response) => {
-        console.log('EDIT PAGE DATA LOADED:', response);
-
-        this.practitioners = response.practitioners;
-
-        this.services = response.services;
-
-        this.packages = response.packages;
-
-        this.loadVisitIntoForm(response.visit);
+        this.loadPractitioners();
       },
 
-      error: (error) => {
-        console.error('ERROR LOADING EDIT PAGE DATA:', error);
+      error: (error: unknown) => {
+        console.error('Failed to load visit:', error);
 
-        this.errorMessage = 'Unable to load visit information.';
-
-        this.isLoading = false;
-
-        this.isFormReady = false;
-
-        this.cdr.detectChanges();
-      },
-    });
-  }
-
-  // =====================================================
-  // LOAD AREAS AND POPULATE FORM
-  // =====================================================
-
-  loadVisitIntoForm(visit: Visit): void {
-    console.log('VISIT RECEIVED:', visit);
-
-    this.addVisitService.getPractitionerAreas(visit.practitionerId).subscribe({
-      next: (areasResponse) => {
-        console.log('AREAS RECEIVED:', areasResponse);
-
-        this.areas = areasResponse;
-
-        // =============================================
-        // PATCH VISIT DATA INTO FORM
-        // =============================================
-
-        this.visitForm.patchValue(
-          {
-            practitionerId: visit.practitionerId,
-
-            areaId: visit.areaId,
-
-            serviceId: visit.serviceId,
-
-            packageId: visit.packageId ?? '',
-
-            scheduledDate: this.formatDateForInput(visit.scheduledDate),
-
-            timeSlot: visit.timeSlot,
-
-            amountDue: visit.amountDue,
-          },
-          {
-            emitEvent: false,
-          },
+        this.errorMessage = this.getErrorMessage(
+          error,
+          'Unable to load the visit. Please try again.',
         );
 
-        console.log('FORM VALUE AFTER PATCH:', this.visitForm.getRawValue());
-
-        // =============================================
-        // FORM IS NOW READY
-        // =============================================
-
         this.isLoading = false;
-
-        this.isFormReady = true;
-
-        console.log('IS LOADING:', this.isLoading);
-
-        console.log('IS FORM READY:', this.isFormReady);
-
-        this.cdr.detectChanges();
-
-        console.log('EDIT FORM LOADED SUCCESSFULLY');
-      },
-
-      error: (error) => {
-        console.error('ERROR LOADING PRACTITIONER AREAS:', error);
-
-        this.errorMessage = 'Unable to load practitioner areas.';
-
-        this.isLoading = false;
-
-        this.isFormReady = false;
-
-        this.cdr.detectChanges();
       },
     });
   }
 
-  // =====================================================
+  // ============================================================
+  // POPULATE FORM
+  // ============================================================
+
+  private populateForm(visit: Visit): void {
+    const scheduledDate = this.formatDateForInput(visit.scheduledDate);
+
+    const slotStart = this.formatTimeForInput(visit.slotStart);
+
+    const slotEnd = this.formatTimeForInput(visit.slotEnd);
+
+    this.form = {
+      practitionerId: visit.practitionerId ?? null,
+
+      areaId: visit.areaId ?? null,
+
+      scheduledDate,
+
+      slotStart,
+
+      slotEnd,
+
+      refusedBy: 'Practitioner',
+
+      reason: '',
+    };
+
+    // Store original values.
+
+    this.originalPractitionerId = visit.practitionerId ?? null;
+
+    this.originalAreaId = visit.areaId ?? null;
+
+    this.originalScheduledDate = scheduledDate;
+
+    this.originalSlotStart = slotStart;
+
+    this.originalSlotEnd = slotEnd;
+  }
+
+  // ============================================================
+  // LOAD PRACTITIONERS
+  // ============================================================
+
+  private loadPractitioners(): void {
+    this.practitionerService.getPractitioners().subscribe({
+      next: (practitioners) => {
+        this.practitioners = practitioners;
+
+        this.loadAreas();
+      },
+
+      error: (error: unknown) => {
+        console.error('Failed to load practitioners:', error);
+
+        this.errorMessage = 'Unable to load practitioners. Please try again.';
+
+        this.isLoading = false;
+      },
+    });
+  }
+
+  // ============================================================
+  // LOAD AREAS
+  // ============================================================
+
+  private loadAreas(): void {
+    this.cityAreaService.getAreas().subscribe({
+      next: (areas) => {
+        this.areas = areas;
+
+        this.isLoading = false;
+      },
+
+      error: (error: unknown) => {
+        console.error('Failed to load areas:', error);
+
+        this.errorMessage = 'Unable to load areas. Please try again.';
+
+        this.isLoading = false;
+      },
+    });
+  }
+
+  // ============================================================
+  // GET PRACTITIONERS
+  // ============================================================
+
+  getPractitioners(): Practitioner[] {
+    if (!this.visit) {
+      return [];
+    }
+
+    return this.practitioners.filter(
+      (practitioner) => practitioner.serviceId === this.visit!.serviceId,
+    );
+  }
+
+  // ============================================================
   // PRACTITIONER CHANGE
-  // =====================================================
+  // ============================================================
 
-  watchPractitionerChanges(): void {
-    this.visitForm.controls.practitionerId.valueChanges.subscribe((practitionerId) => {
-      console.log('PRACTITIONER CHANGED:', practitionerId);
+  onPractitionerChange(): void {
+    if (!this.form.practitionerId) {
+      this.form.areaId = null;
+      return;
+    }
 
-      if (!practitionerId) {
-        this.areas = [];
+    const practitioner = this.practitioners.find((p) => p.id === this.form.practitionerId);
 
-        this.visitForm.patchValue(
-          {
-            areaId: '',
-          },
-          {
-            emitEvent: false,
-          },
-        );
+    if (!practitioner) {
+      this.form.areaId = null;
+      return;
+    }
 
-        return;
+    // If current area does not belong to the selected
+    // practitioner, clear it.
+
+    if (this.form.areaId) {
+      const validArea = practitioner.areas.some((area) => area.id === this.form.areaId);
+
+      if (!validArea) {
+        this.form.areaId = null;
       }
-
-      this.addVisitService.getPractitionerAreas(practitionerId).subscribe({
-        next: (response) => {
-          console.log('PRACTITIONER AREAS LOADED:', response);
-
-          this.areas = response;
-
-          this.visitForm.patchValue(
-            {
-              areaId: '',
-            },
-            {
-              emitEvent: false,
-            },
-          );
-
-          this.cdr.detectChanges();
-        },
-
-        error: (error) => {
-          console.error('ERROR LOADING AREAS FOR PRACTITIONER:', error);
-
-          this.errorMessage = 'Unable to load practitioner areas.';
-
-          this.cdr.detectChanges();
-        },
-      });
-    });
+    }
   }
 
-  // =====================================================
-  // PACKAGE CHANGE
-  // =====================================================
+  // ============================================================
+  // GET AREAS
+  // ============================================================
 
-  watchPackageChanges(): void {
-    this.visitForm.controls.packageId.valueChanges.subscribe((packageId) => {
-      console.log('PACKAGE CHANGED:', packageId);
+  getAreas(): Area[] {
+    if (!this.form.practitionerId) {
+      return this.areas;
+    }
 
-      if (!packageId) {
-        return;
-      }
+    const practitioner = this.practitioners.find((p) => p.id === this.form.practitionerId);
 
-      const selectedPackage = this.packages.find((pkg) => pkg.id === packageId);
+    if (!practitioner) {
+      return [];
+    }
 
-      if (!selectedPackage) {
-        return;
-      }
+    const practitionerAreaIds = new Set(practitioner.areas.map((area) => area.id));
 
-      this.visitForm.patchValue(
-        {
-          amountDue: selectedPackage.amount,
-        },
-        {
-          emitEvent: false,
-        },
-      );
-    });
+    return this.areas.filter((area) => practitionerAreaIds.has(area.id));
   }
 
-  // =====================================================
-  // UPDATE VISIT
-  // =====================================================
+  // ============================================================
+  // CHECK PARTIAL SCHEDULE
+  // ============================================================
 
-  onSubmit(): void {
-    console.log('SUBMIT BUTTON CLICKED');
+  hasPartialSchedule(): boolean {
+    const hasDate = !!this.form.scheduledDate;
 
-    if (this.visitForm.invalid) {
-      console.log('FORM IS INVALID:', this.visitForm.getRawValue());
+    const hasStart = !!this.form.slotStart;
 
-      this.visitForm.markAllAsTouched();
+    const hasEnd = !!this.form.slotEnd;
+
+    const hasAny = hasDate || hasStart || hasEnd;
+
+    const hasAll = hasDate && hasStart && hasEnd;
+
+    return hasAny && !hasAll;
+  }
+
+  // ============================================================
+  // CHECK TIME ORDER
+  // ============================================================
+
+  hasInvalidTimeOrder(): boolean {
+    if (!this.form.slotStart || !this.form.slotEnd) {
+      return false;
+    }
+
+    return this.form.slotStart >= this.form.slotEnd;
+  }
+
+  // ============================================================
+  // CHECK PRACTITIONER CHANGE
+  // ============================================================
+
+  hasPractitionerChanged(): boolean {
+    return this.form.practitionerId !== this.originalPractitionerId;
+  }
+
+  // ============================================================
+  // CHECK AREA CHANGE
+  // ============================================================
+
+  hasAreaChanged(): boolean {
+    return this.form.areaId !== this.originalAreaId;
+  }
+
+  // ============================================================
+  // CHECK SCHEDULE CHANGE
+  // ============================================================
+
+  hasScheduleChanged(): boolean {
+    return (
+      this.form.scheduledDate !== this.originalScheduledDate ||
+      this.form.slotStart !== this.originalSlotStart ||
+      this.form.slotEnd !== this.originalSlotEnd
+    );
+  }
+
+  // ============================================================
+  // CHECK REASSIGNMENT
+  // ============================================================
+
+  hasReassignment(): boolean {
+    return this.hasPractitionerChanged() || this.hasAreaChanged();
+  }
+
+  // ============================================================
+  // SUBMIT
+  // ============================================================
+
+  submit(): void {
+    this.errorMessage = '';
+
+    this.successMessage = '';
+
+    // ----------------------------------------------------------
+    // VISIT VALIDATION
+    // ----------------------------------------------------------
+
+    if (!this.visit) {
+      this.errorMessage = 'Visit information is unavailable.';
 
       return;
     }
 
-    this.isSubmitting = true;
+    // ----------------------------------------------------------
+    // SCHEDULE VALIDATION
+    // ----------------------------------------------------------
 
-    this.errorMessage = '';
+    if (this.hasPartialSchedule()) {
+      this.errorMessage = 'Scheduled date, start time and end time must all be provided together.';
 
-    const updateRequest: UpdateVisitRequest = {
-      practitionerId: this.visitForm.value.practitionerId ?? '',
+      return;
+    }
 
-      areaId: this.visitForm.value.areaId ?? '',
+    if (this.hasInvalidTimeOrder()) {
+      this.errorMessage = 'End time must be later than start time.';
 
-      serviceId: this.visitForm.value.serviceId ?? '',
+      return;
+    }
 
-      packageId: this.visitForm.value.packageId || null,
+    // ----------------------------------------------------------
+    // REASSIGNMENT VALIDATION
+    // ----------------------------------------------------------
 
-      scheduledDate: this.visitForm.value.scheduledDate ?? '',
+    if (this.hasReassignment()) {
+      if (!this.form.practitionerId) {
+        this.errorMessage = 'Please select a practitioner.';
 
-      timeSlot: this.visitForm.value.timeSlot ?? '',
+        return;
+      }
 
-      amountDue: Number(this.visitForm.value.amountDue ?? 0),
-    };
+      if (!this.form.reason.trim()) {
+        this.errorMessage = 'A reason is required when changing the practitioner or area.';
 
-    console.log('UPDATE VISIT PAYLOAD:', updateRequest);
+        return;
+      }
+    }
 
-    this.visitsListService.updateVisit(this.visitId, updateRequest).subscribe({
+    // ----------------------------------------------------------
+    // NOTHING CHANGED
+    // ----------------------------------------------------------
+
+    if (!this.hasScheduleChanged() && !this.hasReassignment()) {
+      this.errorMessage = 'No changes were made to this visit.';
+
+      return;
+    }
+
+    // ----------------------------------------------------------
+    // SAVE
+    // ----------------------------------------------------------
+
+    this.isSaving = true;
+
+    this.saveChanges();
+  }
+
+  // ============================================================
+  // SAVE CHANGES
+  // ============================================================
+
+  private saveChanges(): void {
+    const operations: Array<() => Observable<void>> = [];
+
+    // ----------------------------------------------------------
+    // REASSIGNMENT
+    // ----------------------------------------------------------
+
+    if (this.hasReassignment()) {
+      const request: ReassignPractitionerRequest = {
+        practitionerId: this.form.practitionerId!,
+
+        areaId: this.form.areaId ?? null,
+
+        refusedBy: this.form.refusedBy,
+
+        reason: this.form.reason.trim(),
+      };
+
+      operations.push(() => this.visitsService.reassign(this.visit!.id, request));
+    }
+
+    // ----------------------------------------------------------
+    // SCHEDULE
+    // ----------------------------------------------------------
+
+    if (this.hasScheduleChanged()) {
+      // Because a partial schedule was already rejected above,
+      // either all values are present or all are empty.
+
+      if (!this.form.scheduledDate || !this.form.slotStart || !this.form.slotEnd) {
+        this.errorMessage = 'Scheduled date, start time and end time must all be provided.';
+
+        this.isSaving = false;
+
+        return;
+      }
+
+      const request: ScheduleVisitRequest = {
+        scheduledDate: this.form.scheduledDate,
+
+        slotStart: this.form.slotStart,
+
+        slotEnd: this.form.slotEnd,
+      };
+
+      operations.push(() => this.visitsService.schedule(this.visit!.id, request));
+    }
+
+    // ----------------------------------------------------------
+    // EXECUTE OPERATIONS SEQUENTIALLY
+    // ----------------------------------------------------------
+
+    this.executeOperations(operations, 0);
+  }
+
+  // ============================================================
+  // EXECUTE OPERATIONS
+  // ============================================================
+
+  private executeOperations(operations: Array<() => Observable<void>>, index: number): void {
+    if (index >= operations.length) {
+      this.isSaving = false;
+
+      this.successMessage = 'Visit updated successfully.';
+
+      // Navigate back after successful update.
+
+      setTimeout(() => {
+        this.router.navigate(['/admin/visits']);
+      }, 700);
+
+      return;
+    }
+
+    operations[index]().subscribe({
       next: () => {
-        console.log('VISIT UPDATED SUCCESSFULLY');
-
-        this.isSubmitting = false;
-
-        this.router.navigate(['/visits', this.visitId]);
+        this.executeOperations(operations, index + 1);
       },
 
-      error: (error) => {
-        console.error('ERROR UPDATING VISIT:', error);
+      error: (error: unknown) => {
+        console.error('Failed to update visit:', error);
 
-        this.errorMessage = error?.error?.message ?? 'Unable to update visit.';
+        this.isSaving = false;
 
-        this.isSubmitting = false;
-
-        this.cdr.detectChanges();
+        this.errorMessage = this.getErrorMessage(
+          error,
+          'Unable to update the visit. Please try again.',
+        );
       },
     });
   }
 
-  // =====================================================
-  // CANCEL / BACK
-  // =====================================================
+  // ============================================================
+  // DATE FORMATTER
+  // ============================================================
 
-  onCancel(): void {
-    console.log('CANCEL / BACK BUTTON CLICKED');
-
-    this.router.navigate(['/visits', this.visitId]);
-  }
-
-  // =====================================================
-  // DATE FORMAT
-  // =====================================================
-
-  private formatDateForInput(date: string): string {
-    if (!date) {
-      return '';
+  private formatDateForInput(value: string | null | undefined): string | null {
+    if (!value) {
+      return null;
     }
 
-    return date.split('T')[0];
+    return value.substring(0, 10);
+  }
+
+  // ============================================================
+  // TIME FORMATTER
+  // Handles:
+  // "09:00:00"
+  // "09:00:00.0000000"
+  // "09:00"
+  // ============================================================
+
+  private formatTimeForInput(value: string | null | undefined): string | null {
+    if (!value) {
+      return null;
+    }
+
+    return value.substring(0, 5);
+  }
+
+  // ============================================================
+  // ERROR MESSAGE
+  // ============================================================
+
+  private getErrorMessage(error: unknown, fallback: string): string {
+    if (typeof error === 'object' && error !== null) {
+      const response = error as {
+        error?: {
+          message?: string;
+          title?: string;
+          detail?: string;
+          errors?: Record<string, string[]>;
+        };
+      };
+
+      if (response.error?.message) {
+        return response.error.message;
+      }
+
+      if (response.error?.detail) {
+        return response.error.detail;
+      }
+
+      if (response.error?.title) {
+        return response.error.title;
+      }
+
+      if (response.error?.errors) {
+        const validationErrors = Object.values(response.error.errors).flat();
+
+        if (validationErrors.length > 0) {
+          return validationErrors.join(' ');
+        }
+      }
+    }
+
+    return fallback;
+  }
+
+  // ============================================================
+  // CANCEL
+  // ============================================================
+
+  cancel(): void {
+    this.router.navigate(['/admin/visits']);
   }
 }

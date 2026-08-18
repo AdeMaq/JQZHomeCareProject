@@ -1,203 +1,455 @@
 <div class="edit-visit-page">
-  <!-- =====================================================
-       PAGE HEADER
-  ====================================================== -->
+  <!-- ============================================================
+       BREADCRUMB
+  ============================================================ -->
 
-  <div class="page-header">
-    <div>
-      <h1>Edit Visit</h1>
+  <div class="breadcrumb">
+    <span>Visits</span>
 
-      <p>Update the information for this visit.</p>
-    </div>
+    <i class="fa-solid fa-chevron-right"></i>
 
-    <button type="button" class="back-button" (click)="onCancel()">← Back to Visit Details</button>
+    <span class="current">Edit Visit</span>
   </div>
 
-  <!-- =====================================================
-       ERROR MESSAGE
-  ====================================================== -->
+  <!-- ============================================================
+       PAGE HEADER
+  ============================================================ -->
 
-  @if (errorMessage) {
-    <div class="error-message">
-      {{ errorMessage }}
+  <div class="page-header">
+    <div class="page-header-left">
+      <div class="page-header-icon">
+        <i class="fa-solid fa-calendar-pen"></i>
+      </div>
+
+      <div>
+        <h1>Edit Visit</h1>
+
+        <p>Update the practitioner, area and schedule for this visit.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       LOADING
+  ============================================================ -->
+
+  @if (isLoading) {
+    <div class="loading-card">
+      <i class="fa-solid fa-spinner fa-spin"></i>
+
+      <span>Loading visit...</span>
     </div>
   }
 
-  <!-- =====================================================
-       LOADING MESSAGE
-  ====================================================== -->
+  <!-- ============================================================
+       ERROR BEFORE VISIT LOAD
+  ============================================================ -->
 
-  @if (isLoading) {
-    <div class="loading-message">Loading visit information...</div>
+  @if (!isLoading && !visit && errorMessage) {
+    <div class="form-alert error">
+      <i class="fa-solid fa-circle-exclamation"></i>
+
+      <div>
+        <strong>Unable to load visit</strong>
+
+        <p>
+          {{ errorMessage }}
+        </p>
+      </div>
+    </div>
+
+    <div class="form-footer">
+      <button type="button" class="btn btn-secondary" (click)="cancel()">
+        <i class="fa-solid fa-arrow-left"></i>
+
+        Back to Visits
+      </button>
+    </div>
   }
 
-  <!-- =====================================================
-       FORM
-  ====================================================== -->
+  <!-- ============================================================
+       EDIT FORM
+  ============================================================ -->
 
-  @if (isFormReady && !errorMessage) {
-    <form [formGroup]="visitForm" (ngSubmit)="onSubmit()" class="visit-form">
-      <!-- =================================================
-           VISIT DETAILS
-      ================================================== -->
+  @if (!isLoading && visit) {
+    <form class="visit-form" (ngSubmit)="submit()" #editVisitForm="ngForm">
+      <!-- ========================================================
+           VISIT INFORMATION
+      ========================================================= -->
 
-      <div class="form-section">
-        <h2>Visit Details</h2>
-
-        <div class="form-grid">
-          <!-- =================================================
-               PRACTITIONER
-          ================================================== -->
-
-          <div class="form-group">
-            <label for="practitionerId"> Practitioner </label>
-
-            <select id="practitionerId" formControlName="practitionerId">
-              <option value="">Select practitioner</option>
-
-              @for (practitioner of practitioners; track practitioner.id) {
-                <option [value]="practitioner.id">
-                  {{ practitioner.name }}
-                </option>
-              }
-            </select>
-
-            @if (
-              visitForm.controls.practitionerId.touched && visitForm.controls.practitionerId.invalid
-            ) {
-              <small class="field-error"> Please select a practitioner. </small>
-            }
+      <section class="form-card">
+        <div class="card-header">
+          <div class="card-header-icon">
+            <i class="fa-solid fa-calendar-check"></i>
           </div>
 
-          <!-- =================================================
-               AREA
-          ================================================== -->
+          <div>
+            <h2>Visit Information</h2>
 
-          <div class="form-group">
-            <label for="areaId"> Area </label>
-
-            <select id="areaId" formControlName="areaId">
-              <option value="">Select area</option>
-
-              @for (area of areas; track area.id) {
-                <option [value]="area.id">
-                  {{ area.name }}
-                </option>
-              }
-            </select>
-
-            @if (visitForm.controls.areaId.touched && visitForm.controls.areaId.invalid) {
-              <small class="field-error"> Please select an area. </small>
-            }
-          </div>
-
-          <!-- =================================================
-               SERVICE
-          ================================================== -->
-
-          <div class="form-group">
-            <label for="serviceId"> Service </label>
-
-            <select id="serviceId" formControlName="serviceId">
-              <option value="">Select service</option>
-
-              @for (service of services; track service.id) {
-                <option [value]="service.id">
-                  {{ service.name }}
-                </option>
-              }
-            </select>
-
-            @if (visitForm.controls.serviceId.touched && visitForm.controls.serviceId.invalid) {
-              <small class="field-error"> Please select a service. </small>
-            }
-          </div>
-
-          <!-- =================================================
-               PACKAGE
-          ================================================== -->
-
-          <div class="form-group">
-            <label for="packageId"> Package </label>
-
-            <select id="packageId" formControlName="packageId">
-              <option value="">No package</option>
-
-              @for (package of packages; track package.id) {
-                <option [value]="package.id">{{ package.name }} - Rs. {{ package.amount }}</option>
-              }
-            </select>
-          </div>
-
-          <!-- =================================================
-               SCHEDULED DATE
-          ================================================== -->
-
-          <div class="form-group">
-            <label for="scheduledDate"> Scheduled Date </label>
-
-            <input id="scheduledDate" type="date" formControlName="scheduledDate" />
-
-            @if (
-              visitForm.controls.scheduledDate.touched && visitForm.controls.scheduledDate.invalid
-            ) {
-              <small class="field-error"> Please select a date. </small>
-            }
-          </div>
-
-          <!-- =================================================
-               TIME SLOT
-          ================================================== -->
-
-          <div class="form-group">
-            <label for="timeSlot"> Time Slot </label>
-
-            <input
-              id="timeSlot"
-              type="text"
-              formControlName="timeSlot"
-              placeholder="e.g. 10:00 AM - 11:00 AM"
-            />
-
-            @if (visitForm.controls.timeSlot.touched && visitForm.controls.timeSlot.invalid) {
-              <small class="field-error"> Time slot is required. </small>
-            }
-          </div>
-
-          <!-- =================================================
-               AMOUNT DUE
-          ================================================== -->
-
-          <div class="form-group">
-            <label for="amountDue"> Amount Due </label>
-
-            <input
-              id="amountDue"
-              type="number"
-              formControlName="amountDue"
-              min="0"
-              placeholder="Enter amount"
-            />
-
-            @if (visitForm.controls.amountDue.touched && visitForm.controls.amountDue.invalid) {
-              <small class="field-error"> Amount must be 0 or greater. </small>
-            }
+            <p>Basic information for the selected visit.</p>
           </div>
         </div>
-      </div>
 
-      <!-- =================================================
-           ACTIONS
-      ================================================== -->
+        <div class="card-body">
+          <div class="info-grid">
+            <!-- Patient -->
 
-      <div class="form-actions">
-        <button type="button" class="cancel-button" (click)="onCancel()">Cancel</button>
+            <div class="info-item">
+              <span class="info-label"> Patient </span>
 
-        <button type="submit" class="submit-button" [disabled]="isSubmitting">
-          @if (isSubmitting) {
-            Updating Visit...
+              <strong>
+                {{ visit.patientName }}
+              </strong>
+            </div>
+
+            <!-- Service -->
+
+            <div class="info-item">
+              <span class="info-label"> Service </span>
+
+              <strong>
+                {{ visit.serviceName || '—' }}
+              </strong>
+            </div>
+
+            <!-- Package -->
+
+            <div class="info-item">
+              <span class="info-label"> Package </span>
+
+              <strong>
+                {{ visit.packageName || '—' }}
+              </strong>
+            </div>
+
+            <!-- Status -->
+
+            <div class="info-item">
+              <span class="info-label"> Status </span>
+
+              <span
+                class="status-badge"
+                [class.scheduled]="visit.status === 'Scheduled'"
+                [class.accepted]="visit.status === 'Accepted'"
+                [class.completed]="visit.status === 'Completed'"
+                [class.cancelled]="visit.status === 'Cancelled'"
+              >
+                {{ visit.status }}
+              </span>
+            </div>
+
+            <!-- Amount Due -->
+
+            <div class="info-item">
+              <span class="info-label"> Amount Due </span>
+
+              <strong> PKR {{ visit.amountDue | number: '1.0-2' }} </strong>
+            </div>
+
+            <!-- Collection -->
+
+            <div class="info-item">
+              <span class="info-label"> Collection Status </span>
+
+              <strong>
+                {{ visit.collectionStatus }}
+              </strong>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================================
+           ASSIGNMENT
+      ========================================================= -->
+
+      <section class="form-card">
+        <div class="card-header">
+          <div class="card-header-icon">
+            <i class="fa-solid fa-user-doctor"></i>
+          </div>
+
+          <div>
+            <h2>Practitioner Assignment</h2>
+
+            <p>Update the practitioner and area assigned to this visit.</p>
+          </div>
+        </div>
+
+        <div class="card-body">
+          <div class="form-grid">
+            <!-- Practitioner -->
+
+            <div class="form-field">
+              <label for="practitionerId"> Practitioner </label>
+
+              <div class="input-wrapper">
+                <i class="fa-solid fa-user-doctor"></i>
+
+                <select
+                  id="practitionerId"
+                  name="practitionerId"
+                  [(ngModel)]="form.practitionerId"
+                  (ngModelChange)="onPractitionerChange()"
+                >
+                  <option [ngValue]="null">Select practitioner</option>
+
+                  @for (practitioner of getPractitioners(); track practitioner.id) {
+                    <option [ngValue]="practitioner.id">
+                      {{ practitioner.name }}
+                    </option>
+                  }
+                </select>
+              </div>
+            </div>
+
+            <!-- Area -->
+
+            <div class="form-field">
+              <label for="areaId"> Area </label>
+
+              <div class="input-wrapper">
+                <i class="fa-solid fa-location-dot"></i>
+
+                <select id="areaId" name="areaId" [(ngModel)]="form.areaId">
+                  <option [ngValue]="null">Select area</option>
+
+                  @for (area of getAreas(); track area.id) {
+                    <option [ngValue]="area.id">
+                      {{ area.name }}
+
+                      @if (area.cityName) {
+                        — {{ area.cityName }}
+                      }
+                    </option>
+                  }
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- ======================================================
+               REASSIGNMENT INFORMATION
+          ======================================================= -->
+
+          @if (hasReassignment()) {
+            <div class="reassignment-box">
+              <div class="reassignment-title">
+                <i class="fa-solid fa-arrows-rotate"></i>
+
+                <strong> Reassignment Information </strong>
+              </div>
+
+              <p>A reason is required when changing the practitioner or assigned area.</p>
+
+              <div class="form-grid">
+                <!-- Refused By -->
+
+                <div class="form-field">
+                  <label for="refusedBy">
+                    Refused By
+                    <span class="required">*</span>
+                  </label>
+
+                  <div class="input-wrapper">
+                    <i class="fa-solid fa-user-slash"></i>
+
+                    <select id="refusedBy" name="refusedBy" [(ngModel)]="form.refusedBy">
+                      <option value="Practitioner">Practitioner</option>
+
+                      <option value="Patient">Patient</option>
+                    </select>
+                  </div>
+                </div>
+
+                <!-- Reason -->
+
+                <div class="form-field">
+                  <label for="reason">
+                    Reason
+                    <span class="required">*</span>
+                  </label>
+
+                  <div class="input-wrapper textarea-wrapper">
+                    <i class="fa-solid fa-comment"></i>
+
+                    <textarea
+                      id="reason"
+                      name="reason"
+                      [(ngModel)]="form.reason"
+                      maxlength="500"
+                      rows="3"
+                      placeholder="Enter the reason for reassignment"
+                    ></textarea>
+                  </div>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      </section>
+
+      <!-- ========================================================
+           SCHEDULE
+      ========================================================= -->
+
+      <section class="form-card">
+        <div class="card-header">
+          <div class="card-header-icon">
+            <i class="fa-solid fa-clock"></i>
+          </div>
+
+          <div>
+            <h2>Visit Schedule</h2>
+
+            <p>Set the date and time for this visit.</p>
+          </div>
+        </div>
+
+        <div class="card-body">
+          <div class="form-grid">
+            <!-- Scheduled Date -->
+
+            <div class="form-field">
+              <label for="scheduledDate"> Scheduled Date </label>
+
+              <div class="input-wrapper">
+                <i class="fa-solid fa-calendar"></i>
+
+                <input
+                  id="scheduledDate"
+                  type="date"
+                  name="scheduledDate"
+                  [(ngModel)]="form.scheduledDate"
+                />
+              </div>
+            </div>
+
+            <!-- Start Time -->
+
+            <div class="form-field">
+              <label for="slotStart"> Start Time </label>
+
+              <div class="input-wrapper">
+                <i class="fa-solid fa-clock"></i>
+
+                <input id="slotStart" type="time" name="slotStart" [(ngModel)]="form.slotStart" />
+              </div>
+            </div>
+
+            <!-- End Time -->
+
+            <div class="form-field">
+              <label for="slotEnd"> End Time </label>
+
+              <div class="input-wrapper">
+                <i class="fa-solid fa-clock"></i>
+
+                <input id="slotEnd" type="time" name="slotEnd" [(ngModel)]="form.slotEnd" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Partial Schedule Warning -->
+
+          @if (hasPartialSchedule()) {
+            <div class="assignment-warning">
+              <i class="fa-solid fa-triangle-exclamation"></i>
+
+              <span>
+                Scheduled date, start time and end time must either all be provided or all be left
+                empty.
+              </span>
+            </div>
+          }
+
+          <!-- Invalid Time Warning -->
+
+          @if (hasInvalidTimeOrder()) {
+            <div class="assignment-warning">
+              <i class="fa-solid fa-triangle-exclamation"></i>
+
+              <span> End time must be later than start time. </span>
+            </div>
+          }
+
+          <!-- Scheduling Info -->
+
+          <div class="schedule-info">
+            <i class="fa-solid fa-circle-info"></i>
+
+            <div>
+              <strong> Scheduling </strong>
+
+              <p>
+                You can update the schedule of this visit without changing its practitioner
+                assignment.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================================
+           ERROR
+      ========================================================= -->
+
+      @if (errorMessage) {
+        <div class="form-alert error">
+          <i class="fa-solid fa-circle-exclamation"></i>
+
+          <div>
+            <strong> Unable to update visit </strong>
+
+            <p>
+              {{ errorMessage }}
+            </p>
+          </div>
+        </div>
+      }
+
+      <!-- ========================================================
+           SUCCESS
+      ========================================================= -->
+
+      @if (successMessage) {
+        <div class="form-alert success">
+          <i class="fa-solid fa-circle-check"></i>
+
+          <div>
+            <strong> Visit updated successfully </strong>
+
+            <p>
+              {{ successMessage }}
+            </p>
+          </div>
+        </div>
+      }
+
+      <!-- ========================================================
+           FORM FOOTER
+      ======================================================== -->
+
+      <div class="form-footer">
+        <button type="button" class="btn btn-secondary" (click)="cancel()" [disabled]="isSaving">
+          <i class="fa-solid fa-xmark"></i>
+
+          Cancel
+        </button>
+
+        <button
+          type="submit"
+          class="btn btn-primary"
+          [disabled]="isSaving || hasPartialSchedule() || hasInvalidTimeOrder()"
+        >
+          @if (isSaving) {
+            <i class="fa-solid fa-spinner fa-spin"></i>
+
+            Saving...
           } @else {
-            Update Visit
+            <i class="fa-solid fa-floppy-disk"></i>
+
+            Save Changes
           }
         </button>
       </div>

@@ -1,172 +1,427 @@
 <div class="visit-details-page">
-  <!-- PAGE HEADER -->
+  <!-- =========================================================
+       PAGE HEADER
+  ========================================================== -->
 
   <div class="page-header">
-    <div>
+    <div class="page-header-left">
+      <div class="breadcrumb">
+        <span>Management</span>
+
+        <i class="fa-solid fa-chevron-right"></i>
+
+        <span>Visits</span>
+
+        <i class="fa-solid fa-chevron-right"></i>
+
+        <strong>Details</strong>
+      </div>
+
       <h1>Visit Details</h1>
 
-      <p>View the complete information for this visit.</p>
+      <p>View complete information about this patient visit.</p>
     </div>
 
-    <div class="header-actions">
-      <!-- EDIT BUTTON -->
-
-      <button type="button" class="edit-button" (click)="onEdit()">
-        <i class="fa-solid fa-pen-to-square"></i>
-
-        Edit Visit
-      </button>
-
-      <!-- BACK BUTTON -->
-
-      <button type="button" class="back-button" (click)="onBack()">
+    <div class="page-header-actions">
+      <button type="button" class="secondary-button" (click)="backToVisits()">
         <i class="fa-solid fa-arrow-left"></i>
 
-        Back to Visits
+        <span>Back to Visits</span>
       </button>
     </div>
   </div>
 
-  <!-- LOADING STATE -->
+  <!-- =========================================================
+       LOADING STATE
+  ========================================================== -->
 
   @if (isLoading) {
-    <div class="loading-message">
-      <i class="fa-solid fa-spinner fa-spin"></i>
+    <div class="state-card">
+      <div class="loading-spinner"></div>
 
-      <p>Loading visit details...</p>
+      <h3>Loading visit details...</h3>
+
+      <p>Please wait while we load the visit information.</p>
     </div>
   }
 
-  <!-- ERROR STATE -->
+  <!-- =========================================================
+       ERROR STATE
+  ========================================================== -->
 
   @else if (errorMessage) {
-    <div class="error-message">
-      <i class="fa-solid fa-triangle-exclamation"></i>
+    <div class="state-card error-state">
+      <div class="state-icon error-icon">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+      </div>
 
-      <p>{{ errorMessage }}</p>
+      <h3>Unable to load visit</h3>
+
+      <p>
+        {{ errorMessage }}
+      </p>
+
+      <div class="state-actions">
+        <button type="button" class="secondary-button" (click)="backToVisits()">
+          <i class="fa-solid fa-arrow-left"></i>
+
+          Back to Visits
+        </button>
+
+        <button type="button" class="primary-button" (click)="retry()">
+          <i class="fa-solid fa-rotate-right"></i>
+
+          Try Again
+        </button>
+      </div>
     </div>
   }
 
-  <!-- VISIT DETAILS -->
+  <!-- =========================================================
+       VISIT DETAILS
+  ========================================================== -->
 
   @else if (visit) {
-    <div class="details-card">
-      <!-- DETAILS HEADER -->
+    <!-- =======================================================
+         VISIT SUMMARY
+    ======================================================== -->
 
-      <div class="details-header">
-        <div>
-          <h2>Visit Information</h2>
-
-          <p>Details about the scheduled visit.</p>
+    <div class="summary-card">
+      <div class="summary-left">
+        <div class="visit-icon">
+          <i class="fa-solid fa-calendar-check"></i>
         </div>
 
-        <span class="status-badge" [ngClass]="getStatusClass(visit.status)">
-          {{ getStatusText(visit.status) }}
-        </span>
+        <div class="summary-content">
+          <span class="summary-label"> Visit </span>
+
+          <h2>
+            {{ visit.serviceName || 'Home Care Visit' }}
+          </h2>
+
+          <p>
+            {{ visit.patientName || 'Unknown Patient' }}
+          </p>
+        </div>
       </div>
 
-      <!-- DETAILS GRID -->
+      <div class="summary-right">
+        <span class="status-badge" [ngClass]="getStatusClass(visit.status)">
+          <i [class]="getStatusIcon(visit.status)"></i>
 
-      <div class="details-grid">
-        <!-- PATIENT -->
+          {{ visit.status }}
+        </span>
+      </div>
+    </div>
 
-        <div class="detail-item">
-          <span class="detail-label">Patient Name</span>
+    <!-- =======================================================
+         PATIENT & PRACTITIONER
+    ======================================================== -->
 
-          <span class="detail-value">
-            {{ visit.patientName || '-' }}
-          </span>
+    <div class="details-grid">
+      <!-- PATIENT -->
+
+      <div class="details-card">
+        <div class="card-header">
+          <div class="card-header-icon patient-icon">
+            <i class="fa-solid fa-user"></i>
+          </div>
+
+          <div>
+            <h2>Patient Information</h2>
+
+            <p>Patient associated with this visit.</p>
+          </div>
         </div>
 
-        <!-- PRACTITIONER -->
+        <div class="info-list">
+          <div class="info-row">
+            <span class="info-label"> Patient Name </span>
 
-        <div class="detail-item">
-          <span class="detail-label">Practitioner Name</span>
+            <strong class="info-value">
+              {{ visit.patientName || '-' }}
+            </strong>
+          </div>
 
-          <span class="detail-value">
-            {{ visit.practitionerName || '-' }}
-          </span>
+          <div class="info-row">
+            <span class="info-label"> Patient ID </span>
+
+            <span class="info-value id-value">
+              {{ visit.patientId || '-' }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- PRACTITIONER -->
+
+      <div class="details-card">
+        <div class="card-header">
+          <div class="card-header-icon practitioner-icon">
+            <i class="fa-solid fa-user-doctor"></i>
+          </div>
+
+          <div>
+            <h2>Practitioner Information</h2>
+
+            <p>Practitioner assigned to this visit.</p>
+          </div>
         </div>
 
-        <!-- AREA -->
+        <div class="info-list">
+          <div class="info-row">
+            <span class="info-label"> Practitioner </span>
 
-        <div class="detail-item">
-          <span class="detail-label">Area</span>
+            <strong class="info-value">
+              {{ visit.practitionerName || 'Unassigned' }}
+            </strong>
+          </div>
 
-          <span class="detail-value">
-            {{ visit.areaName || '-' }}
-          </span>
+          <div class="info-row">
+            <span class="info-label"> Practitioner ID </span>
+
+            <span class="info-value id-value">
+              {{ visit.practitionerId || '-' }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- =======================================================
+         SERVICE & PACKAGE
+    ======================================================== -->
+
+    <div class="details-grid">
+      <!-- SERVICE -->
+
+      <div class="details-card">
+        <div class="card-header">
+          <div class="card-header-icon service-icon">
+            <i class="fa-solid fa-briefcase-medical"></i>
+          </div>
+
+          <div>
+            <h2>Service Information</h2>
+
+            <p>Service being provided during the visit.</p>
+          </div>
         </div>
 
-        <!-- SERVICE -->
+        <div class="info-list">
+          <div class="info-row">
+            <span class="info-label"> Service </span>
 
-        <div class="detail-item">
-          <span class="detail-label">Service</span>
+            <strong class="info-value">
+              {{ visit.serviceName || '-' }}
+            </strong>
+          </div>
 
-          <span class="detail-value">
-            {{ visit.serviceName || '-' }}
-          </span>
+          <div class="info-row">
+            <span class="info-label"> Service ID </span>
+
+            <span class="info-value id-value">
+              {{ visit.serviceId || '-' }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- PACKAGE -->
+
+      <div class="details-card">
+        <div class="card-header">
+          <div class="card-header-icon package-icon">
+            <i class="fa-solid fa-box-open"></i>
+          </div>
+
+          <div>
+            <h2>Package Information</h2>
+
+            <p>Package associated with this visit.</p>
+          </div>
         </div>
 
-        <!-- PACKAGE -->
+        <div class="info-list">
+          <div class="info-row">
+            <span class="info-label"> Package </span>
 
-        <div class="detail-item">
-          <span class="detail-label">Package</span>
+            <strong class="info-value">
+              {{ visit.packageName || '-' }}
+            </strong>
+          </div>
 
-          <span class="detail-value">
-            {{ visit.packageName || '-' }}
-          </span>
+          <div class="info-row">
+            <span class="info-label"> Package ID </span>
+
+            <span class="info-value id-value">
+              {{ visit.patientPackageId || '-' }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- =======================================================
+         SCHEDULE & LOCATION
+    ======================================================== -->
+
+    <div class="details-grid">
+      <!-- SCHEDULE -->
+
+      <div class="details-card">
+        <div class="card-header">
+          <div class="card-header-icon schedule-icon">
+            <i class="fa-solid fa-calendar-days"></i>
+          </div>
+
+          <div>
+            <h2>Schedule</h2>
+
+            <p>Scheduled date and visit time.</p>
+          </div>
         </div>
 
-        <!-- DATE -->
+        <div class="info-list">
+          <div class="info-row">
+            <span class="info-label"> Date </span>
 
-        <div class="detail-item">
-          <span class="detail-label">Scheduled Date</span>
+            <strong class="info-value">
+              {{ formatDate(visit.scheduledDate) }}
+            </strong>
+          </div>
 
-          <span class="detail-value">
-            {{ formatDate(visit.scheduledDate) }}
-          </span>
+          <div class="info-row">
+            <span class="info-label"> Time Slot </span>
+
+            <strong class="info-value">
+              {{ formatSlot(visit) }}
+            </strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- AREA -->
+
+      <div class="details-card">
+        <div class="card-header">
+          <div class="card-header-icon area-icon">
+            <i class="fa-solid fa-location-dot"></i>
+          </div>
+
+          <div>
+            <h2>Area</h2>
+
+            <p>Service area assigned to the visit.</p>
+          </div>
         </div>
 
-        <!-- TIME SLOT -->
+        <div class="info-list">
+          <div class="info-row">
+            <span class="info-label"> Area </span>
 
-        <div class="detail-item">
-          <span class="detail-label">Time Slot</span>
+            <strong class="info-value">
+              {{ visit.areaName || 'Not assigned' }}
+            </strong>
+          </div>
 
-          <span class="detail-value">
-            {{ visit.timeSlot || '-' }}
-          </span>
+          <div class="info-row">
+            <span class="info-label"> Area ID </span>
+
+            <span class="info-value id-value">
+              {{ visit.areaId || '-' }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- =======================================================
+         PAYMENT
+    ======================================================== -->
+
+    <div class="payment-card">
+      <div class="card-header">
+        <div class="card-header-icon payment-icon">
+          <i class="fa-solid fa-money-bill-wave"></i>
         </div>
 
-        <!-- AMOUNT DUE -->
+        <div>
+          <h2>Payment & Collection</h2>
 
-        <div class="detail-item">
-          <span class="detail-label">Amount Due</span>
+          <p>Financial information associated with this visit.</p>
+        </div>
+      </div>
 
-          <span class="detail-value">
-            {{ formatCurrency(visit.amountDue) }}
-          </span>
+      <div class="payment-summary">
+        <div class="payment-item">
+          <span class="payment-label"> Amount Due </span>
+
+          <strong class="payment-amount">
+            {{ formatAmount(visit.amountDue) }}
+          </strong>
         </div>
 
-        <!-- AMOUNT RECEIVED -->
+        <div class="payment-item">
+          <span class="payment-label"> Amount Received </span>
 
-        <div class="detail-item">
-          <span class="detail-label">Amount Received</span>
-
-          <span class="detail-value">
-            {{ formatCurrency(visit.amountReceived) }}
-          </span>
+          <strong class="payment-amount received-amount">
+            {{ formatAmount(visit.amountReceived) }}
+          </strong>
         </div>
 
-        <!-- RECEIVED BY -->
+        <div class="payment-item">
+          <span class="payment-label"> Amount Pending </span>
 
-        <div class="detail-item">
-          <span class="detail-label">Received By</span>
+          <strong class="payment-amount pending-payment">
+            {{ formatAmount(getPendingAmount()) }}
+          </strong>
+        </div>
 
-          <span class="detail-value">
-            {{ visit.receivedBy || '-' }}
+        <div class="payment-item collection-item">
+          <span class="payment-label"> Collection Status </span>
+
+          <span
+            class="collection-badge"
+            [ngClass]="getCollectionStatusClass(visit.collectionStatus)"
+          >
+            <i [class]="getCollectionIcon(visit.collectionStatus)"></i>
+
+            {{ visit.collectionStatus }}
           </span>
         </div>
+      </div>
+
+      <div class="payment-meta">
+        <div class="meta-item">
+          <span> Received By </span>
+
+          <strong>
+            {{ getReceivedByLabel() }}
+          </strong>
+        </div>
+
+        <div class="meta-item">
+          <span> Settlement ID </span>
+
+          <strong class="id-value">
+            {{ visit.settlementId || '-' }}
+          </strong>
+        </div>
+      </div>
+    </div>
+
+    <!-- =======================================================
+         VISIT IDENTIFIER
+    ======================================================== -->
+
+    <div class="technical-card">
+      <div>
+        <span class="technical-label"> Visit ID </span>
+
+        <span class="technical-value">
+          {{ visit.id }}
+        </span>
       </div>
     </div>
   }

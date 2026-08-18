@@ -12,3 +12,4 @@ namespace JQZHomeCareProject.Domain.Entities
         public ICollection<Area> Areas { get; set; } = new List<Area>();
     }
 }
+

@@ -6,7 +6,7 @@ import { Visit } from './visits.interface';
 
 // ============================================================
 // CREATE VISIT REQUEST
-// Matches the backend Create Visit request
+// Matches backend CreateVisitDto
 // ============================================================
 
 export interface CreateVisitRequest {
@@ -27,6 +27,29 @@ export interface CreateVisitRequest {
     slotStart: string | null;
     slotEnd: string | null;
   }[];
+}
+
+// ============================================================
+// SCHEDULE VISIT REQUEST
+// Matches backend ScheduleVisitDto
+// ============================================================
+
+export interface ScheduleVisitRequest {
+  scheduledDate: string;
+  slotStart: string;
+  slotEnd: string;
+}
+
+// ============================================================
+// REASSIGN PRACTITIONER REQUEST
+// Matches backend ReassignPractitionerDto
+// ============================================================
+
+export interface ReassignPractitionerRequest {
+  practitionerId: string;
+  areaId: string | null;
+  refusedBy: 'Patient' | 'Practitioner';
+  reason: string;
 }
 
 // ============================================================
@@ -55,7 +78,6 @@ export class VisitsService {
 
   // ============================================================
   // GET VISIT BY ID
-  // Used later by Visit Details
   // ============================================================
 
   getById(id: string): Observable<Visit> {
@@ -68,5 +90,21 @@ export class VisitsService {
 
   create(request: CreateVisitRequest): Observable<any> {
     return this.http.post<any>(this.apiUrl, request);
+  }
+
+  // ============================================================
+  // SCHEDULE VISIT
+  // ============================================================
+
+  schedule(id: string, request: ScheduleVisitRequest): Observable<void> {
+    return this.http.put<void>(`${this.apiUrl}/${id}/schedule`, request);
+  }
+
+  // ============================================================
+  // REASSIGN PRACTITIONER
+  // ============================================================
+
+  reassign(id: string, request: ReassignPractitionerRequest): Observable<void> {
+    return this.http.put<void>(`${this.apiUrl}/${id}/reassign`, request);
   }
 }

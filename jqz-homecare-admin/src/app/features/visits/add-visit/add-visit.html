@@ -1,243 +1,595 @@
 <div class="add-visit-page">
-  <!-- PAGE HEADER -->
+  <!-- ============================================================
+       BREADCRUMB
+  ============================================================ -->
 
-  <div class="page-header">
-    <div>
-      <h1>Add Visit</h1>
+  <div class="breadcrumb">
+    <span>Visits</span>
 
-      <p>Schedule a new clinic visit.</p>
-    </div>
+    <i class="fa-solid fa-chevron-right"></i>
 
-    <button type="button" class="back-button" (click)="onCancel()">← Back to Visits</button>
+    <span class="current">Add Visit</span>
   </div>
 
-  <!-- ERROR MESSAGE -->
+  <!-- ============================================================
+       PAGE HEADER
+  ============================================================ -->
 
-  @if (errorMessage) {
-    <div class="error-message">
-      {{ errorMessage }}
+  <div class="page-header">
+    <div class="page-header-left">
+      <div class="page-header-icon">
+        <i class="fa-solid fa-calendar-plus"></i>
+      </div>
+
+      <div>
+        <h1>Add Visit</h1>
+
+        <p>Create a new patient package and schedule its visits.</p>
+      </div>
     </div>
-  }
+  </div>
 
-  <!-- LOADING -->
+  <!-- ============================================================
+       FORM
+  ============================================================ -->
 
-  @if (isLoading) {
-    <div class="loading-message">Loading form data...</div>
-  }
+  <form class="visit-form" (ngSubmit)="submitVisit()" #visitForm="ngForm">
+    <!-- ==========================================================
+         PATIENT INFORMATION
+    =========================================================== -->
 
-  <!-- FORM -->
-
-  <form [formGroup]="visitForm" (ngSubmit)="onSubmit()" class="visit-form">
-    <!-- ========================= -->
-    <!-- PATIENT INFORMATION -->
-    <!-- ========================= -->
-
-    <div class="form-section">
-      <h2>Patient Information</h2>
-
-      <div class="form-grid">
-        <!-- Patient Name -->
-
-        <div class="form-group">
-          <label for="patientName"> Patient Name </label>
-
-          <input
-            id="patientName"
-            type="text"
-            formControlName="patientName"
-            placeholder="Enter patient name"
-          />
-
-          @if (visitForm.controls.patientName.touched && visitForm.controls.patientName.invalid) {
-            <small class="field-error"> Patient name is required. </small>
-          }
+    <section class="form-card">
+      <div class="card-header">
+        <div class="card-header-icon">
+          <i class="fa-solid fa-user"></i>
         </div>
 
-        <!-- Patient Phone -->
+        <div>
+          <h2>Patient Information</h2>
 
-        <div class="form-group">
-          <label for="patientPhone"> Patient Phone </label>
+          <p>Enter the patient's basic information.</p>
+        </div>
+      </div>
 
-          <input
-            id="patientPhone"
-            type="tel"
-            formControlName="patientPhone"
-            placeholder="Enter patient phone"
-          />
+      <div class="card-body">
+        <div class="form-grid">
+          <!-- Patient Name -->
 
-          @if (visitForm.controls.patientPhone.touched && visitForm.controls.patientPhone.invalid) {
-            <small class="field-error"> Patient phone is required. </small>
-          }
+          <div class="form-field">
+            <label for="patientName">
+              Patient Name
+              <span class="required">*</span>
+            </label>
+
+            <div class="input-wrapper">
+              <i class="fa-solid fa-user"></i>
+
+              <input
+                id="patientName"
+                type="text"
+                name="patientName"
+                [(ngModel)]="form.patientName"
+                #patientName="ngModel"
+                required
+                maxlength="150"
+                placeholder="Enter patient name"
+              />
+            </div>
+
+            @if (patientName.invalid && patientName.touched) {
+              <span class="field-error"> Patient name is required. </span>
+            }
+          </div>
+
+          <!-- Patient Phone -->
+
+          <div class="form-field">
+            <label for="patientPhone">
+              Patient Phone
+              <span class="required">*</span>
+            </label>
+
+            <div class="input-wrapper">
+              <i class="fa-solid fa-phone"></i>
+
+              <input
+                id="patientPhone"
+                type="tel"
+                name="patientPhone"
+                [(ngModel)]="form.patientPhone"
+                #patientPhone="ngModel"
+                required
+                placeholder="Enter patient phone number"
+              />
+            </div>
+
+            @if (patientPhone.invalid && patientPhone.touched) {
+              <span class="field-error"> Patient phone is required. </span>
+            }
+          </div>
+
+          <!-- Location Address -->
+
+          <div class="form-field full-width">
+            <label for="locationAddress">
+              Location Address
+              <span class="required">*</span>
+            </label>
+
+            <div class="input-wrapper textarea-wrapper">
+              <i class="fa-solid fa-location-dot"></i>
+
+              <textarea
+                id="locationAddress"
+                name="locationAddress"
+                [(ngModel)]="form.locationAddress"
+                #locationAddress="ngModel"
+                required
+                maxlength="500"
+                rows="3"
+                placeholder="Enter patient's visit location address"
+              ></textarea>
+            </div>
+
+            @if (locationAddress.invalid && locationAddress.touched) {
+              <span class="field-error"> Location address is required. </span>
+            }
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         PACKAGE INFORMATION
+    ============================================================ -->
+
+    <section class="form-card">
+      <div class="card-header">
+        <div class="card-header-icon">
+          <i class="fa-solid fa-box-open"></i>
         </div>
 
-        <!-- Location Address -->
+        <div>
+          <h2>Package Information</h2>
 
-        <div class="form-group full-width">
-          <label for="locationAddress"> Location Address </label>
+          <p>Select the package that the patient is purchasing.</p>
+        </div>
+      </div>
 
-          <textarea
-            id="locationAddress"
-            formControlName="locationAddress"
-            placeholder="Enter visit location"
-            rows="3"
-          ></textarea>
+      <div class="card-body">
+        <div class="form-grid">
+          <!-- Package -->
 
-          @if (
-            visitForm.controls.locationAddress.touched && visitForm.controls.locationAddress.invalid
-          ) {
-            <small class="field-error"> Location address is required. </small>
+          <div class="form-field full-width">
+            <label for="packageId">
+              Package
+              <span class="required">*</span>
+            </label>
+
+            <div class="input-wrapper">
+              <i class="fa-solid fa-box"></i>
+
+              <select
+                id="packageId"
+                name="packageId"
+                [(ngModel)]="form.packageId"
+                (ngModelChange)="onPackageChange()"
+                #packageId="ngModel"
+                required
+              >
+                <option value="">Select a package</option>
+
+                @for (package of packages; track package.id) {
+                  <option [value]="package.id">
+                    {{ package.name }}
+                    — {{ package.numberOfVisits }} visit(s) — PKR
+                    {{ package.amount | number: '1.0-2' }}
+                  </option>
+                }
+              </select>
+            </div>
+
+            @if (packageId.invalid && packageId.touched) {
+              <span class="field-error"> Please select a package. </span>
+            }
+          </div>
+
+          <!-- Selected Package Summary -->
+
+          @if (selectedPackage) {
+            <div class="package-summary full-width">
+              <div class="package-summary-item">
+                <span class="summary-label"> Service </span>
+
+                <strong>
+                  {{ selectedPackage.serviceName }}
+                </strong>
+              </div>
+
+              <div class="package-summary-item">
+                <span class="summary-label"> Number of Visits </span>
+
+                <strong>
+                  {{ selectedPackage.numberOfVisits }}
+                </strong>
+              </div>
+
+              <div class="package-summary-item">
+                <span class="summary-label"> Package Amount </span>
+
+                <strong> PKR {{ selectedPackage.amount | number: '1.0-2' }} </strong>
+              </div>
+
+              <div class="package-summary-item">
+                <span class="summary-label"> Price / Visit </span>
+
+                <strong> PKR {{ selectedPackage.pricePerVisit | number: '1.0-2' }} </strong>
+              </div>
+            </div>
           }
         </div>
       </div>
-    </div>
+    </section>
 
-    <!-- ========================= -->
-    <!-- VISIT DETAILS -->
-    <!-- ========================= -->
+    <!-- ============================================================
+         PAYMENT INFORMATION
+    ============================================================ -->
 
-    <div class="form-section">
-      <h2>Visit Details</h2>
-
-      <div class="form-grid">
-        <!-- Practitioner -->
-
-        <div class="form-group">
-          <label for="practitionerId"> Practitioner </label>
-
-          <select id="practitionerId" formControlName="practitionerId">
-            <option value="">Select practitioner</option>
-
-            @for (practitioner of practitioners; track practitioner.id) {
-              <option [value]="practitioner.id">
-                {{ practitioner.name }}
-              </option>
-            }
-          </select>
-
-          @if (
-            visitForm.controls.practitionerId.touched && visitForm.controls.practitionerId.invalid
-          ) {
-            <small class="field-error"> Please select a practitioner. </small>
-          }
+    <section class="form-card">
+      <div class="card-header">
+        <div class="card-header-icon">
+          <i class="fa-solid fa-money-bill-wave"></i>
         </div>
 
-        <!-- Area -->
+        <div>
+          <h2>Payment Information</h2>
 
-        <div class="form-group">
-          <label for="areaId"> Area </label>
-
-          <select id="areaId" formControlName="areaId">
-            <option value="">Select area</option>
-
-            @for (area of areas; track area.id) {
-              <option [value]="area.id">
-                {{ area.name }}
-              </option>
-            }
-          </select>
-
-          @if (visitForm.controls.areaId.touched && visitForm.controls.areaId.invalid) {
-            <small class="field-error"> Please select an area. </small>
-          }
-        </div>
-
-        <!-- Service -->
-
-        <div class="form-group">
-          <label for="serviceId"> Service </label>
-
-          <select id="serviceId" formControlName="serviceId">
-            <option value="">Select service</option>
-
-            @for (service of services; track service.id) {
-              <option [value]="service.id">
-                {{ service.name }}
-              </option>
-            }
-          </select>
-
-          @if (visitForm.controls.serviceId.touched && visitForm.controls.serviceId.invalid) {
-            <small class="field-error"> Please select a service. </small>
-          }
-        </div>
-
-        <!-- Package -->
-
-        <div class="form-group">
-          <label for="packageId"> Package </label>
-
-          <select id="packageId" formControlName="packageId">
-            <option value="">No package</option>
-
-            @for (package of packages; track package.id) {
-              <option [value]="package.id">
-                {{ package.name }}
-                - Rs. {{ package.amount }}
-              </option>
-            }
-          </select>
-        </div>
-
-        <!-- Scheduled Date -->
-
-        <div class="form-group">
-          <label for="scheduledDate"> Scheduled Date </label>
-
-          <input id="scheduledDate" type="date" formControlName="scheduledDate" />
-
-          @if (
-            visitForm.controls.scheduledDate.touched && visitForm.controls.scheduledDate.invalid
-          ) {
-            <small class="field-error"> Please select a date. </small>
-          }
-        </div>
-
-        <!-- Time Slot -->
-
-        <div class="form-group">
-          <label for="timeSlot"> Time Slot </label>
-
-          <input
-            id="timeSlot"
-            type="text"
-            formControlName="timeSlot"
-            placeholder="e.g. 10:00 AM - 11:00 AM"
-          />
-
-          @if (visitForm.controls.timeSlot.touched && visitForm.controls.timeSlot.invalid) {
-            <small class="field-error"> Time slot is required. </small>
-          }
-        </div>
-
-        <!-- Amount Due -->
-
-        <div class="form-group">
-          <label for="amountDue"> Amount Due </label>
-
-          <input
-            id="amountDue"
-            type="number"
-            formControlName="amountDue"
-            min="0"
-            placeholder="Enter amount"
-          />
-
-          @if (visitForm.controls.amountDue.touched && visitForm.controls.amountDue.invalid) {
-            <small class="field-error"> Amount must be 0 or greater. </small>
-          }
+          <p>Select how the package will be paid.</p>
         </div>
       </div>
-    </div>
 
-    <!-- FORM ACTIONS -->
+      <div class="card-body">
+        <div class="form-grid">
+          <!-- Payment Type -->
 
-    <div class="form-actions">
-      <button type="button" class="cancel-button" (click)="onCancel()">Cancel</button>
+          <div class="form-field">
+            <label for="paymentType">
+              Payment Type
+              <span class="required">*</span>
+            </label>
 
-      <button type="submit" class="submit-button" [disabled]="isSubmitting">
+            <div class="input-wrapper">
+              <i class="fa-solid fa-credit-card"></i>
+
+              <select
+                id="paymentType"
+                name="paymentType"
+                [(ngModel)]="form.paymentType"
+                (ngModelChange)="onPaymentTypeChange()"
+                required
+              >
+                <option value="FullAdvance">Full Advance</option>
+
+                <option value="Installment">Installment</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Initial Amount -->
+
+          @if (form.paymentType === 'Installment') {
+            <div class="form-field">
+              <label for="initialAmountPaid">
+                Initial Amount Paid
+                <span class="required">*</span>
+              </label>
+
+              <div class="input-wrapper">
+                <span class="currency-prefix"> PKR </span>
+
+                <input
+                  id="initialAmountPaid"
+                  type="number"
+                  name="initialAmountPaid"
+                  [(ngModel)]="form.initialAmountPaid"
+                  #initialAmountPaid="ngModel"
+                  min="0"
+                  step="0.01"
+                  placeholder="Enter initial amount"
+                  required
+                />
+              </div>
+
+              @if (initialAmountPaid.invalid && initialAmountPaid.touched) {
+                <span class="field-error">
+                  Initial amount is required for installment payment.
+                </span>
+              }
+            </div>
+          }
+        </div>
+
+        <!-- Payment Information -->
+
+        @if (selectedPackage) {
+          <div class="payment-info">
+            <div class="payment-info-row">
+              <span> Package Total </span>
+
+              <strong> PKR {{ selectedPackage.amount | number: '1.0-2' }} </strong>
+            </div>
+
+            @if (form.paymentType === 'Installment') {
+              <div class="payment-info-row">
+                <span> Initial Payment </span>
+
+                <strong> PKR {{ form.initialAmountPaid || 0 | number: '1.0-2' }} </strong>
+              </div>
+
+              <div class="payment-info-row pending">
+                <span> Remaining Amount </span>
+
+                <strong> PKR {{ getPendingAmount() | number: '1.0-2' }} </strong>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    </section>
+
+    <!-- ============================================================
+         VISIT ASSIGNMENTS
+    ============================================================ -->
+
+    <section class="form-card">
+      <div class="card-header">
+        <div class="card-header-icon">
+          <i class="fa-solid fa-calendar-days"></i>
+        </div>
+
+        <div>
+          <h2>Visit Assignments</h2>
+
+          <p>Assign practitioners, areas and schedules to the package visits.</p>
+        </div>
+      </div>
+
+      <div class="card-body">
+        <!-- No package selected -->
+
+        @if (!selectedPackage) {
+          <div class="empty-assignments">
+            <div class="empty-icon">
+              <i class="fa-solid fa-calendar-plus"></i>
+            </div>
+
+            <h3>Select a package first</h3>
+
+            <p>Select a package above to configure its visits.</p>
+          </div>
+        }
+
+        <!-- Assignment List -->
+
+        @if (selectedPackage) {
+          <div class="assignment-list">
+            @for (assignment of form.visitAssignments; track $index; let i = $index) {
+              <div class="assignment-card">
+                <!-- Assignment Header -->
+
+                <div class="assignment-header">
+                  <div class="assignment-number">
+                    {{ i + 1 }}
+                  </div>
+
+                  <div>
+                    <h3>Visit {{ i + 1 }}</h3>
+
+                    <p>Configure practitioner, area and schedule.</p>
+                  </div>
+                </div>
+
+                <!-- Assignment Fields -->
+
+                <div class="assignment-grid">
+                  <!-- Practitioner -->
+
+                  <div class="form-field">
+                    <label [for]="'practitioner-' + i"> Practitioner </label>
+
+                    <div class="input-wrapper">
+                      <i class="fa-solid fa-user-doctor"></i>
+
+                      <select
+                        [id]="'practitioner-' + i"
+                        [name]="'practitioner-' + i"
+                        [(ngModel)]="assignment.practitionerId"
+                        (ngModelChange)="onPractitionerChange(i)"
+                      >
+                        <option value="">Select practitioner</option>
+
+                        @for (
+                          practitioner of getPractitionersForAssignment(i);
+                          track practitioner.id
+                        ) {
+                          <option [value]="practitioner.id">
+                            {{ practitioner.name }}
+                          </option>
+                        }
+                      </select>
+                    </div>
+                  </div>
+
+                  <!-- Area -->
+
+                  <div class="form-field">
+                    <label [for]="'area-' + i"> Area </label>
+
+                    <div class="input-wrapper">
+                      <i class="fa-solid fa-location-dot"></i>
+
+                      <select
+                        [id]="'area-' + i"
+                        [name]="'area-' + i"
+                        [(ngModel)]="assignment.areaId"
+                        (ngModelChange)="onAreaChange(i)"
+                      >
+                        <option value="">Select area</option>
+
+                        @for (area of getAreasForAssignment(i); track area.id) {
+                          <option [value]="area.id">
+                            {{ area.name }}
+                            @if (area.cityName) {
+                              — {{ area.cityName }}
+                            }
+                          </option>
+                        }
+                      </select>
+                    </div>
+                  </div>
+
+                  <!-- Scheduled Date -->
+
+                  <div class="form-field">
+                    <label [for]="'date-' + i"> Scheduled Date </label>
+
+                    <div class="input-wrapper">
+                      <i class="fa-solid fa-calendar"></i>
+
+                      <input
+                        [id]="'date-' + i"
+                        type="date"
+                        [name]="'date-' + i"
+                        [(ngModel)]="assignment.scheduledDate"
+                        (ngModelChange)="onAssignmentDateChange(i)"
+                      />
+                    </div>
+                  </div>
+
+                  <!-- Start Time -->
+
+                  <div class="form-field">
+                    <label [for]="'start-time-' + i"> Start Time </label>
+
+                    <div class="input-wrapper">
+                      <i class="fa-solid fa-clock"></i>
+
+                      <input
+                        [id]="'start-time-' + i"
+                        type="time"
+                        [name]="'start-time-' + i"
+                        [(ngModel)]="assignment.slotStart"
+                      />
+                    </div>
+                  </div>
+
+                  <!-- End Time -->
+
+                  <div class="form-field">
+                    <label [for]="'end-time-' + i"> End Time </label>
+
+                    <div class="input-wrapper">
+                      <i class="fa-solid fa-clock"></i>
+
+                      <input
+                        [id]="'end-time-' + i"
+                        type="time"
+                        [name]="'end-time-' + i"
+                        [(ngModel)]="assignment.slotEnd"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Assignment Validation -->
+
+                @if (hasPartialSchedule(assignment)) {
+                  <div class="assignment-warning">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+
+                    <span>
+                      Scheduled date, start time and end time must either all be provided or all be
+                      left empty.
+                    </span>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+
+          <!-- Assignment Information -->
+
+          <div class="assignment-info">
+            <i class="fa-solid fa-circle-info"></i>
+
+            <div>
+              <strong> Visit scheduling is optional </strong>
+
+              <p>
+                You can create the package without scheduling every visit. Individual visits can be
+                scheduled later.
+              </p>
+            </div>
+          </div>
+        }
+      </div>
+    </section>
+
+    <!-- ============================================================
+         FORM ERROR
+    ============================================================ -->
+
+    @if (errorMessage) {
+      <div class="form-alert error">
+        <i class="fa-solid fa-circle-exclamation"></i>
+
+        <div>
+          <strong> Unable to create visit </strong>
+
+          <p>
+            {{ errorMessage }}
+          </p>
+        </div>
+      </div>
+    }
+
+    <!-- ============================================================
+         SUCCESS MESSAGE
+    ============================================================ -->
+
+    @if (successMessage) {
+      <div class="form-alert success">
+        <i class="fa-solid fa-circle-check"></i>
+
+        <div>
+          <strong> Visit created successfully </strong>
+
+          <p>
+            {{ successMessage }}
+          </p>
+        </div>
+      </div>
+    }
+
+    <!-- ============================================================
+         FORM FOOTER
+    ============================================================ -->
+
+    <div class="form-footer">
+      <button type="button" class="btn btn-secondary" (click)="cancel()" [disabled]="isSubmitting">
+        <i class="fa-solid fa-xmark"></i>
+
+        Cancel
+      </button>
+
+      <button type="submit" class="btn btn-primary" [disabled]="isSubmitting || visitForm.invalid">
         @if (isSubmitting) {
-          Creating Visit...
+          <i class="fa-solid fa-spinner fa-spin"></i>
+
+          Creating...
         } @else {
+          <i class="fa-solid fa-calendar-check"></i>
+
           Create Visit
         }
       </button>

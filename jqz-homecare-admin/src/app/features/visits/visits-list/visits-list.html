@@ -1,0 +1,413 @@
+<div class="visits-page">
+  <!-- =========================================================
+       PAGE HEADER
+  ========================================================== -->
+
+  <div class="page-header">
+    <div class="page-header-left">
+      <div class="breadcrumb">
+        <span>Management</span>
+
+        <i class="fa-solid fa-chevron-right"></i>
+
+        <strong>Visits</strong>
+      </div>
+
+      <h1>Visits</h1>
+
+      <p>Manage scheduled and completed patient visits.</p>
+    </div>
+
+    <div class="page-header-actions">
+      <button type="button" class="primary-button" (click)="addVisit()" [disabled]="isLoading">
+        <i class="fa-solid fa-plus"></i>
+
+        <span>Add Visit</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       MAIN TABLE CARD
+  ========================================================== -->
+
+  <div class="table-card">
+    <!-- =======================================================
+         TABLE HEADER
+    ======================================================== -->
+
+    <div class="table-header">
+      <div>
+        <h2>All Visits</h2>
+
+        <p>View patient visits, practitioners, schedules and payments.</p>
+      </div>
+
+      @if (!isLoading && !errorMessage) {
+        <span class="visit-count">
+          {{ filteredVisits.length }}
+
+          {{ filteredVisits.length === 1 ? 'Visit' : 'Visits' }}
+        </span>
+      }
+    </div>
+
+    <!-- =======================================================
+         FILTERS
+    ======================================================== -->
+
+    <div class="filters-container">
+      <!-- SEARCH -->
+
+      <div class="search-box">
+        <i class="fa-solid fa-magnifying-glass"></i>
+
+        <input
+          type="text"
+          [(ngModel)]="searchTerm"
+          placeholder="Search by patient, practitioner, service or area..."
+        />
+
+        @if (searchTerm) {
+          <button type="button" class="clear-search" title="Clear search" (click)="clearSearch()">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        }
+      </div>
+
+      <!-- STATUS FILTER -->
+
+      <div class="filter-control">
+        <label for="visit-status"> Status </label>
+
+        <select id="visit-status" [(ngModel)]="selectedStatus">
+          <option value="All">All Statuses</option>
+
+          <option value="Scheduled">Scheduled</option>
+
+          <option value="Accepted">Accepted</option>
+
+          <option value="Completed">Completed</option>
+
+          <option value="Cancelled">Cancelled</option>
+        </select>
+      </div>
+
+      <!-- COLLECTION FILTER -->
+
+      <div class="filter-control">
+        <label for="collection-status"> Collection </label>
+
+        <select id="collection-status" [(ngModel)]="selectedCollectionStatus">
+          <option value="All">All</option>
+
+          <option value="Pending">Pending</option>
+
+          <option value="Received">Received</option>
+        </select>
+      </div>
+
+      <!-- CLEAR FILTERS -->
+
+      @if (searchTerm || selectedStatus !== 'All' || selectedCollectionStatus !== 'All') {
+        <button
+          type="button"
+          class="secondary-button clear-filters-button"
+          (click)="clearFilters()"
+        >
+          <i class="fa-solid fa-filter-circle-xmark"></i>
+
+          Clear Filters
+        </button>
+      }
+    </div>
+
+    <!-- =======================================================
+         LOADING
+    ======================================================== -->
+
+    @if (isLoading) {
+      <div class="state-container">
+        <div class="loading-spinner"></div>
+
+        <h3>Loading visits...</h3>
+
+        <p>Please wait while we load the visits.</p>
+      </div>
+    }
+
+    <!-- =======================================================
+         ERROR
+    ======================================================== -->
+
+    @else if (errorMessage !== '') {
+      <div class="state-container error-state">
+        <div class="state-icon error-icon">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+        </div>
+
+        <h3>Unable to load visits</h3>
+
+        <p>
+          {{ errorMessage }}
+        </p>
+
+        <button type="button" class="primary-button retry-button" (click)="retry()">
+          <i class="fa-solid fa-rotate-right"></i>
+
+          Try Again
+        </button>
+      </div>
+    }
+
+    <!-- =======================================================
+         EMPTY STATE
+    ======================================================== -->
+
+    @else if (visits.length === 0) {
+      <div class="state-container">
+        <div class="state-icon">
+          <i class="fa-solid fa-calendar-check"></i>
+        </div>
+
+        <h3>No visits found</h3>
+
+        <p>There are currently no visits registered in the system.</p>
+
+        <button type="button" class="primary-button" (click)="addVisit()">
+          <i class="fa-solid fa-plus"></i>
+
+          Add Visit
+        </button>
+      </div>
+    }
+
+    <!-- =======================================================
+         NO FILTER RESULTS
+    ======================================================== -->
+
+    @else if (filteredVisits.length === 0) {
+      <div class="state-container">
+        <div class="state-icon">
+          <i class="fa-solid fa-magnifying-glass"></i>
+        </div>
+
+        <h3>No matching visits</h3>
+
+        <p>No visit matches your current search or filters.</p>
+
+        <button type="button" class="secondary-button" (click)="clearFilters()">
+          Clear Filters
+        </button>
+      </div>
+    }
+
+    <!-- =======================================================
+         TABLE
+    ======================================================== -->
+
+    @else {
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+
+              <th>Patient</th>
+
+              <th>Practitioner</th>
+
+              <th>Service</th>
+
+              <th>Area</th>
+
+              <th>Schedule</th>
+
+              <th>Status</th>
+
+              <th>Amount</th>
+
+              <th>Collection</th>
+
+              <th>Actions</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            @for (visit of filteredVisits; track visit.id; let i = $index) {
+              <tr>
+                <!-- =================================================
+                     INDEX
+                ================================================== -->
+
+                <td class="index-cell">
+                  {{ i + 1 }}
+                </td>
+
+                <!-- =================================================
+                     PATIENT
+                ================================================== -->
+
+                <td>
+                  <div class="patient-cell">
+                    <div class="patient-avatar">
+                      <i class="fa-solid fa-user"></i>
+                    </div>
+
+                    <div>
+                      <strong>
+                        {{ visit.patientName || '-' }}
+                      </strong>
+
+                      <span> Patient </span>
+                    </div>
+                  </div>
+                </td>
+
+                <!-- =================================================
+                     PRACTITIONER
+                ================================================== -->
+
+                <td>
+                  <div class="practitioner-cell">
+                    <div class="practitioner-avatar">
+                      <i class="fa-solid fa-user-doctor"></i>
+                    </div>
+
+                    <span>
+                      {{ visit.practitionerName || 'Unassigned' }}
+                    </span>
+                  </div>
+                </td>
+
+                <!-- =================================================
+                     SERVICE
+                ================================================== -->
+
+                <td>
+                  <div class="service-cell">
+                    <div class="service-avatar">
+                      <i class="fa-solid fa-briefcase-medical"></i>
+                    </div>
+
+                    <span>
+                      {{ visit.serviceName || '-' }}
+                    </span>
+                  </div>
+                </td>
+
+                <!-- =================================================
+                     AREA
+                ================================================== -->
+
+                <td>
+                  <span class="area-text">
+                    {{ visit.areaName || '-' }}
+                  </span>
+                </td>
+
+                <!-- =================================================
+                     SCHEDULE
+                ================================================== -->
+
+                <td>
+                  <div class="schedule-cell">
+                    <strong>
+                      {{ formatDate(visit.scheduledDate) }}
+                    </strong>
+
+                    <span>
+                      {{ formatSlot(visit) }}
+                    </span>
+                  </div>
+                </td>
+
+                <!-- =================================================
+                     STATUS
+                ================================================== -->
+
+                <td>
+                  <span class="status-badge" [ngClass]="getStatusClass(visit.status)">
+                    @switch (visit.status) {
+                      @case ('Scheduled') {
+                        <i class="fa-regular fa-calendar"></i>
+                      }
+
+                      @case ('Accepted') {
+                        <i class="fa-solid fa-check"></i>
+                      }
+
+                      @case ('Completed') {
+                        <i class="fa-solid fa-circle-check"></i>
+                      }
+
+                      @case ('Cancelled') {
+                        <i class="fa-solid fa-xmark"></i>
+                      }
+                    }
+
+                    {{ visit.status }}
+                  </span>
+                </td>
+
+                <!-- =================================================
+                     AMOUNT
+                ================================================== -->
+
+                <td>
+                  <div class="amount-cell">
+                    <strong>
+                      {{ formatAmount(visit.amountDue) }}
+                    </strong>
+
+                    <span>
+                      Received:
+                      {{ formatAmount(visit.amountReceived) }}
+                    </span>
+                  </div>
+                </td>
+
+                <!-- =================================================
+                     COLLECTION
+                ================================================== -->
+
+                <td>
+                  <div class="collection-cell">
+                    <span
+                      class="collection-badge"
+                      [ngClass]="getCollectionStatusClass(visit.collectionStatus)"
+                    >
+                      {{ visit.collectionStatus }}
+                    </span>
+
+                    @if (getPendingAmount(visit) > 0) {
+                      <span class="pending-amount">
+                        {{ formatAmount(getPendingAmount(visit)) }}
+                        pending
+                      </span>
+                    }
+                  </div>
+                </td>
+
+                <!-- =================================================
+                     ACTIONS
+                ================================================== -->
+
+                <td class="actions-cell">
+                  <button
+                    type="button"
+                    class="icon-button view-button"
+                    title="View Visit"
+                    (click)="viewVisit(visit.id)"
+                  >
+                    <i class="fa-solid fa-eye"></i>
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+</div>

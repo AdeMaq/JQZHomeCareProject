@@ -4,7 +4,8 @@ using System.Text;
 
 namespace JQZHomeCareProject.Mobile.Models.Notifications
 {
-    internal class RegisterDeviceTokenDto
+    public class RegisterDeviceTokenDto
     {
+        public string DeviceToken { get; set; } = string.Empty;
     }
 }

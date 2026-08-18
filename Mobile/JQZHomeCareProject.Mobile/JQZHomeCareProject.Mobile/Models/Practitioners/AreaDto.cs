@@ -4,7 +4,9 @@ using System.Text;
 
 namespace JQZHomeCareProject.Mobile.Models.Practitioners
 {
-    internal class AreaDto
+    public class AreaDto
     {
+        public string Id { get; set; } = string.Empty;
+        public string Name {  get; set; } = string.Empty;
     }
 }

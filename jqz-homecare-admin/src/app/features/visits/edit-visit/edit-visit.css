@@ -1,372 +1,782 @@
-/* =====================================================
-   PAGE
-===================================================== */
+/* ============================================================
+   EDIT VISIT PAGE
+============================================================ */
 
 .edit-visit-page {
-  padding: 32px;
-  max-width: 1500px;
-  margin: 0 auto;
-  background: #fdf8f3;
+  min-height: 100%;
+  padding: 2rem;
+  background: #fff8f8;
+  color: #102a43;
 }
 
-/* =====================================================
+/* ============================================================
+   BREADCRUMB
+============================================================ */
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin-bottom: 1.5rem;
+  font-size: 0.875rem;
+  color: #829ab1;
+}
+
+.breadcrumb i {
+  font-size: 0.7rem;
+  color: #bcccdc;
+}
+
+.breadcrumb .current {
+  color: #cf102d;
+  font-weight: 600;
+}
+
+/* ============================================================
    PAGE HEADER
-===================================================== */
+============================================================ */
 
 .page-header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  gap: 24px;
-  margin-bottom: 30px;
+  justify-content: space-between;
+  margin-bottom: 1.75rem;
+}
+
+.page-header-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.page-header-icon {
+  width: 3.25rem;
+  height: 3.25rem;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  border-radius: 0.85rem;
+
+  background: linear-gradient(135deg, #cf102d, #ee7b7d);
+
+  color: #ffffff;
+
+  font-size: 1.25rem;
+
+  box-shadow: 0 8px 20px rgba(207, 16, 45, 0.18);
 }
 
 .page-header h1 {
   margin: 0;
+
   color: #102a43;
-  font-size: 34px;
+
+  font-size: 1.75rem;
+  line-height: 1.25;
+
   font-weight: 700;
-  line-height: 1.2;
 }
 
 .page-header p {
-  margin-top: 8px;
-  color: #627d98;
-  font-size: 15px;
-}
-
-/* =====================================================
-   BACK BUTTON
-===================================================== */
-
-.back-button {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-
-  padding: 12px 22px;
-
-  border: 1px solid #f5d9dc;
-  border-radius: 12px;
-
-  background: #ffffff;
-  color: #cf102d;
-
-  font-size: 14px;
-  font-weight: 600;
-
-  cursor: pointer;
-
-  transition: all 0.25s ease;
-}
-
-.back-button:hover {
-  background: #fdebed;
-  transform: translateY(-2px);
-  box-shadow: 0 8px 18px rgba(207, 16, 45, 0.12);
-}
-
-/* =====================================================
-   ERROR MESSAGE
-===================================================== */
-
-.error-message {
-  margin-bottom: 24px;
-  padding: 16px 18px;
-
-  border: 1px solid #f5d9dc;
-  border-radius: 14px;
-
-  background: #fff3f4;
-  color: #cf102d;
-
-  font-size: 14px;
-  font-weight: 500;
-}
-
-/* =====================================================
-   LOADING MESSAGE
-===================================================== */
-
-.loading-message {
-  padding: 30px;
-
-  background: white;
-
-  border: 1px solid #f5d9dc;
-  border-radius: 18px;
+  margin: 0.35rem 0 0;
 
   color: #627d98;
 
-  text-align: center;
-
-  box-shadow: 0 10px 24px rgba(16, 42, 67, 0.05);
+  font-size: 0.9rem;
 }
 
-/* =====================================================
+/* ============================================================
    FORM
-===================================================== */
+============================================================ */
 
 .visit-form {
   display: flex;
   flex-direction: column;
-  gap: 28px;
+  gap: 1.5rem;
+
+  max-width: 1200px;
 }
 
-/* =====================================================
-   FORM SECTION
-===================================================== */
+/* ============================================================
+   FORM CARD
+============================================================ */
 
-.form-section {
-  padding: 30px;
+.form-card {
+  overflow: hidden;
 
-  background: white;
+  background: #ffffff;
 
-  border: 1px solid #f5d9dc;
-  border-radius: 20px;
+  border: 1px solid #f6d2d5;
 
-  box-shadow: 0 10px 28px rgba(16, 42, 67, 0.08);
+  border-radius: 1rem;
+
+  box-shadow: 0 4px 18px rgba(207, 16, 45, 0.05);
 }
 
-.form-section h2 {
-  margin: 0 0 28px;
+/* ============================================================
+   CARD HEADER
+============================================================ */
+
+.card-header {
+  display: flex;
+  align-items: center;
+
+  gap: 0.9rem;
+
+  padding: 1.25rem 1.5rem;
+
+  background: #fffafa;
+
+  border-bottom: 1px solid #f8e1e3;
+}
+
+.card-header-icon {
+  width: 2.5rem;
+  height: 2.5rem;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  border-radius: 0.7rem;
+
+  background: #fdebed;
+
+  color: #cf102d;
+
+  font-size: 1rem;
+}
+
+.card-header h2 {
+  margin: 0;
 
   color: #102a43;
 
-  font-size: 24px;
+  font-size: 1.05rem;
+
   font-weight: 700;
 }
 
-/* =====================================================
+.card-header p {
+  margin: 0.25rem 0 0;
+
+  color: #829ab1;
+
+  font-size: 0.8rem;
+}
+
+/* ============================================================
+   CARD BODY
+============================================================ */
+
+.card-body {
+  padding: 1.5rem;
+}
+
+/* ============================================================
+   INFORMATION GRID
+============================================================ */
+
+.info-grid {
+  display: grid;
+
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+
+  gap: 1rem;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+
+  gap: 0.3rem;
+
+  min-height: 4.25rem;
+
+  padding: 0.9rem 1rem;
+
+  border: 1px solid #f6d2d5;
+
+  border-radius: 0.7rem;
+
+  background: #fff8f8;
+}
+
+.info-label {
+  color: #829ab1;
+
+  font-size: 0.72rem;
+
+  font-weight: 500;
+}
+
+.info-item strong {
+  color: #102a43;
+
+  font-size: 0.875rem;
+}
+
+/* ============================================================
+   STATUS BADGE
+============================================================ */
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+
+  width: fit-content;
+
+  padding: 0.3rem 0.65rem;
+
+  border-radius: 999px;
+
+  font-size: 0.7rem;
+
+  font-weight: 700;
+
+  background: #f7f9fa;
+
+  color: #486581;
+}
+
+.status-badge.scheduled {
+  background: #fdebed;
+  color: #cf102d;
+}
+
+.status-badge.accepted {
+  background: #fff4df;
+  color: #a15c00;
+}
+
+.status-badge.completed {
+  background: #f1faf3;
+  color: #28713b;
+}
+
+.status-badge.cancelled {
+  background: #fff1f2;
+  color: #a61b2b;
+}
+
+/* ============================================================
    FORM GRID
-===================================================== */
+============================================================ */
 
 .form-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 24px;
+
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  gap: 1.25rem 1.5rem;
 }
 
-/* =====================================================
-   FORM GROUP
-===================================================== */
+/* ============================================================
+   FORM FIELD
+============================================================ */
 
-.form-group {
+.form-field {
   display: flex;
   flex-direction: column;
+
+  gap: 0.45rem;
 }
 
-.form-group label {
-  margin-bottom: 10px;
-
+.form-field label {
   color: #243b53;
 
-  font-size: 14px;
+  font-size: 0.85rem;
+
   font-weight: 600;
 }
 
-/* =====================================================
-   INPUTS
-===================================================== */
+.required {
+  color: #cf102d;
+}
 
-.form-group input,
-.form-group select {
+/* ============================================================
+   INPUT WRAPPER
+============================================================ */
+
+.input-wrapper {
+  position: relative;
+
+  display: flex;
+  align-items: center;
+}
+
+.input-wrapper > i {
+  position: absolute;
+
+  left: 0.95rem;
+
+  z-index: 1;
+
+  color: #9fb3c8;
+
+  font-size: 0.85rem;
+
+  pointer-events: none;
+}
+
+.input-wrapper input,
+.input-wrapper select,
+.input-wrapper textarea {
   width: 100%;
-  height: 50px;
-
-  padding: 0 16px;
 
   box-sizing: border-box;
 
-  border: 1px solid #d8dee9;
-  border-radius: 12px;
+  border: 1px solid #d9e2ec;
 
-  background: white;
+  border-radius: 0.65rem;
+
+  background: #ffffff;
 
   color: #102a43;
 
   font-family: inherit;
-  font-size: 14px;
+
+  font-size: 0.875rem;
 
   outline: none;
 
   transition:
-    border-color 0.25s,
-    box-shadow 0.25s,
-    background 0.25s;
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background-color 0.2s ease;
 }
 
-.form-group input:hover,
-.form-group select:hover {
-  border-color: #cf102d;
+.input-wrapper input,
+.input-wrapper select {
+  height: 2.8rem;
+
+  padding: 0 0.9rem 0 2.7rem;
 }
 
-.form-group input:focus,
-.form-group select:focus {
-  border-color: #cf102d;
+.input-wrapper textarea {
+  min-height: 6rem;
 
-  box-shadow: 0 0 0 4px rgba(207, 16, 45, 0.1);
+  padding: 0.8rem 0.9rem 0.8rem 2.7rem;
+
+  resize: vertical;
 }
 
-/* =====================================================
-   VALIDATION
-===================================================== */
-
-.field-error {
-  margin-top: 8px;
-
-  color: #cf102d;
-
-  font-size: 12px;
-  font-weight: 500;
+.input-wrapper input::placeholder,
+.input-wrapper textarea::placeholder {
+  color: #9fb3c8;
 }
 
-/* =====================================================
-   ACTIONS
-===================================================== */
+/* ============================================================
+   SELECT
+============================================================ */
 
-.form-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 14px;
-}
-
-/* =====================================================
-   CANCEL BUTTON
-===================================================== */
-
-.cancel-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-
-  padding: 12px 24px;
-
-  border: 1px solid #f5d9dc;
-  border-radius: 12px;
-
-  background: white;
-
-  color: #cf102d;
-
-  font-size: 14px;
-  font-weight: 600;
+.input-wrapper select {
+  appearance: none;
 
   cursor: pointer;
 
-  transition: all 0.25s ease;
+  padding-right: 2.5rem;
+
+  background-image:
+    linear-gradient(45deg, transparent 50%, #829ab1 50%),
+    linear-gradient(135deg, #829ab1 50%, transparent 50%);
+
+  background-position:
+    calc(100% - 17px) 50%,
+    calc(100% - 12px) 50%;
+
+  background-size:
+    5px 5px,
+    5px 5px;
+
+  background-repeat: no-repeat;
 }
 
-.cancel-button:hover {
-  background: #fdebed;
+/* ============================================================
+   INPUT FOCUS
+============================================================ */
+
+.input-wrapper input:focus,
+.input-wrapper select:focus,
+.input-wrapper textarea:focus {
+  border-color: #cf102d;
+
+  box-shadow: 0 0 0 3px rgba(207, 16, 45, 0.08);
+
+  background: #fffdfd;
 }
 
-/* =====================================================
-   SUBMIT BUTTON
-===================================================== */
+/* ============================================================
+   REASSIGNMENT BOX
+============================================================ */
 
-.submit-button {
+.reassignment-box {
+  margin-top: 1.25rem;
+
+  padding: 1rem;
+
+  border: 1px solid #f6d2d5;
+
+  border-radius: 0.75rem;
+
+  background: #fff8f8;
+}
+
+.reassignment-title {
+  display: flex;
+  align-items: center;
+
+  gap: 0.55rem;
+
+  margin-bottom: 0.35rem;
+
+  color: #102a43;
+
+  font-size: 0.85rem;
+}
+
+.reassignment-title i {
+  color: #cf102d;
+}
+
+.reassignment-box > p {
+  margin: 0 0 1rem;
+
+  color: #627d98;
+
+  font-size: 0.75rem;
+
+  line-height: 1.45;
+}
+
+/* ============================================================
+   ASSIGNMENT WARNING
+============================================================ */
+
+.assignment-warning {
+  display: flex;
+  align-items: flex-start;
+
+  gap: 0.7rem;
+
+  margin-top: 1.25rem;
+
+  padding: 0.8rem 0.9rem;
+
+  border: 1px solid #f6d2d5;
+
+  border-radius: 0.65rem;
+
+  background: #fff8f8;
+
+  color: #a61b2b;
+
+  font-size: 0.75rem;
+
+  line-height: 1.45;
+}
+
+.assignment-warning i {
+  margin-top: 0.1rem;
+
+  color: #cf102d;
+}
+
+/* ============================================================
+   SCHEDULE INFORMATION
+============================================================ */
+
+.schedule-info {
+  display: flex;
+  align-items: flex-start;
+
+  gap: 0.75rem;
+
+  margin-top: 1.25rem;
+
+  padding: 1rem;
+
+  border: 1px solid #f6d2d5;
+
+  border-radius: 0.7rem;
+
+  background: #fff8f8;
+
+  color: #486581;
+}
+
+.schedule-info > i {
+  margin-top: 0.1rem;
+
+  color: #cf102d;
+}
+
+.schedule-info strong {
+  display: block;
+
+  margin-bottom: 0.2rem;
+
+  color: #102a43;
+
+  font-size: 0.8rem;
+}
+
+.schedule-info p {
+  margin: 0;
+
+  font-size: 0.75rem;
+
+  line-height: 1.45;
+}
+
+/* ============================================================
+   LOADING CARD
+============================================================ */
+
+.loading-card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 0.7rem;
+
+  min-height: 10rem;
+
+  max-width: 1200px;
+
+  border: 1px solid #f6d2d5;
+
+  border-radius: 1rem;
+
+  background: #ffffff;
+
+  color: #627d98;
+
+  font-size: 0.85rem;
+}
+
+.loading-card i {
+  color: #cf102d;
+}
+
+/* ============================================================
+   FORM ALERT
+============================================================ */
+
+.form-alert {
+  display: flex;
+  align-items: flex-start;
+
+  gap: 0.8rem;
+
+  padding: 1rem;
+
+  border-radius: 0.75rem;
+
+  font-size: 0.8rem;
+}
+
+.form-alert > i {
+  margin-top: 0.1rem;
+
+  font-size: 1rem;
+}
+
+.form-alert strong {
+  display: block;
+
+  margin-bottom: 0.25rem;
+}
+
+.form-alert p {
+  margin: 0;
+
+  line-height: 1.45;
+}
+
+.form-alert.error {
+  border: 1px solid #f2b8bf;
+
+  background: #fff1f2;
+
+  color: #a61b2b;
+}
+
+.form-alert.success {
+  border: 1px solid #b7dfc1;
+
+  background: #f1faf3;
+
+  color: #28713b;
+}
+
+/* ============================================================
+   FORM FOOTER
+============================================================ */
+
+.form-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+
+  gap: 0.75rem;
+
+  padding: 0.25rem 0 1rem;
+}
+
+/* ============================================================
+   BUTTONS
+============================================================ */
+
+.btn {
+  min-height: 2.75rem;
+
   display: inline-flex;
   align-items: center;
   justify-content: center;
 
-  padding: 12px 24px;
+  gap: 0.5rem;
+
+  padding: 0 1.25rem;
 
   border: none;
-  border-radius: 12px;
 
-  background: #cf102d;
+  border-radius: 0.65rem;
 
-  color: white;
+  font-family: inherit;
 
-  font-size: 14px;
+  font-size: 0.85rem;
+
   font-weight: 600;
 
   cursor: pointer;
 
-  transition: all 0.25s ease;
+  transition:
+    background-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.15s ease;
 }
 
-.submit-button:hover:not(:disabled) {
-  background: #b80e28;
-
-  transform: translateY(-2px);
-
-  box-shadow: 0 10px 24px rgba(207, 16, 45, 0.25);
-}
-
-.submit-button:disabled {
+.btn:disabled {
   opacity: 0.6;
+
   cursor: not-allowed;
 }
 
-/* =====================================================
+.btn:not(:disabled):active {
+  transform: translateY(1px);
+}
+
+/* ============================================================
+   SECONDARY BUTTON
+============================================================ */
+
+.btn-secondary {
+  border: 1px solid #d9e2ec;
+
+  background: #ffffff;
+
+  color: #486581;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: #f7f9fa;
+
+  border-color: #bcccdc;
+
+  color: #243b53;
+}
+
+/* ============================================================
+   PRIMARY BUTTON
+============================================================ */
+
+.btn-primary {
+  background: #cf102d;
+
+  color: #ffffff;
+
+  box-shadow: 0 5px 14px rgba(207, 16, 45, 0.18);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: #b80e28;
+
+  box-shadow: 0 7px 18px rgba(207, 16, 45, 0.24);
+}
+
+/* ============================================================
    RESPONSIVE
-===================================================== */
+============================================================ */
 
-@media (max-width: 1024px) {
+@media (max-width: 900px) {
   .edit-visit-page {
-    padding: 28px 24px;
+    padding: 1.5rem;
   }
 
-  .page-header {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .form-grid {
-    grid-template-columns: 1fr;
+  .info-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 700px) {
   .edit-visit-page {
-    padding: 20px 16px;
+    padding: 1rem;
   }
 
   .page-header h1 {
-    font-size: 30px;
+    font-size: 1.4rem;
   }
 
-  .page-header p {
-    font-size: 14px;
+  .page-header-icon {
+    width: 2.8rem;
+    height: 2.8rem;
   }
 
-  .form-section {
-    padding: 22px;
+  .card-header {
+    padding: 1rem;
   }
 
-  .form-actions {
+  .card-body {
+    padding: 1rem;
+  }
+
+  .form-grid,
+  .info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .form-footer {
     flex-direction: column-reverse;
+
+    align-items: stretch;
   }
 
-  .cancel-button,
-  .submit-button {
+  .btn {
     width: 100%;
-  }
-
-  .back-button {
-    width: 100%;
-    justify-content: center;
   }
 }
 
 @media (max-width: 480px) {
-  .page-header h1 {
-    font-size: 26px;
+  .breadcrumb {
+    margin-bottom: 1rem;
   }
 
-  .form-section {
-    padding: 18px;
-    border-radius: 18px;
+  .page-header {
+    margin-bottom: 1.25rem;
   }
 
-  .form-section h2 {
-    font-size: 22px;
+  .page-header-left {
+    align-items: flex-start;
   }
 
-  .form-group input,
-  .form-group select {
-    height: 48px;
+  .page-header p {
+    font-size: 0.8rem;
   }
 }

@@ -4,9 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 
 import { Package, PackageService } from '../../../core/services/package';
-
 import { Practitioner, PractitionerService } from '../../../core/services/practitioner';
-
 import { Area, CityAreaService } from '../../../core/services/city-area';
 
 import { CreateVisitRequest, VisitsService } from '../visits.service';
@@ -145,7 +143,10 @@ export class AddVisit implements OnInit {
       error: (error: unknown) => {
         console.error('Failed to load packages:', error);
 
-        this.errorMessage = 'Unable to load packages. Please try again.';
+        this.errorMessage = this.getErrorMessage(
+          error,
+          'Unable to load packages. Please try again.',
+        );
 
         this.isLoading = false;
       },
@@ -161,13 +162,18 @@ export class AddVisit implements OnInit {
       next: (practitioners) => {
         this.practitioners = practitioners;
 
+        console.log('Practitioners loaded:', this.practitioners);
+
         this.loadAreas();
       },
 
       error: (error: unknown) => {
         console.error('Failed to load practitioners:', error);
 
-        this.errorMessage = 'Unable to load practitioners. Please try again.';
+        this.errorMessage = this.getErrorMessage(
+          error,
+          'Unable to load practitioners. Please try again.',
+        );
 
         this.isLoading = false;
       },
@@ -183,13 +189,15 @@ export class AddVisit implements OnInit {
       next: (areas) => {
         this.areas = areas;
 
+        console.log('Areas loaded:', this.areas);
+
         this.isLoading = false;
       },
 
       error: (error: unknown) => {
         console.error('Failed to load areas:', error);
 
-        this.errorMessage = 'Unable to load areas. Please try again.';
+        this.errorMessage = this.getErrorMessage(error, 'Unable to load areas. Please try again.');
 
         this.isLoading = false;
       },
@@ -270,12 +278,11 @@ export class AddVisit implements OnInit {
       return [];
     }
 
-    // If no package is selected, return nothing.
     if (!this.selectedPackage) {
       return [];
     }
 
-    // Filter practitioners according to the package's service.
+    // Filter practitioners according to the package service.
     let result = this.practitioners.filter(
       (practitioner) => practitioner.serviceId === this.selectedPackage!.serviceId,
     );
@@ -284,7 +291,7 @@ export class AddVisit implements OnInit {
     // only show practitioners who work in that area.
     if (assignment.areaId) {
       result = result.filter((practitioner) =>
-        practitioner.areas.some((area) => area.id === assignment.areaId),
+        practitioner.areas?.some((area) => area.id === assignment.areaId),
       );
     }
 
@@ -307,7 +314,7 @@ export class AddVisit implements OnInit {
     if (assignment.practitionerId && assignment.areaId) {
       const practitioner = this.practitioners.find((p) => p.id === assignment.practitionerId);
 
-      const hasArea = practitioner?.areas.some((area) => area.id === assignment.areaId) ?? false;
+      const hasArea = practitioner?.areas?.some((area) => area.id === assignment.areaId) ?? false;
 
       if (!hasArea) {
         assignment.areaId = null;
@@ -327,7 +334,7 @@ export class AddVisit implements OnInit {
     }
 
     // If a practitioner has been selected,
-    // only show their assigned areas.
+    // only show areas assigned to that practitioner.
     if (assignment.practitionerId) {
       const practitioner = this.practitioners.find((p) => p.id === assignment.practitionerId);
 
@@ -335,7 +342,7 @@ export class AddVisit implements OnInit {
         return [];
       }
 
-      const practitionerAreaIds = new Set(practitioner.areas.map((area) => area.id));
+      const practitionerAreaIds = new Set((practitioner.areas ?? []).map((area) => area.id));
 
       return this.areas.filter((area) => practitionerAreaIds.has(area.id));
     }
@@ -356,12 +363,12 @@ export class AddVisit implements OnInit {
     }
 
     // If practitioner is already selected,
-    // make sure that practitioner belongs to the
-    // selected area.
+    // make sure that practitioner belongs to
+    // the selected area.
     if (assignment.areaId && assignment.practitionerId) {
       const practitioner = this.practitioners.find((p) => p.id === assignment.practitionerId);
 
-      const valid = practitioner?.areas.some((area) => area.id === assignment.areaId) ?? false;
+      const valid = practitioner?.areas?.some((area) => area.id === assignment.areaId) ?? false;
 
       if (!valid) {
         assignment.practitionerId = null;
@@ -380,10 +387,7 @@ export class AddVisit implements OnInit {
       return;
     }
 
-    // No additional API call is required here.
-    //
-    // The actual conflict validation is performed
-    // by the backend when the visit is created.
+    // Conflict validation is handled by the backend.
   }
 
   // ============================================================
@@ -409,6 +413,11 @@ export class AddVisit implements OnInit {
   // ============================================================
 
   submitVisit(): void {
+    // Prevent duplicate submissions.
+    if (this.isSubmitting) {
+      return;
+    }
+
     this.errorMessage = '';
     this.successMessage = '';
 
@@ -517,16 +526,24 @@ export class AddVisit implements OnInit {
       })),
     };
 
+    console.log('Create Visit Request:', request);
+
     // ----------------------------------------------------------
-    // SUBMIT
+    // START SUBMISSION
     // ----------------------------------------------------------
 
     this.isSubmitting = true;
+
+    // ----------------------------------------------------------
+    // API REQUEST
+    // ----------------------------------------------------------
 
     this.visitsService.create(request).subscribe({
       next: (response: unknown) => {
         console.log('Visit created successfully:', response);
 
+        // IMPORTANT:
+        // Always stop the loading state before navigation.
         this.isSubmitting = false;
 
         this.successMessage = 'Visit package created successfully.';
@@ -538,9 +555,23 @@ export class AddVisit implements OnInit {
       error: (error: unknown) => {
         console.error('Failed to create visit:', error);
 
+        // IMPORTANT:
+        // Stop loading even when API returns an error.
         this.isSubmitting = false;
 
-        this.errorMessage = this.getErrorMessage(error);
+        this.errorMessage = this.getErrorMessage(
+          error,
+          'Failed to create the visit. Please try again.',
+        );
+      },
+
+      complete: () => {
+        // Safety guard.
+        //
+        // Normally `next` handles this, but keeping this
+        // guard ensures the UI never remains stuck in loading
+        // if the observable completes unexpectedly.
+        this.isSubmitting = false;
       },
     });
   }
@@ -549,30 +580,93 @@ export class AddVisit implements OnInit {
   // ERROR MESSAGE
   // ============================================================
 
-  private getErrorMessage(error: unknown): string {
+  private getErrorMessage(error: unknown, fallbackMessage: string): string {
+    console.error('Processed API error:', error);
+
     if (typeof error === 'object' && error !== null) {
       const response = error as {
+        status?: number;
+
+        message?: string;
+
         error?: {
           message?: string;
+
           title?: string;
+
           detail?: string;
+
+          errors?: Record<string, string[]>;
         };
       };
+
+      // --------------------------------------------------------
+      // BACKEND MESSAGE
+      // --------------------------------------------------------
 
       if (response.error?.message) {
         return response.error.message;
       }
 
+      // --------------------------------------------------------
+      // BACKEND DETAIL
+      // --------------------------------------------------------
+
       if (response.error?.detail) {
         return response.error.detail;
       }
 
+      // --------------------------------------------------------
+      // BACKEND TITLE
+      // --------------------------------------------------------
+
       if (response.error?.title) {
         return response.error.title;
       }
+
+      // --------------------------------------------------------
+      // VALIDATION ERRORS
+      // --------------------------------------------------------
+
+      if (response.error?.errors) {
+        const validationErrors = Object.values(response.error.errors)
+          .flat()
+          .filter(
+            (message): message is string =>
+              typeof message === 'string' && message.trim().length > 0,
+          );
+
+        if (validationErrors.length > 0) {
+          return validationErrors.join(' ');
+        }
+      }
+
+      // --------------------------------------------------------
+      // HTTP ERROR MESSAGE
+      // --------------------------------------------------------
+
+      if (response.message && response.message.trim().length > 0) {
+        return response.message;
+      }
+
+      // --------------------------------------------------------
+      // SERVER ERROR
+      // --------------------------------------------------------
+
+      if ((response.status ?? 0) >= 500) {
+        return 'The server encountered an error while creating the visit. Please try again.';
+      }
+
+      // --------------------------------------------------------
+      // CLIENT ERROR
+      // --------------------------------------------------------
+
+      if ((response.status ?? 0) >= 400) {
+        return 'The visit could not be created. Please check the entered information and try again.';
+      }
     }
 
-    return 'Failed to create the visit. Please try again.';
+    return fallbackMessage;
   }
 
   // ============================================================
@@ -580,6 +674,10 @@ export class AddVisit implements OnInit {
   // ============================================================
 
   cancel(): void {
+    if (this.isSubmitting) {
+      return;
+    }
+
     this.router.navigate(['/admin/visits']);
   }
 }

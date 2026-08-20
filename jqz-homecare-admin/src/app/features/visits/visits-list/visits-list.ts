@@ -2,9 +2,12 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { forkJoin } from 'rxjs';
 
 import { CollectionStatus, Visit, VisitStatus } from '../visits.interface';
 import { VisitsService } from '../visits.service';
+
+import { Practitioner, PractitionerService } from '../../../core/services/practitioner';
 
 @Component({
   selector: 'app-visits-list',
@@ -15,7 +18,11 @@ import { VisitsService } from '../visits.service';
 })
 export class VisitsList implements OnInit {
   private readonly visitsService = inject(VisitsService);
+
+  private readonly practitionerService = inject(PractitionerService);
+
   private readonly router = inject(Router);
+
   private readonly cdr = inject(ChangeDetectorRef);
 
   // ============================================================
@@ -24,11 +31,14 @@ export class VisitsList implements OnInit {
 
   visits: Visit[] = [];
 
+  practitioners: Practitioner[] = [];
+
   // ============================================================
   // UI STATE
   // ============================================================
 
   isLoading = false;
+
   errorMessage = '';
 
   // ============================================================
@@ -50,7 +60,7 @@ export class VisitsList implements OnInit {
   }
 
   // ============================================================
-  // LOAD VISITS
+  // LOAD VISITS + PRACTITIONERS
   // ============================================================
 
   loadVisits(): void {
@@ -61,32 +71,72 @@ export class VisitsList implements OnInit {
     this.isLoading = true;
     this.errorMessage = '';
 
-    this.visitsService.getAll().subscribe({
-      // ----------------------------------------------------------
-      // API SUCCESS
-      // ----------------------------------------------------------
+    /*
+     * We load both APIs together:
+     *
+     * 1. GET /api/visits
+     * 2. GET /api/practitioners
+     *
+     * The Visits API currently returns practitionerId
+     * but practitionerName is null.
+     *
+     * Therefore we use the Practitioner API to resolve
+     * the practitioner name on the frontend.
+     */
 
-      next: (visits) => {
+    forkJoin({
+      visits: this.visitsService.getAll(),
+
+      practitioners: this.practitionerService.getPractitioners(),
+    }).subscribe({
+      // ==========================================================
+      // SUCCESS
+      // ==========================================================
+
+      next: ({ visits, practitioners }) => {
         console.log('=================================');
-        console.log('VISITS LIST: API SUCCESS');
+        console.log('VISITS LIST: BOTH APIs SUCCESS');
+        console.log('=================================');
+
         console.log('VISITS RESPONSE:', visits);
-        console.log('IS ARRAY:', Array.isArray(visits));
+
+        console.log('PRACTITIONERS RESPONSE:', practitioners);
+
         console.log('VISIT COUNT:', visits?.length);
+
+        console.log('PRACTITIONER COUNT:', practitioners?.length);
+
+        // --------------------------------------------------------
+        // Store practitioners
+        // --------------------------------------------------------
+
+        this.practitioners = Array.isArray(practitioners) ? practitioners : [];
+
+        // --------------------------------------------------------
+        // Resolve practitioner names
+        // --------------------------------------------------------
+
+        this.visits = this.resolvePractitionerNames(
+          Array.isArray(visits) ? visits : [],
+          this.practitioners,
+        );
+
+        console.log('=================================');
+        console.log('VISITS AFTER PRACTITIONER MAPPING');
         console.log('=================================');
 
-        // Update component state
-        this.visits = visits ?? [];
+        console.log('MAPPED VISITS:', this.visits);
+
+        // --------------------------------------------------------
+        // Finish loading
+        // --------------------------------------------------------
+
         this.isLoading = false;
 
         console.log('IS LOADING AFTER SUCCESS:', this.isLoading);
 
         // --------------------------------------------------------
-        // IMPORTANT
-        // --------------------------------------------------------
-        // Explicitly tell Angular to refresh the view after the
-        // asynchronous API response.
-        // This prevents the UI from remaining stuck on
-        // "Loading visits..." even though isLoading is false.
+        // Refresh Angular view
         // --------------------------------------------------------
 
         this.cdr.detectChanges();
@@ -94,38 +144,127 @@ export class VisitsList implements OnInit {
         console.log('VISITS LIST: VIEW UPDATED');
       },
 
-      // ----------------------------------------------------------
-      // API ERROR
-      // ----------------------------------------------------------
+      // ==========================================================
+      // ERROR
+      // ==========================================================
 
       error: (error) => {
         console.error('=================================');
+
         console.error('VISITS LIST: API ERROR');
+
         console.error('ERROR:', error);
+
         console.error('ERROR STATUS:', error?.status);
+
         console.error('ERROR MESSAGE:', error?.message);
+
         console.error('ERROR BODY:', error?.error);
+
         console.error('=================================');
 
-        this.errorMessage = error?.error?.message || 'Unable to load visits. Please try again.';
+        this.errorMessage =
+          error?.error?.message || error?.message || 'Unable to load visits. Please try again.';
+
+        this.visits = [];
+
+        this.practitioners = [];
 
         this.isLoading = false;
 
         console.log('IS LOADING AFTER ERROR:', this.isLoading);
 
-        // Make sure the error state is rendered immediately.
         this.cdr.detectChanges();
 
         console.log('VISITS LIST: ERROR VIEW UPDATED');
       },
 
-      // ----------------------------------------------------------
-      // OBSERVABLE COMPLETED
-      // ----------------------------------------------------------
+      // ==========================================================
+      // COMPLETE
+      // ==========================================================
 
       complete: () => {
         console.log('VISITS LIST: OBSERVABLE COMPLETED');
       },
+    });
+  }
+
+  // ============================================================
+  // RESOLVE PRACTITIONER NAMES
+  // ============================================================
+
+  private resolvePractitionerNames(visits: Visit[], practitioners: Practitioner[]): Visit[] {
+    /*
+     * Create a quick lookup map:
+     *
+     * practitionerId -> practitionerName
+     *
+     * Example:
+     *
+     * "652e1080-..." -> "Dr. Ahmed"
+     * "25d973f5-..." -> "Dr. Ali"
+     */
+
+    const practitionerMap = new Map<string, string>();
+
+    practitioners.forEach((practitioner) => {
+      if (practitioner.id && practitioner.name) {
+        practitionerMap.set(practitioner.id.toLowerCase(), practitioner.name);
+      }
+    });
+
+    console.log('=================================');
+    console.log('PRACTITIONER LOOKUP MAP');
+    console.log('=================================');
+
+    console.log(practitionerMap);
+
+    /*
+     * Now process every visit.
+     */
+
+    return visits.map((visit) => {
+      // ----------------------------------------------------------
+      // No practitioner assigned
+      // ----------------------------------------------------------
+
+      if (!visit.practitionerId) {
+        return {
+          ...visit,
+          practitionerName: null,
+        };
+      }
+
+      // ----------------------------------------------------------
+      // Find practitioner by ID
+      // ----------------------------------------------------------
+
+      const practitionerName = practitionerMap.get(visit.practitionerId.toLowerCase());
+
+      console.log(
+        'VISIT:',
+        visit.id,
+        '| PRACTITIONER ID:',
+        visit.practitionerId,
+        '| PRACTITIONER NAME:',
+        practitionerName,
+      );
+
+      // ----------------------------------------------------------
+      // Return updated visit
+      // ----------------------------------------------------------
+
+      return {
+        ...visit,
+
+        /*
+         * If the practitioner exists, use the name from
+         * the Practitioner API.
+         *
+         * Otherwise keep the visit as unassigned.
+         */
+        practitionerName: practitionerName ?? null,
+      };
     });
   }
 
@@ -189,7 +328,9 @@ export class VisitsList implements OnInit {
 
   clearFilters(): void {
     this.searchTerm = '';
+
     this.selectedStatus = 'All';
+
     this.selectedCollectionStatus = 'All';
   }
 
@@ -304,6 +445,7 @@ export class VisitsList implements OnInit {
 
   formatSlot(visit: Visit): string {
     const start = this.formatTime(visit.slotStart);
+
     const end = this.formatTime(visit.slotEnd);
 
     if (start === '-' && end === '-') {
@@ -340,6 +482,7 @@ export class VisitsList implements OnInit {
 
   getPendingAmount(visit: Visit): number {
     const due = Number(visit.amountDue ?? 0);
+
     const received = Number(visit.amountReceived ?? 0);
 
     return Math.max(due - received, 0);

@@ -1,8 +1,8 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 
-import { Visit } from './visits.interface';
+import { CollectionStatus, Visit, VisitStatus } from './visits.interface';
 
 // ============================================================
 // CREATE VISIT REQUEST
@@ -16,7 +16,10 @@ export interface CreateVisitRequest {
 
   packageId: string;
 
-  paymentType: 'FullAdvance' | 'Installment';
+  // Backend PackagePaymentType enum:
+  // FullAdvance = 0
+  // Installment = 1
+  paymentType: 0 | 1;
 
   initialAmountPaid: number | null;
 
@@ -53,6 +56,31 @@ export interface ReassignPractitionerRequest {
 }
 
 // ============================================================
+// RAW BACKEND VISIT
+// ============================================================
+//
+// Backend returns enum values as numbers.
+//
+// VisitStatus:
+// 0 = Scheduled
+// 1 = Accepted
+// 2 = Completed
+// 3 = Cancelled
+//
+// CollectionStatus:
+// 0 = Pending
+// 1 = Received
+//
+// We convert these values into the string values expected
+// by the frontend Visit interface.
+//
+
+interface BackendVisit extends Omit<Visit, 'status' | 'collectionStatus'> {
+  status: number;
+  collectionStatus: number;
+}
+
+// ============================================================
 // VISITS SERVICE
 // ============================================================
 
@@ -73,7 +101,9 @@ export class VisitsService {
   // ============================================================
 
   getAll(): Observable<Visit[]> {
-    return this.http.get<Visit[]>(this.apiUrl);
+    return this.http
+      .get<BackendVisit[]>(this.apiUrl)
+      .pipe(map((visits) => visits.map((visit) => this.mapVisit(visit))));
   }
 
   // ============================================================
@@ -81,7 +111,9 @@ export class VisitsService {
   // ============================================================
 
   getById(id: string): Observable<Visit> {
-    return this.http.get<Visit>(`${this.apiUrl}/${id}`);
+    return this.http
+      .get<BackendVisit>(`${this.apiUrl}/${id}`)
+      .pipe(map((visit) => this.mapVisit(visit)));
   }
 
   // ============================================================
@@ -106,5 +138,67 @@ export class VisitsService {
 
   reassign(id: string, request: ReassignPractitionerRequest): Observable<void> {
     return this.http.put<void>(`${this.apiUrl}/${id}/reassign`, request);
+  }
+
+  // ============================================================
+  // MAP BACKEND VISIT
+  // ============================================================
+  //
+  // Converts numeric backend enum values into the string values
+  // expected by the Angular frontend.
+  //
+
+  private mapVisit(visit: BackendVisit): Visit {
+    return {
+      ...visit,
+
+      status: this.mapVisitStatus(visit.status),
+
+      collectionStatus: this.mapCollectionStatus(visit.collectionStatus),
+    };
+  }
+
+  // ============================================================
+  // MAP VISIT STATUS
+  // ============================================================
+
+  private mapVisitStatus(status: number): VisitStatus {
+    switch (status) {
+      case 0:
+        return 'Scheduled';
+
+      case 1:
+        return 'Accepted';
+
+      case 2:
+        return 'Completed';
+
+      case 3:
+        return 'Cancelled';
+
+      default:
+        console.warn('Unknown visit status received from API:', status);
+
+        return 'Scheduled';
+    }
+  }
+
+  // ============================================================
+  // MAP COLLECTION STATUS
+  // ============================================================
+
+  private mapCollectionStatus(status: number): CollectionStatus {
+    switch (status) {
+      case 0:
+        return 'Pending';
+
+      case 1:
+        return 'Received';
+
+      default:
+        console.warn('Unknown collection status received from API:', status);
+
+        return 'Pending';
+    }
   }
 }

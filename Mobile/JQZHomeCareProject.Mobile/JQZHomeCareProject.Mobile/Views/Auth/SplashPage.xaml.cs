@@ -1,9 +1,12 @@
-namespace JQZHomeCareProject.Mobile.Views.Auth;
+using JQZHomeCareProject.Mobile.ViewModels.Auth;
+
+namespace JQZHomeCareProject.Mobile.Views;
 
 public partial class SplashPage : ContentPage
 {
-	public SplashPage()
-	{
-		InitializeComponent();
-	}
+    public SplashPage(SplashViewModel viewModel)
+    {
+        InitializeComponent();
+        BindingContext = viewModel;
+    }
 }

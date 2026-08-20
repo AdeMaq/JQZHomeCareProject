@@ -1,9 +1,9 @@
-namespace JQZHomeCareProject.Mobile.Views.Home;
+namespace JQZHomeCareProject.Mobile.Views;
 
 public partial class HomePage : ContentPage
 {
-	public HomePage()
-	{
-		InitializeComponent();
-	}
+    public HomePage()
+    {
+        InitializeComponent();
+    }
 }

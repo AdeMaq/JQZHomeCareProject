@@ -1,6 +1,9 @@
 ﻿using CommunityToolkit.Maui;
 using JQZHomeCareProject.Mobile.Services.Api;
 using JQZHomeCareProject.Mobile.Services.Session;
+using JQZHomeCareProject.Mobile.ViewModels.Auth;
+using JQZHomeCareProject.Mobile.Views;
+using JQZHomeCareProject.Mobile.Views.Visits;
 using Microsoft.Extensions.Logging;
 
 namespace JQZHomeCareProject.Mobile
@@ -31,6 +34,16 @@ namespace JQZHomeCareProject.Mobile
             {
                 client.BaseAddress = new Uri(apiBaseAddress);
             });
+
+            builder.Services.AddTransient<App>();
+            builder.Services.AddTransient<SplashPage>();
+            builder.Services.AddTransient<SplashViewModel>();
+            builder.Services.AddTransient<LoginPage>();
+            builder.Services.AddTransient<LoginViewModel>();
+            builder.Services.AddTransient<HomePage>();
+            builder.Services.AddTransient<VisitsListPage>();
+            builder.Services.AddTransient<EarningsPage>();
+            builder.Services.AddTransient<ProfilePage>();
 
             // Other typed clients (IVisitsApi, IPractitionersApi, ...) get
             // AddHttpClient<T, TImpl>(...).AddHttpMessageHandler<AuthHeaderHandler>()

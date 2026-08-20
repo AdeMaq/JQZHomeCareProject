@@ -1,9 +1,9 @@
-namespace JQZHomeCareProject.Mobile.Views.Profile;
+namespace JQZHomeCareProject.Mobile.Views;
 
 public partial class ProfilePage : ContentPage
 {
-	public ProfilePage()
-	{
-		InitializeComponent();
-	}
+    public ProfilePage()
+    {
+        InitializeComponent();
+    }
 }

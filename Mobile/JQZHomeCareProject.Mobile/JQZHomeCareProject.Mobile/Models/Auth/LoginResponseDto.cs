@@ -12,6 +12,6 @@ namespace JQZHomeCareProject.Mobile.Models.Auth
 
         /// Null for non-practitioner roles; the mobile app only ever
         /// logs in practitioners, but keep this nullable to mirror the API exactly.
-        public string? PractitinerId {  get; set; }
+        public string? PractitionerId {  get; set; }
     }
 }

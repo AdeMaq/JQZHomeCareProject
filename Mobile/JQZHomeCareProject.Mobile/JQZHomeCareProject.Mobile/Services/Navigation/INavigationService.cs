@@ -4,7 +4,10 @@ using System.Text;
 
 namespace JQZHomeCareProject.Mobile.Services.Navigation
 {
-    internal interface INavigationService
+    public interface INavigationService
     {
+        Task GoToAsync(string route);
+        Task GoToAsync(string route, IDictionary<string, object> parameters);
+        Task GoBackAsync();
     }
 }

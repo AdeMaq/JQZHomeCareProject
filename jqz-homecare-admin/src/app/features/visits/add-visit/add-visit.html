@@ -182,7 +182,9 @@
                 @for (package of packages; track package.id) {
                   <option [value]="package.id">
                     {{ package.name }}
-                    — {{ package.numberOfVisits }} visit(s) — PKR
+                    —
+                    {{ package.numberOfVisits }}
+                    visit(s) — PKR
                     {{ package.amount | number: '1.0-2' }}
                   </option>
                 }
@@ -217,13 +219,19 @@
               <div class="package-summary-item">
                 <span class="summary-label"> Package Amount </span>
 
-                <strong> PKR {{ selectedPackage.amount | number: '1.0-2' }} </strong>
+                <strong>
+                  PKR
+                  {{ selectedPackage.amount | number: '1.0-2' }}
+                </strong>
               </div>
 
               <div class="package-summary-item">
                 <span class="summary-label"> Price / Visit </span>
 
-                <strong> PKR {{ selectedPackage.pricePerVisit | number: '1.0-2' }} </strong>
+                <strong>
+                  PKR
+                  {{ selectedPackage.pricePerVisit | number: '1.0-2' }}
+                </strong>
               </div>
             </div>
           }
@@ -316,20 +324,29 @@
             <div class="payment-info-row">
               <span> Package Total </span>
 
-              <strong> PKR {{ selectedPackage.amount | number: '1.0-2' }} </strong>
+              <strong>
+                PKR
+                {{ selectedPackage.amount | number: '1.0-2' }}
+              </strong>
             </div>
 
             @if (form.paymentType === 'Installment') {
               <div class="payment-info-row">
                 <span> Initial Payment </span>
 
-                <strong> PKR {{ form.initialAmountPaid || 0 | number: '1.0-2' }} </strong>
+                <strong>
+                  PKR
+                  {{ form.initialAmountPaid || 0 | number: '1.0-2' }}
+                </strong>
               </div>
 
               <div class="payment-info-row pending">
                 <span> Remaining Amount </span>
 
-                <strong> PKR {{ getPendingAmount() | number: '1.0-2' }} </strong>
+                <strong>
+                  PKR
+                  {{ getPendingAmount() | number: '1.0-2' }}
+                </strong>
               </div>
             }
           </div>
@@ -350,7 +367,7 @@
         <div>
           <h2>Visit Assignments</h2>
 
-          <p>Assign practitioners, areas and schedules to the package visits.</p>
+          <p>Assign areas, practitioners and schedules to the package visits.</p>
         </div>
       </div>
 
@@ -385,70 +402,172 @@
                   <div>
                     <h3>Visit {{ i + 1 }}</h3>
 
-                    <p>Configure practitioner, area and schedule.</p>
+                    <p>Configure area, practitioner and schedule.</p>
                   </div>
                 </div>
 
                 <!-- Assignment Fields -->
 
                 <div class="assignment-grid">
-                  <!-- Practitioner -->
-
-                  <div class="form-field">
-                    <label [for]="'practitioner-' + i"> Practitioner </label>
-
-                    <div class="input-wrapper">
-                      <i class="fa-solid fa-user-doctor"></i>
-
-                      <select
-                        [id]="'practitioner-' + i"
-                        [name]="'practitioner-' + i"
-                        [(ngModel)]="assignment.practitionerId"
-                        (ngModelChange)="onPractitionerChange(i)"
-                      >
-                        <option value="">Select practitioner</option>
-
-                        @for (
-                          practitioner of getPractitionersForAssignment(i);
-                          track practitioner.id
-                        ) {
-                          <option [value]="practitioner.id">
-                            {{ practitioner.name }}
-                          </option>
-                        }
-                      </select>
-                    </div>
-                  </div>
-
-                  <!-- Area -->
+                  <!-- ==================================================
+                       AREA
+                  =================================================== -->
 
                   <div class="form-field">
                     <label [for]="'area-' + i"> Area </label>
 
-                    <div class="input-wrapper">
-                      <i class="fa-solid fa-location-dot"></i>
+                    <div class="searchable-select" (click)="$event.stopPropagation()">
+                      <div class="searchable-input-wrapper">
+                        <i class="fa-solid fa-location-dot"></i>
 
-                      <select
-                        [id]="'area-' + i"
-                        [name]="'area-' + i"
-                        [(ngModel)]="assignment.areaId"
-                        (ngModelChange)="onAreaChange(i)"
-                      >
-                        <option value="">Select area</option>
+                        <input
+                          [id]="'area-' + i"
+                          type="text"
+                          [name]="'area-search-' + i"
+                          autocomplete="off"
+                          [value]="
+                            isAreaDropdownOpen(i)
+                              ? (areaSearchTerms[i] ?? '')
+                              : getSelectedAreaName(i)
+                          "
+                          placeholder="Search area..."
+                          (focus)="openAreaDropdown(i)"
+                          (input)="onAreaSearch(i, $any($event.target).value)"
+                        />
 
-                        @for (area of getAreasForAssignment(i); track area.id) {
-                          <option [value]="area.id">
-                            {{ area.name }}
-                            @if (area.cityName) {
-                              — {{ area.cityName }}
-                            }
-                          </option>
-                        }
-                      </select>
+                        <i
+                          class="fa-solid fa-chevron-down dropdown-arrow"
+                          [class.open]="isAreaDropdownOpen(i)"
+                        ></i>
+                      </div>
+
+                      @if (isAreaDropdownOpen(i)) {
+                        <div class="searchable-dropdown">
+                          @if (getFilteredAreas(i).length === 0) {
+                            <div class="dropdown-empty">
+                              <i class="fa-solid fa-location-dot"></i>
+
+                              <span> No areas found. </span>
+                            </div>
+                          }
+
+                          @for (area of getFilteredAreas(i); track area.id) {
+                            <button
+                              type="button"
+                              class="dropdown-option"
+                              [class.selected]="assignment.areaId === area.id"
+                              (click)="selectArea(i, area)"
+                            >
+                              <span class="dropdown-option-icon">
+                                <i class="fa-solid fa-location-dot"></i>
+                              </span>
+
+                              <span class="dropdown-option-content">
+                                <strong>
+                                  {{ area.name }}
+                                </strong>
+
+                                @if (area.cityName) {
+                                  <small>
+                                    {{ area.cityName }}
+                                  </small>
+                                }
+                              </span>
+
+                              @if (assignment.areaId === area.id) {
+                                <i class="fa-solid fa-check"></i>
+                              }
+                            </button>
+                          }
+                        </div>
+                      }
                     </div>
                   </div>
 
-                  <!-- Scheduled Date -->
+                  <!-- ==================================================
+                       PRACTITIONER
+                  =================================================== -->
+
+                  <div class="form-field">
+                    <label [for]="'practitioner-' + i"> Practitioner </label>
+
+                    <div class="searchable-select" (click)="$event.stopPropagation()">
+                      <div class="searchable-input-wrapper">
+                        <i class="fa-solid fa-user-doctor"></i>
+
+                        <input
+                          [id]="'practitioner-' + i"
+                          type="text"
+                          [name]="'practitioner-search-' + i"
+                          autocomplete="off"
+                          [value]="
+                            isPractitionerDropdownOpen(i)
+                              ? (practitionerSearchTerms[i] ?? '')
+                              : getSelectedPractitionerName(i)
+                          "
+                          placeholder="Search practitioner..."
+                          (focus)="openPractitionerDropdown(i)"
+                          (input)="onPractitionerSearch(i, $any($event.target).value)"
+                        />
+
+                        <i
+                          class="fa-solid fa-chevron-down dropdown-arrow"
+                          [class.open]="isPractitionerDropdownOpen(i)"
+                        ></i>
+                      </div>
+
+                      @if (isPractitionerDropdownOpen(i)) {
+                        <div class="searchable-dropdown">
+                          @if (getPractitionersForAssignment(i).length === 0) {
+                            <div class="dropdown-empty">
+                              <i class="fa-solid fa-user-doctor"></i>
+
+                              <span> No practitioners found. </span>
+                            </div>
+                          }
+
+                          @for (
+                            practitioner of getPractitionersForAssignment(i);
+                            track practitioner.id
+                          ) {
+                            <button
+                              type="button"
+                              class="dropdown-option"
+                              [class.selected]="assignment.practitionerId === practitioner.id"
+                              (click)="selectPractitioner(i, practitioner)"
+                            >
+                              <span class="dropdown-option-icon practitioner-icon">
+                                <i class="fa-solid fa-user-doctor"></i>
+                              </span>
+
+                              <span class="dropdown-option-content">
+                                <strong>
+                                  {{ practitioner.name }}
+                                </strong>
+
+                                @if (
+                                  assignment.areaId &&
+                                  practitioner.areas?.some((area) => area.id === assignment.areaId)
+                                ) {
+                                  <small class="area-assigned-label">
+                                    Assigned to selected area
+                                  </small>
+                                }
+                              </span>
+
+                              @if (assignment.practitionerId === practitioner.id) {
+                                <i class="fa-solid fa-check"></i>
+                              }
+                            </button>
+                          }
+                        </div>
+                      }
+                    </div>
+                  </div>
+
+                  <!-- ==================================================
+                       SCHEDULED DATE
+                  =================================================== -->
 
                   <div class="form-field">
                     <label [for]="'date-' + i"> Scheduled Date </label>
@@ -466,7 +585,9 @@
                     </div>
                   </div>
 
-                  <!-- Start Time -->
+                  <!-- ==================================================
+                       START TIME
+                  =================================================== -->
 
                   <div class="form-field">
                     <label [for]="'start-time-' + i"> Start Time </label>
@@ -483,7 +604,9 @@
                     </div>
                   </div>
 
-                  <!-- End Time -->
+                  <!-- ==================================================
+                       END TIME
+                  =================================================== -->
 
                   <div class="form-field">
                     <label [for]="'end-time-' + i"> End Time </label>

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, HostListener, inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 
@@ -32,12 +32,54 @@ interface AddVisitForm {
 
   packageId: string;
 
+  /*
+   * These are UI values.
+   *
+   * They are converted to the numeric backend enum
+   * immediately before the API request is sent.
+   *
+   * FullAdvance = 0
+   * Installment = 1
+   */
   paymentType: 'FullAdvance' | 'Installment';
 
   initialAmountPaid: number | null;
 
   visitAssignments: VisitAssignmentForm[];
 }
+
+// ============================================================
+// BACKEND CREATE VISIT PAYLOAD
+// ============================================================
+
+interface CreateVisitPayload {
+  patientName: string;
+  patientPhone: string;
+  locationAddress: string;
+
+  packageId: string;
+
+  paymentType: 0 | 1;
+
+  initialAmountPaid: number | null;
+
+  visitAssignments: {
+    practitionerId: string | null;
+    areaId: string | null;
+    scheduledDate: string | null;
+    slotStart: string | null;
+    slotEnd: string | null;
+  }[];
+}
+
+// ============================================================
+// DROPDOWN TYPE
+// ============================================================
+
+type OpenDropdown = {
+  type: 'area' | 'practitioner';
+  index: number;
+} | null;
 
 // ============================================================
 // COMPONENT
@@ -76,6 +118,32 @@ export class AddVisit implements OnInit {
   practitioners: Practitioner[] = [];
 
   areas: Area[] = [];
+
+  // ============================================================
+  // SEARCHABLE DROPDOWN STATE
+  // ============================================================
+
+  /*
+   * Keeps track of which dropdown is currently open.
+   *
+   * Only one dropdown is open at a time.
+   */
+  openDropdown: OpenDropdown = null;
+
+  /*
+   * Search text for every Area assignment row.
+   *
+   * Example:
+   *
+   * areaSearchTerms[0] = "kamran"
+   * areaSearchTerms[1] = "tank"
+   */
+  areaSearchTerms: Record<number, string> = {};
+
+  /*
+   * Search text for every Practitioner assignment row.
+   */
+  practitionerSearchTerms: Record<number, string> = {};
 
   // ============================================================
   // SELECTED PACKAGE
@@ -126,16 +194,28 @@ export class AddVisit implements OnInit {
   }
 
   // ============================================================
+  // CLOSE DROPDOWN WHEN CLICKING OUTSIDE
+  // ============================================================
+
+  @HostListener('document:click')
+  onDocumentClick(): void {
+    this.closeDropdown();
+  }
+
+  // ============================================================
   // LOAD INITIAL DATA
   // ============================================================
 
   private loadInitialData(): void {
     this.isLoading = true;
+
     this.errorMessage = '';
 
     this.packageService.getPackages().subscribe({
       next: (packages) => {
         this.packages = packages;
+
+        console.log('Packages loaded:', this.packages);
 
         this.loadPractitioners();
       },
@@ -211,16 +291,35 @@ export class AddVisit implements OnInit {
   onPackageChange(): void {
     this.selectedPackage = this.packages.find((pkg) => pkg.id === this.form.packageId) ?? null;
 
+    /*
+     * Close any currently open dropdown when the package
+     * changes.
+     */
+    this.closeDropdown();
+
+    /*
+     * Reset searchable dropdown state because the assignment
+     * rows are about to be recreated.
+     */
+    this.areaSearchTerms = {};
+
+    this.practitionerSearchTerms = {};
+
     if (!this.selectedPackage) {
       this.form.visitAssignments = [];
+
       return;
     }
 
-    // Reset installment amount when package changes.
+    /*
+     * Reset installment amount whenever the package changes.
+     */
     this.form.initialAmountPaid = null;
 
-    // Create one assignment row for every visit
-    // included in the selected package.
+    /*
+     * Create one assignment row for every visit
+     * contained in the selected package.
+     */
     this.form.visitAssignments = Array.from(
       {
         length: this.selectedPackage.numberOfVisits,
@@ -268,6 +367,153 @@ export class AddVisit implements OnInit {
   }
 
   // ============================================================
+  // OPEN AREA DROPDOWN
+  // ============================================================
+
+  openAreaDropdown(index: number): void {
+    /*
+     * Stop the document click handler from immediately
+     * closing the dropdown.
+     */
+    this.openDropdown = {
+      type: 'area',
+      index,
+    };
+
+    /*
+     * Start with an empty search whenever the dropdown opens.
+     *
+     * The selected Area is still displayed while the dropdown
+     * is closed.
+     */
+    this.areaSearchTerms[index] = '';
+  }
+
+  // ============================================================
+  // OPEN PRACTITIONER DROPDOWN
+  // ============================================================
+
+  openPractitionerDropdown(index: number): void {
+    this.openDropdown = {
+      type: 'practitioner',
+      index,
+    };
+
+    /*
+     * Start with an empty search whenever the dropdown opens.
+     */
+    this.practitionerSearchTerms[index] = '';
+  }
+
+  // ============================================================
+  // CLOSE DROPDOWN
+  // ============================================================
+
+  closeDropdown(): void {
+    this.openDropdown = null;
+  }
+
+  // ============================================================
+  // CHECK DROPDOWN STATE
+  // ============================================================
+
+  isAreaDropdownOpen(index: number): boolean {
+    return this.openDropdown?.type === 'area' && this.openDropdown.index === index;
+  }
+
+  isPractitionerDropdownOpen(index: number): boolean {
+    return this.openDropdown?.type === 'practitioner' && this.openDropdown.index === index;
+  }
+
+  // ============================================================
+  // AREA SEARCH
+  // ============================================================
+
+  onAreaSearch(index: number, searchValue: string): void {
+    this.areaSearchTerms[index] = searchValue;
+
+    this.openDropdown = {
+      type: 'area',
+      index,
+    };
+  }
+
+  // ============================================================
+  // GET FILTERED AREAS
+  // ============================================================
+
+  getFilteredAreas(index: number): Area[] {
+    const search = (this.areaSearchTerms[index] ?? '').trim().toLowerCase();
+
+    if (!search) {
+      return this.areas;
+    }
+
+    return this.areas.filter((area) => {
+      const areaName = (area.name ?? '').toLowerCase();
+
+      const cityName = (area.cityName ?? '').toLowerCase();
+
+      return areaName.includes(search) || cityName.includes(search);
+    });
+  }
+
+  // ============================================================
+  // GET SELECTED AREA NAME
+  // ============================================================
+
+  getSelectedAreaName(index: number): string {
+    const assignment = this.form.visitAssignments[index];
+
+    if (!assignment?.areaId) {
+      return '';
+    }
+
+    const area = this.areas.find((item) => item.id === assignment.areaId);
+
+    if (!area) {
+      return '';
+    }
+
+    return area.cityName ? `${area.name} — ${area.cityName}` : area.name;
+  }
+
+  // ============================================================
+  // SELECT AREA
+  // ============================================================
+
+  selectArea(index: number, area: Area): void {
+    const assignment = this.form.visitAssignments[index];
+
+    if (!assignment) {
+      return;
+    }
+
+    /*
+     * Set the selected Area.
+     */
+    assignment.areaId = area.id;
+
+    /*
+     * Keep the selected Area visible after selection.
+     */
+    this.areaSearchTerms[index] = area.cityName ? `${area.name} — ${area.cityName}` : area.name;
+
+    /*
+     * IMPORTANT:
+     *
+     * onAreaChange() no longer clears a practitioner who is
+     * not assigned to this Area.
+     *
+     * Instead, it only causes the practitioner list to be
+     * recalculated and prioritized.
+     */
+    this.onAreaChange(index);
+
+    this.closeDropdown();
+  }
+
+  // ============================================================
   // GET PRACTITIONERS FOR ASSIGNMENT
   // ============================================================
 
@@ -278,24 +524,127 @@ export class AddVisit implements OnInit {
       return [];
     }
 
-    if (!this.selectedPackage) {
-      return [];
-    }
+    /*
+     * IMPORTANT:
+     *
+     * All loaded practitioners remain available.
+     *
+     * We intentionally do NOT filter by:
+     *
+     * - selected Area
+     * - selected Package service
+     *
+     * The selected Area only controls the ordering.
+     */
+    let result = [...this.practitioners];
 
-    // Filter practitioners according to the package service.
-    let result = this.practitioners.filter(
-      (practitioner) => practitioner.serviceId === this.selectedPackage!.serviceId,
-    );
+    /*
+     * Apply Practitioner search AFTER taking the complete
+     * practitioner list.
+     *
+     * Therefore searching always searches across all
+     * practitioners.
+     */
+    const search = (this.practitionerSearchTerms[index] ?? '').trim().toLowerCase();
 
-    // If an area has already been selected,
-    // only show practitioners who work in that area.
-    if (assignment.areaId) {
+    if (search) {
       result = result.filter((practitioner) =>
-        practitioner.areas?.some((area) => area.id === assignment.areaId),
+        (practitioner.name ?? '').toLowerCase().includes(search),
       );
     }
 
+    /*
+     * If an Area is selected, prioritize practitioners who
+     * are already assigned to that Area.
+     *
+     * Practitioners who are not assigned to that Area are
+     * still kept in the list.
+     */
+    if (assignment.areaId) {
+      const selectedAreaId = assignment.areaId;
+
+      result.sort((a, b) => {
+        const aAssigned = a.areas?.some((area) => area.id === selectedAreaId) ?? false;
+
+        const bAssigned = b.areas?.some((area) => area.id === selectedAreaId) ?? false;
+
+        if (aAssigned && !bAssigned) {
+          return -1;
+        }
+
+        if (!aAssigned && bAssigned) {
+          return 1;
+        }
+
+        return 0;
+      });
+    }
+
     return result;
+  }
+
+  // ============================================================
+  // GET SELECTED PRACTITIONER NAME
+  // ============================================================
+
+  getSelectedPractitionerName(index: number): string {
+    const assignment = this.form.visitAssignments[index];
+
+    if (!assignment?.practitionerId) {
+      return '';
+    }
+
+    const practitioner = this.practitioners.find((item) => item.id === assignment.practitionerId);
+
+    return practitioner?.name ?? '';
+  }
+
+  // ============================================================
+  // PRACTITIONER SEARCH
+  // ============================================================
+
+  onPractitionerSearch(index: number, searchValue: string): void {
+    this.practitionerSearchTerms[index] = searchValue;
+
+    this.openDropdown = {
+      type: 'practitioner',
+      index,
+    };
+  }
+
+  // ============================================================
+  // SELECT PRACTITIONER
+  // ============================================================
+
+  selectPractitioner(index: number, practitioner: Practitioner): void {
+    const assignment = this.form.visitAssignments[index];
+
+    if (!assignment) {
+      return;
+    }
+
+    /*
+     * Select the practitioner.
+     */
+    assignment.practitionerId = practitioner.id;
+
+    /*
+     * Keep the selected practitioner name visible.
+     */
+    this.practitionerSearchTerms[index] = practitioner.name;
+
+    /*
+     * IMPORTANT:
+     *
+     * We intentionally do NOT clear the selected Area.
+     *
+     * A practitioner can be intentionally selected even if
+     * they have not previously been assigned to the selected
+     * Area.
+     */
+    this.onPractitionerChange(index);
+
+    this.closeDropdown();
   }
 
   // ============================================================
@@ -309,17 +658,18 @@ export class AddVisit implements OnInit {
       return;
     }
 
-    // If the currently selected area does not belong
-    // to the newly selected practitioner, clear it.
-    if (assignment.practitionerId && assignment.areaId) {
-      const practitioner = this.practitioners.find((p) => p.id === assignment.practitionerId);
-
-      const hasArea = practitioner?.areas?.some((area) => area.id === assignment.areaId) ?? false;
-
-      if (!hasArea) {
-        assignment.areaId = null;
-      }
-    }
+    /*
+     * IMPORTANT:
+     *
+     * We intentionally do NOT clear assignment.areaId here.
+     *
+     * The business requirement allows a practitioner to be
+     * selected even when that practitioner is not already
+     * assigned to the selected Area.
+     *
+     * Therefore this method is intentionally kept as a
+     * no-op for Area validation.
+     */
   }
 
   // ============================================================
@@ -327,27 +677,12 @@ export class AddVisit implements OnInit {
   // ============================================================
 
   getAreasForAssignment(index: number): Area[] {
-    const assignment = this.form.visitAssignments[index];
-
-    if (!assignment) {
-      return [];
-    }
-
-    // If a practitioner has been selected,
-    // only show areas assigned to that practitioner.
-    if (assignment.practitionerId) {
-      const practitioner = this.practitioners.find((p) => p.id === assignment.practitionerId);
-
-      if (!practitioner) {
-        return [];
-      }
-
-      const practitionerAreaIds = new Set((practitioner.areas ?? []).map((area) => area.id));
-
-      return this.areas.filter((area) => practitionerAreaIds.has(area.id));
-    }
-
-    // Otherwise show all areas.
+    /*
+     * The Area dropdown must always contain ALL available
+     * areas.
+     *
+     * It is no longer restricted by the selected practitioner.
+     */
     return this.areas;
   }
 
@@ -362,18 +697,17 @@ export class AddVisit implements OnInit {
       return;
     }
 
-    // If practitioner is already selected,
-    // make sure that practitioner belongs to
-    // the selected area.
-    if (assignment.areaId && assignment.practitionerId) {
-      const practitioner = this.practitioners.find((p) => p.id === assignment.practitionerId);
-
-      const valid = practitioner?.areas?.some((area) => area.id === assignment.areaId) ?? false;
-
-      if (!valid) {
-        assignment.practitionerId = null;
-      }
-    }
+    /*
+     * IMPORTANT:
+     *
+     * Do NOT clear assignment.practitionerId.
+     *
+     * Changing the Area only changes the priority ordering
+     * inside getPractitionersForAssignment().
+     *
+     * The selected practitioner remains selected even if
+     * they are not assigned to the new Area.
+     */
   }
 
   // ============================================================
@@ -387,7 +721,10 @@ export class AddVisit implements OnInit {
       return;
     }
 
-    // Conflict validation is handled by the backend.
+    /*
+     * Schedule conflict validation is handled by
+     * the backend.
+     */
   }
 
   // ============================================================
@@ -409,81 +746,112 @@ export class AddVisit implements OnInit {
   }
 
   // ============================================================
+  // CONVERT PAYMENT TYPE TO BACKEND ENUM
+  // ============================================================
+
+  private getPaymentTypeValue(): 0 | 1 {
+    /*
+     * Backend PackagePaymentType enum:
+     *
+     * 0 = FullAdvance
+     * 1 = Installment
+     */
+    return this.form.paymentType === 'FullAdvance' ? 0 : 1;
+  }
+
+  // ============================================================
   // SUBMIT VISIT
   // ============================================================
 
   submitVisit(): void {
-    // Prevent duplicate submissions.
+    /*
+     * Prevent duplicate submissions.
+     */
     if (this.isSubmitting) {
       return;
     }
 
     this.errorMessage = '';
+
     this.successMessage = '';
 
-    // ----------------------------------------------------------
+    // ==========================================================
     // BASIC VALIDATION
-    // ----------------------------------------------------------
+    // ==========================================================
 
     if (!this.form.patientName.trim()) {
       this.errorMessage = 'Patient name is required.';
+
       return;
     }
 
     if (!this.form.patientPhone.trim()) {
       this.errorMessage = 'Patient phone is required.';
+
       return;
     }
 
     if (!this.form.locationAddress.trim()) {
       this.errorMessage = 'Patient location address is required.';
+
       return;
     }
 
     if (!this.form.packageId) {
       this.errorMessage = 'Please select a package.';
+
       return;
     }
 
     if (!this.selectedPackage) {
       this.errorMessage = 'Selected package could not be found.';
+
       return;
     }
 
-    // ----------------------------------------------------------
+    // ==========================================================
     // INSTALLMENT VALIDATION
-    // ----------------------------------------------------------
+    // ==========================================================
 
     if (this.form.paymentType === 'Installment') {
       if (this.form.initialAmountPaid === null || this.form.initialAmountPaid === undefined) {
         this.errorMessage = 'Initial amount paid is required for installment payment.';
+
         return;
       }
 
       if (this.form.initialAmountPaid < 0) {
         this.errorMessage = 'Initial amount paid cannot be negative.';
+
         return;
       }
 
       if (this.form.initialAmountPaid > this.selectedPackage.amount) {
         this.errorMessage = 'Initial amount paid cannot exceed the package amount.';
+
         return;
       }
     }
 
-    // ----------------------------------------------------------
+    // ==========================================================
     // ASSIGNMENT VALIDATION
-    // ----------------------------------------------------------
+    // ==========================================================
 
     for (let i = 0; i < this.form.visitAssignments.length; i++) {
       const assignment = this.form.visitAssignments[i];
 
+      /*
+       * Check partial scheduling.
+       */
       if (this.hasPartialSchedule(assignment)) {
         this.errorMessage = `Visit #${i + 1}: Scheduled date, start time and end time must all be provided together.`;
 
         return;
       }
 
+      /*
+       * Check time order.
+       */
       if (
         assignment.slotStart &&
         assignment.slotEnd &&
@@ -495,11 +863,11 @@ export class AddVisit implements OnInit {
       }
     }
 
-    // ----------------------------------------------------------
-    // CREATE REQUEST
-    // ----------------------------------------------------------
+    // ==========================================================
+    // CREATE ACTUAL BACKEND PAYLOAD
+    // ==========================================================
 
-    const request: CreateVisitRequest = {
+    const payload: CreateVisitPayload = {
       patientName: this.form.patientName.trim(),
 
       patientPhone: this.form.patientPhone.trim(),
@@ -508,7 +876,7 @@ export class AddVisit implements OnInit {
 
       packageId: this.form.packageId,
 
-      paymentType: this.form.paymentType,
+      paymentType: this.getPaymentTypeValue(),
 
       initialAmountPaid:
         this.form.paymentType === 'Installment' ? Number(this.form.initialAmountPaid) : null,
@@ -526,51 +894,87 @@ export class AddVisit implements OnInit {
       })),
     };
 
-    console.log('Create Visit Request:', request);
+    // ==========================================================
+    // DEBUG LOGGING
+    // ==========================================================
 
-    // ----------------------------------------------------------
+    console.log('================================================');
+
+    console.log('CREATE VISIT REQUEST');
+
+    console.log('Payload sent to backend:', payload);
+
+    console.log(
+      'Payment Type:',
+      payload.paymentType,
+      payload.paymentType === 0 ? '(FullAdvance)' : '(Installment)',
+    );
+
+    console.log('Package:', this.selectedPackage);
+
+    console.log('Assignments:', payload.visitAssignments);
+
+    console.log('================================================');
+
+    // ==========================================================
     // START SUBMISSION
-    // ----------------------------------------------------------
+    // ==========================================================
 
     this.isSubmitting = true;
 
-    // ----------------------------------------------------------
+    // ==========================================================
     // API REQUEST
-    // ----------------------------------------------------------
+    // ==========================================================
 
-    this.visitsService.create(request).subscribe({
+    this.visitsService.create(payload as unknown as CreateVisitRequest).subscribe({
+      // ======================================================
+      // SUCCESS
+      // ======================================================
+
       next: (response: unknown) => {
-        console.log('Visit created successfully:', response);
+        console.log('================================================');
 
-        // IMPORTANT:
-        // Always stop the loading state before navigation.
+        console.log('VISIT CREATED SUCCESSFULLY');
+
+        console.log('API RESPONSE:', response);
+
+        console.log('================================================');
+
         this.isSubmitting = false;
 
         this.successMessage = 'Visit package created successfully.';
 
-        // Navigate back to visits list.
-        this.router.navigate(['/admin/visits']);
+        this.router.navigate(['/visits']);
       },
 
-      error: (error: unknown) => {
-        console.error('Failed to create visit:', error);
+      // ======================================================
+      // ERROR
+      // ======================================================
 
-        // IMPORTANT:
-        // Stop loading even when API returns an error.
+      error: (error: unknown) => {
+        console.error('================================================');
+
+        console.error('FAILED TO CREATE VISIT');
+
+        console.error('HTTP ERROR:', error);
+
+        console.error('================================================');
+
         this.isSubmitting = false;
 
         this.errorMessage = this.getErrorMessage(
           error,
           'Failed to create the visit. Please try again.',
         );
+
+        console.error('Create Visit Error Message:', this.errorMessage);
       },
 
+      // ======================================================
+      // COMPLETE
+      // ======================================================
+
       complete: () => {
-        // Safety guard.
-        //
-        // Normally `next` handles this, but keeping this
-        // guard ensures the UI never remains stuck in loading
-        // if the observable completes unexpectedly.
         this.isSubmitting = false;
       },
     });
@@ -600,33 +1004,17 @@ export class AddVisit implements OnInit {
         };
       };
 
-      // --------------------------------------------------------
-      // BACKEND MESSAGE
-      // --------------------------------------------------------
-
       if (response.error?.message) {
         return response.error.message;
       }
-
-      // --------------------------------------------------------
-      // BACKEND DETAIL
-      // --------------------------------------------------------
 
       if (response.error?.detail) {
         return response.error.detail;
       }
 
-      // --------------------------------------------------------
-      // BACKEND TITLE
-      // --------------------------------------------------------
-
       if (response.error?.title) {
         return response.error.title;
       }
-
-      // --------------------------------------------------------
-      // VALIDATION ERRORS
-      // --------------------------------------------------------
 
       if (response.error?.errors) {
         const validationErrors = Object.values(response.error.errors)
@@ -641,25 +1029,13 @@ export class AddVisit implements OnInit {
         }
       }
 
-      // --------------------------------------------------------
-      // HTTP ERROR MESSAGE
-      // --------------------------------------------------------
-
       if (response.message && response.message.trim().length > 0) {
         return response.message;
       }
 
-      // --------------------------------------------------------
-      // SERVER ERROR
-      // --------------------------------------------------------
-
       if ((response.status ?? 0) >= 500) {
         return 'The server encountered an error while creating the visit. Please try again.';
       }
-
-      // --------------------------------------------------------
-      // CLIENT ERROR
-      // --------------------------------------------------------
 
       if ((response.status ?? 0) >= 400) {
         return 'The visit could not be created. Please check the entered information and try again.';
@@ -678,6 +1054,6 @@ export class AddVisit implements OnInit {
       return;
     }
 
-    this.router.navigate(['/admin/visits']);
+    this.router.navigate(['/visits']);
   }
 }

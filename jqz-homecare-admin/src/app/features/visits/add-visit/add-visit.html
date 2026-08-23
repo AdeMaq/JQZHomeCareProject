@@ -24,7 +24,7 @@
       <div>
         <h1>Add Visit</h1>
 
-        <p>Create a new patient package and schedule its visits.</p>
+        <p>Create a new patient package and configure its visits.</p>
       </div>
     </div>
   </div>
@@ -77,7 +77,7 @@
             </div>
 
             @if (patientName.invalid && patientName.touched) {
-              <span class="field-error"> Patient name is required. </span>
+              <span class="field-error">Patient name is required.</span>
             }
           </div>
 
@@ -104,7 +104,7 @@
             </div>
 
             @if (patientPhone.invalid && patientPhone.touched) {
-              <span class="field-error"> Patient phone is required. </span>
+              <span class="field-error">Patient phone is required.</span>
             }
           </div>
 
@@ -132,16 +132,16 @@
             </div>
 
             @if (locationAddress.invalid && locationAddress.touched) {
-              <span class="field-error"> Location address is required. </span>
+              <span class="field-error">Location address is required.</span>
             }
           </div>
         </div>
       </div>
     </section>
 
-    <!-- ============================================================
+    <!-- ==========================================================
          PACKAGE INFORMATION
-    ============================================================ -->
+    =========================================================== -->
 
     <section class="form-card">
       <div class="card-header">
@@ -176,32 +176,37 @@
                 (ngModelChange)="onPackageChange()"
                 #packageId="ngModel"
                 required
+                [disabled]="isLoading"
               >
-                <option value="">Select a package</option>
+                @if (isLoading) {
+                  <option value="">Loading packages...</option>
+                } @else {
+                  <option value="">Select a package</option>
 
-                @for (package of packages; track package.id) {
-                  <option [value]="package.id">
-                    {{ package.name }}
-                    —
-                    {{ package.numberOfVisits }}
-                    visit(s) — PKR
-                    {{ package.amount | number: '1.0-2' }}
-                  </option>
+                  @for (package of packages; track package.id) {
+                    <option [value]="package.id">
+                      {{ package.name }}
+                      —
+                      {{ package.numberOfVisits }}
+                      visit(s) — PKR
+                      {{ package.amount | number: '1.0-2' }}
+                    </option>
+                  }
                 }
               </select>
             </div>
 
             @if (packageId.invalid && packageId.touched) {
-              <span class="field-error"> Please select a package. </span>
+              <span class="field-error">Please select a package.</span>
             }
           </div>
 
-          <!-- Selected Package Summary -->
+          <!-- Package Summary -->
 
           @if (selectedPackage) {
             <div class="package-summary full-width">
               <div class="package-summary-item">
-                <span class="summary-label"> Service </span>
+                <span class="summary-label">Service</span>
 
                 <strong>
                   {{ selectedPackage.serviceName }}
@@ -209,7 +214,7 @@
               </div>
 
               <div class="package-summary-item">
-                <span class="summary-label"> Number of Visits </span>
+                <span class="summary-label">Number of Visits</span>
 
                 <strong>
                   {{ selectedPackage.numberOfVisits }}
@@ -217,7 +222,7 @@
               </div>
 
               <div class="package-summary-item">
-                <span class="summary-label"> Package Amount </span>
+                <span class="summary-label">Package Amount</span>
 
                 <strong>
                   PKR
@@ -226,7 +231,7 @@
               </div>
 
               <div class="package-summary-item">
-                <span class="summary-label"> Price / Visit </span>
+                <span class="summary-label">Price / Visit</span>
 
                 <strong>
                   PKR
@@ -239,9 +244,9 @@
       </div>
     </section>
 
-    <!-- ============================================================
+    <!-- ==========================================================
          PAYMENT INFORMATION
-    ============================================================ -->
+    =========================================================== -->
 
     <section class="form-card">
       <div class="card-header">
@@ -276,9 +281,9 @@
                 (ngModelChange)="onPaymentTypeChange()"
                 required
               >
-                <option value="FullAdvance">Full Advance</option>
+                <option [ngValue]="'FullAdvance'">Full Advance</option>
 
-                <option value="Installment">Installment</option>
+                <option [ngValue]="'Installment'">Installment</option>
               </select>
             </div>
           </div>
@@ -293,7 +298,7 @@
               </label>
 
               <div class="input-wrapper">
-                <span class="currency-prefix"> PKR </span>
+                <span class="currency-prefix">PKR</span>
 
                 <input
                   id="initialAmountPaid"
@@ -317,12 +322,12 @@
           }
         </div>
 
-        <!-- Payment Information -->
+        <!-- Payment Summary -->
 
         @if (selectedPackage) {
           <div class="payment-info">
             <div class="payment-info-row">
-              <span> Package Total </span>
+              <span>Package Total</span>
 
               <strong>
                 PKR
@@ -330,9 +335,17 @@
               </strong>
             </div>
 
+            @if (form.paymentType === 'FullAdvance') {
+              <div class="payment-info-row">
+                <span>Payment Method</span>
+
+                <strong>Full Advance</strong>
+              </div>
+            }
+
             @if (form.paymentType === 'Installment') {
               <div class="payment-info-row">
-                <span> Initial Payment </span>
+                <span>Initial Payment</span>
 
                 <strong>
                   PKR
@@ -341,7 +354,7 @@
               </div>
 
               <div class="payment-info-row pending">
-                <span> Remaining Amount </span>
+                <span>Remaining Amount</span>
 
                 <strong>
                   PKR
@@ -354,9 +367,9 @@
       </div>
     </section>
 
-    <!-- ============================================================
+    <!-- ==========================================================
          VISIT ASSIGNMENTS
-    ============================================================ -->
+    =========================================================== -->
 
     <section class="form-card">
       <div class="card-header">
@@ -372,7 +385,7 @@
       </div>
 
       <div class="card-body">
-        <!-- No package selected -->
+        <!-- No Package Selected -->
 
         @if (!selectedPackage) {
           <div class="empty-assignments">
@@ -406,15 +419,15 @@
                   </div>
                 </div>
 
-                <!-- Assignment Fields -->
+                <!-- ==================================================
+                     ASSIGNMENT FIELDS
+                =================================================== -->
 
                 <div class="assignment-grid">
-                  <!-- ==================================================
-                       AREA
-                  =================================================== -->
+                  <!-- AREA -->
 
                   <div class="form-field">
-                    <label [for]="'area-' + i"> Area </label>
+                    <label [for]="'area-' + i">Area</label>
 
                     <div class="searchable-select" (click)="$event.stopPropagation()">
                       <div class="searchable-input-wrapper">
@@ -425,6 +438,7 @@
                           type="text"
                           [name]="'area-search-' + i"
                           autocomplete="off"
+                          [disabled]="isLoading"
                           [value]="
                             isAreaDropdownOpen(i)
                               ? (areaSearchTerms[i] ?? '')
@@ -443,53 +457,57 @@
 
                       @if (isAreaDropdownOpen(i)) {
                         <div class="searchable-dropdown">
-                          @if (getFilteredAreas(i).length === 0) {
+                          @if (isLoading) {
+                            <div class="dropdown-empty">
+                              <i class="fa-solid fa-spinner fa-spin"></i>
+
+                              <span>Loading areas...</span>
+                            </div>
+                          } @else if (getFilteredAreas(i).length === 0) {
                             <div class="dropdown-empty">
                               <i class="fa-solid fa-location-dot"></i>
 
-                              <span> No areas found. </span>
+                              <span>No areas found.</span>
                             </div>
-                          }
+                          } @else {
+                            @for (area of getFilteredAreas(i); track area.id) {
+                              <button
+                                type="button"
+                                class="dropdown-option"
+                                [class.selected]="assignment.areaId === area.id"
+                                (click)="selectArea(i, area)"
+                              >
+                                <span class="dropdown-option-icon">
+                                  <i class="fa-solid fa-location-dot"></i>
+                                </span>
 
-                          @for (area of getFilteredAreas(i); track area.id) {
-                            <button
-                              type="button"
-                              class="dropdown-option"
-                              [class.selected]="assignment.areaId === area.id"
-                              (click)="selectArea(i, area)"
-                            >
-                              <span class="dropdown-option-icon">
-                                <i class="fa-solid fa-location-dot"></i>
-                              </span>
+                                <span class="dropdown-option-content">
+                                  <strong>
+                                    {{ area.name }}
+                                  </strong>
 
-                              <span class="dropdown-option-content">
-                                <strong>
-                                  {{ area.name }}
-                                </strong>
+                                  @if (area.cityName) {
+                                    <small>
+                                      {{ area.cityName }}
+                                    </small>
+                                  }
+                                </span>
 
-                                @if (area.cityName) {
-                                  <small>
-                                    {{ area.cityName }}
-                                  </small>
+                                @if (assignment.areaId === area.id) {
+                                  <i class="fa-solid fa-check"></i>
                                 }
-                              </span>
-
-                              @if (assignment.areaId === area.id) {
-                                <i class="fa-solid fa-check"></i>
-                              }
-                            </button>
+                              </button>
+                            }
                           }
                         </div>
                       }
                     </div>
                   </div>
 
-                  <!-- ==================================================
-                       PRACTITIONER
-                  =================================================== -->
+                  <!-- PRACTITIONER -->
 
                   <div class="form-field">
-                    <label [for]="'practitioner-' + i"> Practitioner </label>
+                    <label [for]="'practitioner-' + i">Practitioner</label>
 
                     <div class="searchable-select" (click)="$event.stopPropagation()">
                       <div class="searchable-input-wrapper">
@@ -500,6 +518,7 @@
                           type="text"
                           [name]="'practitioner-search-' + i"
                           autocomplete="off"
+                          [disabled]="isLoading"
                           [value]="
                             isPractitionerDropdownOpen(i)
                               ? (practitionerSearchTerms[i] ?? '')
@@ -518,59 +537,65 @@
 
                       @if (isPractitionerDropdownOpen(i)) {
                         <div class="searchable-dropdown">
-                          @if (getPractitionersForAssignment(i).length === 0) {
+                          @if (isLoading) {
+                            <div class="dropdown-empty">
+                              <i class="fa-solid fa-spinner fa-spin"></i>
+
+                              <span>Loading practitioners...</span>
+                            </div>
+                          } @else if (getPractitionersForAssignment(i).length === 0) {
                             <div class="dropdown-empty">
                               <i class="fa-solid fa-user-doctor"></i>
 
-                              <span> No practitioners found. </span>
+                              <span>No practitioners found.</span>
                             </div>
-                          }
+                          } @else {
+                            @for (
+                              practitioner of getPractitionersForAssignment(i);
+                              track practitioner.id
+                            ) {
+                              <button
+                                type="button"
+                                class="dropdown-option"
+                                [class.selected]="assignment.practitionerId === practitioner.id"
+                                (click)="selectPractitioner(i, practitioner)"
+                              >
+                                <span class="dropdown-option-icon practitioner-icon">
+                                  <i class="fa-solid fa-user-doctor"></i>
+                                </span>
 
-                          @for (
-                            practitioner of getPractitionersForAssignment(i);
-                            track practitioner.id
-                          ) {
-                            <button
-                              type="button"
-                              class="dropdown-option"
-                              [class.selected]="assignment.practitionerId === practitioner.id"
-                              (click)="selectPractitioner(i, practitioner)"
-                            >
-                              <span class="dropdown-option-icon practitioner-icon">
-                                <i class="fa-solid fa-user-doctor"></i>
-                              </span>
+                                <span class="dropdown-option-content">
+                                  <strong>
+                                    {{ practitioner.name }}
+                                  </strong>
 
-                              <span class="dropdown-option-content">
-                                <strong>
-                                  {{ practitioner.name }}
-                                </strong>
+                                  @if (
+                                    assignment.areaId &&
+                                    practitioner.areas?.some(
+                                      (area) => area.id === assignment.areaId
+                                    )
+                                  ) {
+                                    <small class="area-assigned-label">
+                                      Assigned to selected area
+                                    </small>
+                                  }
+                                </span>
 
-                                @if (
-                                  assignment.areaId &&
-                                  practitioner.areas?.some((area) => area.id === assignment.areaId)
-                                ) {
-                                  <small class="area-assigned-label">
-                                    Assigned to selected area
-                                  </small>
+                                @if (assignment.practitionerId === practitioner.id) {
+                                  <i class="fa-solid fa-check"></i>
                                 }
-                              </span>
-
-                              @if (assignment.practitionerId === practitioner.id) {
-                                <i class="fa-solid fa-check"></i>
-                              }
-                            </button>
+                              </button>
+                            }
                           }
                         </div>
                       }
                     </div>
                   </div>
 
-                  <!-- ==================================================
-                       SCHEDULED DATE
-                  =================================================== -->
+                  <!-- SCHEDULED DATE -->
 
                   <div class="form-field">
-                    <label [for]="'date-' + i"> Scheduled Date </label>
+                    <label [for]="'date-' + i">Scheduled Date</label>
 
                     <div class="input-wrapper">
                       <i class="fa-solid fa-calendar"></i>
@@ -584,13 +609,116 @@
                       />
                     </div>
                   </div>
+                </div>
 
-                  <!-- ==================================================
-                       START TIME
-                  =================================================== -->
+                <!-- ==================================================
+                     PRACTITIONER SCHEDULE
+                =================================================== -->
+
+                @if (shouldShowPractitionerSchedule(i)) {
+                  <div class="practitioner-schedule">
+                    <!-- Schedule Header -->
+
+                    <div class="practitioner-schedule-header">
+                      <div class="schedule-title">
+                        <div class="schedule-title-icon">
+                          <i class="fa-solid fa-calendar-clock"></i>
+                        </div>
+
+                        <div>
+                          <h4>Practitioner Schedule</h4>
+
+                          <p>
+                            {{ getSelectedPractitionerName(i) }}
+                            •
+                            {{ formatDate(assignment.scheduledDate) }}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div class="schedule-summary">
+                        {{ getBookedVisitCount(i) }}
+                        booked
+                      </div>
+                    </div>
+
+                    <!-- Loading -->
+
+                    @if (isLoadingSchedule[i]) {
+                      <div class="schedule-loading">
+                        <i class="fa-solid fa-spinner fa-spin"></i>
+
+                        <span>Loading practitioner schedule...</span>
+                      </div>
+                    }
+
+                    <!-- Error -->
+
+                    @if (scheduleErrors[i]) {
+                      <div class="schedule-error">
+                        <i class="fa-solid fa-circle-exclamation"></i>
+
+                        <span>
+                          {{ scheduleErrors[i] }}
+                        </span>
+                      </div>
+                    }
+
+                    <!-- Schedule Slots -->
+
+                    @if (!isLoadingSchedule[i] && !scheduleErrors[i]) {
+                      <div class="schedule-slots">
+                        @for (slot of getPractitionerSchedule(i); track slot.start) {
+                          <div
+                            class="schedule-slot"
+                            [class.booked]="slot.status === 'BOOKED'"
+                            [class.available]="slot.status === 'AVAILABLE'"
+                          >
+                            <div class="schedule-time">
+                              <i class="fa-solid fa-clock"></i>
+
+                              <span>
+                                {{ formatTime(slot.start) }}
+                                —
+                                {{ formatTime(slot.end) }}
+                              </span>
+                            </div>
+
+                            <div class="schedule-slot-status">
+                              @if (slot.status === 'BOOKED') {
+                                <span class="schedule-status booked-status">
+                                  <i class="fa-solid fa-lock"></i>
+                                  BOOKED
+                                </span>
+
+                                @if (slot.patientName) {
+                                  <span class="schedule-patient">
+                                    {{ slot.patientName }}
+                                  </span>
+                                }
+                              } @else {
+                                <span class="schedule-status available-status">
+                                  <i class="fa-solid fa-check"></i>
+                                  AVAILABLE
+                                </span>
+                              }
+                            </div>
+                          </div>
+                        }
+                      </div>
+                    }
+                  </div>
+                }
+
+                <!-- ==================================================
+                     TIME SELECTION
+                =================================================== -->
+
+                <div class="assignment-grid time-selection-grid">
+                  <!-- START TIME -->
 
                   <div class="form-field">
-                    <label [for]="'start-time-' + i"> Start Time </label>
+                    <label [for]="'start-time-' + i">Start Time</label>
 
                     <div class="input-wrapper">
                       <i class="fa-solid fa-clock"></i>
@@ -600,16 +728,15 @@
                         type="time"
                         [name]="'start-time-' + i"
                         [(ngModel)]="assignment.slotStart"
+                        (ngModelChange)="onTimeChange(i)"
                       />
                     </div>
                   </div>
 
-                  <!-- ==================================================
-                       END TIME
-                  =================================================== -->
+                  <!-- END TIME -->
 
                   <div class="form-field">
-                    <label [for]="'end-time-' + i"> End Time </label>
+                    <label [for]="'end-time-' + i">End Time</label>
 
                     <div class="input-wrapper">
                       <i class="fa-solid fa-clock"></i>
@@ -619,12 +746,29 @@
                         type="time"
                         [name]="'end-time-' + i"
                         [(ngModel)]="assignment.slotEnd"
+                        (ngModelChange)="onTimeChange(i)"
                       />
                     </div>
                   </div>
                 </div>
 
-                <!-- Assignment Validation -->
+                <!-- ==================================================
+                     TIME RANGE VALIDATION
+                =================================================== -->
+
+                @if (getTimeRangeError(i)) {
+                  <div class="assignment-warning time-range-warning">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+
+                    <span>
+                      {{ getTimeRangeError(i) }}
+                    </span>
+                  </div>
+                }
+
+                <!-- ==================================================
+                     PARTIAL SCHEDULE VALIDATION
+                =================================================== -->
 
                 @if (hasPartialSchedule(assignment)) {
                   <div class="assignment-warning">
@@ -646,11 +790,12 @@
             <i class="fa-solid fa-circle-info"></i>
 
             <div>
-              <strong> Visit scheduling is optional </strong>
+              <strong>Visit scheduling is optional</strong>
 
               <p>
                 You can create the package without scheduling every visit. Individual visits can be
-                scheduled later.
+                scheduled later. When a practitioner and date are selected, their existing schedule
+                will be shown to help you choose an available time.
               </p>
             </div>
           </div>
@@ -658,16 +803,16 @@
       </div>
     </section>
 
-    <!-- ============================================================
+    <!-- ==========================================================
          FORM ERROR
-    ============================================================ -->
+    =========================================================== -->
 
     @if (errorMessage) {
       <div class="form-alert error">
         <i class="fa-solid fa-circle-exclamation"></i>
 
         <div>
-          <strong> Unable to create visit </strong>
+          <strong>Unable to create visit</strong>
 
           <p>
             {{ errorMessage }}
@@ -676,16 +821,16 @@
       </div>
     }
 
-    <!-- ============================================================
+    <!-- ==========================================================
          SUCCESS MESSAGE
-    ============================================================ -->
+    =========================================================== -->
 
     @if (successMessage) {
       <div class="form-alert success">
         <i class="fa-solid fa-circle-check"></i>
 
         <div>
-          <strong> Visit created successfully </strong>
+          <strong>Visit created successfully</strong>
 
           <p>
             {{ successMessage }}
@@ -694,9 +839,9 @@
       </div>
     }
 
-    <!-- ============================================================
+    <!-- ==========================================================
          FORM FOOTER
-    ============================================================ -->
+    =========================================================== -->
 
     <div class="form-footer">
       <button type="button" class="btn btn-secondary" (click)="cancel()" [disabled]="isSubmitting">
@@ -705,7 +850,11 @@
         Cancel
       </button>
 
-      <button type="submit" class="btn btn-primary" [disabled]="isSubmitting || visitForm.invalid">
+      <button
+        type="submit"
+        class="btn btn-primary"
+        [disabled]="isSubmitting || visitForm.invalid || isLoading"
+      >
         @if (isSubmitting) {
           <i class="fa-solid fa-spinner fa-spin"></i>
 

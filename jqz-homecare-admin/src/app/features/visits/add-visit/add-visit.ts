@@ -8,6 +8,7 @@ import { Practitioner, PractitionerService } from '../../../core/services/practi
 import { Area, CityAreaService } from '../../../core/services/city-area';
 
 import { CreateVisitRequest, VisitsService } from '../visits.service';
+import { Visit } from '../visits.interface';
 
 // ============================================================
 // VISIT ASSIGNMENT MODEL
@@ -22,6 +23,17 @@ interface VisitAssignmentForm {
 }
 
 // ============================================================
+// PRACTITIONER SCHEDULE ITEM
+// ============================================================
+
+interface PractitionerScheduleItem {
+  start: string;
+  end: string;
+  status: 'BOOKED' | 'AVAILABLE';
+  patientName?: string;
+}
+
+// ============================================================
 // ADD VISIT FORM MODEL
 // ============================================================
 
@@ -33,10 +45,7 @@ interface AddVisitForm {
   packageId: string;
 
   /*
-   * These are UI values.
-   *
-   * They are converted to the numeric backend enum
-   * immediately before the API request is sent.
+   * UI payment type.
    *
    * FullAdvance = 0
    * Installment = 1
@@ -88,9 +97,7 @@ type OpenDropdown = {
 @Component({
   selector: 'app-add-visit',
   standalone: true,
-
   imports: [CommonModule, FormsModule],
-
   templateUrl: './add-visit.html',
   styleUrl: './add-visit.css',
 })
@@ -100,50 +107,53 @@ export class AddVisit implements OnInit {
   // ============================================================
 
   private readonly router = inject(Router);
-
   private readonly visitsService = inject(VisitsService);
-
   private readonly packageService = inject(PackageService);
-
   private readonly practitionerService = inject(PractitionerService);
-
   private readonly cityAreaService = inject(CityAreaService);
+
+  // ============================================================
+  // WORKING HOURS
+  // ============================================================
+
+  readonly scheduleStartHour = 0;
+  readonly scheduleEndHour = 24;
 
   // ============================================================
   // DATA
   // ============================================================
 
   packages: Package[] = [];
-
   practitioners: Practitioner[] = [];
-
   areas: Area[] = [];
 
   // ============================================================
   // SEARCHABLE DROPDOWN STATE
   // ============================================================
 
-  /*
-   * Keeps track of which dropdown is currently open.
-   *
-   * Only one dropdown is open at a time.
-   */
   openDropdown: OpenDropdown = null;
 
-  /*
-   * Search text for every Area assignment row.
-   *
-   * Example:
-   *
-   * areaSearchTerms[0] = "kamran"
-   * areaSearchTerms[1] = "tank"
-   */
   areaSearchTerms: Record<number, string> = {};
 
-  /*
-   * Search text for every Practitioner assignment row.
-   */
   practitionerSearchTerms: Record<number, string> = {};
+
+  // ============================================================
+  // PRACTITIONER SCHEDULE STATE
+  // ============================================================
+
+  practitionerVisits: Record<number, Visit[]> = {};
+
+  isLoadingSchedule: Record<number, boolean> = {};
+
+  scheduleErrors: Record<number, string> = {};
+
+  /*
+   * Every schedule request gets a unique version number.
+   *
+   * If the practitioner or date changes while an older request
+   * is still running, that older response is ignored.
+   */
+  private scheduleRequestVersions: Record<number, number> = {};
 
   // ============================================================
   // SELECTED PACKAGE
@@ -156,7 +166,9 @@ export class AddVisit implements OnInit {
   // ============================================================
 
   isLoading = false;
-
+  isLoadingPackages = false;
+  isLoadingPractitioners = false;
+  isLoadingAreas = false;
   isSubmitting = false;
 
   // ============================================================
@@ -164,7 +176,6 @@ export class AddVisit implements OnInit {
   // ============================================================
 
   errorMessage = '';
-
   successMessage = '';
 
   // ============================================================
@@ -175,13 +186,9 @@ export class AddVisit implements OnInit {
     patientName: '',
     patientPhone: '',
     locationAddress: '',
-
     packageId: '',
-
     paymentType: 'FullAdvance',
-
     initialAmountPaid: null,
-
     visitAssignments: [],
   };
 
@@ -208,12 +215,13 @@ export class AddVisit implements OnInit {
 
   private loadInitialData(): void {
     this.isLoading = true;
-
+    this.isLoadingPackages = true;
     this.errorMessage = '';
 
     this.packageService.getPackages().subscribe({
       next: (packages) => {
         this.packages = packages;
+        this.isLoadingPackages = false;
 
         console.log('Packages loaded:', this.packages);
 
@@ -222,6 +230,8 @@ export class AddVisit implements OnInit {
 
       error: (error: unknown) => {
         console.error('Failed to load packages:', error);
+
+        this.isLoadingPackages = false;
 
         this.errorMessage = this.getErrorMessage(
           error,
@@ -238,9 +248,12 @@ export class AddVisit implements OnInit {
   // ============================================================
 
   private loadPractitioners(): void {
+    this.isLoadingPractitioners = true;
+
     this.practitionerService.getPractitioners().subscribe({
       next: (practitioners) => {
         this.practitioners = practitioners;
+        this.isLoadingPractitioners = false;
 
         console.log('Practitioners loaded:', this.practitioners);
 
@@ -249,6 +262,8 @@ export class AddVisit implements OnInit {
 
       error: (error: unknown) => {
         console.error('Failed to load practitioners:', error);
+
+        this.isLoadingPractitioners = false;
 
         this.errorMessage = this.getErrorMessage(
           error,
@@ -265,17 +280,21 @@ export class AddVisit implements OnInit {
   // ============================================================
 
   private loadAreas(): void {
+    this.isLoadingAreas = true;
+
     this.cityAreaService.getAreas().subscribe({
       next: (areas) => {
         this.areas = areas;
+        this.isLoadingAreas = false;
+        this.isLoading = false;
 
         console.log('Areas loaded:', this.areas);
-
-        this.isLoading = false;
       },
 
       error: (error: unknown) => {
         console.error('Failed to load areas:', error);
+
+        this.isLoadingAreas = false;
 
         this.errorMessage = this.getErrorMessage(error, 'Unable to load areas. Please try again.');
 
@@ -291,35 +310,23 @@ export class AddVisit implements OnInit {
   onPackageChange(): void {
     this.selectedPackage = this.packages.find((pkg) => pkg.id === this.form.packageId) ?? null;
 
-    /*
-     * Close any currently open dropdown when the package
-     * changes.
-     */
     this.closeDropdown();
 
-    /*
-     * Reset searchable dropdown state because the assignment
-     * rows are about to be recreated.
-     */
     this.areaSearchTerms = {};
-
     this.practitionerSearchTerms = {};
+
+    this.practitionerVisits = {};
+    this.isLoadingSchedule = {};
+    this.scheduleErrors = {};
+    this.scheduleRequestVersions = {};
+
+    this.form.initialAmountPaid = null;
 
     if (!this.selectedPackage) {
       this.form.visitAssignments = [];
-
       return;
     }
 
-    /*
-     * Reset installment amount whenever the package changes.
-     */
-    this.form.initialAmountPaid = null;
-
-    /*
-     * Create one assignment row for every visit
-     * contained in the selected package.
-     */
     this.form.visitAssignments = Array.from(
       {
         length: this.selectedPackage.numberOfVisits,
@@ -343,7 +350,7 @@ export class AddVisit implements OnInit {
   }
 
   // ============================================================
-  // GET PENDING AMOUNT
+  // PAYMENT
   // ============================================================
 
   getPendingAmount(): number {
@@ -356,10 +363,6 @@ export class AddVisit implements OnInit {
     return Math.max(0, this.selectedPackage.amount - initialPaid);
   }
 
-  // ============================================================
-  // PAYMENT TYPE CHANGE
-  // ============================================================
-
   onPaymentTypeChange(): void {
     if (this.form.paymentType === 'FullAdvance') {
       this.form.initialAmountPaid = null;
@@ -367,67 +370,21 @@ export class AddVisit implements OnInit {
   }
 
   // ============================================================
-  // OPEN AREA DROPDOWN
+  // AREA DROPDOWN
   // ============================================================
 
   openAreaDropdown(index: number): void {
-    /*
-     * Stop the document click handler from immediately
-     * closing the dropdown.
-     */
     this.openDropdown = {
       type: 'area',
       index,
     };
 
-    /*
-     * Start with an empty search whenever the dropdown opens.
-     *
-     * The selected Area is still displayed while the dropdown
-     * is closed.
-     */
     this.areaSearchTerms[index] = '';
   }
-
-  // ============================================================
-  // OPEN PRACTITIONER DROPDOWN
-  // ============================================================
-
-  openPractitionerDropdown(index: number): void {
-    this.openDropdown = {
-      type: 'practitioner',
-      index,
-    };
-
-    /*
-     * Start with an empty search whenever the dropdown opens.
-     */
-    this.practitionerSearchTerms[index] = '';
-  }
-
-  // ============================================================
-  // CLOSE DROPDOWN
-  // ============================================================
-
-  closeDropdown(): void {
-    this.openDropdown = null;
-  }
-
-  // ============================================================
-  // CHECK DROPDOWN STATE
-  // ============================================================
 
   isAreaDropdownOpen(index: number): boolean {
     return this.openDropdown?.type === 'area' && this.openDropdown.index === index;
   }
-
-  isPractitionerDropdownOpen(index: number): boolean {
-    return this.openDropdown?.type === 'practitioner' && this.openDropdown.index === index;
-  }
-
-  // ============================================================
-  // AREA SEARCH
-  // ============================================================
 
   onAreaSearch(index: number, searchValue: string): void {
     this.areaSearchTerms[index] = searchValue;
@@ -438,10 +395,6 @@ export class AddVisit implements OnInit {
     };
   }
 
-  // ============================================================
-  // GET FILTERED AREAS
-  // ============================================================
-
   getFilteredAreas(index: number): Area[] {
     const search = (this.areaSearchTerms[index] ?? '').trim().toLowerCase();
 
@@ -451,16 +404,11 @@ export class AddVisit implements OnInit {
 
     return this.areas.filter((area) => {
       const areaName = (area.name ?? '').toLowerCase();
-
       const cityName = (area.cityName ?? '').toLowerCase();
 
       return areaName.includes(search) || cityName.includes(search);
     });
   }
-
-  // ============================================================
-  // GET SELECTED AREA NAME
-  // ============================================================
 
   getSelectedAreaName(index: number): string {
     const assignment = this.form.visitAssignments[index];
@@ -478,10 +426,6 @@ export class AddVisit implements OnInit {
     return area.cityName ? `${area.name} — ${area.cityName}` : area.name;
   }
 
-  // ============================================================
-  // SELECT AREA
-  // ============================================================
-
   selectArea(index: number, area: Area): void {
     const assignment = this.form.visitAssignments[index];
 
@@ -489,33 +433,40 @@ export class AddVisit implements OnInit {
       return;
     }
 
-    /*
-     * Set the selected Area.
-     */
     assignment.areaId = area.id;
 
-    /*
-     * Keep the selected Area visible after selection.
-     */
     this.areaSearchTerms[index] = area.cityName ? `${area.name} — ${area.cityName}` : area.name;
 
-    /*
-     * IMPORTANT:
-     *
-     * onAreaChange() no longer clears a practitioner who is
-     * not assigned to this Area.
-     *
-     * Instead, it only causes the practitioner list to be
-     * recalculated and prioritized.
-     */
     this.onAreaChange(index);
 
     this.closeDropdown();
   }
 
   // ============================================================
-  // GET PRACTITIONERS FOR ASSIGNMENT
+  // PRACTITIONER DROPDOWN
   // ============================================================
+
+  openPractitionerDropdown(index: number): void {
+    this.openDropdown = {
+      type: 'practitioner',
+      index,
+    };
+
+    this.practitionerSearchTerms[index] = '';
+  }
+
+  isPractitionerDropdownOpen(index: number): boolean {
+    return this.openDropdown?.type === 'practitioner' && this.openDropdown.index === index;
+  }
+
+  onPractitionerSearch(index: number, searchValue: string): void {
+    this.practitionerSearchTerms[index] = searchValue;
+
+    this.openDropdown = {
+      type: 'practitioner',
+      index,
+    };
+  }
 
   getPractitionersForAssignment(index: number): Practitioner[] {
     const assignment = this.form.visitAssignments[index];
@@ -524,27 +475,8 @@ export class AddVisit implements OnInit {
       return [];
     }
 
-    /*
-     * IMPORTANT:
-     *
-     * All loaded practitioners remain available.
-     *
-     * We intentionally do NOT filter by:
-     *
-     * - selected Area
-     * - selected Package service
-     *
-     * The selected Area only controls the ordering.
-     */
     let result = [...this.practitioners];
 
-    /*
-     * Apply Practitioner search AFTER taking the complete
-     * practitioner list.
-     *
-     * Therefore searching always searches across all
-     * practitioners.
-     */
     const search = (this.practitionerSearchTerms[index] ?? '').trim().toLowerCase();
 
     if (search) {
@@ -553,13 +485,6 @@ export class AddVisit implements OnInit {
       );
     }
 
-    /*
-     * If an Area is selected, prioritize practitioners who
-     * are already assigned to that Area.
-     *
-     * Practitioners who are not assigned to that Area are
-     * still kept in the list.
-     */
     if (assignment.areaId) {
       const selectedAreaId = assignment.areaId;
 
@@ -583,10 +508,6 @@ export class AddVisit implements OnInit {
     return result;
   }
 
-  // ============================================================
-  // GET SELECTED PRACTITIONER NAME
-  // ============================================================
-
   getSelectedPractitionerName(index: number): string {
     const assignment = this.form.visitAssignments[index];
 
@@ -599,23 +520,6 @@ export class AddVisit implements OnInit {
     return practitioner?.name ?? '';
   }
 
-  // ============================================================
-  // PRACTITIONER SEARCH
-  // ============================================================
-
-  onPractitionerSearch(index: number, searchValue: string): void {
-    this.practitionerSearchTerms[index] = searchValue;
-
-    this.openDropdown = {
-      type: 'practitioner',
-      index,
-    };
-  }
-
-  // ============================================================
-  // SELECT PRACTITIONER
-  // ============================================================
-
   selectPractitioner(index: number, practitioner: Practitioner): void {
     const assignment = this.form.visitAssignments[index];
 
@@ -623,25 +527,10 @@ export class AddVisit implements OnInit {
       return;
     }
 
-    /*
-     * Select the practitioner.
-     */
     assignment.practitionerId = practitioner.id;
 
-    /*
-     * Keep the selected practitioner name visible.
-     */
     this.practitionerSearchTerms[index] = practitioner.name;
 
-    /*
-     * IMPORTANT:
-     *
-     * We intentionally do NOT clear the selected Area.
-     *
-     * A practitioner can be intentionally selected even if
-     * they have not previously been assigned to the selected
-     * Area.
-     */
     this.onPractitionerChange(index);
 
     this.closeDropdown();
@@ -659,31 +548,19 @@ export class AddVisit implements OnInit {
     }
 
     /*
-     * IMPORTANT:
-     *
-     * We intentionally do NOT clear assignment.areaId here.
-     *
-     * The business requirement allows a practitioner to be
-     * selected even when that practitioner is not already
-     * assigned to the selected Area.
-     *
-     * Therefore this method is intentionally kept as a
-     * no-op for Area validation.
+     * Changing practitioner means the previous schedule
+     * and selected time are no longer valid.
      */
-  }
+    assignment.slotStart = null;
+    assignment.slotEnd = null;
 
-  // ============================================================
-  // GET AREAS FOR ASSIGNMENT
-  // ============================================================
+    this.resetScheduleState(index);
 
-  getAreasForAssignment(index: number): Area[] {
     /*
-     * The Area dropdown must always contain ALL available
-     * areas.
-     *
-     * It is no longer restricted by the selected practitioner.
+     * If a date is already selected, immediately fetch
+     * the schedule for the newly selected practitioner.
      */
-    return this.areas;
+    this.loadPractitionerSchedule(index);
   }
 
   // ============================================================
@@ -698,15 +575,21 @@ export class AddVisit implements OnInit {
     }
 
     /*
-     * IMPORTANT:
+     * Area affects practitioner suitability/order.
      *
-     * Do NOT clear assignment.practitionerId.
+     * Invalidate any currently running request so an old
+     * response cannot update stale schedule data.
+     */
+    this.invalidateScheduleRequest(index);
+
+    /*
+     * If your business rules require changing area to also
+     * invalidate the selected practitioner, uncomment:
      *
-     * Changing the Area only changes the priority ordering
-     * inside getPractitionersForAssignment().
-     *
-     * The selected practitioner remains selected even if
-     * they are not assigned to the new Area.
+     * assignment.practitionerId = null;
+     * assignment.slotStart = null;
+     * assignment.slotEnd = null;
+     * this.resetScheduleState(index);
      */
   }
 
@@ -722,9 +605,551 @@ export class AddVisit implements OnInit {
     }
 
     /*
-     * Schedule conflict validation is handled by
-     * the backend.
+     * A different date has a completely different schedule.
      */
+    assignment.slotStart = null;
+    assignment.slotEnd = null;
+
+    this.resetScheduleState(index);
+
+    /*
+     * This is triggered directly by:
+     *
+     * (ngModelChange)="onAssignmentDateChange(i)"
+     *
+     * So the API request starts immediately when the date
+     * value changes.
+     */
+    this.loadPractitionerSchedule(index);
+  }
+
+  // ============================================================
+  // INVALIDATE SCHEDULE REQUEST
+  // ============================================================
+
+  private invalidateScheduleRequest(index: number): void {
+    const nextVersion = (this.scheduleRequestVersions[index] ?? 0) + 1;
+
+    this.scheduleRequestVersions = {
+      ...this.scheduleRequestVersions,
+      [index]: nextVersion,
+    };
+  }
+
+  // ============================================================
+  // RESET SCHEDULE STATE
+  // ============================================================
+
+  private resetScheduleState(index: number): void {
+    /*
+     * Invalidate any request currently in progress.
+     */
+    this.invalidateScheduleRequest(index);
+
+    /*
+     * Create new object references so the schedule state
+     * is replaced as one consistent update.
+     */
+    this.practitionerVisits = {
+      ...this.practitionerVisits,
+      [index]: [],
+    };
+
+    this.isLoadingSchedule = {
+      ...this.isLoadingSchedule,
+      [index]: false,
+    };
+
+    this.scheduleErrors = {
+      ...this.scheduleErrors,
+      [index]: '',
+    };
+  }
+
+  // ============================================================
+  // LOAD PRACTITIONER SCHEDULE
+  // ============================================================
+
+  private loadPractitionerSchedule(index: number): void {
+    const assignment = this.form.visitAssignments[index];
+
+    /*
+     * A schedule only exists when both practitioner and date
+     * are selected.
+     */
+    if (!assignment || !assignment.practitionerId || !assignment.scheduledDate) {
+      this.practitionerVisits = {
+        ...this.practitionerVisits,
+        [index]: [],
+      };
+
+      this.isLoadingSchedule = {
+        ...this.isLoadingSchedule,
+        [index]: false,
+      };
+
+      this.scheduleErrors = {
+        ...this.scheduleErrors,
+        [index]: '',
+      };
+
+      return;
+    }
+
+    const practitionerId = assignment.practitionerId;
+    const scheduledDate = assignment.scheduledDate;
+
+    /*
+     * Create a new request version.
+     *
+     * Only the latest request version is allowed to update
+     * this assignment's schedule state.
+     */
+    const requestVersion = (this.scheduleRequestVersions[index] ?? 0) + 1;
+
+    this.scheduleRequestVersions = {
+      ...this.scheduleRequestVersions,
+      [index]: requestVersion,
+    };
+
+    /*
+     * Immediately show loading and clear stale data.
+     */
+    this.isLoadingSchedule = {
+      ...this.isLoadingSchedule,
+      [index]: true,
+    };
+
+    this.scheduleErrors = {
+      ...this.scheduleErrors,
+      [index]: '',
+    };
+
+    this.practitionerVisits = {
+      ...this.practitionerVisits,
+      [index]: [],
+    };
+
+    console.log(`Loading practitioner schedule for assignment ${index + 1}`, {
+      practitionerId,
+      scheduledDate,
+      requestVersion,
+    });
+
+    this.visitsService.getByDate(scheduledDate).subscribe({
+      next: (visits) => {
+        /*
+         * Ignore stale responses.
+         */
+        if (this.scheduleRequestVersions[index] !== requestVersion) {
+          return;
+        }
+
+        const currentAssignment = this.form.visitAssignments[index];
+
+        /*
+         * Also verify that the current form state still
+         * matches the request that was sent.
+         */
+        if (
+          !currentAssignment ||
+          currentAssignment.practitionerId !== practitionerId ||
+          currentAssignment.scheduledDate !== scheduledDate
+        ) {
+          return;
+        }
+
+        const practitionerVisits = visits
+          .filter(
+            (visit) =>
+              visit.practitionerId === practitionerId && !!visit.slotStart && !!visit.slotEnd,
+          )
+          .sort((a, b) => this.getTimeValue(a.slotStart) - this.getTimeValue(b.slotStart));
+
+        /*
+         * Replace state with new object references.
+         *
+         * Angular can now render the schedule immediately
+         * without requiring a click or focus event.
+         */
+        this.practitionerVisits = {
+          ...this.practitionerVisits,
+          [index]: practitionerVisits,
+        };
+
+        this.isLoadingSchedule = {
+          ...this.isLoadingSchedule,
+          [index]: false,
+        };
+
+        this.scheduleErrors = {
+          ...this.scheduleErrors,
+          [index]: '',
+        };
+
+        console.log(
+          `Practitioner schedule loaded for assignment ${index + 1}:`,
+          practitionerVisits,
+        );
+      },
+
+      error: (error: unknown) => {
+        /*
+         * Ignore errors from stale requests as well.
+         */
+        if (this.scheduleRequestVersions[index] !== requestVersion) {
+          return;
+        }
+
+        const currentAssignment = this.form.visitAssignments[index];
+
+        if (
+          !currentAssignment ||
+          currentAssignment.practitionerId !== practitionerId ||
+          currentAssignment.scheduledDate !== scheduledDate
+        ) {
+          return;
+        }
+
+        console.error('Failed to load practitioner schedule:', error);
+
+        this.practitionerVisits = {
+          ...this.practitionerVisits,
+          [index]: [],
+        };
+
+        this.isLoadingSchedule = {
+          ...this.isLoadingSchedule,
+          [index]: false,
+        };
+
+        this.scheduleErrors = {
+          ...this.scheduleErrors,
+          [index]: this.getErrorMessage(error, 'Unable to load the practitioner schedule.'),
+        };
+      },
+    });
+  }
+
+  // ============================================================
+  // SHOULD SHOW PRACTITIONER SCHEDULE
+  // ============================================================
+
+  shouldShowPractitionerSchedule(index: number): boolean {
+    const assignment = this.form.visitAssignments[index];
+
+    return !!(assignment?.practitionerId && assignment?.scheduledDate);
+  }
+
+  // ============================================================
+  // GET PRACTITIONER VISITS
+  // ============================================================
+
+  getPractitionerVisits(index: number): Visit[] {
+    return this.practitionerVisits[index] ?? [];
+  }
+
+  // ============================================================
+  // GET PRACTITIONER SCHEDULE
+  // ============================================================
+
+  getPractitionerSchedule(index: number): PractitionerScheduleItem[] {
+    const assignment = this.form.visitAssignments[index];
+
+    if (!assignment?.scheduledDate) {
+      return [];
+    }
+
+    const bookedVisits = this.getPractitionerVisits(index);
+
+    const schedule: PractitionerScheduleItem[] = [];
+
+    /*
+     * Full 24-hour timeline.
+     */
+    for (let hour = this.scheduleStartHour; hour < this.scheduleEndHour; hour++) {
+      const start = `${hour.toString().padStart(2, '0')}:00`;
+
+      const nextHour = hour + 1;
+
+      const end = nextHour === 24 ? '23:59' : `${nextHour.toString().padStart(2, '0')}:00`;
+
+      const bookedVisit = bookedVisits.find((visit) =>
+        this.doesTimeRangeOverlap(start, end, visit.slotStart ?? '', visit.slotEnd ?? ''),
+      );
+
+      if (bookedVisit) {
+        schedule.push({
+          start,
+          end,
+          status: 'BOOKED',
+          patientName: bookedVisit.patientName || 'Unknown Patient',
+        });
+      } else {
+        schedule.push({
+          start,
+          end,
+          status: 'AVAILABLE',
+        });
+      }
+    }
+
+    return schedule;
+  }
+
+  // ============================================================
+  // GET BOOKED SLOT COUNT
+  // ============================================================
+
+  getBookedVisitCount(index: number): number {
+    return this.getPractitionerSchedule(index).filter((slot) => slot.status === 'BOOKED').length;
+  }
+
+  // ============================================================
+  // TIME INPUT CHANGE
+  // ============================================================
+
+  onTimeChange(index: number): void {
+    const assignment = this.form.visitAssignments[index];
+
+    if (!assignment) {
+      return;
+    }
+
+    this.errorMessage = '';
+
+    /*
+     * Immediately validate the selected time range.
+     */
+    if (
+      assignment.slotStart &&
+      assignment.slotEnd &&
+      this.getTimeValue(assignment.slotStart) >= this.getTimeValue(assignment.slotEnd)
+    ) {
+      this.errorMessage = `Visit #${index + 1}: ` + 'End time must be later than start time.';
+    }
+  }
+
+  // ============================================================
+  // CHECK IF TIME IS INSIDE WORKING HOURS
+  // ============================================================
+
+  isWithinWorkingHours(start: string | null, end: string | null): boolean {
+    if (!start || !end) {
+      return true;
+    }
+
+    const startValue = this.getTimeValue(start);
+    const endValue = this.getTimeValue(end);
+
+    const minimumTime = this.scheduleStartHour * 60;
+
+    const maximumTime = this.scheduleEndHour * 60;
+
+    return startValue >= minimumTime && endValue <= maximumTime;
+  }
+
+  // ============================================================
+  // GET TIME RANGE ERROR
+  // ============================================================
+
+  getTimeRangeError(index: number): string {
+    const assignment = this.form.visitAssignments[index];
+
+    if (!assignment) {
+      return '';
+    }
+
+    if (
+      assignment.slotStart &&
+      assignment.slotEnd &&
+      this.getTimeValue(assignment.slotStart) >= this.getTimeValue(assignment.slotEnd)
+    ) {
+      return 'End time must be later than start time.';
+    }
+
+    if (
+      assignment.slotStart &&
+      assignment.slotEnd &&
+      !this.isWithinWorkingHours(assignment.slotStart, assignment.slotEnd)
+    ) {
+      return (
+        `Visit time must be between ` +
+        `${this.formatTime(`${this.scheduleStartHour}:00`)} and ` +
+        `${this.formatTime(`${this.scheduleEndHour}:00`)}.`
+      );
+    }
+
+    if (assignment.slotStart && assignment.slotEnd && this.hasScheduleConflict(index)) {
+      return 'The selected time overlaps with another visit ' + 'for this practitioner.';
+    }
+
+    return '';
+  }
+
+  // ============================================================
+  // FORMAT TIME
+  // ============================================================
+
+  formatTime(time: string | null | undefined): string {
+    if (!time) {
+      return '';
+    }
+
+    const normalizedTime = time.substring(0, 5);
+
+    const [hourString, minuteString] = normalizedTime.split(':');
+
+    const hour = Number(hourString);
+    const minute = minuteString ?? '00';
+
+    if (Number.isNaN(hour)) {
+      return time;
+    }
+
+    const period = hour >= 12 ? 'PM' : 'AM';
+
+    const displayHour = hour % 12 || 12;
+
+    return `${displayHour.toString().padStart(2, '0')}:${minute} ${period}`;
+  }
+
+  // ============================================================
+  // FORMAT DATE
+  // ============================================================
+
+  formatDate(date: string | null | undefined): string {
+    if (!date) {
+      return '';
+    }
+
+    const parts = date.split('-');
+
+    if (parts.length !== 3) {
+      return date;
+    }
+
+    const year = Number(parts[0]);
+    const month = Number(parts[1]) - 1;
+    const day = Number(parts[2]);
+
+    const parsedDate = new Date(year, month, day);
+
+    if (Number.isNaN(parsedDate.getTime())) {
+      return date;
+    }
+
+    return parsedDate.toLocaleDateString('en-US', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+    });
+  }
+
+  // ============================================================
+  // TIME VALUE
+  // ============================================================
+
+  private getTimeValue(time: string | null | undefined): number {
+    if (!time) {
+      return 0;
+    }
+
+    const normalizedTime = time.substring(0, 5);
+
+    const [hourString, minuteString] = normalizedTime.split(':');
+
+    const hours = Number(hourString);
+    const minutes = Number(minuteString);
+
+    if (Number.isNaN(hours) || Number.isNaN(minutes)) {
+      return 0;
+    }
+
+    return hours * 60 + minutes;
+  }
+
+  // ============================================================
+  // TIME RANGE OVERLAP
+  // ============================================================
+
+  private doesTimeRangeOverlap(
+    startA: string,
+    endA: string,
+    startB: string,
+    endB: string,
+  ): boolean {
+    const startValueA = this.getTimeValue(startA);
+
+    const endValueA = this.getTimeValue(endA);
+
+    const startValueB = this.getTimeValue(startB);
+
+    const endValueB = this.getTimeValue(endB);
+
+    return startValueA < endValueB && endValueA > startValueB;
+  }
+
+  // ============================================================
+  // CHECK SCHEDULE CONFLICT
+  // ============================================================
+
+  private hasScheduleConflict(index: number): boolean {
+    const assignment = this.form.visitAssignments[index];
+
+    if (
+      !assignment ||
+      !assignment.practitionerId ||
+      !assignment.scheduledDate ||
+      !assignment.slotStart ||
+      !assignment.slotEnd
+    ) {
+      return false;
+    }
+
+    /*
+     * Check conflict with existing backend visits.
+     */
+    const bookedVisits = this.practitionerVisits[index] ?? [];
+
+    const conflictsWithExistingVisit = bookedVisits.some((visit) =>
+      this.doesTimeRangeOverlap(
+        assignment.slotStart ?? '',
+        assignment.slotEnd ?? '',
+        visit.slotStart ?? '',
+        visit.slotEnd ?? '',
+      ),
+    );
+
+    if (conflictsWithExistingVisit) {
+      return true;
+    }
+
+    /*
+     * Check conflict with another assignment
+     * currently being created in this form.
+     */
+    return this.form.visitAssignments.some((otherAssignment, otherIndex) => {
+      if (otherIndex === index) {
+        return false;
+      }
+
+      if (
+        otherAssignment.practitionerId !== assignment.practitionerId ||
+        otherAssignment.scheduledDate !== assignment.scheduledDate ||
+        !otherAssignment.slotStart ||
+        !otherAssignment.slotEnd
+      ) {
+        return false;
+      }
+
+      return this.doesTimeRangeOverlap(
+        assignment.slotStart!,
+        assignment.slotEnd!,
+        otherAssignment.slotStart!,
+        otherAssignment.slotEnd!,
+      );
+    });
   }
 
   // ============================================================
@@ -746,16 +1171,10 @@ export class AddVisit implements OnInit {
   }
 
   // ============================================================
-  // CONVERT PAYMENT TYPE TO BACKEND ENUM
+  // PAYMENT TYPE VALUE
   // ============================================================
 
   private getPaymentTypeValue(): 0 | 1 {
-    /*
-     * Backend PackagePaymentType enum:
-     *
-     * 0 = FullAdvance
-     * 1 = Installment
-     */
     return this.form.paymentType === 'FullAdvance' ? 0 : 1;
   }
 
@@ -764,15 +1183,11 @@ export class AddVisit implements OnInit {
   // ============================================================
 
   submitVisit(): void {
-    /*
-     * Prevent duplicate submissions.
-     */
     if (this.isSubmitting) {
       return;
     }
 
     this.errorMessage = '';
-
     this.successMessage = '';
 
     // ==========================================================
@@ -781,31 +1196,26 @@ export class AddVisit implements OnInit {
 
     if (!this.form.patientName.trim()) {
       this.errorMessage = 'Patient name is required.';
-
       return;
     }
 
     if (!this.form.patientPhone.trim()) {
       this.errorMessage = 'Patient phone is required.';
-
       return;
     }
 
     if (!this.form.locationAddress.trim()) {
       this.errorMessage = 'Patient location address is required.';
-
       return;
     }
 
     if (!this.form.packageId) {
       this.errorMessage = 'Please select a package.';
-
       return;
     }
 
     if (!this.selectedPackage) {
       this.errorMessage = 'Selected package could not be found.';
-
       return;
     }
 
@@ -816,19 +1226,16 @@ export class AddVisit implements OnInit {
     if (this.form.paymentType === 'Installment') {
       if (this.form.initialAmountPaid === null || this.form.initialAmountPaid === undefined) {
         this.errorMessage = 'Initial amount paid is required for installment payment.';
-
         return;
       }
 
       if (this.form.initialAmountPaid < 0) {
         this.errorMessage = 'Initial amount paid cannot be negative.';
-
         return;
       }
 
       if (this.form.initialAmountPaid > this.selectedPackage.amount) {
         this.errorMessage = 'Initial amount paid cannot exceed the package amount.';
-
         return;
       }
     }
@@ -841,30 +1248,62 @@ export class AddVisit implements OnInit {
       const assignment = this.form.visitAssignments[i];
 
       /*
-       * Check partial scheduling.
+       * Date, start time and end time must all
+       * be supplied together.
        */
       if (this.hasPartialSchedule(assignment)) {
-        this.errorMessage = `Visit #${i + 1}: Scheduled date, start time and end time must all be provided together.`;
+        this.errorMessage =
+          `Visit #${i + 1}: Scheduled date, start time and end time ` +
+          'must all be provided together.';
 
         return;
       }
 
       /*
-       * Check time order.
+       * Validate time order.
        */
       if (
         assignment.slotStart &&
         assignment.slotEnd &&
-        assignment.slotStart >= assignment.slotEnd
+        this.getTimeValue(assignment.slotStart) >= this.getTimeValue(assignment.slotEnd)
       ) {
-        this.errorMessage = `Visit #${i + 1}: End time must be later than start time.`;
+        this.errorMessage = `Visit #${i + 1}: ` + 'End time must be later than start time.';
+
+        return;
+      }
+
+      /*
+       * Validate working hours.
+       */
+      if (
+        assignment.slotStart &&
+        assignment.slotEnd &&
+        !this.isWithinWorkingHours(assignment.slotStart, assignment.slotEnd)
+      ) {
+        this.errorMessage =
+          `Visit #${i + 1}: Visit time must be between ` +
+          `${this.formatTime(`${this.scheduleStartHour}:00`)} and ` +
+          `${this.formatTime(`${this.scheduleEndHour}:00`)}.`;
+
+        return;
+      }
+
+      /*
+       * Validate overlap with backend visits
+       * and other assignments.
+       */
+      if (this.hasScheduleConflict(i)) {
+        this.errorMessage =
+          `Visit #${i + 1}: ` +
+          'The selected time overlaps with an existing visit ' +
+          'for this practitioner. Please choose another time.';
 
         return;
       }
     }
 
     // ==========================================================
-    // CREATE ACTUAL BACKEND PAYLOAD
+    // CREATE BACKEND PAYLOAD
     // ==========================================================
 
     const payload: CreateVisitPayload = {
@@ -886,11 +1325,11 @@ export class AddVisit implements OnInit {
 
         areaId: assignment.areaId,
 
-        scheduledDate: assignment.scheduledDate ? assignment.scheduledDate : null,
+        scheduledDate: assignment.scheduledDate || null,
 
-        slotStart: assignment.slotStart ? assignment.slotStart : null,
+        slotStart: assignment.slotStart || null,
 
-        slotEnd: assignment.slotEnd ? assignment.slotEnd : null,
+        slotEnd: assignment.slotEnd || null,
       })),
     };
 
@@ -927,10 +1366,6 @@ export class AddVisit implements OnInit {
     // ==========================================================
 
     this.visitsService.create(payload as unknown as CreateVisitRequest).subscribe({
-      // ======================================================
-      // SUCCESS
-      // ======================================================
-
       next: (response: unknown) => {
         console.log('================================================');
 
@@ -946,10 +1381,6 @@ export class AddVisit implements OnInit {
 
         this.router.navigate(['/visits']);
       },
-
-      // ======================================================
-      // ERROR
-      // ======================================================
 
       error: (error: unknown) => {
         console.error('================================================');
@@ -969,10 +1400,6 @@ export class AddVisit implements OnInit {
 
         console.error('Create Visit Error Message:', this.errorMessage);
       },
-
-      // ======================================================
-      // COMPLETE
-      // ======================================================
 
       complete: () => {
         this.isSubmitting = false;
@@ -995,11 +1422,8 @@ export class AddVisit implements OnInit {
 
         error?: {
           message?: string;
-
           title?: string;
-
           detail?: string;
-
           errors?: Record<string, string[]>;
         };
       };
@@ -1034,15 +1458,25 @@ export class AddVisit implements OnInit {
       }
 
       if ((response.status ?? 0) >= 500) {
-        return 'The server encountered an error while creating the visit. Please try again.';
+        return 'The server encountered an error while creating the visit. ' + 'Please try again.';
       }
 
       if ((response.status ?? 0) >= 400) {
-        return 'The visit could not be created. Please check the entered information and try again.';
+        return (
+          'The visit could not be created. ' + 'Please check the entered information and try again.'
+        );
       }
     }
 
     return fallbackMessage;
+  }
+
+  // ============================================================
+  // CLOSE DROPDOWN
+  // ============================================================
+
+  closeDropdown(): void {
+    this.openDropdown = null;
   }
 
   // ============================================================

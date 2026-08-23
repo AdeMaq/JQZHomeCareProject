@@ -30,7 +30,7 @@
   </div>
 
   <!-- ============================================================
-       LOADING
+       LOADING VISIT
   ============================================================ -->
 
   @if (isLoading) {
@@ -52,9 +52,7 @@
       <div>
         <strong>Unable to load visit</strong>
 
-        <p>
-          {{ errorMessage }}
-        </p>
+        <p>{{ errorMessage }}</p>
       </div>
     </div>
 
@@ -75,7 +73,7 @@
     <form class="visit-form" (ngSubmit)="submit()" #editVisitForm="ngForm">
       <!-- ========================================================
            VISIT INFORMATION
-      ========================================================= -->
+      ======================================================== -->
 
       <section class="form-card">
         <div class="card-header">
@@ -92,8 +90,6 @@
 
         <div class="card-body">
           <div class="info-grid">
-            <!-- Patient -->
-
             <div class="info-item">
               <span class="info-label"> Patient </span>
 
@@ -101,8 +97,6 @@
                 {{ visit.patientName }}
               </strong>
             </div>
-
-            <!-- Service -->
 
             <div class="info-item">
               <span class="info-label"> Service </span>
@@ -112,8 +106,6 @@
               </strong>
             </div>
 
-            <!-- Package -->
-
             <div class="info-item">
               <span class="info-label"> Package </span>
 
@@ -121,8 +113,6 @@
                 {{ visit.packageName || '—' }}
               </strong>
             </div>
-
-            <!-- Status -->
 
             <div class="info-item">
               <span class="info-label"> Status </span>
@@ -138,15 +128,11 @@
               </span>
             </div>
 
-            <!-- Amount Due -->
-
             <div class="info-item">
               <span class="info-label"> Amount Due </span>
 
               <strong> PKR {{ visit.amountDue | number: '1.0-2' }} </strong>
             </div>
-
-            <!-- Collection -->
 
             <div class="info-item">
               <span class="info-label"> Collection Status </span>
@@ -160,8 +146,8 @@
       </section>
 
       <!-- ========================================================
-           ASSIGNMENT
-      ========================================================= -->
+           PRACTITIONER ASSIGNMENT
+      ======================================================== -->
 
       <section class="form-card">
         <div class="card-header">
@@ -172,58 +158,224 @@
           <div>
             <h2>Practitioner Assignment</h2>
 
-            <p>Update the practitioner and area assigned to this visit.</p>
+            <p>Update the area and practitioner assigned to this visit.</p>
           </div>
         </div>
 
         <div class="card-body">
           <div class="form-grid">
-            <!-- Practitioner -->
+            <!-- ==================================================
+                 AREA SEARCHABLE DROPDOWN
+            =================================================== -->
 
-            <div class="form-field">
-              <label for="practitionerId"> Practitioner </label>
+            <div class="form-field searchable-field">
+              <label for="areaSearch"> Area </label>
 
-              <div class="input-wrapper">
-                <i class="fa-solid fa-user-doctor"></i>
+              <div class="searchable-select">
+                <div class="searchable-input" [class.open]="isAreaDropdownOpen">
+                  <i class="fa-solid fa-location-dot"></i>
 
-                <select
-                  id="practitionerId"
-                  name="practitionerId"
-                  [(ngModel)]="form.practitionerId"
-                  (ngModelChange)="onPractitionerChange()"
-                >
-                  <option [ngValue]="null">Select practitioner</option>
+                  <input
+                    id="areaSearch"
+                    type="text"
+                    autocomplete="off"
+                    [(ngModel)]="areaSearchTerm"
+                    name="areaSearchTerm"
+                    placeholder="Search or select area..."
+                    (focus)="openAreaDropdown()"
+                    (input)="filterAreas()"
+                  />
 
-                  @for (practitioner of getPractitioners(); track practitioner.id) {
-                    <option [ngValue]="practitioner.id">
-                      {{ practitioner.name }}
-                    </option>
+                  @if (form.areaId) {
+                    <button
+                      type="button"
+                      class="clear-selection-btn"
+                      (click)="clearAreaSelection()"
+                      title="Clear area"
+                    >
+                      <i class="fa-solid fa-xmark"></i>
+                    </button>
                   }
-                </select>
+
+                  <button
+                    type="button"
+                    class="dropdown-toggle"
+                    (click)="toggleAreaDropdown()"
+                    title="Toggle areas"
+                  >
+                    <i class="fa-solid fa-chevron-down" [class.rotated]="isAreaDropdownOpen"></i>
+                  </button>
+                </div>
+
+                @if (isAreaDropdownOpen) {
+                  <div class="searchable-dropdown">
+                    @if (isLoadingAreas) {
+                      <div class="no-results">
+                        <i class="fa-solid fa-spinner fa-spin"></i>
+
+                        <span>Loading areas...</span>
+                      </div>
+                    } @else if (getFilteredAreas().length > 0) {
+                      @for (area of getFilteredAreas(); track area.id) {
+                        <button
+                          type="button"
+                          class="searchable-option"
+                          [class.selected]="isAreaSelected(area.id)"
+                          (click)="selectArea(area)"
+                        >
+                          <div class="option-main">
+                            <i class="fa-solid fa-location-dot"></i>
+
+                            <div class="option-text">
+                              <span class="option-title">
+                                {{ area.name }}
+                              </span>
+
+                              @if (area.cityName) {
+                                <span class="option-subtitle">
+                                  {{ area.cityName }}
+                                </span>
+                              }
+                            </div>
+                          </div>
+
+                          @if (isAreaSelected(area.id)) {
+                            <i class="fa-solid fa-check option-check"></i>
+                          }
+                        </button>
+                      }
+                    } @else {
+                      <div class="no-results">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+
+                        <span>No areas found</span>
+                      </div>
+                    }
+                  </div>
+                }
               </div>
             </div>
 
-            <!-- Area -->
+            <!-- ==================================================
+                 PRACTITIONER SEARCHABLE DROPDOWN
+            =================================================== -->
 
-            <div class="form-field">
-              <label for="areaId"> Area </label>
+            <div class="form-field searchable-field">
+              <label for="practitionerSearch"> Practitioner </label>
 
-              <div class="input-wrapper">
-                <i class="fa-solid fa-location-dot"></i>
+              <div class="searchable-select">
+                <div class="searchable-input" [class.open]="isPractitionerDropdownOpen">
+                  <i class="fa-solid fa-user-doctor"></i>
 
-                <select id="areaId" name="areaId" [(ngModel)]="form.areaId">
-                  <option [ngValue]="null">Select area</option>
+                  <input
+                    id="practitionerSearch"
+                    type="text"
+                    autocomplete="off"
+                    [(ngModel)]="practitionerSearchTerm"
+                    name="practitionerSearchTerm"
+                    placeholder="Search or select practitioner..."
+                    (focus)="openPractitionerDropdown()"
+                    (input)="filterPractitioners()"
+                  />
 
-                  @for (area of getAreas(); track area.id) {
-                    <option [ngValue]="area.id">
-                      {{ area.name }}
-
-                      @if (area.cityName) {
-                        — {{ area.cityName }}
-                      }
-                    </option>
+                  @if (form.practitionerId) {
+                    <button
+                      type="button"
+                      class="clear-selection-btn"
+                      (click)="clearPractitionerSelection()"
+                      title="Clear practitioner"
+                    >
+                      <i class="fa-solid fa-xmark"></i>
+                    </button>
                   }
-                </select>
+
+                  <button
+                    type="button"
+                    class="dropdown-toggle"
+                    (click)="togglePractitionerDropdown()"
+                    title="Toggle practitioners"
+                  >
+                    <i
+                      class="fa-solid fa-chevron-down"
+                      [class.rotated]="isPractitionerDropdownOpen"
+                    ></i>
+                  </button>
+                </div>
+
+                @if (isPractitionerDropdownOpen) {
+                  <div class="searchable-dropdown practitioner-dropdown">
+                    @if (isLoadingPractitioners) {
+                      <div class="no-results">
+                        <i class="fa-solid fa-spinner fa-spin"></i>
+
+                        <span>Loading practitioners...</span>
+                      </div>
+                    } @else if (getFilteredPractitioners().length > 0) {
+                      @for (practitioner of getFilteredPractitioners(); track practitioner.id) {
+                        <button
+                          type="button"
+                          class="searchable-option practitioner-option"
+                          [class.selected]="isPractitionerSelected(practitioner.id)"
+                          (click)="selectPractitioner(practitioner)"
+                        >
+                          <div class="option-main">
+                            <div class="practitioner-avatar">
+                              <i class="fa-solid fa-user-doctor"></i>
+                            </div>
+
+                            <div class="option-text">
+                              <div class="practitioner-name-row">
+                                <span class="option-title">
+                                  {{ practitioner.name }}
+                                </span>
+
+                                @if (isPractitionerAssignedToSelectedArea(practitioner)) {
+                                  <span class="assigned-badge">
+                                    <i class="fa-solid fa-star"></i>
+
+                                    Assigned to Area
+                                  </span>
+                                }
+                              </div>
+
+                              @if (practitioner.serviceName) {
+                                <span class="option-subtitle">
+                                  {{ practitioner.serviceName }}
+                                </span>
+                              }
+
+                              @if (practitioner.email || practitioner.phone) {
+                                <span class="option-meta">
+                                  @if (practitioner.email) {
+                                    {{ practitioner.email }}
+                                  }
+
+                                  @if (practitioner.email && practitioner.phone) {
+                                    <span class="meta-separator"> • </span>
+                                  }
+
+                                  @if (practitioner.phone) {
+                                    {{ practitioner.phone }}
+                                  }
+                                </span>
+                              }
+                            </div>
+                          </div>
+
+                          @if (isPractitionerSelected(practitioner.id)) {
+                            <i class="fa-solid fa-check option-check"></i>
+                          }
+                        </button>
+                      }
+                    } @else {
+                      <div class="no-results">
+                        <i class="fa-solid fa-user-slash"></i>
+
+                        <span>No practitioners found</span>
+                      </div>
+                    }
+                  </div>
+                }
               </div>
             </div>
           </div>
@@ -243,11 +395,10 @@
               <p>A reason is required when changing the practitioner or assigned area.</p>
 
               <div class="form-grid">
-                <!-- Refused By -->
-
                 <div class="form-field">
                   <label for="refusedBy">
                     Refused By
+
                     <span class="required">*</span>
                   </label>
 
@@ -262,11 +413,10 @@
                   </div>
                 </div>
 
-                <!-- Reason -->
-
                 <div class="form-field">
                   <label for="reason">
                     Reason
+
                     <span class="required">*</span>
                   </label>
 
@@ -291,7 +441,7 @@
 
       <!-- ========================================================
            SCHEDULE
-      ========================================================= -->
+      ======================================================== -->
 
       <section class="form-card">
         <div class="card-header">
@@ -308,8 +458,6 @@
 
         <div class="card-body">
           <div class="form-grid">
-            <!-- Scheduled Date -->
-
             <div class="form-field">
               <label for="scheduledDate"> Scheduled Date </label>
 
@@ -318,62 +466,46 @@
 
                 <input
                   id="scheduledDate"
-                  type="date"
                   name="scheduledDate"
+                  type="date"
                   [(ngModel)]="form.scheduledDate"
+                  required
                 />
               </div>
             </div>
 
-            <!-- Start Time -->
-
             <div class="form-field">
-              <label for="slotStart"> Start Time </label>
+              <label for="startTime"> Start Time </label>
 
               <div class="input-wrapper">
                 <i class="fa-solid fa-clock"></i>
 
-                <input id="slotStart" type="time" name="slotStart" [(ngModel)]="form.slotStart" />
+                <input
+                  id="startTime"
+                  name="startTime"
+                  type="time"
+                  [(ngModel)]="form.startTime"
+                  required
+                />
               </div>
             </div>
 
-            <!-- End Time -->
-
             <div class="form-field">
-              <label for="slotEnd"> End Time </label>
+              <label for="endTime"> End Time </label>
 
               <div class="input-wrapper">
                 <i class="fa-solid fa-clock"></i>
 
-                <input id="slotEnd" type="time" name="slotEnd" [(ngModel)]="form.slotEnd" />
+                <input
+                  id="endTime"
+                  name="endTime"
+                  type="time"
+                  [(ngModel)]="form.endTime"
+                  required
+                />
               </div>
             </div>
           </div>
-
-          <!-- Partial Schedule Warning -->
-
-          @if (hasPartialSchedule()) {
-            <div class="assignment-warning">
-              <i class="fa-solid fa-triangle-exclamation"></i>
-
-              <span>
-                Scheduled date, start time and end time must either all be provided or all be left
-                empty.
-              </span>
-            </div>
-          }
-
-          <!-- Invalid Time Warning -->
-
-          @if (hasInvalidTimeOrder()) {
-            <div class="assignment-warning">
-              <i class="fa-solid fa-triangle-exclamation"></i>
-
-              <span> End time must be later than start time. </span>
-            </div>
-          }
-
-          <!-- Scheduling Info -->
 
           <div class="schedule-info">
             <i class="fa-solid fa-circle-info"></i>
@@ -391,10 +523,10 @@
       </section>
 
       <!-- ========================================================
-           ERROR
-      ========================================================= -->
+           ERROR MESSAGE
+      ======================================================== -->
 
-      @if (errorMessage) {
+      @if (errorMessage && visit) {
         <div class="form-alert error">
           <i class="fa-solid fa-circle-exclamation"></i>
 
@@ -409,15 +541,15 @@
       }
 
       <!-- ========================================================
-           SUCCESS
-      ========================================================= -->
+           SUCCESS MESSAGE
+      ======================================================== -->
 
       @if (successMessage) {
         <div class="form-alert success">
           <i class="fa-solid fa-circle-check"></i>
 
           <div>
-            <strong> Visit updated successfully </strong>
+            <strong> Success </strong>
 
             <p>
               {{ successMessage }}
@@ -427,11 +559,16 @@
       }
 
       <!-- ========================================================
-           FORM FOOTER
+           FOOTER
       ======================================================== -->
 
       <div class="form-footer">
-        <button type="button" class="btn btn-secondary" (click)="cancel()" [disabled]="isSaving">
+        <button
+          type="button"
+          class="btn btn-secondary"
+          (click)="cancel()"
+          [disabled]="isSubmitting"
+        >
           <i class="fa-solid fa-xmark"></i>
 
           Cancel
@@ -440,9 +577,9 @@
         <button
           type="submit"
           class="btn btn-primary"
-          [disabled]="isSaving || hasPartialSchedule() || hasInvalidTimeOrder()"
+          [disabled]="isSubmitting || !editVisitForm.valid"
         >
-          @if (isSaving) {
+          @if (isSubmitting) {
             <i class="fa-solid fa-spinner fa-spin"></i>
 
             Saving...

@@ -116,16 +116,35 @@ export class VisitsList implements OnInit {
         // Resolve practitioner names
         // --------------------------------------------------------
 
-        this.visits = this.resolvePractitionerNames(
+        const mappedVisits = this.resolvePractitionerNames(
           Array.isArray(visits) ? visits : [],
           this.practitioners,
         );
+
+        // --------------------------------------------------------
+        // Sort visits by scheduled date and start time
+        //
+        // Latest date appears first.
+        //
+        // Example:
+        //
+        // 27 Aug 2026 - 19:24
+        // 24 Aug 2026 - 09:56
+        // 23 Aug 2026 - 21:10
+        // 23 Aug 2026 - 13:00
+        // 23 Aug 2026 - 09:00
+        // 22 Aug 2026 - 18:07
+        //
+        // Unscheduled visits appear at the bottom.
+        // --------------------------------------------------------
+
+        this.visits = this.sortVisitsBySchedule(mappedVisits);
 
         console.log('=================================');
         console.log('VISITS AFTER PRACTITIONER MAPPING');
         console.log('=================================');
 
-        console.log('MAPPED VISITS:', this.visits);
+        console.log('MAPPED AND SORTED VISITS:', this.visits);
 
         // --------------------------------------------------------
         // Finish loading
@@ -263,9 +282,106 @@ export class VisitsList implements OnInit {
          *
          * Otherwise keep the visit as unassigned.
          */
+
         practitionerName: practitionerName ?? null,
       };
     });
+  }
+
+  // ============================================================
+  // SORT VISITS BY SCHEDULE
+  // ============================================================
+
+  private sortVisitsBySchedule(visits: Visit[]): Visit[] {
+    return [...visits].sort((a, b) => {
+      const aDateTime = this.getVisitScheduleTimestamp(a);
+
+      const bDateTime = this.getVisitScheduleTimestamp(b);
+
+      // --------------------------------------------------------
+      // Both visits are unscheduled
+      // --------------------------------------------------------
+
+      if (aDateTime === null && bDateTime === null) {
+        return 0;
+      }
+
+      // --------------------------------------------------------
+      // Unscheduled visit goes to the bottom
+      // --------------------------------------------------------
+
+      if (aDateTime === null) {
+        return 1;
+      }
+
+      if (bDateTime === null) {
+        return -1;
+      }
+
+      // --------------------------------------------------------
+      // Sort from latest to earliest
+      //
+      // Example:
+      //
+      // 27 Aug 2026
+      // 24 Aug 2026
+      // 23 Aug 2026
+      // 22 Aug 2026
+      // --------------------------------------------------------
+
+      return bDateTime - aDateTime;
+    });
+  }
+
+  // ============================================================
+  // GET VISIT SCHEDULE TIMESTAMP
+  // ============================================================
+
+  private getVisitScheduleTimestamp(visit: Visit): number | null {
+    // ----------------------------------------------------------
+    // Visit has no scheduled date
+    // ----------------------------------------------------------
+
+    if (!visit.scheduledDate) {
+      return null;
+    }
+
+    /*
+     * Backend date may arrive as:
+     *
+     * 2026-08-23
+     *
+     * or:
+     *
+     * 2026-08-23T00:00:00
+     *
+     * We only need the YYYY-MM-DD portion.
+     */
+
+    const datePart = visit.scheduledDate.split('T')[0];
+
+    /*
+     * Backend TimeSpan values may arrive as:
+     *
+     * 09:00:00
+     * 14:30:00
+     *
+     * If a visit has a date but no start time,
+     * use midnight so all visits on that date
+     * remain grouped together.
+     */
+
+    const timePart = visit.slotStart || '00:00:00';
+
+    const dateTime = new Date(`${datePart}T${timePart}`);
+
+    const timestamp = dateTime.getTime();
+
+    if (Number.isNaN(timestamp)) {
+      return null;
+    }
+
+    return timestamp;
   }
 
   // ============================================================
@@ -399,7 +515,26 @@ export class VisitsList implements OnInit {
       return '-';
     }
 
-    const parsedDate = new Date(date);
+    /*
+     * Extract the date portion to avoid timezone-related
+     * date shifting.
+     */
+
+    const datePart = date.split('T')[0];
+
+    const parts = datePart.split('-');
+
+    if (parts.length !== 3) {
+      return '-';
+    }
+
+    const year = Number(parts[0]);
+
+    const month = Number(parts[1]) - 1;
+
+    const day = Number(parts[2]);
+
+    const parsedDate = new Date(year, month, day);
 
     if (Number.isNaN(parsedDate.getTime())) {
       return '-';

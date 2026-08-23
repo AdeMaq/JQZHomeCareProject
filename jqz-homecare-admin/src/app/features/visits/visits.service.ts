@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 
 import { CollectionStatus, Visit, VisitStatus } from './visits.interface';
@@ -16,9 +16,12 @@ export interface CreateVisitRequest {
 
   packageId: string;
 
-  // Backend PackagePaymentType enum:
-  // FullAdvance = 0
-  // Installment = 1
+  /*
+   * Backend PackagePaymentType enum:
+   *
+   * FullAdvance = 0
+   * Installment = 1
+   */
   paymentType: 0 | 1;
 
   initialAmountPaid: number | null;
@@ -71,9 +74,9 @@ export interface ReassignPractitionerRequest {
 // 0 = Pending
 // 1 = Received
 //
-// We convert these values into the string values expected
-// by the frontend Visit interface.
-//
+// We convert these numeric values into the string values
+// expected by the frontend Visit interface.
+// ============================================================
 
 interface BackendVisit extends Omit<Visit, 'status' | 'collectionStatus'> {
   status: number;
@@ -88,6 +91,10 @@ interface BackendVisit extends Omit<Visit, 'status' | 'collectionStatus'> {
   providedIn: 'root',
 })
 export class VisitsService {
+  // ============================================================
+  // SERVICES
+  // ============================================================
+
   private readonly http = inject(HttpClient);
 
   // ============================================================
@@ -103,7 +110,9 @@ export class VisitsService {
   getAll(): Observable<Visit[]> {
     return this.http
       .get<BackendVisit[]>(this.apiUrl)
-      .pipe(map((visits) => visits.map((visit) => this.mapVisit(visit))));
+      .pipe(
+        map((visits: BackendVisit[]) => visits.map((visit: BackendVisit) => this.mapVisit(visit))),
+      );
   }
 
   // ============================================================
@@ -113,15 +122,15 @@ export class VisitsService {
   getById(id: string): Observable<Visit> {
     return this.http
       .get<BackendVisit>(`${this.apiUrl}/${id}`)
-      .pipe(map((visit) => this.mapVisit(visit)));
+      .pipe(map((visit: BackendVisit) => this.mapVisit(visit)));
   }
 
   // ============================================================
   // CREATE VISIT
   // ============================================================
 
-  create(request: CreateVisitRequest): Observable<any> {
-    return this.http.post<any>(this.apiUrl, request);
+  create(request: CreateVisitRequest): Observable<unknown> {
+    return this.http.post<unknown>(this.apiUrl, request);
   }
 
   // ============================================================
@@ -141,12 +150,81 @@ export class VisitsService {
   }
 
   // ============================================================
+  // GET TODAY VISITS
+  //
+  // Backend:
+  // GET /api/visits/today
+  //
+  // Optional query:
+  // ?practitionerId={guid}
+  // ============================================================
+
+  getToday(practitionerId?: string): Observable<Visit[]> {
+    let params = new HttpParams();
+
+    if (practitionerId) {
+      params = params.set('practitionerId', practitionerId);
+    }
+
+    return this.http
+      .get<BackendVisit[]>(`${this.apiUrl}/today`, { params })
+      .pipe(
+        map((visits: BackendVisit[]) => visits.map((visit: BackendVisit) => this.mapVisit(visit))),
+      );
+  }
+
+  // ============================================================
+  // GET VISITS BY DATE
+  //
+  // Backend:
+  // GET /api/visits/by-date
+  //
+  // Optional query:
+  //
+  // ?date=2026-08-21
+  //
+  // If no date is provided, backend returns all visits.
+  // ============================================================
+
+  getByDate(date?: string): Observable<Visit[]> {
+    let params = new HttpParams();
+
+    if (date) {
+      params = params.set('date', date);
+    }
+
+    return this.http
+      .get<BackendVisit[]>(`${this.apiUrl}/by-date`, { params })
+      .pipe(
+        map((visits: BackendVisit[]) => visits.map((visit: BackendVisit) => this.mapVisit(visit))),
+      );
+  }
+
+  // ============================================================
+  // GET PRACTITIONER VISITS BY DATE
+  //
+  // Backend:
+  //
+  // GET /api/visits/by-date?date=2026-08-21
+  //
+  // The backend returns visits for the selected date.
+  //
+  // We then filter those visits on the frontend so that
+  // only visits belonging to the selected practitioner
+  // are returned.
+  // ============================================================
+
+  getPractitionerVisitsByDate(practitionerId: string, date: string): Observable<Visit[]> {
+    return this.getByDate(date).pipe(
+      map((visits: Visit[]) =>
+        visits.filter((visit: Visit) => visit.practitionerId === practitionerId),
+      ),
+    );
+  }
+
+  // ============================================================
   // MAP BACKEND VISIT
   // ============================================================
-  //
-  // Converts numeric backend enum values into the string values
-  // expected by the Angular frontend.
-  //
 
   private mapVisit(visit: BackendVisit): Visit {
     return {

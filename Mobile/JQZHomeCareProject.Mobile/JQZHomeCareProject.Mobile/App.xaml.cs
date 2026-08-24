@@ -7,29 +7,31 @@ namespace JQZHomeCareProject.Mobile
     public partial class App : Application
     {
         private readonly IServiceProvider _services;
+        private readonly ISessionService _session;
+        private readonly INavigationService _navigation;
 
-        public App(IServiceProvider services)
+        public App(IServiceProvider services, ISessionService session, INavigationService navigation)
         {
             InitializeComponent();
+
             _services = services;
+            _session = session;
+            _navigation = navigation;
 
-            var session = _services.GetRequiredService<ISessionService>();
-            session.SessionExpired += OnSessionExpired;
-        }
-
-        private async void OnSessionExpired()
-        {
-            var session = _services.GetRequiredService<ISessionService>();
-            var navigation = _services.GetRequiredService<INavigationService>();
-
-            await session.ClearAsync();
-            await navigation.GoToLoginAsync();
+            // Any 401 from the backend (via AuthHeaderHandler) routes back to Login.
+            _session.SessionExpired += OnSessionExpired;
         }
 
         protected override Window CreateWindow(IActivationState? activationState)
         {
             var splash = _services.GetRequiredService<SplashPage>();
             return new Window(splash);
+        }
+
+        private async void OnSessionExpired()
+        {
+            await _session.ClearAsync();
+            await _navigation.GoToLoginAsync();
         }
     }
 }

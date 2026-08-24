@@ -10,13 +10,11 @@ namespace JQZHomeCareProject.Mobile.Models.Visits
         public double Latitude { get; set; }
         public double Longitude { get; set; }
         public DateTime Timestamp { get; set; }
-        public ReceivedBy ReceivedBy { get; set; }
+        public ReceivedByType ReceivedBy { get; set; }
 
-        /// <summary>
-        /// Required only when ReceivedBy = Practitioner. Never sent (or left
-        /// null) when ReceivedBy = Company — validate this client-side before
-        /// calling the API, matching the backend's rejection rule (Section 11).
-        /// </summary>
+        // Required only when ReceivedBy == Practitioner; must stay null/hidden
+        // when ReceivedBy == Company. Enforce this in CheckOutViewModel before
+        // the API call (Section 11 business rule), not here.
         public decimal? AmountReceived { get; set; }
     }
 }

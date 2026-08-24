@@ -1,4 +1,5 @@
-﻿using System;
+﻿using JQZHomeCareProject.Mobile.Models.Common;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -7,11 +8,11 @@ namespace JQZHomeCareProject.Mobile.Models.Auth
     public class LoginResponseDto
     {
         public string Token { get; set; } = string.Empty;
-        public string UserId { get; set; }= string.Empty;
-        public string Role { get; set; } = string.Empty;
+        public Guid UserId { get; set; }
+        public UserRole Role { get; set; }
 
-        // Null if the account somehow isn't linked to a practitioner —
-        // LoginViewModel should treat that as an error (this app is practitioner-only).
-        public string? PractitionerId { get; set; }
+        // Null for non-practitioner accounts; the mobile app only ever
+        // expects Practitioner logins, but keep it nullable to match the API.
+        public Guid? PractitionerId { get; set; }
     }
 }

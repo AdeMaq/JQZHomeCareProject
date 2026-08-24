@@ -23,9 +23,11 @@ namespace JQZHomeCareProject.Mobile.ViewModels.Base
             {
                 ErrorMessage = ex.Message;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                ErrorMessage = "Something went wrong. Please try again.";
+                System.Diagnostics.Debug.WriteLine($"[LOGIN ERROR] {ex.GetType().Name}: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine(ex.StackTrace);
+                ErrorMessage = ex.Message; // TEMP — revert to the generic message once fixed
             }
             finally
             {

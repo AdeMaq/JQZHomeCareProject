@@ -1,4 +1,6 @@
-﻿namespace JQZHomeCareProject.Mobile.Services.Auth
+﻿using JQZHomeCareProject.Mobile.Models.Common;
+
+namespace JQZHomeCareProject.Mobile.Services.Auth
 {
     public class SessionService : ISessionService
     {
@@ -9,18 +11,20 @@
 
         public event Action? SessionExpired;
 
-        public async Task SaveSessionAsync(string token, string userId, string role, string? practitionerId)
+        public async Task SaveSessionAsync(string token, Guid userId, UserRole role, Guid? practitionerId)
         {
             await SecureStorage.Default.SetAsync(TokenKey, token);
-            await SecureStorage.Default.SetAsync(UserIdKey, userId);
-            await SecureStorage.Default.SetAsync(RoleKey, role);
+            await SecureStorage.Default.SetAsync(UserIdKey, userId.ToString());
+            await SecureStorage.Default.SetAsync(RoleKey, role.ToString());
 
-            if (!string.IsNullOrWhiteSpace(practitionerId))
-                await SecureStorage.Default.SetAsync(PractitionerIdKey, practitionerId);
+            if (practitionerId.HasValue)
+                await SecureStorage.Default.SetAsync(PractitionerIdKey, practitionerId.Value.ToString());
         }
 
         public async Task<bool> HasValidSessionAsync()
         {
+            // Splash only confirms a token is present; actual expiry is
+            // discovered on the first 401 from the backend, via SessionExpired.
             var token = await GetTokenAsync();
             return !string.IsNullOrWhiteSpace(token);
         }
@@ -28,8 +32,17 @@
         public Task<string?> GetTokenAsync()
             => SecureStorage.Default.GetAsync(TokenKey);
 
-        public Task<string?> GetPractitionerIdAsync()
-            => SecureStorage.Default.GetAsync(PractitionerIdKey);
+        public async Task<Guid?> GetPractitionerIdAsync()
+        {
+            var raw = await SecureStorage.Default.GetAsync(PractitionerIdKey);
+            return Guid.TryParse(raw, out var id) ? id : null;
+        }
+
+        public async Task<UserRole?> GetRoleAsync()
+        {
+            var raw = await SecureStorage.Default.GetAsync(RoleKey);
+            return Enum.TryParse<UserRole>(raw, out var role) ? role : null;
+        }
 
         public Task ClearAsync()
         {

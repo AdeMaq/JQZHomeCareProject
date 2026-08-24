@@ -7,27 +7,32 @@ namespace JQZHomeCareProject.Mobile.Models.Visits
 {
     public class VisitDto
     {
-        public string Id { get; set; } = string.Empty;
+        public Guid Id { get; set; }
         public string PatientName { get; set; } = string.Empty;
-        public string PractitionerId { get; set; } = string.Empty;
-        public string PractitionerName { get; set; } = string.Empty;
-        public string AreaId { get; set; } = string.Empty;
-        public string AreaName { get; set; } = string.Empty;
+
+        public Guid? PractitionerId { get; set; }
+        public string? PractitionerName { get; set; }
+
+        public Guid? AreaId { get; set; }
+        public string? AreaName { get; set; }
+
         public string ServiceName { get; set; } = string.Empty;
         public string? PackageName { get; set; }
-        /// <summary>
-        /// Null means Admin hasn't scheduled this visit yet — per the business
-        /// rule in Section 11, an unscheduled visit should never surface on
-        /// the practitioner's Today/Visits list in the first place, but keep
-        /// this nullable to match the API contract.
-        /// </summary>
+
         public DateTime? ScheduledDate { get; set; }
-        public string TimeSlot { get; set; } = string.Empty;
+
+        // Formatted display slot (e.g. "10:00 AM - 11:00 AM"), combining
+        // the backend's SlotStart/SlotEnd for direct binding on VisitCard.
+        public string? TimeSlot { get; set; }
+
         public VisitStatus Status { get; set; }
+
+        // Fixed by the backend at checkout time — never editable client-side.
         public decimal AmountDue { get; set; }
-        public decimal? AmountReceived { get; set; }
-        public ReceivedBy? ReceivedBy { get; set; }
-        public CollectionStatus? CollectionStatus { get; set; }
-        public string? SettlementId { get; set; }
+        public decimal AmountReceived { get; set; }
+
+        public ReceivedByType? ReceivedBy { get; set; }
+        public CollectionStatus CollectionStatus { get; set; }
+        public Guid? SettlementId { get; set; }
     }
 }

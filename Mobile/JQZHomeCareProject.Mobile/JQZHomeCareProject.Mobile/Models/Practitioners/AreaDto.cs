@@ -6,7 +6,8 @@ namespace JQZHomeCareProject.Mobile.Models.Practitioners
 {
     public class AreaDto
     {
-        public string Id { get; set; } = string.Empty;
-        public string Name {  get; set; } = string.Empty;
+        public Guid Id { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public string? CityName { get; set; }
     }
 }

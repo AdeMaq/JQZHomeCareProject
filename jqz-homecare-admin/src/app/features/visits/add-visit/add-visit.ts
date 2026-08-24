@@ -31,6 +31,7 @@ interface PractitionerScheduleItem {
   end: string;
   status: 'BOOKED' | 'AVAILABLE';
   patientName?: string;
+  visitId?: string;
 }
 
 // ============================================================
@@ -581,16 +582,6 @@ export class AddVisit implements OnInit {
      * response cannot update stale schedule data.
      */
     this.invalidateScheduleRequest(index);
-
-    /*
-     * If your business rules require changing area to also
-     * invalidate the selected practitioner, uncomment:
-     *
-     * assignment.practitionerId = null;
-     * assignment.slotStart = null;
-     * assignment.slotEnd = null;
-     * this.resetScheduleState(index);
-     */
   }
 
   // ============================================================
@@ -613,12 +604,7 @@ export class AddVisit implements OnInit {
     this.resetScheduleState(index);
 
     /*
-     * This is triggered directly by:
-     *
-     * (ngModelChange)="onAssignmentDateChange(i)"
-     *
-     * So the API request starts immediately when the date
-     * value changes.
+     * Fetch the schedule immediately.
      */
     this.loadPractitionerSchedule(index);
   }
@@ -768,9 +754,6 @@ export class AddVisit implements OnInit {
 
         /*
          * Replace state with new object references.
-         *
-         * Angular can now render the schedule immediately
-         * without requiring a click or focus event.
          */
         this.practitionerVisits = {
           ...this.practitionerVisits,
@@ -860,49 +843,137 @@ export class AddVisit implements OnInit {
       return [];
     }
 
-    const bookedVisits = this.getPractitionerVisits(index);
+    /*
+     * Get all booked visits for this practitioner and ensure
+     * they contain valid start and end times.
+     */
+    const bookedVisits = [...this.getPractitionerVisits(index)]
+      .filter(
+        (visit) =>
+          !!visit.slotStart &&
+          !!visit.slotEnd &&
+          this.getTimeValue(visit.slotStart) < this.getTimeValue(visit.slotEnd),
+      )
+      .sort((a, b) => this.getTimeValue(a.slotStart) - this.getTimeValue(b.slotStart));
 
     const schedule: PractitionerScheduleItem[] = [];
 
     /*
-     * Full 24-hour timeline.
+     * Full 24-hour schedule boundaries.
      */
-    for (let hour = this.scheduleStartHour; hour < this.scheduleEndHour; hour++) {
-      const start = `${hour.toString().padStart(2, '0')}:00`;
+    const scheduleStart = this.scheduleStartHour * 60;
 
-      const nextHour = hour + 1;
+    const scheduleEnd = this.scheduleEndHour * 60;
 
-      const end = nextHour === 24 ? '23:59' : `${nextHour.toString().padStart(2, '0')}:00`;
+    let currentTime = scheduleStart;
 
-      const bookedVisit = bookedVisits.find((visit) =>
-        this.doesTimeRangeOverlap(start, end, visit.slotStart ?? '', visit.slotEnd ?? ''),
-      );
+    /*
+     * Build the schedule dynamically.
+     *
+     * Example:
+     *
+     * Backend visits:
+     *
+     * 08:30 - 09:30
+     * 09:30 - 10:22
+     * 18:07 - 19:08
+     *
+     * Generated schedule:
+     *
+     * 00:00 - 08:30 AVAILABLE
+     * 08:30 - 09:30 BOOKED
+     * 09:30 - 10:22 BOOKED
+     * 10:22 - 18:07 AVAILABLE
+     * 18:07 - 19:08 BOOKED
+     * 19:08 - 23:59 AVAILABLE
+     */
+    for (const visit of bookedVisits) {
+      const visitStart = Math.max(scheduleStart, this.getTimeValue(visit.slotStart));
 
-      if (bookedVisit) {
+      const visitEnd = Math.min(scheduleEnd, this.getTimeValue(visit.slotEnd));
+
+      /*
+       * Ignore invalid ranges.
+       */
+      if (visitStart >= visitEnd) {
+        continue;
+      }
+
+      /*
+       * If there is available time before the booked visit,
+       * create one dynamic available slot.
+       */
+      if (currentTime < visitStart) {
         schedule.push({
-          start,
-          end,
-          status: 'BOOKED',
-          patientName: bookedVisit.patientName || 'Unknown Patient',
-        });
-      } else {
-        schedule.push({
-          start,
-          end,
+          start: this.getTimeString(currentTime),
+          end: this.getTimeString(visitStart),
           status: 'AVAILABLE',
         });
       }
+
+      /*
+       * Add the booked visit using its exact backend times.
+       */
+      schedule.push({
+        start: this.getTimeString(visitStart),
+        end: this.getTimeString(visitEnd),
+        status: 'BOOKED',
+        patientName: visit.patientName || 'Unknown Patient',
+        visitId: visit.id,
+      });
+
+      /*
+       * Move forward in the timeline.
+       */
+      currentTime = Math.max(currentTime, visitEnd);
+    }
+
+    /*
+     * Add the remaining available time after the final
+     * booked visit.
+     */
+    if (currentTime < scheduleEnd) {
+      schedule.push({
+        start: this.getTimeString(currentTime),
+        end: this.getTimeString(scheduleEnd),
+        status: 'AVAILABLE',
+      });
+    }
+
+    /*
+     * If there are no booked visits, the entire day is
+     * available.
+     */
+    if (schedule.length === 0) {
+      schedule.push({
+        start: this.getTimeString(scheduleStart),
+        end: this.getTimeString(scheduleEnd),
+        status: 'AVAILABLE',
+      });
     }
 
     return schedule;
   }
 
   // ============================================================
-  // GET BOOKED SLOT COUNT
+  // GET BOOKED VISIT COUNT
   // ============================================================
 
   getBookedVisitCount(index: number): number {
-    return this.getPractitionerSchedule(index).filter((slot) => slot.status === 'BOOKED').length;
+    return this.getPractitionerVisits(index).filter(
+      (visit) =>
+        !!visit.slotStart &&
+        !!visit.slotEnd &&
+        this.getTimeValue(visit.slotStart) < this.getTimeValue(visit.slotEnd),
+    ).length;
+  }
+
+  // ============================================================
+  // GET AVAILABLE SLOT COUNT
+  // ============================================================
+
+  getAvailableSlotCount(index: number): number {
+    return this.getPractitionerSchedule(index).filter((slot) => slot.status === 'AVAILABLE').length;
   }
 
   // ============================================================
@@ -996,6 +1067,13 @@ export class AddVisit implements OnInit {
       return '';
     }
 
+    /*
+     * Handle 24:00 / end-of-day safely.
+     */
+    if (time === '24:00' || time === '24:00:00') {
+      return '11:59 PM';
+    }
+
     const normalizedTime = time.substring(0, 5);
 
     const [hourString, minuteString] = normalizedTime.split(':');
@@ -1047,6 +1125,29 @@ export class AddVisit implements OnInit {
   }
 
   // ============================================================
+  // GET TIME STRING FROM MINUTES
+  // ============================================================
+
+  private getTimeString(totalMinutes: number): string {
+    /*
+     * End of the 24-hour schedule.
+     *
+     * We display this as 23:59 instead of 24:00 because
+     * standard HTML time formatting and formatTime()
+     * work more consistently with 23:59.
+     */
+    if (totalMinutes >= 24 * 60) {
+      return '23:59';
+    }
+
+    const hours = Math.floor(totalMinutes / 60);
+
+    const minutes = totalMinutes % 60;
+
+    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+  }
+
+  // ============================================================
   // TIME VALUE
   // ============================================================
 
@@ -1064,6 +1165,13 @@ export class AddVisit implements OnInit {
 
     if (Number.isNaN(hours) || Number.isNaN(minutes)) {
       return 0;
+    }
+
+    /*
+     * Allow 24:00 as the end of the day.
+     */
+    if (hours === 24 && minutes === 0) {
+      return 24 * 60;
     }
 
     return hours * 60 + minutes;

@@ -1,6 +1,9 @@
 import { CommonModule } from '@angular/common';
+
 import { ChangeDetectorRef, Component, inject, OnDestroy, OnInit } from '@angular/core';
+
 import { FormsModule } from '@angular/forms';
+
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { forkJoin, Observable, Subject, takeUntil } from 'rxjs';
@@ -35,6 +38,22 @@ interface EditVisitForm {
   refusedBy: 'Patient' | 'Practitioner';
 
   reason: string;
+}
+
+// ============================================================
+// PRACTITIONER SCHEDULE ITEM
+// ============================================================
+
+interface PractitionerScheduleItem {
+  start: string;
+
+  end: string;
+
+  status: 'BOOKED' | 'AVAILABLE' | 'CURRENT';
+
+  patientName?: string;
+
+  visitId?: string;
 }
 
 // ============================================================
@@ -76,6 +95,14 @@ export class EditVisit implements OnInit, OnDestroy {
   private readonly destroy$ = new Subject<void>();
 
   // ============================================================
+  // SCHEDULE CONFIGURATION
+  // ============================================================
+
+  readonly scheduleStartHour = 0;
+
+  readonly scheduleEndHour = 24;
+
+  // ============================================================
   // DATA
   // ============================================================
 
@@ -100,6 +127,18 @@ export class EditVisit implements OnInit, OnDestroy {
   filteredAreas: Area[] = [];
 
   filteredPractitioners: Practitioner[] = [];
+
+  // ============================================================
+  // PRACTITIONER SCHEDULE
+  // ============================================================
+
+  practitionerVisits: Visit[] = [];
+
+  isLoadingSchedule = false;
+
+  scheduleError = '';
+
+  private scheduleRequestVersion = 0;
 
   // ============================================================
   // ORIGINAL VALUES
@@ -182,10 +221,6 @@ export class EditVisit implements OnInit, OnDestroy {
   // ============================================================
 
   private loadInitialData(visitId: string): void {
-    // ----------------------------------------------------------
-    // RESET STATE
-    // ----------------------------------------------------------
-
     this.isLoading = true;
 
     this.isLoadingPractitioners = true;
@@ -206,11 +241,9 @@ export class EditVisit implements OnInit, OnDestroy {
 
     this.filteredPractitioners = [];
 
-    this.detectChanges();
+    this.resetScheduleState();
 
-    // ----------------------------------------------------------
-    // LOAD VISIT + PRACTITIONERS + AREAS TOGETHER
-    // ----------------------------------------------------------
+    this.detectChanges();
 
     forkJoin({
       visit: this.visitsService.getById(visitId),
@@ -224,41 +257,37 @@ export class EditVisit implements OnInit, OnDestroy {
         next: ({ visit, practitioners, areas }) => {
           console.log('EDIT VISIT INITIAL DATA LOADED');
 
-          // ----------------------------------------------------
-          // ASSIGN DATA
-          // ----------------------------------------------------
-
           this.visit = visit;
 
           this.practitioners = practitioners ?? [];
 
           this.areas = areas ?? [];
 
-          // ----------------------------------------------------
+          // ------------------------------------------------------
           // POPULATE FORM
-          // ----------------------------------------------------
+          // ------------------------------------------------------
 
           this.populateForm(visit);
 
-          // ----------------------------------------------------
+          // ------------------------------------------------------
           // INITIALIZE FILTERED LISTS
-          // ----------------------------------------------------
+          // ------------------------------------------------------
 
           this.filteredAreas = [...this.areas];
 
           this.filteredPractitioners = this.getPrioritizedPractitioners();
 
-          // ----------------------------------------------------
+          // ------------------------------------------------------
           // RESTORE SELECTED VALUES
-          // ----------------------------------------------------
+          // ------------------------------------------------------
 
           this.restoreSelectedAreaDisplay();
 
           this.restoreSelectedPractitionerDisplay();
 
-          // ----------------------------------------------------
+          // ------------------------------------------------------
           // STOP LOADING
-          // ----------------------------------------------------
+          // ------------------------------------------------------
 
           this.isLoading = false;
 
@@ -266,9 +295,11 @@ export class EditVisit implements OnInit, OnDestroy {
 
           this.isLoadingAreas = false;
 
-          // ----------------------------------------------------
-          // FORCE VIEW UPDATE
-          // ----------------------------------------------------
+          // ------------------------------------------------------
+          // LOAD SCHEDULE
+          // ------------------------------------------------------
+
+          this.loadPractitionerSchedule();
 
           this.detectChanges();
         },
@@ -541,6 +572,8 @@ export class EditVisit implements OnInit, OnDestroy {
     this.filteredPractitioners = this.getPrioritizedPractitioners();
 
     this.closePractitionerDropdown();
+
+    this.onPractitionerScheduleChange();
   }
 
   clearPractitionerSelection(): void {
@@ -549,6 +582,8 @@ export class EditVisit implements OnInit, OnDestroy {
     this.practitionerSearchTerm = '';
 
     this.filteredPractitioners = this.getPrioritizedPractitioners();
+
+    this.onPractitionerScheduleChange();
   }
 
   onPractitionerChange(): void {
@@ -571,7 +606,7 @@ export class EditVisit implements OnInit, OnDestroy {
   }
 
   // ============================================================
-  // CHECK IF PRACTITIONER IS ASSIGNED TO SELECTED AREA
+  // CHECK PRACTITIONER AREA
   // ============================================================
 
   isPractitionerAssignedToSelectedArea(practitioner: Practitioner): boolean {
@@ -603,6 +638,460 @@ export class EditVisit implements OnInit, OnDestroy {
   }
 
   // ============================================================
+  // SCHEDULE DATE CHANGE
+  // ============================================================
+
+  onScheduleDateChange(): void {
+    this.resetScheduleState();
+
+    this.loadPractitionerSchedule();
+  }
+
+  // ============================================================
+  // PRACTITIONER SCHEDULE CHANGE
+  // ============================================================
+
+  onPractitionerScheduleChange(): void {
+    this.resetScheduleState();
+
+    this.loadPractitionerSchedule();
+  }
+
+  // ============================================================
+  // INVALIDATE REQUEST
+  // ============================================================
+
+  private invalidateScheduleRequest(): void {
+    this.scheduleRequestVersion++;
+  }
+
+  // ============================================================
+  // RESET SCHEDULE
+  // ============================================================
+
+  private resetScheduleState(): void {
+    this.invalidateScheduleRequest();
+
+    this.practitionerVisits = [];
+
+    this.isLoadingSchedule = false;
+
+    this.scheduleError = '';
+  }
+
+  // ============================================================
+  // LOAD PRACTITIONER SCHEDULE
+  // ============================================================
+
+  private loadPractitionerSchedule(): void {
+    if (!this.form.practitionerId || !this.form.scheduledDate) {
+      this.practitionerVisits = [];
+
+      this.isLoadingSchedule = false;
+
+      this.scheduleError = '';
+
+      return;
+    }
+
+    const practitionerId = this.form.practitionerId;
+
+    const scheduledDate = this.form.scheduledDate;
+
+    const requestVersion = ++this.scheduleRequestVersion;
+
+    this.isLoadingSchedule = true;
+
+    this.scheduleError = '';
+
+    this.practitionerVisits = [];
+
+    console.log('Loading practitioner schedule:', {
+      practitionerId,
+      scheduledDate,
+      requestVersion,
+    });
+
+    this.visitsService
+      .getByDate(scheduledDate)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (visits) => {
+          if (this.scheduleRequestVersion !== requestVersion) {
+            return;
+          }
+
+          if (
+            this.form.practitionerId !== practitionerId ||
+            this.form.scheduledDate !== scheduledDate
+          ) {
+            return;
+          }
+
+          // =====================================================
+          // IMPORTANT:
+          //
+          // DO NOT EXCLUDE THE CURRENT VISIT HERE.
+          //
+          // We need it in the schedule so that its current
+          // 08:30 - 09:30 slot is visible.
+          //
+          // The current visit is excluded ONLY during overlap
+          // validation.
+          // =====================================================
+
+          const practitionerVisits = visits
+            .filter(
+              (visit) =>
+                visit.practitionerId === practitionerId && !!visit.slotStart && !!visit.slotEnd,
+            )
+            .sort(
+              (a, b) => this.getTimeValue(a.slotStart ?? '') - this.getTimeValue(b.slotStart ?? ''),
+            );
+
+          this.practitionerVisits = practitionerVisits;
+
+          this.isLoadingSchedule = false;
+
+          this.scheduleError = '';
+
+          this.detectChanges();
+
+          console.log('Practitioner schedule loaded:', practitionerVisits);
+        },
+
+        error: (error: unknown) => {
+          if (this.scheduleRequestVersion !== requestVersion) {
+            return;
+          }
+
+          if (
+            this.form.practitionerId !== practitionerId ||
+            this.form.scheduledDate !== scheduledDate
+          ) {
+            return;
+          }
+
+          console.error('Failed to load practitioner schedule:', error);
+
+          this.practitionerVisits = [];
+
+          this.isLoadingSchedule = false;
+
+          this.scheduleError = this.getErrorMessage(
+            error,
+            'Unable to load the practitioner schedule.',
+          );
+
+          this.detectChanges();
+        },
+      });
+  }
+
+  // ============================================================
+  // SHOULD SHOW SCHEDULE
+  // ============================================================
+
+  shouldShowPractitionerSchedule(): boolean {
+    return !!(this.form.practitionerId && this.form.scheduledDate);
+  }
+
+  // ============================================================
+  // GET PRACTITIONER VISITS
+  // ============================================================
+
+  getPractitionerVisits(): Visit[] {
+    return this.practitionerVisits;
+  }
+
+  // ============================================================
+  // CHECK IF CURRENT VISIT
+  // ============================================================
+
+  isCurrentVisit(visit: Visit): boolean {
+    return !!this.visit && visit.id === this.visit.id;
+  }
+
+  // ============================================================
+  // GET PRACTITIONER SCHEDULE
+  //
+  // The schedule is generated dynamically.
+  //
+  // Example:
+  //
+  // 08:00 - 08:30 AVAILABLE
+  // 08:30 - 09:30 CURRENT VISIT
+  // 09:30 - 10:00 AVAILABLE
+  //
+  // This allows non-hourly visits such as:
+  //
+  // 08:30 - 09:30
+  // 09:15 - 10:45
+  // 13:20 - 14:10
+  // ============================================================
+
+  getPractitionerSchedule(): PractitionerScheduleItem[] {
+    if (!this.form.practitionerId || !this.form.scheduledDate) {
+      return [];
+    }
+
+    const schedule: PractitionerScheduleItem[] = [];
+
+    const relevantVisits = this.practitionerVisits
+      .filter((visit) => !!visit.slotStart && !!visit.slotEnd)
+      .sort((a, b) => this.getTimeValue(a.slotStart ?? '') - this.getTimeValue(b.slotStart ?? ''));
+
+    // ----------------------------------------------------------
+    // Create exact booked/current visit slots.
+    //
+    // Example:
+    // 08:30 - 09:30
+    // ----------------------------------------------------------
+
+    const occupiedSlots = relevantVisits.map((visit) => {
+      const isCurrent = this.isCurrentVisit(visit);
+
+      return {
+        start: this.formatTimeForInput(visit.slotStart) ?? '',
+
+        end: this.formatTimeForInput(visit.slotEnd) ?? '',
+
+        status: isCurrent ? ('CURRENT' as const) : ('BOOKED' as const),
+
+        patientName: visit.patientName || 'Unknown Patient',
+
+        visitId: visit.id,
+      };
+    });
+
+    // ----------------------------------------------------------
+    // Generate available gaps between visits.
+    // ----------------------------------------------------------
+
+    let cursor = '00:00';
+
+    for (const occupied of occupiedSlots) {
+      if (this.getTimeValue(cursor) < this.getTimeValue(occupied.start)) {
+        schedule.push({
+          start: cursor,
+
+          end: occupied.start,
+
+          status: 'AVAILABLE',
+        });
+      }
+
+      schedule.push(occupied);
+
+      if (this.getTimeValue(occupied.end) > this.getTimeValue(cursor)) {
+        cursor = occupied.end;
+      }
+    }
+
+    // ----------------------------------------------------------
+    // Add remaining time until end of day.
+    // ----------------------------------------------------------
+
+    if (this.getTimeValue(cursor) < this.getTimeValue('23:59')) {
+      schedule.push({
+        start: cursor,
+
+        end: '23:59',
+
+        status: 'AVAILABLE',
+      });
+    }
+
+    return schedule;
+  }
+
+  // ============================================================
+  // GET BOOKED VISIT COUNT
+  //
+  // Counts actual visits, not schedule blocks.
+  // ============================================================
+
+  getBookedVisitCount(): number {
+    return this.practitionerVisits.filter((visit) => !this.isCurrentVisit(visit)).length;
+  }
+
+  // ============================================================
+  // GET AVAILABLE SLOT COUNT
+  // ============================================================
+
+  getAvailableSlotCount(): number {
+    return this.getPractitionerSchedule().filter((slot) => slot.status === 'AVAILABLE').length;
+  }
+
+  // ============================================================
+  // FORMAT TIME FOR DISPLAY
+  // ============================================================
+
+  formatTimeForDisplay(value: string): string {
+    if (!value) {
+      return '';
+    }
+
+    const timeValue = value.substring(0, 5);
+
+    const [hoursString, minutes] = timeValue.split(':');
+
+    let hours = Number(hoursString);
+
+    const period = hours >= 12 ? 'PM' : 'AM';
+
+    hours = hours % 12;
+
+    if (hours === 0) {
+      hours = 12;
+    }
+
+    return `${hours}:${minutes} ${period}`;
+  }
+
+  // ============================================================
+  // TIME INPUT CHANGE
+  // ============================================================
+
+  onTimeChange(): void {
+    this.errorMessage = '';
+
+    if (
+      this.form.startTime &&
+      this.form.endTime &&
+      this.getTimeValue(this.form.startTime) >= this.getTimeValue(this.form.endTime)
+    ) {
+      this.errorMessage = 'End time must be later than start time.';
+
+      return;
+    }
+
+    const timeRangeError = this.getTimeRangeError();
+
+    if (timeRangeError) {
+      this.errorMessage = timeRangeError;
+    }
+  }
+
+  // ============================================================
+  // CHECK WORKING HOURS
+  // ============================================================
+
+  isWithinWorkingHours(start: string | null, end: string | null): boolean {
+    if (!start || !end) {
+      return true;
+    }
+
+    const startValue = this.getTimeValue(start);
+
+    const endValue = this.getTimeValue(end);
+
+    const minimumTime = 0;
+
+    const maximumTime = 23 * 60 + 59;
+
+    return startValue >= minimumTime && endValue <= maximumTime;
+  }
+
+  // ============================================================
+  // GET TIME RANGE ERROR
+  //
+  // IMPORTANT:
+  //
+  // Current visit is excluded here.
+  //
+  // Therefore:
+  //
+  // Existing visit:
+  // 08:30 - 09:30
+  //
+  // Editing page can keep:
+  // 08:30 - 09:30
+  //
+  // But another visit cannot overlap it.
+  // ============================================================
+
+  getTimeRangeError(): string {
+    if (!this.form.startTime || !this.form.endTime) {
+      return '';
+    }
+
+    if (this.getTimeValue(this.form.startTime) >= this.getTimeValue(this.form.endTime)) {
+      return 'End time must be later than start time.';
+    }
+
+    if (!this.isWithinWorkingHours(this.form.startTime, this.form.endTime)) {
+      return 'The selected time must be between ' + '12:00 AM and 11:59 PM.';
+    }
+
+    // ==========================================================
+    // EXCLUDE ONLY THE CURRENT VISIT FROM VALIDATION
+    // ==========================================================
+
+    const conflictingVisit = this.practitionerVisits.find(
+      (visit) =>
+        visit.id !== this.visit?.id &&
+        this.doesTimeRangeOverlap(
+          this.form.startTime!,
+          this.form.endTime!,
+          visit.slotStart ?? '',
+          visit.slotEnd ?? '',
+        ),
+    );
+
+    if (conflictingVisit) {
+      const patientName = conflictingVisit.patientName || 'another patient';
+
+      return `The selected time conflicts with an ` + `existing visit for ${patientName}.`;
+    }
+
+    return '';
+  }
+
+  // ============================================================
+  // TIME RANGE OVERLAP
+  // ============================================================
+
+  private doesTimeRangeOverlap(
+    startA: string,
+    endA: string,
+    startB: string,
+    endB: string,
+  ): boolean {
+    if (!startA || !endA || !startB || !endB) {
+      return false;
+    }
+
+    const startAValue = this.getTimeValue(startA);
+
+    const endAValue = this.getTimeValue(endA);
+
+    const startBValue = this.getTimeValue(startB);
+
+    const endBValue = this.getTimeValue(endB);
+
+    return startAValue < endBValue && endAValue > startBValue;
+  }
+
+  // ============================================================
+  // GET TIME VALUE
+  // ============================================================
+
+  private getTimeValue(value: string): number {
+    if (!value) {
+      return 0;
+    }
+
+    const parts = value.substring(0, 5).split(':');
+
+    const hours = Number(parts[0] ?? 0);
+
+    const minutes = Number(parts[1] ?? 0);
+
+    return hours * 60 + minutes;
+  }
+
+  // ============================================================
   // SCHEDULE VALIDATION
   // ============================================================
 
@@ -625,7 +1114,7 @@ export class EditVisit implements OnInit, OnDestroy {
       return false;
     }
 
-    return this.form.startTime >= this.form.endTime;
+    return this.getTimeValue(this.form.startTime) >= this.getTimeValue(this.form.endTime);
   }
 
   // ============================================================
@@ -675,6 +1164,14 @@ export class EditVisit implements OnInit, OnDestroy {
 
     if (this.hasInvalidTimeOrder()) {
       this.errorMessage = 'End time must be later than start time.';
+
+      return;
+    }
+
+    const timeRangeError = this.getTimeRangeError();
+
+    if (timeRangeError) {
+      this.errorMessage = timeRangeError;
 
       return;
     }
@@ -749,7 +1246,7 @@ export class EditVisit implements OnInit, OnDestroy {
   }
 
   // ============================================================
-  // EXECUTE OPERATIONS SEQUENTIALLY
+  // EXECUTE OPERATIONS
   // ============================================================
 
   private executeOperations(operations: Array<() => Observable<void>>, index: number): void {

@@ -164,9 +164,7 @@
 
         <div class="card-body">
           <div class="form-grid">
-            <!-- ==================================================
-                 AREA SEARCHABLE DROPDOWN
-            =================================================== -->
+            <!-- AREA -->
 
             <div class="form-field searchable-field">
               <label for="areaSearch"> Area </label>
@@ -213,7 +211,7 @@
                       <div class="no-results">
                         <i class="fa-solid fa-spinner fa-spin"></i>
 
-                        <span>Loading areas...</span>
+                        <span> Loading areas... </span>
                       </div>
                     } @else if (getFilteredAreas().length > 0) {
                       @for (area of getFilteredAreas(); track area.id) {
@@ -248,7 +246,7 @@
                       <div class="no-results">
                         <i class="fa-solid fa-magnifying-glass"></i>
 
-                        <span>No areas found</span>
+                        <span> No areas found </span>
                       </div>
                     }
                   </div>
@@ -256,9 +254,7 @@
               </div>
             </div>
 
-            <!-- ==================================================
-                 PRACTITIONER SEARCHABLE DROPDOWN
-            =================================================== -->
+            <!-- PRACTITIONER -->
 
             <div class="form-field searchable-field">
               <label for="practitionerSearch"> Practitioner </label>
@@ -308,7 +304,7 @@
                       <div class="no-results">
                         <i class="fa-solid fa-spinner fa-spin"></i>
 
-                        <span>Loading practitioners...</span>
+                        <span> Loading practitioners... </span>
                       </div>
                     } @else if (getFilteredPractitioners().length > 0) {
                       @for (practitioner of getFilteredPractitioners(); track practitioner.id) {
@@ -371,7 +367,7 @@
                       <div class="no-results">
                         <i class="fa-solid fa-user-slash"></i>
 
-                        <span>No practitioners found</span>
+                        <span> No practitioners found </span>
                       </div>
                     }
                   </div>
@@ -380,9 +376,7 @@
             </div>
           </div>
 
-          <!-- ======================================================
-               REASSIGNMENT INFORMATION
-          ======================================================= -->
+          <!-- REASSIGNMENT INFORMATION -->
 
           @if (hasReassignment()) {
             <div class="reassignment-box">
@@ -440,7 +434,7 @@
       </section>
 
       <!-- ========================================================
-           SCHEDULE
+           VISIT SCHEDULE
       ======================================================== -->
 
       <section class="form-card">
@@ -452,14 +446,20 @@
           <div>
             <h2>Visit Schedule</h2>
 
-            <p>Set the date and time for this visit.</p>
+            <p>Select the date and time and review the practitioner's availability.</p>
           </div>
         </div>
 
         <div class="card-body">
-          <div class="form-grid">
+          <!-- SCHEDULE FIELDS -->
+
+          <div class="schedule-fields">
             <div class="form-field">
-              <label for="scheduledDate"> Scheduled Date </label>
+              <label for="scheduledDate">
+                Scheduled Date
+
+                <span class="required">*</span>
+              </label>
 
               <div class="input-wrapper">
                 <i class="fa-solid fa-calendar"></i>
@@ -469,13 +469,18 @@
                   name="scheduledDate"
                   type="date"
                   [(ngModel)]="form.scheduledDate"
+                  (ngModelChange)="onScheduleDateChange()"
                   required
                 />
               </div>
             </div>
 
             <div class="form-field">
-              <label for="startTime"> Start Time </label>
+              <label for="startTime">
+                Start Time
+
+                <span class="required">*</span>
+              </label>
 
               <div class="input-wrapper">
                 <i class="fa-solid fa-clock"></i>
@@ -485,13 +490,18 @@
                   name="startTime"
                   type="time"
                   [(ngModel)]="form.startTime"
+                  (ngModelChange)="onTimeChange()"
                   required
                 />
               </div>
             </div>
 
             <div class="form-field">
-              <label for="endTime"> End Time </label>
+              <label for="endTime">
+                End Time
+
+                <span class="required">*</span>
+              </label>
 
               <div class="input-wrapper">
                 <i class="fa-solid fa-clock"></i>
@@ -501,24 +511,181 @@
                   name="endTime"
                   type="time"
                   [(ngModel)]="form.endTime"
+                  (ngModelChange)="onTimeChange()"
                   required
                 />
               </div>
             </div>
           </div>
 
-          <div class="schedule-info">
-            <i class="fa-solid fa-circle-info"></i>
+          <!-- TIME RANGE ERROR -->
 
-            <div>
-              <strong> Scheduling </strong>
+          @if (getTimeRangeError()) {
+            <div class="schedule-validation-error">
+              <i class="fa-solid fa-triangle-exclamation"></i>
 
-              <p>
-                You can update the schedule of this visit without changing its practitioner
-                assignment.
-              </p>
+              <span>
+                {{ getTimeRangeError() }}
+              </span>
             </div>
-          </div>
+          }
+
+          <!-- PRACTITIONER SCHEDULE -->
+
+          @if (shouldShowPractitionerSchedule()) {
+            <div class="practitioner-schedule">
+              <!-- SCHEDULE HEADER -->
+
+              <div class="practitioner-schedule-header">
+                <div class="schedule-title">
+                  <div class="schedule-title-icon">
+                    <i class="fa-solid fa-calendar-day"></i>
+                  </div>
+
+                  <div>
+                    <h3>Practitioner Schedule</h3>
+
+                    <p>
+                      {{ getSelectedPractitionerDisplay() }}
+                    </p>
+                  </div>
+                </div>
+
+                <div class="schedule-summary">
+                  <span>
+                    <strong>
+                      {{ getBookedVisitCount() }}
+                    </strong>
+
+                    booked
+                  </span>
+
+                  <span>
+                    <strong>
+                      {{ getAvailableSlotCount() }}
+                    </strong>
+
+                    available
+                  </span>
+                </div>
+              </div>
+
+              <!-- LOADING -->
+
+              @if (isLoadingSchedule) {
+                <div class="schedule-loading">
+                  <i class="fa-solid fa-spinner fa-spin"></i>
+
+                  <span> Loading practitioner schedule... </span>
+                </div>
+              }
+
+              <!-- ERROR -->
+
+              @if (!isLoadingSchedule && scheduleError) {
+                <div class="schedule-error">
+                  <i class="fa-solid fa-circle-exclamation"></i>
+
+                  <span>
+                    {{ scheduleError }}
+                  </span>
+                </div>
+              }
+
+              <!-- SCHEDULE -->
+
+              @if (!isLoadingSchedule && !scheduleError) {
+                <!-- LEGEND -->
+
+                <div class="schedule-legend">
+                  <div class="legend-item">
+                    <span class="legend-dot available-dot"></span>
+
+                    Available
+                  </div>
+
+                  <div class="legend-item">
+                    <span class="legend-dot booked-dot"></span>
+
+                    Booked
+                  </div>
+
+                  <div class="legend-item">
+                    <span class="legend-dot current-dot"></span>
+
+                    Current Visit
+                  </div>
+                </div>
+
+                <!-- SCHEDULE SLOTS -->
+
+                <div class="schedule-slots">
+                  @for (
+                    slot of getPractitionerSchedule();
+                    track slot.start + '-' + slot.end + '-' + slot.status
+                  ) {
+                    <div
+                      class="schedule-slot"
+                      [class.booked]="slot.status === 'BOOKED'"
+                      [class.available]="slot.status === 'AVAILABLE'"
+                      [class.current]="slot.status === 'CURRENT'"
+                    >
+                      <div class="schedule-time">
+                        <i class="fa-solid fa-clock"></i>
+
+                        <span>
+                          {{ formatTimeForDisplay(slot.start) }}
+                          -
+                          {{ formatTimeForDisplay(slot.end) }}
+                        </span>
+                      </div>
+
+                      <div class="schedule-slot-content">
+                        <span
+                          class="schedule-status"
+                          [class.booked-status]="slot.status === 'BOOKED'"
+                          [class.available-status]="slot.status === 'AVAILABLE'"
+                          [class.current-status]="slot.status === 'CURRENT'"
+                        >
+                          @if (slot.status === 'BOOKED') {
+                            <i class="fa-solid fa-lock"></i>
+                          } @else if (slot.status === 'CURRENT') {
+                            <i class="fa-solid fa-pen"></i>
+                          } @else {
+                            <i class="fa-solid fa-check"></i>
+                          }
+
+                          @if (slot.status === 'CURRENT') {
+                            CURRENT VISIT
+                          } @else {
+                            {{ slot.status }}
+                          }
+                        </span>
+
+                        @if (slot.status === 'BOOKED' || slot.status === 'CURRENT') {
+                          <span class="schedule-patient">
+                            {{ slot.patientName }}
+                          </span>
+                        }
+                      </div>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          } @else {
+            <div class="schedule-empty-state">
+              <div class="schedule-empty-icon">
+                <i class="fa-solid fa-calendar-plus"></i>
+              </div>
+
+              <div>
+                <strong> Practitioner schedule unavailable </strong>
+
+                <p>Select a practitioner and scheduled date to view the availability.</p>
+              </div>
+            </div>
+          }
         </div>
       </section>
 
@@ -577,7 +744,7 @@
         <button
           type="submit"
           class="btn btn-primary"
-          [disabled]="isSubmitting || !editVisitForm.valid"
+          [disabled]="isSubmitting || !editVisitForm.valid || !!getTimeRangeError()"
         >
           @if (isSubmitting) {
             <i class="fa-solid fa-spinner fa-spin"></i>

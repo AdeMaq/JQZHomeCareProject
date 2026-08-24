@@ -253,7 +253,7 @@
   resize: vertical;
 }
 
-/* Inputs without left icon */
+/* Inputs with currency prefix */
 
 .input-wrapper:has(.currency-prefix) input {
   padding-left: 54px;
@@ -624,8 +624,6 @@
   box-shadow: 0 14px 35px rgba(60, 20, 26, 0.14);
 }
 
-/* Scrollbar */
-
 .searchable-dropdown::-webkit-scrollbar {
   width: 7px;
 }
@@ -750,11 +748,11 @@
 ============================================================ */
 
 .practitioner-schedule {
-  margin-top: 22px;
+  margin-top: 24px;
   overflow: hidden;
-  border: 1px solid #f0d7da;
+  border: 1px solid #f3d9dd;
   border-radius: 16px;
-  background: #fffafb;
+  background: #fffdfd;
 }
 
 /* ============================================================
@@ -765,16 +763,16 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 18px;
-  padding: 18px 20px;
-  border-bottom: 1px solid #f4dfe1;
+  gap: 20px;
+  padding: 20px;
+  border-bottom: 1px solid #f5e3e6;
   background: #ffffff;
 }
 
 .schedule-title {
   display: flex;
   align-items: center;
-  gap: 11px;
+  gap: 12px;
   min-width: 0;
 }
 
@@ -792,28 +790,38 @@
 }
 
 .schedule-title h4 {
-  margin: 0 0 4px;
-  color: #243b53;
-  font-size: 14px;
+  margin: 0;
+  color: #102a43;
+  font-size: 16px;
   font-weight: 700;
 }
 
 .schedule-title p {
   overflow: hidden;
-  margin: 0;
-  color: #829ab1;
-  font-size: 12px;
+  margin: 4px 0 0;
+  color: #7b8794;
+  font-size: 13px;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
+/* ============================================================
+   SCHEDULE SUMMARY
+============================================================ */
+
 .schedule-summary {
   flex-shrink: 0;
   padding: 7px 11px;
+  border: 1px solid #f1d7dc;
   border-radius: 999px;
-  background: #fdebed;
-  color: #cf102d;
+  background: #fffafa;
+  color: #7b6570;
   font-size: 12px;
+  font-weight: 600;
+}
+
+.schedule-summary strong {
+  color: #cf102d;
   font-weight: 700;
 }
 
@@ -822,13 +830,14 @@
 ============================================================ */
 
 .schedule-loading {
+  min-height: 180px;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
-  padding: 28px 20px;
-  color: #627d98;
-  font-size: 13px;
+  color: #cf102d;
+  font-size: 14px;
+  font-weight: 600;
 }
 
 .schedule-loading i {
@@ -841,21 +850,59 @@
 
 .schedule-error {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 10px;
-  margin: 16px;
-  padding: 13px 15px;
-  border: 1px solid #f5c2c7;
-  border-radius: 11px;
+  margin: 20px;
+  padding: 14px 16px;
+  border: 1px solid #fecdd3;
+  border-radius: 10px;
   background: #fff1f2;
-  color: #b4232f;
+  color: #b42336;
   font-size: 13px;
-  line-height: 1.5;
 }
 
 .schedule-error i {
-  margin-top: 2px;
   flex-shrink: 0;
+}
+
+/* ============================================================
+   SCHEDULE LEGEND
+============================================================ */
+
+.schedule-legend {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 22px;
+  padding: 16px 20px;
+  border-bottom: 1px solid #f5e3e6;
+  background: #fffafa;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: #6b7280;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.legend-dot {
+  width: 9px;
+  height: 9px;
+  flex-shrink: 0;
+  border-radius: 50%;
+}
+
+.available-dot {
+  background: #4f9b6d;
+  box-shadow: 0 0 0 4px rgba(79, 155, 109, 0.1);
+}
+
+.booked-dot {
+  background: #cf102d;
+  box-shadow: 0 0 0 4px rgba(207, 16, 45, 0.08);
 }
 
 /* ============================================================
@@ -864,114 +911,145 @@
 
 .schedule-slots {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
-
-  max-height: 520px;
+  max-height: 430px;
   overflow-y: auto;
-
-  padding: 18px;
-  padding-right: 12px;
-
+  padding: 18px 20px 20px;
+  background: #ffffff;
   scrollbar-width: thin;
-  scrollbar-color: #e7a7ad transparent;
+  scrollbar-color: #e9a3ad #fff5f6;
 }
-
-/* ============================================================
-   SCHEDULE SCROLLBAR
-============================================================ */
 
 .schedule-slots::-webkit-scrollbar {
   width: 8px;
 }
 
 .schedule-slots::-webkit-scrollbar-track {
-  background: transparent;
+  border-radius: 999px;
+  background: #fff5f6;
 }
 
 .schedule-slots::-webkit-scrollbar-thumb {
-  border-radius: 10px;
-  background: #f0c4c8;
+  border-radius: 999px;
+  background: #e9a3ad;
 }
 
 .schedule-slots::-webkit-scrollbar-thumb:hover {
-  background: #e7a7ad;
+  background: #cf102d;
 }
 
+/* ============================================================
+   SCHEDULE SLOT
+============================================================ */
+
 .schedule-slot {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
   min-width: 0;
-  padding: 14px;
-  border: 1px solid #e1e8ed;
-  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 16px;
+  border: 1px solid #e8dfe2;
+  border-radius: 13px;
   background: #ffffff;
   transition:
-    transform 0.18s ease,
-    box-shadow 0.18s ease;
+    border-color 0.2s ease,
+    background 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .schedule-slot:hover {
   transform: translateY(-1px);
-  box-shadow: 0 5px 14px rgba(40, 55, 71, 0.06);
-}
-
-.schedule-slot.booked {
-  border-color: #f0c8cc;
-  background: #fff8f8;
+  box-shadow: 0 6px 16px rgba(38, 29, 32, 0.06);
 }
 
 .schedule-slot.available {
-  border-color: #d7e8df;
-  background: #fbfefc;
+  border-color: #cfe4d8;
+  background: linear-gradient(135deg, rgba(79, 155, 109, 0.07), rgba(79, 155, 109, 0.025));
 }
+
+.schedule-slot.booked {
+  border-color: rgba(207, 16, 45, 0.22);
+  background: linear-gradient(135deg, rgba(207, 16, 45, 0.06), rgba(238, 123, 125, 0.025));
+}
+
+/* ============================================================
+   SCHEDULE TIME
+============================================================ */
 
 .schedule-time {
   display: flex;
   align-items: center;
   gap: 8px;
+  min-width: 0;
   color: #334e68;
-  font-size: 12px;
-  font-weight: 600;
+  font-size: 13px;
+  font-weight: 700;
 }
 
 .schedule-time i {
-  color: #829ab1;
+  flex-shrink: 0;
+  color: #8b9bab;
+  font-size: 13px;
 }
+
+.schedule-time span {
+  white-space: nowrap;
+}
+
+/* ============================================================
+   SCHEDULE SLOT CONTENT
+============================================================ */
 
 .schedule-slot-status {
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  align-items: flex-end;
+  gap: 7px;
+  min-width: 0;
 }
+
+/* ============================================================
+   SCHEDULE STATUS
+============================================================ */
 
 .schedule-status {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  width: fit-content;
-  padding: 4px 8px;
+  gap: 6px;
+  padding: 6px 10px;
   border-radius: 999px;
   font-size: 10px;
   font-weight: 700;
-  letter-spacing: 0.4px;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+}
+
+.schedule-status i {
+  font-size: 10px;
+}
+
+.available-status {
+  background: #eaf6ee;
+  color: #397a53;
 }
 
 .booked-status {
   background: #fdebed;
-  color: #cf102d;
+  color: #b20e28;
 }
 
-.available-status {
-  background: #eaf7ee;
-  color: #27864b;
-}
+/* ============================================================
+   SCHEDULE PATIENT
+============================================================ */
 
 .schedule-patient {
+  max-width: 150px;
   overflow: hidden;
-  color: #829ab1;
-  font-size: 11px;
+  color: #6b7280;
+  font-size: 12px;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -1179,10 +1257,6 @@
   .package-summary-item:nth-last-child(-n + 2) {
     border-bottom: none;
   }
-
-  .schedule-slots {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
 }
 
 /* ============================================================
@@ -1205,6 +1279,15 @@
 
   .searchable-dropdown {
     position: absolute;
+  }
+
+  .practitioner-schedule-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .schedule-summary {
+    align-self: flex-start;
   }
 }
 
@@ -1277,15 +1360,31 @@
 
   .schedule-slots {
     grid-template-columns: 1fr;
+    max-height: 380px;
+    padding: 14px;
   }
 
-  .practitioner-schedule-header {
+  .schedule-slot {
     align-items: flex-start;
     flex-direction: column;
+    gap: 10px;
   }
 
-  .schedule-summary {
-    align-self: flex-start;
+  .schedule-slot-status {
+    width: 100%;
+    align-items: flex-start;
+  }
+
+  .schedule-patient {
+    max-width: 100%;
+  }
+
+  .schedule-time span {
+    white-space: normal;
+  }
+
+  .schedule-legend {
+    gap: 14px;
   }
 
   .time-selection-grid {
@@ -1365,6 +1464,16 @@
 
   .assignment-info {
     padding: 14px;
+  }
+
+  .schedule-summary {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .schedule-legend {
+    flex-direction: column;
+    align-items: flex-start;
   }
 
   .schedule-slots {

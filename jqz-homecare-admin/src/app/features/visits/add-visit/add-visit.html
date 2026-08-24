@@ -77,7 +77,7 @@
             </div>
 
             @if (patientName.invalid && patientName.touched) {
-              <span class="field-error">Patient name is required.</span>
+              <span class="field-error"> Patient name is required. </span>
             }
           </div>
 
@@ -104,7 +104,7 @@
             </div>
 
             @if (patientPhone.invalid && patientPhone.touched) {
-              <span class="field-error">Patient phone is required.</span>
+              <span class="field-error"> Patient phone is required. </span>
             }
           </div>
 
@@ -132,7 +132,7 @@
             </div>
 
             @if (locationAddress.invalid && locationAddress.touched) {
-              <span class="field-error">Location address is required.</span>
+              <span class="field-error"> Location address is required. </span>
             }
           </div>
         </div>
@@ -197,7 +197,7 @@
             </div>
 
             @if (packageId.invalid && packageId.touched) {
-              <span class="field-error">Please select a package.</span>
+              <span class="field-error"> Please select a package. </span>
             }
           </div>
 
@@ -206,7 +206,7 @@
           @if (selectedPackage) {
             <div class="package-summary full-width">
               <div class="package-summary-item">
-                <span class="summary-label">Service</span>
+                <span class="summary-label"> Service </span>
 
                 <strong>
                   {{ selectedPackage.serviceName }}
@@ -214,7 +214,7 @@
               </div>
 
               <div class="package-summary-item">
-                <span class="summary-label">Number of Visits</span>
+                <span class="summary-label"> Number of Visits </span>
 
                 <strong>
                   {{ selectedPackage.numberOfVisits }}
@@ -222,7 +222,7 @@
               </div>
 
               <div class="package-summary-item">
-                <span class="summary-label">Package Amount</span>
+                <span class="summary-label"> Package Amount </span>
 
                 <strong>
                   PKR
@@ -231,7 +231,7 @@
               </div>
 
               <div class="package-summary-item">
-                <span class="summary-label">Price / Visit</span>
+                <span class="summary-label"> Price / Visit </span>
 
                 <strong>
                   PKR
@@ -298,7 +298,7 @@
               </label>
 
               <div class="input-wrapper">
-                <span class="currency-prefix">PKR</span>
+                <span class="currency-prefix"> PKR </span>
 
                 <input
                   id="initialAmountPaid"
@@ -339,7 +339,7 @@
               <div class="payment-info-row">
                 <span>Payment Method</span>
 
-                <strong>Full Advance</strong>
+                <strong> Full Advance </strong>
               </div>
             }
 
@@ -427,7 +427,7 @@
                   <!-- AREA -->
 
                   <div class="form-field">
-                    <label [for]="'area-' + i">Area</label>
+                    <label [for]="'area-' + i"> Area </label>
 
                     <div class="searchable-select" (click)="$event.stopPropagation()">
                       <div class="searchable-input-wrapper">
@@ -461,13 +461,13 @@
                             <div class="dropdown-empty">
                               <i class="fa-solid fa-spinner fa-spin"></i>
 
-                              <span>Loading areas...</span>
+                              <span> Loading areas... </span>
                             </div>
                           } @else if (getFilteredAreas(i).length === 0) {
                             <div class="dropdown-empty">
                               <i class="fa-solid fa-location-dot"></i>
 
-                              <span>No areas found.</span>
+                              <span> No areas found. </span>
                             </div>
                           } @else {
                             @for (area of getFilteredAreas(i); track area.id) {
@@ -507,7 +507,7 @@
                   <!-- PRACTITIONER -->
 
                   <div class="form-field">
-                    <label [for]="'practitioner-' + i">Practitioner</label>
+                    <label [for]="'practitioner-' + i"> Practitioner </label>
 
                     <div class="searchable-select" (click)="$event.stopPropagation()">
                       <div class="searchable-input-wrapper">
@@ -541,13 +541,13 @@
                             <div class="dropdown-empty">
                               <i class="fa-solid fa-spinner fa-spin"></i>
 
-                              <span>Loading practitioners...</span>
+                              <span> Loading practitioners... </span>
                             </div>
                           } @else if (getPractitionersForAssignment(i).length === 0) {
                             <div class="dropdown-empty">
                               <i class="fa-solid fa-user-doctor"></i>
 
-                              <span>No practitioners found.</span>
+                              <span> No practitioners found. </span>
                             </div>
                           } @else {
                             @for (
@@ -595,7 +595,7 @@
                   <!-- SCHEDULED DATE -->
 
                   <div class="form-field">
-                    <label [for]="'date-' + i">Scheduled Date</label>
+                    <label [for]="'date-' + i"> Scheduled Date </label>
 
                     <div class="input-wrapper">
                       <i class="fa-solid fa-calendar"></i>
@@ -648,7 +648,7 @@
                       <div class="schedule-loading">
                         <i class="fa-solid fa-spinner fa-spin"></i>
 
-                        <span>Loading practitioner schedule...</span>
+                        <span> Loading practitioner schedule... </span>
                       </div>
                     }
 
@@ -718,7 +718,7 @@
                   <!-- START TIME -->
 
                   <div class="form-field">
-                    <label [for]="'start-time-' + i">Start Time</label>
+                    <label [for]="'start-time-' + i"> Start Time </label>
 
                     <div class="input-wrapper">
                       <i class="fa-solid fa-clock"></i>
@@ -736,7 +736,7 @@
                   <!-- END TIME -->
 
                   <div class="form-field">
-                    <label [for]="'end-time-' + i">End Time</label>
+                    <label [for]="'end-time-' + i"> End Time </label>
 
                     <div class="input-wrapper">
                       <i class="fa-solid fa-clock"></i>
@@ -790,7 +790,7 @@
             <i class="fa-solid fa-circle-info"></i>
 
             <div>
-              <strong>Visit scheduling is optional</strong>
+              <strong> Visit scheduling is optional </strong>
 
               <p>
                 You can create the package without scheduling every visit. Individual visits can be
@@ -812,7 +812,7 @@
         <i class="fa-solid fa-circle-exclamation"></i>
 
         <div>
-          <strong>Unable to create visit</strong>
+          <strong> Unable to create visit </strong>
 
           <p>
             {{ errorMessage }}
@@ -830,7 +830,7 @@
         <i class="fa-solid fa-circle-check"></i>
 
         <div>
-          <strong>Visit created successfully</strong>
+          <strong> Visit created successfully </strong>
 
           <p>
             {{ successMessage }}

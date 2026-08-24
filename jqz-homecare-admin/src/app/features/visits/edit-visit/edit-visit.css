@@ -3,10 +3,10 @@
 ============================================================ */
 
 .edit-visit-page {
+  width: 100%;
+  padding: 28px;
+  background: #fffafa;
   min-height: 100%;
-  padding: 2rem;
-  background: #fff8f8;
-  color: #102a43;
 }
 
 /* ============================================================
@@ -16,15 +16,17 @@
 .breadcrumb {
   display: flex;
   align-items: center;
-  gap: 0.65rem;
-  margin-bottom: 1.5rem;
-  font-size: 0.875rem;
-  color: #829ab1;
+  gap: 10px;
+  margin-bottom: 24px;
+
+  color: #7a6570;
+  font-size: 14px;
+  font-weight: 500;
 }
 
 .breadcrumb i {
-  font-size: 0.7rem;
-  color: #bcccdc;
+  font-size: 11px;
+  color: #b8a5ad;
 }
 
 .breadcrumb .current {
@@ -40,34 +42,30 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 1.75rem;
+
+  margin-bottom: 28px;
 }
 
 .page-header-left {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 16px;
 }
 
 .page-header-icon {
-  width: 3.25rem;
-  height: 3.25rem;
+  width: 52px;
+  height: 52px;
 
   display: flex;
   align-items: center;
   justify-content: center;
 
-  flex-shrink: 0;
+  border-radius: 14px;
 
-  border-radius: 0.85rem;
+  background: #fdebed;
+  color: #cf102d;
 
-  background: linear-gradient(135deg, #cf102d, #ee7b7d);
-
-  color: #ffffff;
-
-  font-size: 1.25rem;
-
-  box-shadow: 0 8px 20px rgba(207, 16, 45, 0.18);
+  font-size: 21px;
 }
 
 .page-header h1 {
@@ -75,17 +73,42 @@
 
   color: #102a43;
 
-  font-size: 1.75rem;
-  line-height: 1.25;
+  font-size: 28px;
   font-weight: 700;
+  line-height: 1.2;
 }
 
 .page-header p {
-  margin: 0.35rem 0 0;
+  margin: 6px 0 0;
 
-  color: #627d98;
+  color: #6b7280;
 
-  font-size: 0.9rem;
+  font-size: 14px;
+}
+
+/* ============================================================
+   LOADING CARD
+============================================================ */
+
+.loading-card {
+  min-height: 220px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+
+  background: #ffffff;
+
+  border: 1px solid #f6d2d5;
+  border-radius: 18px;
+
+  color: #cf102d;
+
+  font-size: 15px;
+  font-weight: 600;
+
+  box-shadow: 0 8px 24px rgba(207, 16, 45, 0.05);
 }
 
 /* ============================================================
@@ -95,10 +118,7 @@
 .visit-form {
   display: flex;
   flex-direction: column;
-
-  gap: 1.5rem;
-
-  max-width: 1200px;
+  gap: 24px;
 }
 
 /* ============================================================
@@ -111,34 +131,24 @@
   background: #ffffff;
 
   border: 1px solid #f6d2d5;
+  border-radius: 18px;
 
-  border-radius: 1rem;
-
-  box-shadow: 0 4px 18px rgba(207, 16, 45, 0.05);
+  box-shadow: 0 8px 24px rgba(207, 16, 45, 0.04);
 }
-
-/* ============================================================
-   CARD HEADER
-============================================================ */
 
 .card-header {
   display: flex;
   align-items: center;
+  gap: 14px;
 
-  gap: 0.9rem;
+  padding: 22px 24px;
 
-  padding: 1.25rem 1.5rem;
-
-  background: #fffafa;
-
-  border-bottom: 1px solid #f8e1e3;
-
-  border-radius: 1rem 1rem 0 0;
+  border-bottom: 1px solid #f8e4e6;
 }
 
 .card-header-icon {
-  width: 2.5rem;
-  height: 2.5rem;
+  width: 42px;
+  height: 42px;
 
   display: flex;
   align-items: center;
@@ -146,13 +156,12 @@
 
   flex-shrink: 0;
 
-  border-radius: 0.7rem;
+  border-radius: 12px;
 
   background: #fdebed;
-
   color: #cf102d;
 
-  font-size: 1rem;
+  font-size: 17px;
 }
 
 .card-header h2 {
@@ -160,29 +169,24 @@
 
   color: #102a43;
 
-  font-size: 1.05rem;
-
+  font-size: 18px;
   font-weight: 700;
 }
 
 .card-header p {
-  margin: 0.25rem 0 0;
+  margin: 4px 0 0;
 
-  color: #829ab1;
+  color: #6b7280;
 
-  font-size: 0.8rem;
+  font-size: 13px;
 }
-
-/* ============================================================
-   CARD BODY
-============================================================ */
 
 .card-body {
-  padding: 1.5rem;
+  padding: 24px;
 }
 
 /* ============================================================
-   INFORMATION GRID
+   VISIT INFORMATION
 ============================================================ */
 
 .info-grid {
@@ -190,80 +194,75 @@
 
   grid-template-columns: repeat(3, minmax(0, 1fr));
 
-  gap: 1rem;
+  gap: 18px;
 }
 
 .info-item {
   display: flex;
   flex-direction: column;
+  gap: 7px;
 
-  gap: 0.3rem;
+  padding: 16px;
 
-  min-height: 4.25rem;
+  background: #fffafa;
 
-  padding: 0.9rem 1rem;
-
-  border: 1px solid #f6d2d5;
-
-  border-radius: 0.7rem;
-
-  background: #fff8f8;
+  border: 1px solid #f8e4e6;
+  border-radius: 12px;
 }
 
 .info-label {
-  color: #829ab1;
+  color: #8b7480;
 
-  font-size: 0.72rem;
+  font-size: 12px;
+  font-weight: 600;
 
-  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .info-item strong {
   color: #102a43;
 
-  font-size: 0.875rem;
+  font-size: 15px;
+  font-weight: 600;
 }
 
 /* ============================================================
-   STATUS BADGE
+   STATUS BADGES
 ============================================================ */
 
 .status-badge {
+  width: fit-content;
+
   display: inline-flex;
   align-items: center;
 
-  width: fit-content;
-
-  padding: 0.3rem 0.65rem;
+  padding: 6px 10px;
 
   border-radius: 999px;
 
-  font-size: 0.7rem;
+  font-size: 12px;
   font-weight: 700;
-
-  background: #f7f9fa;
-
-  color: #486581;
 }
 
 .status-badge.scheduled {
-  background: #fdebed;
-  color: #cf102d;
+  color: #a16207;
+  background: #fff7d6;
 }
 
 .status-badge.accepted {
-  background: #fff4df;
-  color: #a15c00;
+  color: #1d4ed8;
+  background: #eaf2ff;
 }
 
 .status-badge.completed {
-  background: #f1faf3;
-  color: #28713b;
+  color: #15803d;
+  background: #eaf8ef;
 }
 
 .status-badge.cancelled {
-  background: #fff1f2;
-  color: #a61b2b;
+  color: #b91c1c;
+  background: #fdebec;
 }
 
 /* ============================================================
@@ -275,25 +274,22 @@
 
   grid-template-columns: repeat(2, minmax(0, 1fr));
 
-  gap: 1.25rem 1.5rem;
+  gap: 20px;
 }
-
-/* ============================================================
-   FORM FIELD
-============================================================ */
 
 .form-field {
   display: flex;
   flex-direction: column;
 
-  gap: 0.45rem;
+  gap: 8px;
+
+  min-width: 0;
 }
 
 .form-field label {
-  color: #243b53;
+  color: #334e68;
 
-  font-size: 0.85rem;
-
+  font-size: 13px;
   font-weight: 600;
 }
 
@@ -302,13 +298,78 @@
 }
 
 /* ============================================================
+   INPUT WRAPPER
+============================================================ */
+
+.input-wrapper {
+  position: relative;
+
+  display: flex;
+  align-items: center;
+}
+
+.input-wrapper > i {
+  position: absolute;
+  left: 14px;
+
+  color: #9aa5b1;
+
+  font-size: 14px;
+
+  pointer-events: none;
+}
+
+.input-wrapper input,
+.input-wrapper select,
+.input-wrapper textarea {
+  width: 100%;
+
+  border: 1px solid #e8d8dc;
+  border-radius: 10px;
+
+  background: #ffffff;
+
+  color: #102a43;
+
+  font-family: inherit;
+  font-size: 14px;
+
+  outline: none;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.input-wrapper input,
+.input-wrapper select {
+  height: 46px;
+
+  padding: 0 14px 0 42px;
+}
+
+.input-wrapper textarea {
+  min-height: 92px;
+
+  padding: 12px 14px 12px 42px;
+
+  resize: vertical;
+}
+
+.input-wrapper input:focus,
+.input-wrapper select:focus,
+.input-wrapper textarea:focus {
+  border-color: #cf102d;
+
+  box-shadow: 0 0 0 3px rgba(207, 16, 45, 0.08);
+}
+
+/* ============================================================
    SEARCHABLE SELECT
 ============================================================ */
 
 .searchable-field {
   position: relative;
-
-  z-index: 10;
 }
 
 .searchable-select {
@@ -323,71 +384,68 @@
   display: flex;
   align-items: center;
 
-  width: 100%;
+  height: 46px;
+
+  border: 1px solid #e8d8dc;
+  border-radius: 10px;
+
+  background: #ffffff;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
-.searchable-input > i:first-child {
+.searchable-input.open {
+  border-color: #cf102d;
+
+  box-shadow: 0 0 0 3px rgba(207, 16, 45, 0.08);
+}
+
+.searchable-input > i {
   position: absolute;
+  left: 14px;
 
-  left: 0.95rem;
+  color: #9aa5b1;
 
-  z-index: 2;
-
-  color: #9fb3c8;
-
-  font-size: 0.85rem;
+  font-size: 14px;
 
   pointer-events: none;
 }
 
 .searchable-input input {
   width: 100%;
-  height: 2.8rem;
+  height: 100%;
 
-  box-sizing: border-box;
+  padding: 0 76px 0 42px;
 
-  padding: 0 5.5rem 0 2.7rem;
+  border: none;
+  outline: none;
 
-  border: 1px solid #d9e2ec;
-
-  border-radius: 0.65rem;
-
-  background: #ffffff;
+  background: transparent;
 
   color: #102a43;
 
   font-family: inherit;
-
-  font-size: 0.875rem;
-
-  outline: none;
-
-  transition:
-    border-color 0.2s ease,
-    box-shadow 0.2s ease,
-    background-color 0.2s ease;
+  font-size: 14px;
 }
 
 .searchable-input input::placeholder {
-  color: #9fb3c8;
-}
-
-.searchable-input.open input,
-.searchable-input input:focus {
-  border-color: #cf102d;
-
-  background: #fffdfd;
-
-  box-shadow: 0 0 0 3px rgba(207, 16, 45, 0.08);
+  color: #a8a1a5;
 }
 
 /* ============================================================
    DROPDOWN BUTTONS
 ============================================================ */
 
-.dropdown-toggle,
-.clear-selection-btn {
+.clear-selection-btn,
+.dropdown-toggle {
   position: absolute;
+
+  top: 50%;
+
+  width: 32px;
+  height: 32px;
 
   display: flex;
   align-items: center;
@@ -397,47 +455,32 @@
 
   background: transparent;
 
-  color: #829ab1;
+  color: #8b7480;
 
   cursor: pointer;
 
-  z-index: 3;
+  transform: translateY(-50%);
+
+  transition:
+    color 0.2s ease,
+    background 0.2s ease;
 }
 
 .clear-selection-btn {
-  right: 2.7rem;
-
-  width: 1.8rem;
-  height: 1.8rem;
-
-  border-radius: 50%;
-
-  font-size: 0.75rem;
-}
-
-.clear-selection-btn:hover {
-  background: #fdebed;
-
-  color: #cf102d;
+  right: 38px;
 }
 
 .dropdown-toggle {
-  right: 0.45rem;
-
-  width: 2.2rem;
-  height: 2.2rem;
-
-  border-radius: 0.5rem;
+  right: 4px;
 }
 
+.clear-selection-btn:hover,
 .dropdown-toggle:hover {
-  background: #fff1f2;
-
   color: #cf102d;
 }
 
 .dropdown-toggle i {
-  font-size: 0.75rem;
+  font-size: 12px;
 
   transition: transform 0.2s ease;
 }
@@ -453,45 +496,25 @@
 .searchable-dropdown {
   position: absolute;
 
-  top: calc(100% + 0.45rem);
-
+  top: calc(100% + 6px);
   left: 0;
   right: 0;
 
   z-index: 100;
 
-  max-height: 18rem;
+  max-height: 290px;
 
   overflow-y: auto;
 
-  padding: 0.45rem;
-
-  border: 1px solid #f6d2d5;
-
-  border-radius: 0.75rem;
+  padding: 6px;
 
   background: #ffffff;
 
-  box-shadow: 0 12px 30px rgba(16, 42, 67, 0.14);
+  border: 1px solid #f1d9dd;
+  border-radius: 12px;
+
+  box-shadow: 0 14px 30px rgba(102, 51, 61, 0.14);
 }
-
-.searchable-dropdown::-webkit-scrollbar {
-  width: 6px;
-}
-
-.searchable-dropdown::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.searchable-dropdown::-webkit-scrollbar-thumb {
-  border-radius: 10px;
-
-  background: #f1b5bc;
-}
-
-/* ============================================================
-   DROPDOWN OPTION
-============================================================ */
 
 .searchable-option {
   width: 100%;
@@ -500,31 +523,24 @@
   align-items: center;
   justify-content: space-between;
 
-  gap: 0.75rem;
+  gap: 14px;
 
-  padding: 0.75rem;
+  padding: 11px 12px;
 
   border: none;
-
-  border-radius: 0.6rem;
+  border-radius: 9px;
 
   background: transparent;
 
-  color: #102a43;
-
   text-align: left;
-
-  font-family: inherit;
 
   cursor: pointer;
 
-  transition:
-    background-color 0.18s ease,
-    color 0.18s ease;
+  transition: background 0.2s ease;
 }
 
 .searchable-option:hover {
-  background: #fff3f4;
+  background: #fff4f5;
 }
 
 .searchable-option.selected {
@@ -535,100 +551,81 @@
   display: flex;
   align-items: center;
 
-  min-width: 0;
+  gap: 11px;
 
-  gap: 0.75rem;
+  min-width: 0;
 }
 
 .option-main > i {
-  width: 1.8rem;
-  height: 1.8rem;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  flex-shrink: 0;
-
-  border-radius: 0.5rem;
-
-  background: #fff1f2;
-
   color: #cf102d;
-
-  font-size: 0.75rem;
 }
 
 .option-text {
   display: flex;
   flex-direction: column;
 
-  min-width: 0;
+  gap: 3px;
 
-  gap: 0.18rem;
+  min-width: 0;
 }
 
 .option-title {
-  overflow: hidden;
+  color: #102a43;
 
-  color: #243b53;
-
-  font-size: 0.82rem;
-
+  font-size: 14px;
   font-weight: 600;
-
-  text-overflow: ellipsis;
-
-  white-space: nowrap;
 }
 
 .option-subtitle {
-  overflow: hidden;
+  color: #7b8794;
 
-  color: #829ab1;
-
-  font-size: 0.72rem;
-
-  text-overflow: ellipsis;
-
-  white-space: nowrap;
+  font-size: 12px;
 }
 
 .option-meta {
+  color: #8b7480;
+
+  font-size: 11px;
+
   overflow: hidden;
 
-  color: #9fb3c8;
-
-  font-size: 0.67rem;
-
   text-overflow: ellipsis;
-
   white-space: nowrap;
 }
 
-.meta-separator {
-  margin: 0 0.25rem;
+.option-check {
+  color: #cf102d;
 }
 
-.option-check {
-  flex-shrink: 0;
+.no-results {
+  min-height: 90px;
 
-  color: #cf102d;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-  font-size: 0.8rem;
+  gap: 10px;
+
+  color: #7b8794;
+
+  font-size: 13px;
 }
 
 /* ============================================================
-   PRACTITIONER OPTION
+   PRACTITIONER DROPDOWN
 ============================================================ */
+
+.practitioner-dropdown {
+  max-height: 340px;
+}
 
 .practitioner-option {
   align-items: flex-start;
 }
 
 .practitioner-avatar {
-  width: 1.9rem;
-  height: 1.9rem;
+  width: 38px;
+  height: 38px;
 
   display: flex;
   align-items: center;
@@ -636,190 +633,39 @@
 
   flex-shrink: 0;
 
-  border-radius: 50%;
+  border-radius: 10px;
 
   background: #fdebed;
-
   color: #cf102d;
-
-  font-size: 0.75rem;
 }
 
 .practitioner-name-row {
   display: flex;
   align-items: center;
-
   flex-wrap: wrap;
 
-  gap: 0.45rem;
+  gap: 7px;
 }
-
-/* ============================================================
-   ASSIGNED TO AREA INDICATOR
-============================================================ */
 
 .assigned-badge {
   display: inline-flex;
   align-items: center;
 
-  gap: 0.25rem;
+  gap: 5px;
 
-  padding: 0.18rem 0.45rem;
-
-  border: 1px solid #f1b5bc;
+  padding: 4px 7px;
 
   border-radius: 999px;
 
-  background: #fff1f2;
+  background: #fff4d9;
+  color: #a16207;
 
-  color: #cf102d;
-
-  font-size: 0.62rem;
-
+  font-size: 10px;
   font-weight: 700;
-
-  white-space: nowrap;
 }
 
 .assigned-badge i {
-  font-size: 0.55rem;
-}
-
-/* ============================================================
-   NO RESULTS
-============================================================ */
-
-.no-results {
-  min-height: 6rem;
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-
-  gap: 0.5rem;
-
-  color: #829ab1;
-
-  font-size: 0.78rem;
-}
-
-.no-results i {
-  color: #cf102d;
-
-  font-size: 1.1rem;
-}
-
-/* ============================================================
-   STANDARD INPUT WRAPPER
-============================================================ */
-
-.input-wrapper {
-  position: relative;
-
-  display: flex;
-  align-items: center;
-}
-
-.input-wrapper > i {
-  position: absolute;
-
-  left: 0.95rem;
-
-  z-index: 1;
-
-  color: #9fb3c8;
-
-  font-size: 0.85rem;
-
-  pointer-events: none;
-}
-
-.input-wrapper input,
-.input-wrapper select,
-.input-wrapper textarea {
-  width: 100%;
-
-  box-sizing: border-box;
-
-  border: 1px solid #d9e2ec;
-
-  border-radius: 0.65rem;
-
-  background: #ffffff;
-
-  color: #102a43;
-
-  font-family: inherit;
-
-  font-size: 0.875rem;
-
-  outline: none;
-
-  transition:
-    border-color 0.2s ease,
-    box-shadow 0.2s ease,
-    background-color 0.2s ease;
-}
-
-.input-wrapper input,
-.input-wrapper select {
-  height: 2.8rem;
-
-  padding: 0 0.9rem 0 2.7rem;
-}
-
-.input-wrapper textarea {
-  min-height: 6rem;
-
-  padding: 0.8rem 0.9rem 0.8rem 2.7rem;
-
-  resize: vertical;
-}
-
-.input-wrapper input::placeholder,
-.input-wrapper textarea::placeholder {
-  color: #9fb3c8;
-}
-
-/* ============================================================
-   SELECT
-============================================================ */
-
-.input-wrapper select {
-  appearance: none;
-
-  cursor: pointer;
-
-  padding-right: 2.5rem;
-
-  background-image:
-    linear-gradient(45deg, transparent 50%, #829ab1 50%),
-    linear-gradient(135deg, #829ab1 50%, transparent 50%);
-
-  background-position:
-    calc(100% - 17px) 50%,
-    calc(100% - 12px) 50%;
-
-  background-size:
-    5px 5px,
-    5px 5px;
-
-  background-repeat: no-repeat;
-}
-
-/* ============================================================
-   INPUT FOCUS
-============================================================ */
-
-.input-wrapper input:focus,
-.input-wrapper select:focus,
-.input-wrapper textarea:focus {
-  border-color: #cf102d;
-
-  box-shadow: 0 0 0 3px rgba(207, 16, 45, 0.08);
-
-  background: #fffdfd;
+  font-size: 9px;
 }
 
 /* ============================================================
@@ -827,170 +673,633 @@
 ============================================================ */
 
 .reassignment-box {
-  margin-top: 1.25rem;
+  margin-top: 22px;
 
-  padding: 1rem;
+  padding: 20px;
+
+  background: #fff5f6;
 
   border: 1px solid #f6d2d5;
-
-  border-radius: 0.75rem;
-
-  background: #fff8f8;
+  border-radius: 14px;
 }
 
 .reassignment-title {
   display: flex;
   align-items: center;
 
-  gap: 0.55rem;
+  gap: 9px;
 
-  margin-bottom: 0.35rem;
-
-  color: #102a43;
-
-  font-size: 0.85rem;
-}
-
-.reassignment-title i {
   color: #cf102d;
+
+  font-size: 14px;
 }
 
 .reassignment-box > p {
-  margin: 0 0 1rem;
+  margin: 8px 0 18px;
 
-  color: #627d98;
+  color: #7b6570;
 
-  font-size: 0.75rem;
-
-  line-height: 1.45;
+  font-size: 13px;
 }
 
 /* ============================================================
-   SCHEDULE INFORMATION
+   VISIT SCHEDULE FIELDS
 ============================================================ */
 
-.schedule-info {
+.schedule-fields {
+  display: grid;
+
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+
+  gap: 18px;
+}
+
+/* ============================================================
+   SCHEDULE VALIDATION ERROR
+============================================================ */
+
+.schedule-validation-error {
   display: flex;
   align-items: flex-start;
 
-  gap: 0.75rem;
+  gap: 10px;
 
-  margin-top: 1.25rem;
+  margin-top: 18px;
+  padding: 13px 15px;
 
-  padding: 1rem;
+  background: #fff1f2;
 
-  border: 1px solid #f6d2d5;
+  border: 1px solid #fecdd3;
+  border-radius: 10px;
 
-  border-radius: 0.7rem;
+  color: #b42336;
 
-  background: #fff8f8;
-
-  color: #486581;
+  font-size: 13px;
+  line-height: 1.5;
 }
 
-.schedule-info > i {
-  margin-top: 0.1rem;
+.schedule-validation-error i {
+  margin-top: 2px;
 
   color: #cf102d;
 }
 
-.schedule-info strong {
-  display: block;
+/* ============================================================
+   PRACTITIONER SCHEDULE
+============================================================ */
 
-  margin-bottom: 0.2rem;
+.practitioner-schedule {
+  margin-top: 24px;
 
-  color: #102a43;
+  overflow: hidden;
 
-  font-size: 0.8rem;
-}
+  border: 1px solid #f3d9dd;
+  border-radius: 16px;
 
-.schedule-info p {
-  margin: 0;
-
-  font-size: 0.75rem;
-
-  line-height: 1.45;
+  background: #fffdfd;
 }
 
 /* ============================================================
-   LOADING CARD
+   SCHEDULE HEADER
 ============================================================ */
 
-.loading-card {
+.practitioner-schedule-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  padding: 20px;
+
+  border-bottom: 1px solid #f5e3e6;
+}
+
+.schedule-title {
+  display: flex;
+  align-items: center;
+
+  gap: 12px;
+}
+
+.schedule-title-icon {
+  width: 40px;
+  height: 40px;
+
   display: flex;
   align-items: center;
   justify-content: center;
 
-  gap: 0.7rem;
+  border-radius: 11px;
 
-  min-height: 10rem;
+  background: #fdebed;
+  color: #cf102d;
 
-  max-width: 1200px;
-
-  border: 1px solid #f6d2d5;
-
-  border-radius: 1rem;
-
-  background: #ffffff;
-
-  color: #627d98;
-
-  font-size: 0.85rem;
+  font-size: 16px;
 }
 
-.loading-card i {
-  color: #cf102d;
+.schedule-title h3 {
+  margin: 0;
+
+  color: #102a43;
+
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.schedule-title p {
+  margin: 4px 0 0;
+
+  color: #7b8794;
+
+  font-size: 13px;
 }
 
 /* ============================================================
-   FORM ALERT
+   SCHEDULE SUMMARY
+============================================================ */
+
+.schedule-summary {
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+
+  flex-shrink: 0;
+}
+
+.schedule-summary span {
+  display: inline-flex;
+  align-items: center;
+
+  gap: 4px;
+
+  padding: 7px 11px;
+
+  border: 1px solid #f1d7dc;
+  border-radius: 999px;
+
+  background: #fffafa;
+
+  color: #7b6570;
+
+  font-size: 12px;
+}
+
+.schedule-summary strong {
+  color: #cf102d;
+
+  font-weight: 700;
+}
+
+/* ============================================================
+   SCHEDULE LOADING
+============================================================ */
+
+.schedule-loading {
+  min-height: 180px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 10px;
+
+  color: #cf102d;
+
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* ============================================================
+   SCHEDULE ERROR
+============================================================ */
+
+.schedule-error {
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+
+  margin: 20px;
+  padding: 14px 16px;
+
+  background: #fff1f2;
+
+  border: 1px solid #fecdd3;
+  border-radius: 10px;
+
+  color: #b42336;
+
+  font-size: 13px;
+}
+
+/* ============================================================
+   SCHEDULE LEGEND
+============================================================ */
+
+.schedule-legend {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+
+  gap: 22px;
+
+  padding: 16px 20px;
+
+  border-bottom: 1px solid #f5e3e6;
+
+  background: #fffafa;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+
+  gap: 7px;
+
+  color: #6b7280;
+
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.legend-dot {
+  width: 9px;
+  height: 9px;
+
+  flex-shrink: 0;
+
+  border-radius: 50%;
+}
+
+/* AVAILABLE LEGEND */
+
+.available-dot {
+  background: #4f9b6d;
+
+  box-shadow: 0 0 0 4px rgba(79, 155, 109, 0.1);
+}
+
+/* BOOKED LEGEND */
+
+.booked-dot {
+  background: #cf102d;
+
+  box-shadow: 0 0 0 4px rgba(207, 16, 45, 0.08);
+}
+
+/* CURRENT VISIT LEGEND */
+
+.current-dot {
+  background: #cf102d;
+
+  box-shadow: 0 0 0 4px rgba(207, 16, 45, 0.14);
+}
+
+/* ============================================================
+   SCHEDULE SLOTS
+============================================================ */
+
+.schedule-slots {
+  display: grid;
+
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  gap: 12px;
+
+  max-height: 430px;
+
+  overflow-y: auto;
+
+  padding: 18px 20px 20px;
+
+  background: #ffffff;
+}
+
+/* ============================================================
+   CUSTOM SCHEDULE SCROLLBAR
+============================================================ */
+
+.schedule-slots::-webkit-scrollbar {
+  width: 8px;
+}
+
+.schedule-slots::-webkit-scrollbar-track {
+  background: #fff5f6;
+
+  border-radius: 999px;
+}
+
+.schedule-slots::-webkit-scrollbar-thumb {
+  background: #e9a3ad;
+
+  border-radius: 999px;
+}
+
+.schedule-slots::-webkit-scrollbar-thumb:hover {
+  background: #cf102d;
+}
+
+/* ============================================================
+   SCHEDULE SLOT
+============================================================ */
+
+.schedule-slot {
+  min-width: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 14px;
+
+  padding: 16px;
+
+  border: 1px solid #e8dfe2;
+  border-radius: 13px;
+
+  background: #ffffff;
+
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.schedule-slot:hover {
+  transform: translateY(-1px);
+
+  box-shadow: 0 6px 16px rgba(38, 29, 32, 0.06);
+}
+
+/* ============================================================
+   AVAILABLE SLOT
+============================================================ */
+
+.schedule-slot.available {
+  border-color: #cfe4d8;
+
+  background: linear-gradient(135deg, rgba(79, 155, 109, 0.07), rgba(79, 155, 109, 0.025));
+}
+
+/* ============================================================
+   BOOKED SLOT
+============================================================ */
+
+.schedule-slot.booked {
+  border-color: rgba(207, 16, 45, 0.22);
+
+  background: linear-gradient(135deg, rgba(207, 16, 45, 0.06), rgba(238, 123, 125, 0.025));
+}
+
+/* ============================================================
+   CURRENT VISIT SLOT
+============================================================ */
+
+.schedule-slot.current {
+  border-color: rgba(207, 16, 45, 0.42);
+
+  background: linear-gradient(135deg, rgba(207, 16, 45, 0.12), rgba(238, 123, 125, 0.06));
+
+  box-shadow:
+    inset 3px 0 0 #cf102d,
+    0 4px 14px rgba(207, 16, 45, 0.09);
+}
+
+/* ============================================================
+   SCHEDULE TIME
+============================================================ */
+
+.schedule-time {
+  display: flex;
+  align-items: center;
+
+  gap: 8px;
+
+  min-width: 0;
+
+  color: #334e68;
+
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.schedule-time i {
+  flex-shrink: 0;
+
+  color: #8b9bab;
+
+  font-size: 13px;
+}
+
+.schedule-time span {
+  white-space: nowrap;
+}
+
+/* ============================================================
+   SCHEDULE SLOT CONTENT
+============================================================ */
+
+.schedule-slot-content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+
+  gap: 7px;
+
+  min-width: 0;
+}
+
+/* ============================================================
+   SCHEDULE STATUS
+============================================================ */
+
+.schedule-status {
+  display: inline-flex;
+  align-items: center;
+
+  gap: 6px;
+
+  padding: 6px 10px;
+
+  border-radius: 999px;
+
+  font-size: 10px;
+  font-weight: 700;
+
+  letter-spacing: 0.3px;
+
+  white-space: nowrap;
+}
+
+.schedule-status i {
+  font-size: 10px;
+}
+
+/* ============================================================
+   AVAILABLE STATUS
+============================================================ */
+
+.available-status {
+  background: #eaf6ee;
+
+  color: #397a53;
+}
+
+/* ============================================================
+   BOOKED STATUS
+============================================================ */
+
+.booked-status {
+  background: #fdebed;
+
+  color: #b20e28;
+}
+
+/* ============================================================
+   CURRENT VISIT STATUS
+============================================================ */
+
+.current-status {
+  color: #a70d25;
+
+  background: rgba(207, 16, 45, 0.13);
+
+  border: 1px solid rgba(207, 16, 45, 0.18);
+}
+
+/* ============================================================
+   SCHEDULE PATIENT
+============================================================ */
+
+.schedule-patient {
+  max-width: 150px;
+
+  overflow: hidden;
+
+  color: #6b7280;
+
+  font-size: 12px;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* CURRENT VISIT PATIENT */
+
+.schedule-slot.current .schedule-patient {
+  color: #a70d25;
+
+  font-weight: 600;
+}
+
+/* ============================================================
+   EMPTY SCHEDULE STATE
+============================================================ */
+
+.schedule-empty-state {
+  display: flex;
+  align-items: center;
+
+  gap: 15px;
+
+  padding: 28px;
+
+  border: 1px dashed #edcbd0;
+  border-radius: 14px;
+
+  background: #fffafa;
+}
+
+.schedule-empty-icon {
+  width: 48px;
+  height: 48px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  border-radius: 12px;
+
+  background: #fdebed;
+
+  color: #cf102d;
+
+  font-size: 18px;
+}
+
+.schedule-empty-state strong {
+  display: block;
+
+  margin-bottom: 5px;
+
+  color: #334e68;
+
+  font-size: 14px;
+}
+
+.schedule-empty-state p {
+  margin: 0;
+
+  color: #7b8794;
+
+  font-size: 13px;
+}
+
+/* ============================================================
+   ALERTS
 ============================================================ */
 
 .form-alert {
   display: flex;
   align-items: flex-start;
 
-  gap: 0.8rem;
+  gap: 12px;
 
-  padding: 1rem;
+  padding: 16px 18px;
 
-  border-radius: 0.75rem;
-
-  font-size: 0.8rem;
+  border-radius: 12px;
 }
 
-.form-alert > i {
-  margin-top: 0.1rem;
+.form-alert i {
+  margin-top: 2px;
 
-  font-size: 1rem;
+  font-size: 18px;
 }
 
 .form-alert strong {
   display: block;
 
-  margin-bottom: 0.25rem;
+  margin-bottom: 4px;
+
+  font-size: 14px;
 }
 
 .form-alert p {
   margin: 0;
 
-  line-height: 1.45;
+  font-size: 13px;
+  line-height: 1.5;
 }
 
 .form-alert.error {
-  border: 1px solid #f2b8bf;
-
   background: #fff1f2;
 
-  color: #a61b2b;
+  border: 1px solid #fecdd3;
+
+  color: #b42336;
 }
 
 .form-alert.success {
-  border: 1px solid #b7dfc1;
+  background: #effaf2;
 
-  background: #f1faf3;
+  border: 1px solid #cdebd7;
 
-  color: #28713b;
+  color: #237a45;
 }
 
 /* ============================================================
@@ -999,59 +1308,53 @@
 
 .form-footer {
   display: flex;
-  align-items: center;
   justify-content: flex-end;
 
-  gap: 0.75rem;
+  gap: 12px;
 
-  padding: 0.25rem 0 1rem;
+  padding-top: 4px;
 }
 
-/* ============================================================
-   BUTTONS
-============================================================ */
-
 .btn {
-  min-height: 2.75rem;
+  min-height: 46px;
 
   display: inline-flex;
   align-items: center;
   justify-content: center;
 
-  gap: 0.5rem;
+  gap: 9px;
 
-  padding: 0 1.25rem;
+  padding: 0 20px;
 
-  border: none;
-
-  border-radius: 0.65rem;
+  border-radius: 11px;
 
   font-family: inherit;
-
-  font-size: 0.85rem;
-
+  font-size: 14px;
   font-weight: 600;
 
   cursor: pointer;
 
   transition:
-    background-color 0.2s ease,
+    transform 0.2s ease,
     box-shadow 0.2s ease,
-    transform 0.15s ease;
+    background 0.2s ease,
+    border-color 0.2s ease;
 }
 
 .btn:disabled {
   opacity: 0.6;
 
   cursor: not-allowed;
+
+  transform: none;
+
+  box-shadow: none;
 }
 
-.btn:not(:disabled):active {
-  transform: translateY(1px);
-}
+/* SECONDARY BUTTON */
 
 .btn-secondary {
-  border: 1px solid #d9e2ec;
+  border: 1px solid #d9dde3;
 
   background: #ffffff;
 
@@ -1059,76 +1362,168 @@
 }
 
 .btn-secondary:hover:not(:disabled) {
-  background: #f7f9fa;
+  border-color: #b9c1ca;
 
-  border-color: #bcccdc;
-
-  color: #243b53;
+  background: #f8fafc;
 }
 
+/* PRIMARY BUTTON */
+
 .btn-primary {
+  border: 1px solid #cf102d;
+
   background: #cf102d;
 
   color: #ffffff;
 
-  box-shadow: 0 5px 14px rgba(207, 16, 45, 0.18);
+  box-shadow: 0 6px 16px rgba(207, 16, 45, 0.18);
 }
 
 .btn-primary:hover:not(:disabled) {
   background: #b80e28;
 
-  box-shadow: 0 7px 18px rgba(207, 16, 45, 0.24);
+  border-color: #b80e28;
+
+  transform: translateY(-1px);
+
+  box-shadow: 0 8px 20px rgba(207, 16, 45, 0.24);
 }
 
 /* ============================================================
-   RESPONSIVE
+   RESPONSIVE - LARGE TABLET
 ============================================================ */
 
-@media (max-width: 900px) {
-  .edit-visit-page {
-    padding: 1.5rem;
-  }
-
+@media (max-width: 1100px) {
   .info-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
+  .schedule-slots {
+    grid-template-columns: 1fr;
+  }
 }
 
-@media (max-width: 700px) {
+/* ============================================================
+   RESPONSIVE - TABLET
+============================================================ */
+
+@media (max-width: 850px) {
   .edit-visit-page {
-    padding: 1rem;
+    padding: 22px;
   }
 
-  .page-header h1 {
-    font-size: 1.4rem;
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .schedule-fields {
+    grid-template-columns: 1fr;
+  }
+
+  .practitioner-schedule-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .schedule-summary {
+    width: 100%;
+
+    flex-wrap: wrap;
+  }
+}
+
+/* ============================================================
+   RESPONSIVE - MOBILE
+============================================================ */
+
+@media (max-width: 640px) {
+  .edit-visit-page {
+    padding: 16px;
+  }
+
+  .breadcrumb {
+    margin-bottom: 18px;
+
+    font-size: 13px;
+  }
+
+  .page-header {
+    margin-bottom: 22px;
+  }
+
+  .page-header-left {
+    align-items: flex-start;
   }
 
   .page-header-icon {
-    width: 2.8rem;
-    height: 2.8rem;
+    width: 46px;
+    height: 46px;
+
+    border-radius: 12px;
+
+    font-size: 18px;
   }
 
-  .card-header {
-    padding: 1rem;
+  .page-header h1 {
+    font-size: 23px;
   }
 
+  .page-header p {
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  .card-header,
   .card-body {
-    padding: 1rem;
+    padding: 18px;
   }
 
-  .form-grid,
   .info-grid {
     grid-template-columns: 1fr;
   }
 
-  .searchable-dropdown {
-    max-height: 15rem;
+  .schedule-legend {
+    gap: 14px;
+  }
+
+  .schedule-slots {
+    grid-template-columns: 1fr;
+
+    max-height: 380px;
+
+    padding: 14px;
+  }
+
+  .schedule-slot {
+    align-items: flex-start;
+
+    flex-direction: column;
+
+    gap: 10px;
+  }
+
+  .schedule-slot-content {
+    width: 100%;
+
+    align-items: flex-start;
+  }
+
+  .schedule-patient {
+    max-width: 100%;
+  }
+
+  .schedule-time span {
+    white-space: normal;
+  }
+
+  .schedule-empty-state {
+    align-items: flex-start;
+
+    padding: 20px;
   }
 
   .form-footer {
     flex-direction: column-reverse;
-
-    align-items: stretch;
   }
 
   .btn {
@@ -1136,28 +1531,33 @@
   }
 }
 
-@media (max-width: 480px) {
-  .breadcrumb {
-    margin-bottom: 1rem;
+/* ============================================================
+   RESPONSIVE - SMALL MOBILE
+============================================================ */
+
+@media (max-width: 420px) {
+  .schedule-summary {
+    flex-direction: column;
+    align-items: stretch;
   }
 
-  .page-header {
-    margin-bottom: 1.25rem;
+  .schedule-summary span {
+    justify-content: center;
   }
 
-  .page-header-left {
+  .schedule-legend {
+    flex-direction: column;
     align-items: flex-start;
   }
 
-  .page-header p {
-    font-size: 0.8rem;
+  .card-header-icon {
+    width: 38px;
+    height: 38px;
+
+    font-size: 15px;
   }
 
-  .assigned-badge {
-    font-size: 0.58rem;
-  }
-
-  .option-meta {
-    font-size: 0.62rem;
+  .card-header h2 {
+    font-size: 16px;
   }
 }

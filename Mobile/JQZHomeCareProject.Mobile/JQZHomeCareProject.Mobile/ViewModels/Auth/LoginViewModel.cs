@@ -1,7 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using JQZHomeCareProject.Mobile.Helpers;
 using JQZHomeCareProject.Mobile.Models.Auth;
+using JQZHomeCareProject.Mobile.Models.Common;
 using JQZHomeCareProject.Mobile.Services.Api;
 using JQZHomeCareProject.Mobile.Services.Auth;
 using JQZHomeCareProject.Mobile.Services.Navigation;
@@ -47,8 +47,7 @@ namespace JQZHomeCareProject.Mobile.ViewModels.Auth
                     Password = Password
                 });
 
-                if (!string.Equals(result.Role, Constants.PractitionerRole, StringComparison.OrdinalIgnoreCase)
-                    || string.IsNullOrWhiteSpace(result.PractitionerId))
+                if (result.Role != UserRole.Practitioner || result.PractitionerId is null)
                 {
                     ErrorMessage = "This account is not a practitioner account.";
                     return;

@@ -1,10 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace JQZHomeCareProject.Mobile.Models.Common
+﻿namespace JQZHomeCareProject.Mobile.Models.Common
 {
-   public enum VisitStatus
+    public enum UserRole
+    {
+        SuperAdmin,
+        MiddlePowerAdmin,
+        SimpleAdmin,
+        Practitioner
+    }
+
+    public enum VisitStatus
     {
         Scheduled,
         Accepted,
@@ -12,21 +16,21 @@ namespace JQZHomeCareProject.Mobile.Models.Common
         Cancelled
     }
 
-    public enum CollectionStatus
+    public enum RefusedBy
     {
-        Pending,
-        Received
+        Patient,
+        Practitioner
     }
 
-    public enum ReceivedBy
+    public enum ReceivedByType
     {
         Practitioner,
         Company
     }
 
-    public enum RefusedBy
+    public enum CollectionStatus
     {
-        Patient,
-        Practitioner
+        Pending,
+        Received
     }
 }

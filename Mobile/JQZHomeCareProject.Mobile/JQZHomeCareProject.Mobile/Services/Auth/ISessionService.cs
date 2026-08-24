@@ -1,11 +1,14 @@
-﻿namespace JQZHomeCareProject.Mobile.Services.Auth
+﻿using JQZHomeCareProject.Mobile.Models.Common;
+
+namespace JQZHomeCareProject.Mobile.Services.Auth
 {
     public interface ISessionService
     {
-        Task SaveSessionAsync(string token, string userId, string role, string? practitionerId);
+        Task SaveSessionAsync(string token, Guid userId, UserRole role, Guid? practitionerId);
         Task<bool> HasValidSessionAsync();
         Task<string?> GetTokenAsync();
-        Task<string?> GetPractitionerIdAsync();
+        Task<Guid?> GetPractitionerIdAsync();
+        Task<UserRole?> GetRoleAsync();
         Task ClearAsync();
 
         event Action? SessionExpired;

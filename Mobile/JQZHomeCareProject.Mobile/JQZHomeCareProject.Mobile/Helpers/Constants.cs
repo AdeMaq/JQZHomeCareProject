@@ -11,6 +11,5 @@ namespace JQZHomeCareProject.Mobile.Helpers
         public const string RouteHome = "//home";
         public const string PrefLastEmail = "last_login_email";
 
-        public const string PractitionerRole = "Practitioner";
     }
 }

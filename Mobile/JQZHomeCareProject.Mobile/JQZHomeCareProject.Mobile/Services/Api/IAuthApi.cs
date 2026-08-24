@@ -4,6 +4,6 @@ namespace JQZHomeCareProject.Mobile.Services.Api
 {
     public interface IAuthApi
     {
-        Task<LoginResponseDto> LoginAsync(LoginRequestDto request);
+        Task<LoginResponseDto> LoginAsync(LoginRequestDto request, CancellationToken cancellationToken = default);
     }
 }

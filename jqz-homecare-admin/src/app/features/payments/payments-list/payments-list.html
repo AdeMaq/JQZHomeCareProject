@@ -1,0 +1,598 @@
+<div class="payments-page">
+  <!-- ========================================================= -->
+  <!-- PAGE HEADER -->
+  <!-- ========================================================= -->
+
+  <div class="page-header">
+    <div class="page-header-content">
+      <div class="page-title-section">
+        <div class="page-icon">
+          <i class="fa-solid fa-money-bill-transfer"></i>
+        </div>
+
+        <div>
+          <h1>Payments</h1>
+          <p>Manage practitioner weekly settlements and payment collections.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- ALERTS -->
+  <!-- ========================================================= -->
+
+  @if (successMessage) {
+    <div class="alert alert-success">
+      <div class="alert-content">
+        <i class="fa-solid fa-circle-check"></i>
+        <span>{{ successMessage }}</span>
+      </div>
+
+      <button type="button" class="alert-close" (click)="successMessage = ''">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+  }
+
+  @if (errorMessage) {
+    <div class="alert alert-error">
+      <div class="alert-content">
+        <i class="fa-solid fa-circle-exclamation"></i>
+        <span>{{ errorMessage }}</span>
+      </div>
+
+      <button type="button" class="alert-close" (click)="errorMessage = ''">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+  }
+
+  <!-- ========================================================= -->
+  <!-- WEEKLY SETTLEMENT -->
+  <!-- ========================================================= -->
+
+  <div class="section-card">
+    <!-- CARD HEADER -->
+
+    <div class="section-header">
+      <div>
+        <h2>
+          <i class="fa-solid fa-calendar-week"></i>
+          Weekly Settlement
+        </h2>
+
+        <p>Select a practitioner and week to review completed visits and generate a settlement.</p>
+      </div>
+    </div>
+
+    <!-- FILTERS -->
+
+    <div class="settlement-filters">
+      <!-- PRACTITIONER -->
+
+      <div class="form-group">
+        <label for="practitioner"> Practitioner </label>
+
+        <select
+          id="practitioner"
+          [(ngModel)]="selectedPractitionerId"
+          (ngModelChange)="onSelectionChange()"
+        >
+          <option value="">Select Practitioner</option>
+
+          @for (practitioner of practitioners; track practitioner.id) {
+            <option [value]="practitioner.id">
+              {{ practitioner.name }}
+            </option>
+          }
+        </select>
+      </div>
+
+      <!-- WEEK -->
+
+      <div class="form-group">
+        <label for="weekStart"> Week Start </label>
+
+        <input
+          id="weekStart"
+          type="date"
+          [(ngModel)]="selectedWeekStart"
+          (ngModelChange)="onSelectionChange()"
+        />
+      </div>
+
+      <!-- LOAD BUTTON -->
+
+      <div class="filter-action">
+        <button
+          type="button"
+          class="btn btn-primary"
+          [disabled]="!selectedPractitionerId || !selectedWeekStart || isLoadingSummary"
+          (click)="loadWeeklySummary()"
+        >
+          @if (isLoadingSummary) {
+            <i class="fa-solid fa-spinner fa-spin"></i>
+            Loading...
+          } @else {
+            <i class="fa-solid fa-magnifying-glass"></i>
+            View Summary
+          }
+        </button>
+      </div>
+    </div>
+
+    <!-- ======================================================= -->
+    <!-- LOADING -->
+    <!-- ======================================================= -->
+
+    @if (isLoadingSummary) {
+      <div class="loading-state">
+        <i class="fa-solid fa-spinner fa-spin"></i>
+        <p>Loading weekly settlement...</p>
+      </div>
+    }
+
+    <!-- ======================================================= -->
+    <!-- WEEKLY SUMMARY -->
+    <!-- ======================================================= -->
+
+    @if (!isLoadingSummary && weeklySettlement) {
+      <div class="weekly-summary">
+        <!-- SUMMARY HEADER -->
+
+        <div class="summary-top">
+          <div class="practitioner-info">
+            <div class="avatar">
+              {{ weeklySettlement.practitionerName.charAt(0).toUpperCase() }}
+            </div>
+
+            <div>
+              <span class="summary-label"> Practitioner </span>
+
+              <h3>
+                {{ weeklySettlement.practitionerName }}
+              </h3>
+
+              <p>
+                {{ weeklySettlement.weekStart | date: 'dd MMM yyyy' }}
+                -
+                {{ weeklySettlement.weekEnd | date: 'dd MMM yyyy' }}
+              </p>
+            </div>
+          </div>
+
+          <div class="settlement-status">
+            <span
+              class="status-badge"
+              [class.status-pending]="weeklySettlement.status === 'Pending'"
+              [class.status-received]="weeklySettlement.status === 'Received'"
+            >
+              @if (weeklySettlement.status === 'Received') {
+                <i class="fa-solid fa-circle-check"></i>
+              } @else {
+                <i class="fa-solid fa-clock"></i>
+              }
+
+              {{ weeklySettlement.status }}
+            </span>
+          </div>
+        </div>
+
+        <!-- SUMMARY STATS -->
+
+        <div class="summary-stats">
+          <div class="summary-stat">
+            <div class="stat-icon visits-icon">
+              <i class="fa-solid fa-house-medical"></i>
+            </div>
+
+            <div>
+              <span>Total Visits</span>
+              <strong>
+                {{ weeklySettlement.visitCount }}
+              </strong>
+            </div>
+          </div>
+
+          <div class="summary-stat">
+            <div class="stat-icon total-icon">
+              <i class="fa-solid fa-money-bill-wave"></i>
+            </div>
+
+            <div>
+              <span>Total Visit Amount</span>
+              <strong>
+                {{ weeklySettlement.totalVisitAmount | number: '1.2-2' }}
+              </strong>
+            </div>
+          </div>
+
+          <div class="summary-stat">
+            <div class="stat-icon practitioner-icon">
+              <i class="fa-solid fa-user-doctor"></i>
+            </div>
+
+            <div>
+              <span>Practitioner Share</span>
+              <strong>
+                {{ weeklySettlement.practitionerShareAmount | number: '1.2-2' }}
+              </strong>
+            </div>
+          </div>
+
+          <div class="summary-stat">
+            <div class="stat-icon company-icon">
+              <i class="fa-solid fa-building"></i>
+            </div>
+
+            <div>
+              <span>Company Share</span>
+              <strong>
+                {{ weeklySettlement.companyShareAmount | number: '1.2-2' }}
+              </strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- RECEIVED DATE -->
+
+        @if (weeklySettlement.receivedDate) {
+          <div class="received-info">
+            <i class="fa-solid fa-calendar-check"></i>
+
+            <span>
+              Payment received on
+              <strong>
+                {{ weeklySettlement.receivedDate | date: 'dd MMM yyyy, hh:mm a' }}
+              </strong>
+            </span>
+          </div>
+        }
+
+        <!-- ===================================================== -->
+        <!-- VISITS TABLE -->
+        <!-- ===================================================== -->
+
+        <div class="visits-section">
+          <div class="table-heading">
+            <div>
+              <h3>Completed Visits</h3>
+
+              <p>Visits included in this weekly settlement.</p>
+            </div>
+
+            <span class="visit-count">
+              {{ weeklySettlement.visits.length }}
+              Visits
+            </span>
+          </div>
+
+          @if (weeklySettlement.visits.length > 0) {
+            <div class="table-wrapper">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Patient</th>
+                    <th>Service</th>
+                    <th>Area</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Amount Due</th>
+                    <th>Collection</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  @for (visit of weeklySettlement.visits; track visit.id) {
+                    <tr>
+                      <!-- PATIENT -->
+
+                      <td>
+                        <div class="patient-cell">
+                          <div class="patient-avatar">
+                            {{ visit.patientName.charAt(0).toUpperCase() }}
+                          </div>
+
+                          <span>
+                            {{ visit.patientName }}
+                          </span>
+                        </div>
+                      </td>
+
+                      <!-- SERVICE -->
+
+                      <td>
+                        {{ visit.serviceName || '-' }}
+                      </td>
+
+                      <!-- AREA -->
+
+                      <td>
+                        {{ visit.areaName || '-' }}
+                      </td>
+
+                      <!-- DATE -->
+
+                      <td>
+                        @if (visit.scheduledDate) {
+                          {{ visit.scheduledDate | date: 'dd MMM yyyy' }}
+                        } @else {
+                          -
+                        }
+                      </td>
+
+                      <!-- TIME -->
+
+                      <td>
+                        @if (visit.slotStart && visit.slotEnd) {
+                          {{ visit.slotStart }} - {{ visit.slotEnd }}
+                        } @else {
+                          -
+                        }
+                      </td>
+
+                      <!-- AMOUNT -->
+
+                      <td>
+                        <strong class="amount">
+                          {{ visit.amountDue | number: '1.2-2' }}
+                        </strong>
+                      </td>
+
+                      <!-- COLLECTION STATUS -->
+
+                      <td>
+                        <span
+                          class="collection-badge"
+                          [class.collection-pending]="visit.collectionStatus === 'Pending'"
+                          [class.collection-received]="visit.collectionStatus === 'Received'"
+                        >
+                          {{ visit.collectionStatus }}
+                        </span>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          } @else {
+            <div class="empty-visits">
+              <div class="empty-icon">
+                <i class="fa-solid fa-calendar-xmark"></i>
+              </div>
+
+              <h3>No Completed Visits</h3>
+
+              <p>
+                No unsettled completed visits were found for this practitioner during the selected
+                week.
+              </p>
+            </div>
+          }
+        </div>
+
+        <!-- ===================================================== -->
+        <!-- SETTLEMENT ACTION -->
+        <!-- ===================================================== -->
+
+        <div class="settlement-action">
+          <div class="action-info">
+            <div class="action-icon">
+              <i class="fa-solid fa-file-invoice-dollar"></i>
+            </div>
+
+            <div>
+              @if (weeklySettlement.settlementId) {
+                <h3>Settlement Already Generated</h3>
+
+                <p>This week's settlement has already been generated.</p>
+              } @else {
+                <h3>Ready to Generate Settlement</h3>
+
+                <p>
+                  Generate a weekly settlement for
+                  {{ weeklySettlement.visitCount }}
+                  completed visit(s).
+                </p>
+              }
+            </div>
+          </div>
+
+          @if (!weeklySettlement.settlementId) {
+            <button
+              type="button"
+              class="btn btn-generate"
+              [disabled]="weeklySettlement.visitCount === 0 || isGeneratingSettlement"
+              (click)="generateSettlement()"
+            >
+              @if (isGeneratingSettlement) {
+                <i class="fa-solid fa-spinner fa-spin"></i>
+                Generating...
+              } @else {
+                <i class="fa-solid fa-file-circle-plus"></i>
+                Generate Settlement
+              }
+            </button>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- ======================================================= -->
+    <!-- INITIAL STATE -->
+    <!-- ======================================================= -->
+
+    @if (!isLoadingSummary && !weeklySettlement && !selectedPractitionerId) {
+      <div class="initial-state">
+        <div class="initial-icon">
+          <i class="fa-solid fa-money-bill-transfer"></i>
+        </div>
+
+        <h3>View Weekly Settlement</h3>
+
+        <p>Select a practitioner and week to view completed visits and payment calculations.</p>
+      </div>
+    }
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- PENDING SETTLEMENTS -->
+  <!-- ========================================================= -->
+
+  <div class="section-card pending-card">
+    <div class="section-header">
+      <div>
+        <h2>
+          <i class="fa-solid fa-clock"></i>
+          Pending Settlements
+        </h2>
+
+        <p>Review generated settlements that are awaiting payment confirmation.</p>
+      </div>
+
+      <button
+        type="button"
+        class="refresh-button"
+        [disabled]="isLoadingPending"
+        (click)="loadPendingSettlements()"
+      >
+        @if (isLoadingPending) {
+          <i class="fa-solid fa-spinner fa-spin"></i>
+        } @else {
+          <i class="fa-solid fa-rotate-right"></i>
+        }
+
+        Refresh
+      </button>
+    </div>
+
+    <!-- LOADING -->
+
+    @if (isLoadingPending) {
+      <div class="loading-state">
+        <i class="fa-solid fa-spinner fa-spin"></i>
+        <p>Loading pending settlements...</p>
+      </div>
+    }
+
+    <!-- TABLE -->
+
+    @if (!isLoadingPending && pendingSettlements.length > 0) {
+      <div class="table-wrapper">
+        <table class="pending-table">
+          <thead>
+            <tr>
+              <th>Practitioner</th>
+              <th>Week</th>
+              <th>Total Amount</th>
+              <th>Practitioner Share</th>
+              <th>Company Share</th>
+              <th>Status</th>
+              <th class="action-column">Action</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            @for (settlement of pendingSettlements; track settlement.id) {
+              <tr>
+                <!-- PRACTITIONER -->
+
+                <td>
+                  <div class="practitioner-cell">
+                    <div class="table-avatar">
+                      {{ settlement.practitionerName.charAt(0).toUpperCase() }}
+                    </div>
+
+                    <strong>
+                      {{ settlement.practitionerName }}
+                    </strong>
+                  </div>
+                </td>
+
+                <!-- WEEK -->
+
+                <td>
+                  <div class="week-cell">
+                    <span>
+                      {{ settlement.weekStart | date: 'dd MMM' }}
+                    </span>
+
+                    <i class="fa-solid fa-arrow-right"></i>
+
+                    <span>
+                      {{ settlement.weekEnd | date: 'dd MMM yyyy' }}
+                    </span>
+                  </div>
+                </td>
+
+                <!-- TOTAL -->
+
+                <td>
+                  <strong class="amount">
+                    {{ settlement.totalVisitAmount | number: '1.2-2' }}
+                  </strong>
+                </td>
+
+                <!-- PRACTITIONER SHARE -->
+
+                <td>
+                  {{ settlement.practitionerShareAmount | number: '1.2-2' }}
+                </td>
+
+                <!-- COMPANY SHARE -->
+
+                <td>
+                  {{ settlement.companyShareAmount | number: '1.2-2' }}
+                </td>
+
+                <!-- STATUS -->
+
+                <td>
+                  <span class="status-badge status-pending">
+                    <i class="fa-solid fa-clock"></i>
+
+                    {{ settlement.status }}
+                  </span>
+                </td>
+
+                <!-- ACTION -->
+
+                <td class="action-column">
+                  <button
+                    type="button"
+                    class="btn-received"
+                    [disabled]="processingSettlementId === settlement.id"
+                    (click)="markSettlementReceived(settlement.id)"
+                  >
+                    @if (processingSettlementId === settlement.id) {
+                      <i class="fa-solid fa-spinner fa-spin"></i>
+                      Processing...
+                    } @else {
+                      <i class="fa-solid fa-circle-check"></i>
+                      Mark Received
+                    }
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+
+    <!-- EMPTY STATE -->
+
+    @if (!isLoadingPending && pendingSettlements.length === 0) {
+      <div class="empty-state">
+        <div class="empty-icon">
+          <i class="fa-solid fa-circle-check"></i>
+        </div>
+
+        <h3>No Pending Settlements</h3>
+
+        <p>All generated practitioner settlements have been received.</p>
+      </div>
+    }
+  </div>
+</div>

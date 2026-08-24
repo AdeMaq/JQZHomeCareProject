@@ -69,6 +69,12 @@ import { AddRating } from './features/ratings/add-rating/add-rating';
 import { EditRating } from './features/ratings/edit-rating/edit-rating';
 
 // ============================================================
+// PAYMENTS
+// ============================================================
+
+import { PaymentsList } from './features/payments/payments-list/payments-list';
+
+// ============================================================
 // ROUTES
 // ============================================================
 
@@ -142,6 +148,15 @@ export const routes: Routes = [
       {
         path: 'visits',
         component: VisitsList,
+      },
+
+      // ========================================================
+      // PAYMENTS
+      // ========================================================
+
+      {
+        path: 'payments',
+        component: PaymentsList,
       },
 
       // ========================================================

@@ -11,10 +11,18 @@ using Microsoft.OpenApi;
 using System.Text;
 using System.Text.Json.Serialization;
 
-
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
+// Single AddControllers call — merged options + JSON config together
+builder.Services.AddControllers(options =>
+{
+    options.SuppressAsyncSuffixInActionNames = false;
+})
+.AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+});
+
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSwaggerGen(options =>
@@ -49,7 +57,7 @@ builder.Services.AddScoped<IAreaService, JQZHomeCareProject.Application.Services
 builder.Services.AddScoped<IPackageService, JQZHomeCareProject.Application.Services.PackageService>();
 builder.Services.AddScoped<IServiceService, JQZHomeCareProject.Application.Services.ServiceService>();
 builder.Services.AddScoped<ILocationRepository, JQZHomeCareProject.Persistence.Repositories.LocationRepository>();
-builder.Services.AddScoped<IVisitService, JQZHomeCareProject.Application.Services.VisitService>(); 
+builder.Services.AddScoped<IVisitService, JQZHomeCareProject.Application.Services.VisitService>();
 builder.Services.AddScoped<IDashboardService, JQZHomeCareProject.Application.Services.DashboardService>();
 builder.Services.AddScoped<IRatingService, JQZHomeCareProject.Application.Services.RatingService>();
 builder.Services.AddScoped<IPaymentService, JQZHomeCareProject.Application.Services.PaymentService>();
@@ -60,9 +68,6 @@ builder.Services.AddScoped<IPatientService, JQZHomeCareProject.Application.Servi
 builder.Services.AddScoped<IPatientPackageService, JQZHomeCareProject.Application.Services.PatientPackageService>();
 builder.Services.AddScoped<IApiClientService, JQZHomeCareProject.Application.Services.ApiClientService>();
 
-
-
-
 var jwtSettings = builder.Configuration.GetSection("Jwt").Get<JwtSettings>()
     ?? throw new InvalidOperationException("Jwt configuration section is missing.");
 
@@ -72,20 +77,20 @@ builder.Services.AddAuthentication(options =>
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 })
     .AddJwtBearer(options =>
-{
-    options.TokenValidationParameters = new TokenValidationParameters
     {
-        ValidateIssuer = true,
-        ValidateAudience = true,
-        ValidateLifetime = true,
-        ValidateIssuerSigningKey = true,
-        ValidIssuer = jwtSettings.Issuer,
-        ValidAudience = jwtSettings.Audience,
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Secret))
-    };
-})
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = jwtSettings.Issuer,
+            ValidAudience = jwtSettings.Audience,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Secret))
+        };
+    })
     .AddScheme<ApiKeyAuthenticationOptions, ApiKeyAuthenticationHandler>(
-        ApiKeyAuthenticationOptions.SchemeName, options => { }); ;
+        ApiKeyAuthenticationOptions.SchemeName, options => { });
 
 builder.Services.AddAuthorization(options =>
 {
@@ -104,26 +109,19 @@ builder.Services.AddCors(options =>
     });
 });
 
-builder.Services.AddControllers(options =>
-{
-    options.SuppressAsyncSuffixInActionNames = false;
-})
-.AddJsonOptions(options =>
-{
-    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-});
-
 var app = builder.Build();
 
+// Bind to all network interfaces on 5212 (LAN access for mobile testing),
+// keep HTTPS on 7151 too so Swagger/local dev tooling still works.
 app.Urls.Clear();
-app.Urls.Add("http://0.0.0.0:5212"); // accept LAN connections, not just localhost
+app.Urls.Add("http://0.0.0.0:5212");
+app.Urls.Add("https://localhost:7151");
 
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
 
 app.UseCors("AngularPolicy");
 

@@ -8,6 +8,9 @@ namespace JQZHomeCareProject.Application.DTOs
         public Guid Id { get; set; }
         public Guid PatientId { get; set; }
         public string PatientName { get; set; } = string.Empty;
+        public string PatientPhone { get; set; } = string.Empty;
+        public string PatientAddress { get; set; } = string.Empty;
+        public string? PatientDescription { get; set; }
         public Guid? PractitionerId { get; set; }
         public string? PractitionerName { get; set; }
         public Guid? AreaId { get; set; }
@@ -39,6 +42,9 @@ namespace JQZHomeCareProject.Application.DTOs
 
         [Required, StringLength(500, MinimumLength = 1)]
         public string LocationAddress { get; set; } = string.Empty;
+
+        [StringLength(1000)]
+        public string? PatientDescription { get; set; }
 
         public Guid PackageId { get; set; }
         public PackagePaymentType PaymentType { get; set; }

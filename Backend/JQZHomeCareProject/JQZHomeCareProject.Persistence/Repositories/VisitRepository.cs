@@ -12,7 +12,7 @@ namespace JQZHomeCareProject.Persistence.Repositories
 
         private IQueryable<Visit> WithIncludes() =>
             _context.Visits
-                .Include(v => v.Patient)
+                .Include(v => v.Patient).ThenInclude(p => p!.Location)
                 .Include(v => v.Practitioner)
                 .Include(v => v.Area)
                 .Include(v => v.Service)

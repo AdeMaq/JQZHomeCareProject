@@ -12,6 +12,7 @@ namespace JQZHomeCareProject.Application.DTOs
         public string Phone { get; set; } = string.Empty;
         public int VisitCount { get; set; }
         public string LocationAddress { get; set; } = string.Empty;
+        public string? PatientDescription { get; set; }
     }
 
     public class UpdatePatientDto
@@ -27,5 +28,8 @@ namespace JQZHomeCareProject.Application.DTOs
         [Required(ErrorMessage = "Location address is required.")]
         [StringLength(500, MinimumLength = 1)]
         public string LocationAddress { get; set; } = string.Empty;
+
+        [StringLength(1000)]
+        public string? PatientDescription { get; set; }
     }
 }

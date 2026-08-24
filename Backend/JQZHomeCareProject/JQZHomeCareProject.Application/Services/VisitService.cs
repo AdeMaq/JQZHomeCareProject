@@ -65,7 +65,7 @@ namespace JQZHomeCareProject.Application.Services
             foreach (var assignment in dto.VisitAssignments)
                 await ValidateAssignmentAsync(assignment);
 
-            var patient = await _patientService.GetOrCreateAsync(dto.PatientName, dto.PatientPhone, dto.LocationAddress);
+            var patient = await _patientService.GetOrCreateAsync(dto.PatientName, dto.PatientPhone, dto.LocationAddress, dto.PatientDescription);
 
             CheckAssignmentsAgainstEachOther(dto.VisitAssignments);
 

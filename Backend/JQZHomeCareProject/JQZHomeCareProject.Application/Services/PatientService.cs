@@ -19,11 +19,12 @@ namespace JQZHomeCareProject.Application.Services
             _mapsService = mapsService;
         }
 
-        public async Task<PatientDto> GetOrCreateAsync(string name, string phone, string locationAddress)
+        public async Task<PatientDto> GetOrCreateAsync(string name, string phone, string locationAddress, string? patientDescription = null)
         {
             var normalizedPhone = Guard.NormalizePhone(phone);
             var normalizedName = NameValidator.NormalizeRequired(name, "Patient name", 150);
             var normalizedAddress = NameValidator.NormalizeRequired(locationAddress, "Location address", 500);
+            var normalizedDescription = string.IsNullOrWhiteSpace(patientDescription) ? null : patientDescription.Trim();
 
             var existing = await _patientRepository.GetByPhoneAsync(normalizedPhone);
             if (existing is not null)
@@ -47,7 +48,8 @@ namespace JQZHomeCareProject.Application.Services
                 Phone = normalizedPhone,
                 VisitCount = 0,
                 LocationId = location.Id,
-                Location = location
+                Location = location,
+                PatientDescription = normalizedDescription
             };
             await _patientRepository.AddAsync(patient);
 
@@ -87,6 +89,7 @@ namespace JQZHomeCareProject.Application.Services
 
             patient.Name = name;
             patient.Phone = phone;
+            patient.PatientDescription = string.IsNullOrWhiteSpace(dto.PatientDescription) ? null : dto.PatientDescription.Trim();
 
             if (!string.Equals(patient.Location?.Address, address, StringComparison.OrdinalIgnoreCase))
             {
@@ -125,7 +128,8 @@ namespace JQZHomeCareProject.Application.Services
             Name = patient.Name,
             Phone = patient.Phone,
             VisitCount = patient.VisitCount,
-            LocationAddress = patient.Location?.Address ?? string.Empty
+            LocationAddress = patient.Location?.Address ?? string.Empty,
+            PatientDescription = patient.PatientDescription
         };
     }
 }

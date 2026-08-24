@@ -17,6 +17,7 @@ namespace JQZHomeCareProject.Persistence.Configurations
 
             builder.Property(p => p.Name).IsRequired().HasMaxLength(150);
             builder.Property(p => p.Phone).IsRequired().HasMaxLength(20);
+            builder.Property(p => p.PatientDescription).HasMaxLength(1000);
 
             builder.HasIndex(p => p.Phone).IsUnique();
             builder.HasOne(p => p.Location)

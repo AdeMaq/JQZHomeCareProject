@@ -130,7 +130,11 @@
     ======================================================== -->
 
     <section class="details-grid">
-      <div class="details-card">
+      <!-- =====================================================
+           PATIENT INFORMATION
+      ====================================================== -->
+
+      <div class="details-card patient-details-card">
         <div class="card-header">
           <div class="card-header-icon patient-icon">
             <i class="fa-solid fa-user"></i>
@@ -144,6 +148,8 @@
         </div>
 
         <div class="info-list">
+          <!-- PATIENT NAME -->
+
           <div class="info-row">
             <span class="info-label">Patient Name</span>
 
@@ -151,8 +157,32 @@
               {{ visit.patientName || '-' }}
             </strong>
           </div>
+
+          <!-- PATIENT PHONE -->
+
+          <div class="info-row info-row-secondary">
+            <span class="info-label">Phone Number</span>
+
+            <strong class="info-value">
+              {{ visit.patientPhone || '-' }}
+            </strong>
+          </div>
+
+          <!-- LOCATION ADDRESS -->
+
+          <div class="info-row info-row-secondary">
+            <span class="info-label">Location Address</span>
+
+            <strong class="info-value">
+              {{ visit.locationAddress || '-' }}
+            </strong>
+          </div>
         </div>
       </div>
+
+      <!-- =====================================================
+           PRACTITIONER INFORMATION
+      ====================================================== -->
 
       <div class="details-card">
         <div class="card-header">

@@ -1,10 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace JQZHomeCareProject.Mobile.Services.Auth
+﻿namespace JQZHomeCareProject.Mobile.Services.Auth
 {
-    internal interface ISessionService
+    public interface ISessionService
     {
+        Task SaveSessionAsync(string token, string userId, string role, string? practitionerId);
+        Task<bool> HasValidSessionAsync();
+        Task<string?> GetTokenAsync();
+        Task<string?> GetPractitionerIdAsync();
+        Task ClearAsync();
+
+        event Action? SessionExpired;
+        void RaiseSessionExpired();
     }
 }

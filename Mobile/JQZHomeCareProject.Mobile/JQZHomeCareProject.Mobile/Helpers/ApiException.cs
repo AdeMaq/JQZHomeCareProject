@@ -1,15 +1,12 @@
-﻿namespace JQZHomeCareProject.Mobile.Helpers;
+﻿using System.Net;
+
+namespace JQZHomeCareProject.Mobile.Helpers;
 
 public class ApiException : Exception
 {
-    public int? StatusCode { get; }
+    public HttpStatusCode StatusCode { get; }
 
-    public ApiException(string message, int? statusCode = null): base(message)
-    {
-        StatusCode = statusCode;
-    }
-
-    public ApiException(string message, Exception innerException, int? statusCode = null): base(message, innerException)
+    public ApiException(HttpStatusCode statusCode, string message) : base(message)
     {
         StatusCode = statusCode;
     }

@@ -1,14 +1,15 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<Shell
-    x:Class="JQZHomeCareProject.Mobile.AppShell"
-    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:local="clr-namespace:JQZHomeCareProject.Mobile"
-    Title="JQZHomeCareProject.Mobile">
+<?xml version="1.0" encoding="utf-8"?>
+<Shell xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+       xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+       xmlns:home="clr-namespace:JQZHomeCareProject.Mobile.Views.Home"
+       x:Class="JQZHomeCareProject.Mobile.AppShell"
+       FlyoutBehavior="Disabled"
+       Shell.TabBarIsVisible="True">
 
-    <ShellContent
-        Title="Home"
-        ContentTemplate="{DataTemplate local:MainPage}"
-        Route="MainPage" />
+    <TabBar>
+        <ShellContent Title="Home"
+                      Route="home"
+                      ContentTemplate="{DataTemplate home:HomePage}" />
+    </TabBar>
 
 </Shell>

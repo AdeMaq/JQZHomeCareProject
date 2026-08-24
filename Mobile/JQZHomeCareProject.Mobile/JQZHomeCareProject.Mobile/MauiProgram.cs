@@ -1,6 +1,11 @@
 ﻿using CommunityToolkit.Maui;
+using JQZHomeCareProject.Mobile.Helpers;
 using JQZHomeCareProject.Mobile.Services.Api;
-using JQZHomeCareProject.Mobile.Services.Session;
+using JQZHomeCareProject.Mobile.Services.Auth;
+using JQZHomeCareProject.Mobile.Services.Navigation;
+using JQZHomeCareProject.Mobile.ViewModels.Auth;
+using JQZHomeCareProject.Mobile.Views.Auth;
+using JQZHomeCareProject.Mobile.Views.Home;
 using Microsoft.Extensions.Logging;
 
 namespace JQZHomeCareProject.Mobile
@@ -19,22 +24,24 @@ namespace JQZHomeCareProject.Mobile
                     fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
                 });
 
-            const string apiBaseAddress = "https://your-backend-host/";
-
-            // Session — singleton, no dependencies
+            // --- Core services ---
             builder.Services.AddSingleton<ISessionService, SessionService>();
-            // AuthHeaderHandler must be transient: HttpClientFactory creates
-            // a new handler instance per named/typed client internally.
+            builder.Services.AddSingleton<INavigationService, ShellNavigationService>();
             builder.Services.AddTransient<AuthHeaderHandler>();
-            // IAuthApi: no AuthHeaderHandler — login has no token to attach yet.
+
+            // --- Auth API (no AuthHeaderHandler — login can't require a token) ---
             builder.Services.AddHttpClient<IAuthApi, AuthApi>(client =>
             {
-                client.BaseAddress = new Uri(apiBaseAddress);
+                client.BaseAddress = new Uri(Constants.ApiBaseUrl);
             });
 
-            // Other typed clients (IVisitsApi, IPractitionersApi, ...) get
-            // AddHttpClient<T, TImpl>(...).AddHttpMessageHandler<AuthHeaderHandler>()
-            // added here as you build each one in later phases.
+            // --- Pages / ViewModels ---
+            builder.Services.AddTransient<SplashPage>();
+            builder.Services.AddTransient<LoginPage>();
+            builder.Services.AddTransient<LoginViewModel>();
+            builder.Services.AddTransient<HomePage>();
+            builder.Services.AddTransient<AppShell>();
+
 
 #if DEBUG
             builder.Logging.AddDebug();

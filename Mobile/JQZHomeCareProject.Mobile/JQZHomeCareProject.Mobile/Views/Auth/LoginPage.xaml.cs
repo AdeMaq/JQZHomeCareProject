@@ -1,9 +1,13 @@
-namespace JQZHomeCareProject.Mobile.Views.Auth;
+using JQZHomeCareProject.Mobile.ViewModels.Auth;
 
-public partial class LoginPage : ContentPage
+namespace JQZHomeCareProject.Mobile.Views.Auth
 {
-	public LoginPage()
-	{
-		InitializeComponent();
-	}
+    public partial class LoginPage : ContentPage
+    {
+        public LoginPage(LoginViewModel viewModel)
+        {
+            InitializeComponent();
+            BindingContext = viewModel;
+        }
+    }
 }

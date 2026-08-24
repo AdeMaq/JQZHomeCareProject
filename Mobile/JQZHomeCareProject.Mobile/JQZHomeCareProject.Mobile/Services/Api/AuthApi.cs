@@ -1,53 +1,37 @@
-﻿using JQZHomeCareProject.Mobile.Helpers;
+﻿using System.Net.Http.Json;
+using System.Text.Json;
+using JQZHomeCareProject.Mobile.Helpers;
 using JQZHomeCareProject.Mobile.Models.Auth;
 using JQZHomeCareProject.Mobile.Models.Common;
-using System;
-using System.Collections.Generic;
-using System.Net.Http.Json;
-using System.Text;
-using System.Text.Json;
 
 namespace JQZHomeCareProject.Mobile.Services.Api
 {
-    public class AuthApi: IAuthApi
+    public class AuthApi : IAuthApi
     {
-        private readonly HttpClient _httpClient;
+        private readonly HttpClient _http;
 
-        public AuthApi(HttpClient httpClient)
+        // Web defaults = camelCase-aware + case-insensitive matching,
+        // consistent with ASP.NET Core's default output. Use these options
+        // in every typed API client we add later (Visits, Practitioners, etc.).
+        private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web);
+
+        public AuthApi(HttpClient http)
         {
-            _httpClient = httpClient;
+            _http = http; // BaseAddress + Timeout set at registration in MauiProgram.cs
         }
+
         public async Task<LoginResponseDto> LoginAsync(LoginRequestDto request)
         {
-            var response = await _httpClient.PostAsJsonAsync("api/auth/login", request, JsonOptions.Default);
+            var response = await _http.PostAsJsonAsync("auth/login", request, JsonOptions);
 
             if (!response.IsSuccessStatusCode)
             {
-                throw await BuildApiExceptionAsync(response);
+                var error = await response.Content.ReadFromJsonAsync<ApiErrorResponse>(JsonOptions);
+                throw new ApiException(response.StatusCode, error?.Message ?? "Login failed.");
             }
 
-            var result = await response.Content.ReadFromJsonAsync<LoginResponseDto>(JsonOptions.Default);
-
-            return result
-                ?? throw new ApiException("Login succeeded but the response could not be read.");
-        }
-        private static async Task<ApiException> BuildApiExceptionAsync(HttpResponseMessage response)
-        {
-            try
-            {
-                var error = await response.Content.ReadFromJsonAsync<ApiErrorResponse>(JsonOptions.Default);
-
-                if (error is not null && !string.IsNullOrWhiteSpace(error.Message))
-                {
-                    return new ApiException(error.Message, (int)response.StatusCode);
-                }
-            }
-            catch (JsonException)
-            {
-                // Body wasn't the expected { message } shape — fall through to generic message.
-            }
-
-            return new ApiException($"Request failed with status {(int)response.StatusCode}.",(int)response.StatusCode);
+            var result = await response.Content.ReadFromJsonAsync<LoginResponseDto>(JsonOptions);
+            return result ?? throw new ApiException(response.StatusCode, "Empty response from server.");
         }
     }
 }

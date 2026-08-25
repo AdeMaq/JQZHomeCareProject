@@ -35,7 +35,19 @@ export interface Visit {
 
   patientPhone?: string | null;
 
-  locationAddress?: string | null;
+  /*
+   * Backend VisitDto property:
+   *
+   * public string PatientAddress { get; set; }
+   */
+  patientAddress?: string | null;
+
+  /*
+   * Backend VisitDto property:
+   *
+   * public string? PatientDescription { get; set; }
+   */
+  patientDescription?: string | null;
 
   // ==========================================================
   // PRACTITIONER INFORMATION

@@ -23,6 +23,12 @@
     </div>
 
     <div class="page-header-actions">
+      <button type="button" class="secondary-button" (click)="backToVisits()">
+        <i class="fa-solid fa-arrow-left"></i>
+
+        <span>Back to Visits</span>
+      </button>
+
       <button
         type="button"
         class="primary-button"
@@ -32,12 +38,6 @@
         <i class="fa-solid fa-pen-to-square"></i>
 
         <span>Edit Visit</span>
-      </button>
-
-      <button type="button" class="secondary-button" (click)="backToVisits()">
-        <i class="fa-solid fa-arrow-left"></i>
-
-        <span>Back to Visits</span>
       </button>
     </div>
   </div>
@@ -68,9 +68,7 @@
 
       <h3>Unable to load visit</h3>
 
-      <p>
-        {{ errorMessage }}
-      </p>
+      <p>{{ errorMessage }}</p>
 
       <div class="state-actions">
         <button type="button" class="secondary-button" (click)="backToVisits()">
@@ -94,29 +92,49 @@
 
   @else if (visit) {
     <!-- =======================================================
-         VISIT SUMMARY
+         VISIT OVERVIEW
     ======================================================== -->
 
-    <section class="summary-card">
-      <div class="summary-left">
+    <section class="visit-overview-card">
+      <div class="visit-overview-main">
         <div class="visit-icon">
           <i class="fa-solid fa-calendar-check"></i>
         </div>
 
-        <div class="summary-content">
-          <span class="summary-label">Visit</span>
+        <div class="visit-overview-content">
+          <span class="eyebrow">Patient Visit</span>
 
           <h2>
             {{ visit.serviceName || 'Home Care Visit' }}
           </h2>
 
-          <p>
-            {{ visit.patientName || 'Unknown Patient' }}
-          </p>
+          <div class="patient-name">
+            <i class="fa-solid fa-user"></i>
+
+            <span>
+              {{ visit.patientName || 'Unknown Patient' }}
+            </span>
+          </div>
         </div>
       </div>
 
-      <div class="summary-right">
+      <div class="visit-overview-meta">
+        <div class="overview-meta-item">
+          <span>Scheduled Date</span>
+
+          <strong>
+            {{ formatDate(visit.scheduledDate) }}
+          </strong>
+        </div>
+
+        <div class="overview-meta-item">
+          <span>Time Slot</span>
+
+          <strong>
+            {{ formatSlot(visit) }}
+          </strong>
+        </div>
+
         <span class="status-badge" [ngClass]="getStatusClass(visit.status)">
           <i [class]="getStatusIcon(visit.status)"></i>
 
@@ -126,137 +144,163 @@
     </section>
 
     <!-- =======================================================
-         PATIENT & PRACTITIONER
+         PATIENT INFORMATION
     ======================================================== -->
 
-    <section class="details-grid">
-      <!-- =====================================================
-           PATIENT INFORMATION
-      ====================================================== -->
+    <section class="details-section">
+      <div class="section-heading">
+        <div>
+          <h2>Patient Information</h2>
 
-      <div class="details-card patient-details-card">
-        <div class="card-header">
-          <div class="card-header-icon patient-icon">
-            <i class="fa-solid fa-user"></i>
-          </div>
-
-          <div class="card-header-content">
-            <h2>Patient Information</h2>
-
-            <p>Patient associated with this visit.</p>
-          </div>
-        </div>
-
-        <div class="info-list">
-          <!-- PATIENT NAME -->
-
-          <div class="info-row">
-            <span class="info-label">Patient Name</span>
-
-            <strong class="info-value">
-              {{ visit.patientName || '-' }}
-            </strong>
-          </div>
-
-          <!-- PATIENT PHONE -->
-
-          <div class="info-row info-row-secondary">
-            <span class="info-label">Phone Number</span>
-
-            <strong class="info-value">
-              {{ visit.patientPhone || '-' }}
-            </strong>
-          </div>
-
-          <!-- LOCATION ADDRESS -->
-
-          <div class="info-row info-row-secondary">
-            <span class="info-label">Location Address</span>
-
-            <strong class="info-value">
-              {{ visit.locationAddress || '-' }}
-            </strong>
-          </div>
+          <p>Contact, address and additional patient details.</p>
         </div>
       </div>
 
-      <!-- =====================================================
-           PRACTITIONER INFORMATION
-      ====================================================== -->
+      <div class="patient-information-card">
+        <!-- PATIENT NAME -->
 
-      <div class="details-card">
-        <div class="card-header">
-          <div class="card-header-icon practitioner-icon">
-            <i class="fa-solid fa-user-doctor"></i>
+        <div class="patient-primary">
+          <div class="patient-avatar">
+            <i class="fa-solid fa-user"></i>
           </div>
 
-          <div class="card-header-content">
-            <h2>Practitioner Information</h2>
+          <div>
+            <span class="eyebrow">Patient</span>
 
-            <p>Practitioner assigned to this visit.</p>
+            <strong>
+              {{ visit.patientName || 'Unknown Patient' }}
+            </strong>
           </div>
         </div>
 
-        <div class="info-list">
-          <div class="info-row">
-            <span class="info-label">Practitioner</span>
+        <!-- PATIENT DETAILS -->
 
-            <strong class="info-value">
+        <div class="patient-details-grid">
+          <!-- PHONE -->
+
+          <div class="patient-detail-item">
+            <div class="detail-icon phone-icon">
+              <i class="fa-solid fa-phone"></i>
+            </div>
+
+            <div class="detail-content">
+              <span>Phone Number</span>
+
+              <strong>
+                {{ visit.patientPhone || 'Not available' }}
+              </strong>
+            </div>
+          </div>
+
+          <!-- ADDRESS -->
+
+          <div class="patient-detail-item">
+            <div class="detail-icon address-icon">
+              <i class="fa-solid fa-location-dot"></i>
+            </div>
+
+            <div class="detail-content">
+              <span>Location Address</span>
+
+              <strong>
+                {{ visit.patientAddress || 'Not available' }}
+              </strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- DESCRIPTION -->
+
+        <div class="patient-description">
+          <div class="description-header">
+            <div class="detail-icon description-icon">
+              <i class="fa-solid fa-align-left"></i>
+            </div>
+
+            <span>Description</span>
+          </div>
+
+          <p>
+            {{ visit.patientDescription || 'No description provided' }}
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- =======================================================
+         VISIT INFORMATION
+    ======================================================== -->
+
+    <section class="details-section">
+      <div class="section-heading">
+        <div>
+          <h2>Visit Information</h2>
+
+          <p>Practitioner, service, package and assigned area.</p>
+        </div>
+      </div>
+
+      <div class="information-grid">
+        <!-- PRACTITIONER -->
+
+        <div class="info-card">
+          <div class="info-card-icon practitioner-icon">
+            <i class="fa-solid fa-user-doctor"></i>
+          </div>
+
+          <div class="info-card-content">
+            <span>Practitioner</span>
+
+            <strong>
               {{ visit.practitionerName || 'Not assigned' }}
             </strong>
           </div>
         </div>
-      </div>
-    </section>
 
-    <!-- =======================================================
-         SERVICE & PACKAGE
-    ======================================================== -->
+        <!-- SERVICE -->
 
-    <section class="details-grid">
-      <div class="details-card">
-        <div class="card-header">
-          <div class="card-header-icon service-icon">
+        <div class="info-card">
+          <div class="info-card-icon service-icon">
             <i class="fa-solid fa-briefcase-medical"></i>
           </div>
 
-          <div class="card-header-content">
-            <h2>Service Information</h2>
+          <div class="info-card-content">
+            <span>Service</span>
 
-            <p>Service being provided during the visit.</p>
-          </div>
-        </div>
-
-        <div class="info-list">
-          <div class="info-row">
-            <span class="info-label">Service</span>
-
-            <strong class="info-value">
+            <strong>
               {{ visit.serviceName || '-' }}
             </strong>
           </div>
         </div>
-      </div>
 
-      <div class="details-card">
-        <div class="card-header">
-          <div class="card-header-icon package-icon">
+        <!-- PACKAGE -->
+
+        <div class="info-card">
+          <div class="info-card-icon package-icon">
             <i class="fa-solid fa-box-open"></i>
           </div>
 
-          <div class="card-header-content">
-            <h2>Package Information</h2>
+          <div class="info-card-content">
+            <span>Package</span>
 
-            <p>Package associated with this visit.</p>
+            <strong>
+              {{ visit.packageName || '-' }}
+            </strong>
           </div>
         </div>
 
-        <div class="info-list">
-          <div class="info-row">
-            <span class="info-label">Package</span>
+        <!-- ASSIGNED AREA -->
 
-            <strong class="info-value">
-              {{ visit.packageName || '-' }}
+        <div class="info-card">
+          <div class="info-card-icon area-icon">
+            <i class="fa-solid fa-location-dot"></i>
+          </div>
+
+          <div class="info-card-content">
+            <span>Assigned Area</span>
+
+            <strong>
+              {{ visit.areaName || 'Not assigned' }}
             </strong>
           </div>
         </div>
@@ -264,61 +308,63 @@
     </section>
 
     <!-- =======================================================
-         SCHEDULE & AREA
+         SCHEDULE
     ======================================================== -->
 
-    <section class="details-grid">
-      <div class="details-card">
-        <div class="card-header">
-          <div class="card-header-icon schedule-icon">
+    <section class="details-section">
+      <div class="section-heading">
+        <div>
+          <h2>Schedule</h2>
+
+          <p>Date, time slot and current visit status.</p>
+        </div>
+      </div>
+
+      <div class="schedule-card">
+        <!-- DATE -->
+
+        <div class="schedule-item">
+          <div class="info-card-icon date-icon">
             <i class="fa-solid fa-calendar-days"></i>
           </div>
 
-          <div class="card-header-content">
-            <h2>Schedule</h2>
+          <div class="schedule-content">
+            <span>Scheduled Date</span>
 
-            <p>Scheduled date and visit time.</p>
-          </div>
-        </div>
-
-        <div class="info-list">
-          <div class="info-row">
-            <span class="info-label">Date</span>
-
-            <strong class="info-value">
+            <strong>
               {{ formatDate(visit.scheduledDate) }}
             </strong>
           </div>
+        </div>
 
-          <div class="info-row info-row-secondary">
-            <span class="info-label">Time Slot</span>
+        <!-- TIME -->
 
-            <strong class="info-value">
+        <div class="schedule-item">
+          <div class="info-card-icon time-icon">
+            <i class="fa-solid fa-clock"></i>
+          </div>
+
+          <div class="schedule-content">
+            <span>Time Slot</span>
+
+            <strong>
               {{ formatSlot(visit) }}
             </strong>
           </div>
         </div>
-      </div>
 
-      <div class="details-card">
-        <div class="card-header">
-          <div class="card-header-icon area-icon">
-            <i class="fa-solid fa-location-dot"></i>
+        <!-- STATUS -->
+
+        <div class="schedule-item">
+          <div class="info-card-icon visit-status-icon">
+            <i [class]="getStatusIcon(visit.status)"></i>
           </div>
 
-          <div class="card-header-content">
-            <h2>Area</h2>
+          <div class="schedule-content">
+            <span>Visit Status</span>
 
-            <p>Service area assigned to this visit.</p>
-          </div>
-        </div>
-
-        <div class="info-list">
-          <div class="info-row">
-            <span class="info-label">Area</span>
-
-            <strong class="info-value">
-              {{ visit.areaName || 'Not assigned' }}
+            <strong>
+              {{ visit.status }}
             </strong>
           </div>
         </div>
@@ -329,72 +375,85 @@
          PAYMENT & COLLECTION
     ======================================================== -->
 
-    <section class="payment-card">
-      <div class="card-header">
-        <div class="card-header-icon payment-icon">
-          <i class="fa-solid fa-money-bill-wave"></i>
-        </div>
-
-        <div class="card-header-content">
+    <section class="details-section">
+      <div class="section-heading payment-heading">
+        <div>
           <h2>Payment & Collection</h2>
 
-          <p>Financial information associated with this visit.</p>
+          <p>Financial summary and collection information.</p>
+        </div>
+
+        <span class="collection-badge" [ngClass]="getCollectionStatusClass(visit.collectionStatus)">
+          <i [class]="getCollectionIcon(visit.collectionStatus)"></i>
+
+          {{ visit.collectionStatus }}
+        </span>
+      </div>
+
+      <!-- PAYMENT AMOUNTS -->
+
+      <div class="payment-grid">
+        <!-- AMOUNT DUE -->
+
+        <div class="payment-stat due-stat">
+          <div class="payment-stat-header">
+            <span>Amount Due</span>
+
+            <i class="fa-solid fa-money-bill-wave"></i>
+          </div>
+
+          <strong> PKR {{ formatAmount(visit.amountDue) }} </strong>
+        </div>
+
+        <!-- AMOUNT RECEIVED -->
+
+        <div class="payment-stat received-stat">
+          <div class="payment-stat-header">
+            <span>Amount Received</span>
+
+            <i class="fa-solid fa-circle-check"></i>
+          </div>
+
+          <strong> PKR {{ formatAmount(visit.amountReceived) }} </strong>
+        </div>
+
+        <!-- AMOUNT PENDING -->
+
+        <div class="payment-stat pending-stat">
+          <div class="payment-stat-header">
+            <span>Amount Pending</span>
+
+            <i class="fa-solid fa-clock"></i>
+          </div>
+
+          <strong> PKR {{ formatAmount(getPendingAmount()) }} </strong>
         </div>
       </div>
 
-      <div class="payment-summary">
-        <div class="payment-item">
-          <span class="payment-label">Amount Due</span>
+      <!-- PAYMENT DETAILS -->
 
-          <strong class="payment-amount">
-            {{ formatAmount(visit.amountDue) }}
-          </strong>
-        </div>
+      <div class="payment-details-card">
+        <div class="payment-detail-row">
+          <div class="payment-detail-label">
+            <i class="fa-solid fa-user"></i>
 
-        <div class="payment-item">
-          <span class="payment-label">Amount Received</span>
-
-          <strong class="payment-amount received-amount">
-            {{ formatAmount(visit.amountReceived) }}
-          </strong>
-        </div>
-
-        <div class="payment-item">
-          <span class="payment-label">Amount Pending</span>
-
-          <strong class="payment-amount pending-payment">
-            {{ formatAmount(getPendingAmount()) }}
-          </strong>
-        </div>
-
-        <div class="payment-item collection-item">
-          <span class="payment-label">Collection Status</span>
-
-          <span
-            class="collection-badge"
-            [ngClass]="getCollectionStatusClass(visit.collectionStatus)"
-          >
-            <i [class]="getCollectionIcon(visit.collectionStatus)"></i>
-
-            {{ visit.collectionStatus }}
-          </span>
-        </div>
-      </div>
-
-      <div class="payment-meta">
-        <div class="meta-item">
-          <span>Received By</span>
+            <span>Received By</span>
+          </div>
 
           <strong>
             {{ getReceivedByLabel() }}
           </strong>
         </div>
 
-        <div class="meta-item">
-          <span>Settlement ID</span>
+        <div class="payment-detail-row">
+          <div class="payment-detail-label">
+            <i class="fa-solid fa-file-invoice"></i>
+
+            <span>Settlement ID</span>
+          </div>
 
           <strong>
-            {{ visit.settlementId || '-' }}
+            {{ visit.settlementId || 'Not available' }}
           </strong>
         </div>
       </div>

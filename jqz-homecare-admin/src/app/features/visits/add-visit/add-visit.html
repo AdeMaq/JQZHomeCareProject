@@ -40,7 +40,7 @@
 
     <section class="form-card">
       <div class="card-header">
-        <div class="card-header-icon">
+        <div class="card-header-icon patient-icon">
           <i class="fa-solid fa-user"></i>
         </div>
 
@@ -135,6 +135,28 @@
               <span class="field-error"> Location address is required. </span>
             }
           </div>
+
+          <!-- Description -->
+
+          <div class="form-field full-width">
+            <label for="description">
+              Description
+              <span class="optional">(Optional)</span>
+            </label>
+
+            <div class="input-wrapper textarea-wrapper">
+              <i class="fa-solid fa-align-left"></i>
+
+              <textarea
+                id="description"
+                name="description"
+                [(ngModel)]="form.description"
+                maxlength="1000"
+                rows="4"
+                placeholder="Enter any additional notes or visit description"
+              ></textarea>
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -145,7 +167,7 @@
 
     <section class="form-card">
       <div class="card-header">
-        <div class="card-header-icon">
+        <div class="card-header-icon package-icon">
           <i class="fa-solid fa-box-open"></i>
         </div>
 
@@ -206,7 +228,7 @@
           @if (selectedPackage) {
             <div class="package-summary full-width">
               <div class="package-summary-item">
-                <span class="summary-label"> Service </span>
+                <span class="summary-label">Service</span>
 
                 <strong>
                   {{ selectedPackage.serviceName }}
@@ -214,7 +236,7 @@
               </div>
 
               <div class="package-summary-item">
-                <span class="summary-label"> Number of Visits </span>
+                <span class="summary-label">Number of Visits</span>
 
                 <strong>
                   {{ selectedPackage.numberOfVisits }}
@@ -222,7 +244,7 @@
               </div>
 
               <div class="package-summary-item">
-                <span class="summary-label"> Package Amount </span>
+                <span class="summary-label">Package Amount</span>
 
                 <strong>
                   PKR
@@ -231,7 +253,7 @@
               </div>
 
               <div class="package-summary-item">
-                <span class="summary-label"> Price / Visit </span>
+                <span class="summary-label">Price / Visit</span>
 
                 <strong>
                   PKR
@@ -250,7 +272,7 @@
 
     <section class="form-card">
       <div class="card-header">
-        <div class="card-header-icon">
+        <div class="card-header-icon payment-icon">
           <i class="fa-solid fa-money-bill-wave"></i>
         </div>
 
@@ -339,7 +361,7 @@
               <div class="payment-info-row">
                 <span>Payment Method</span>
 
-                <strong> Full Advance </strong>
+                <strong>Full Advance</strong>
               </div>
             }
 
@@ -373,7 +395,7 @@
 
     <section class="form-card">
       <div class="card-header">
-        <div class="card-header-icon">
+        <div class="card-header-icon visit-assignment-icon">
           <i class="fa-solid fa-calendar-days"></i>
         </div>
 
@@ -419,9 +441,7 @@
                   </div>
                 </div>
 
-                <!-- ==================================================
-                     ASSIGNMENT FIELDS
-                =================================================== -->
+                <!-- Assignment Fields -->
 
                 <div class="assignment-grid">
                   <!-- AREA -->
@@ -461,13 +481,13 @@
                             <div class="dropdown-empty">
                               <i class="fa-solid fa-spinner fa-spin"></i>
 
-                              <span> Loading areas... </span>
+                              <span>Loading areas...</span>
                             </div>
                           } @else if (getFilteredAreas(i).length === 0) {
                             <div class="dropdown-empty">
                               <i class="fa-solid fa-location-dot"></i>
 
-                              <span> No areas found. </span>
+                              <span>No areas found.</span>
                             </div>
                           } @else {
                             @for (area of getFilteredAreas(i); track area.id) {
@@ -477,7 +497,7 @@
                                 [class.selected]="assignment.areaId === area.id"
                                 (click)="selectArea(i, area)"
                               >
-                                <span class="dropdown-option-icon">
+                                <span class="dropdown-option-icon area-option-icon">
                                   <i class="fa-solid fa-location-dot"></i>
                                 </span>
 
@@ -541,13 +561,13 @@
                             <div class="dropdown-empty">
                               <i class="fa-solid fa-spinner fa-spin"></i>
 
-                              <span> Loading practitioners... </span>
+                              <span>Loading practitioners...</span>
                             </div>
                           } @else if (getPractitionersForAssignment(i).length === 0) {
                             <div class="dropdown-empty">
                               <i class="fa-solid fa-user-doctor"></i>
 
-                              <span> No practitioners found. </span>
+                              <span>No practitioners found.</span>
                             </div>
                           } @else {
                             @for (
@@ -611,18 +631,14 @@
                   </div>
                 </div>
 
-                <!-- ==================================================
-                     PRACTITIONER SCHEDULE
-                =================================================== -->
+                <!-- PRACTITIONER SCHEDULE -->
 
                 @if (shouldShowPractitionerSchedule(i)) {
                   <div class="practitioner-schedule">
-                    <!-- Schedule Header -->
-
                     <div class="practitioner-schedule-header">
                       <div class="schedule-title">
-                        <div class="schedule-title-icon">
-                          <i class="fa-solid fa-calendar-clock"></i>
+                        <div class="schedule-title-icon practitioner-schedule-icon">
+                          <i class="fa-solid fa-user-doctor"></i>
                         </div>
 
                         <div>
@@ -636,23 +652,26 @@
                         </div>
                       </div>
 
+                      <!-- BOOKED COUNTER -->
+
                       <div class="schedule-summary">
-                        {{ getBookedVisitCount(i) }}
-                        booked
+                        <i class="fa-solid fa-calendar-check"></i>
+
+                        <span class="schedule-count">
+                          {{ getBookedVisitCount(i) }}
+                        </span>
+
+                        <span class="schedule-label"> booked </span>
                       </div>
                     </div>
-
-                    <!-- Loading -->
 
                     @if (isLoadingSchedule[i]) {
                       <div class="schedule-loading">
                         <i class="fa-solid fa-spinner fa-spin"></i>
 
-                        <span> Loading practitioner schedule... </span>
+                        <span>Loading practitioner schedule...</span>
                       </div>
                     }
-
-                    <!-- Error -->
 
                     @if (scheduleErrors[i]) {
                       <div class="schedule-error">
@@ -663,8 +682,6 @@
                         </span>
                       </div>
                     }
-
-                    <!-- Schedule Slots -->
 
                     @if (!isLoadingSchedule[i] && !scheduleErrors[i]) {
                       <div class="schedule-slots">
@@ -710,9 +727,7 @@
                   </div>
                 }
 
-                <!-- ==================================================
-                     TIME SELECTION
-                =================================================== -->
+                <!-- TIME SELECTION -->
 
                 <div class="assignment-grid time-selection-grid">
                   <!-- START TIME -->
@@ -752,9 +767,7 @@
                   </div>
                 </div>
 
-                <!-- ==================================================
-                     TIME RANGE VALIDATION
-                =================================================== -->
+                <!-- TIME RANGE VALIDATION -->
 
                 @if (getTimeRangeError(i)) {
                   <div class="assignment-warning time-range-warning">
@@ -766,9 +779,7 @@
                   </div>
                 }
 
-                <!-- ==================================================
-                     PARTIAL SCHEDULE VALIDATION
-                =================================================== -->
+                <!-- PARTIAL SCHEDULE VALIDATION -->
 
                 @if (hasPartialSchedule(assignment)) {
                   <div class="assignment-warning">

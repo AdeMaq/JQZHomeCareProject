@@ -12,6 +12,7 @@
 
         <div>
           <h1>Payments</h1>
+
           <p>Manage practitioner weekly settlements and payment collections.</p>
         </div>
       </div>
@@ -26,6 +27,7 @@
     <div class="alert alert-success">
       <div class="alert-content">
         <i class="fa-solid fa-circle-check"></i>
+
         <span>{{ successMessage }}</span>
       </div>
 
@@ -39,6 +41,7 @@
     <div class="alert alert-error">
       <div class="alert-content">
         <i class="fa-solid fa-circle-exclamation"></i>
+
         <span>{{ errorMessage }}</span>
       </div>
 
@@ -66,7 +69,9 @@
       </div>
     </div>
 
+    <!-- ======================================================= -->
     <!-- FILTERS -->
+    <!-- ======================================================= -->
 
     <div class="settlement-filters">
       <!-- PRACTITIONER -->
@@ -123,21 +128,22 @@
     </div>
 
     <!-- ======================================================= -->
-    <!-- LOADING -->
+    <!-- WEEKLY SETTLEMENT CONTENT -->
     <!-- ======================================================= -->
 
     @if (isLoadingSummary) {
+      <!-- LOADING -->
+
       <div class="loading-state">
         <i class="fa-solid fa-spinner fa-spin"></i>
+
         <p>Loading weekly settlement...</p>
       </div>
-    }
+    } @else if (weeklySettlement) {
+      <!-- ===================================================== -->
+      <!-- WEEKLY SUMMARY -->
+      <!-- ===================================================== -->
 
-    <!-- ======================================================= -->
-    <!-- WEEKLY SUMMARY -->
-    <!-- ======================================================= -->
-
-    @if (!isLoadingSummary && weeklySettlement) {
       <div class="weekly-summary">
         <!-- SUMMARY HEADER -->
 
@@ -179,7 +185,9 @@
           </div>
         </div>
 
+        <!-- ===================================================== -->
         <!-- SUMMARY STATS -->
+        <!-- ===================================================== -->
 
         <div class="summary-stats">
           <div class="summary-stat">
@@ -189,6 +197,7 @@
 
             <div>
               <span>Total Visits</span>
+
               <strong>
                 {{ weeklySettlement.visitCount }}
               </strong>
@@ -202,6 +211,7 @@
 
             <div>
               <span>Total Visit Amount</span>
+
               <strong>
                 {{ weeklySettlement.totalVisitAmount | number: '1.2-2' }}
               </strong>
@@ -215,6 +225,7 @@
 
             <div>
               <span>Practitioner Share</span>
+
               <strong>
                 {{ weeklySettlement.practitionerShareAmount | number: '1.2-2' }}
               </strong>
@@ -228,6 +239,7 @@
 
             <div>
               <span>Company Share</span>
+
               <strong>
                 {{ weeklySettlement.companyShareAmount | number: '1.2-2' }}
               </strong>
@@ -235,7 +247,9 @@
           </div>
         </div>
 
+        <!-- ===================================================== -->
         <!-- RECEIVED DATE -->
+        <!-- ===================================================== -->
 
         @if (weeklySettlement.receivedDate) {
           <div class="received-info">
@@ -243,6 +257,7 @@
 
             <span>
               Payment received on
+
               <strong>
                 {{ weeklySettlement.receivedDate | date: 'dd MMM yyyy, hh:mm a' }}
               </strong>
@@ -326,7 +341,9 @@
 
                       <td>
                         @if (visit.slotStart && visit.slotEnd) {
-                          {{ visit.slotStart }} - {{ visit.slotEnd }}
+                          {{ visit.slotStart }}
+                          -
+                          {{ visit.slotEnd }}
                         } @else {
                           -
                         }
@@ -417,13 +434,11 @@
           }
         </div>
       </div>
-    }
+    } @else {
+      <!-- ===================================================== -->
+      <!-- INITIAL STATE -->
+      <!-- ===================================================== -->
 
-    <!-- ======================================================= -->
-    <!-- INITIAL STATE -->
-    <!-- ======================================================= -->
-
-    @if (!isLoadingSummary && !weeklySettlement && !selectedPractitionerId) {
       <div class="initial-state">
         <div class="initial-icon">
           <i class="fa-solid fa-money-bill-transfer"></i>
@@ -467,18 +482,21 @@
       </button>
     </div>
 
-    <!-- LOADING -->
+    <!-- ======================================================= -->
+    <!-- PENDING SETTLEMENTS CONTENT -->
+    <!-- ======================================================= -->
 
     @if (isLoadingPending) {
+      <!-- LOADING STATE -->
+
       <div class="loading-state">
         <i class="fa-solid fa-spinner fa-spin"></i>
+
         <p>Loading pending settlements...</p>
       </div>
-    }
+    } @else if (pendingSettlements.length > 0) {
+      <!-- TABLE -->
 
-    <!-- TABLE -->
-
-    @if (!isLoadingPending && pendingSettlements.length > 0) {
       <div class="table-wrapper">
         <table class="pending-table">
           <thead>
@@ -579,11 +597,9 @@
           </tbody>
         </table>
       </div>
-    }
+    } @else {
+      <!-- EMPTY STATE -->
 
-    <!-- EMPTY STATE -->
-
-    @if (!isLoadingPending && pendingSettlements.length === 0) {
       <div class="empty-state">
         <div class="empty-icon">
           <i class="fa-solid fa-circle-check"></i>
@@ -591,7 +607,7 @@
 
         <h3>No Pending Settlements</h3>
 
-        <p>All generated practitioner settlements have been received.</p>
+        <p>There are currently no generated settlements awaiting payment confirmation.</p>
       </div>
     }
   </div>

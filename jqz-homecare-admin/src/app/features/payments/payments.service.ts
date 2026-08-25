@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { map, Observable } from 'rxjs';
+import { map, Observable, timeout } from 'rxjs';
 
 import {
   BackendPractitionerSettlement,
@@ -14,9 +14,19 @@ import {
   providedIn: 'root',
 })
 export class PaymentsService {
+  // ============================================================
+  // SERVICES
+  // ============================================================
+
   private readonly http = inject(HttpClient);
 
+  // ============================================================
+  // API CONFIGURATION
+  // ============================================================
+
   private readonly apiUrl = 'http://localhost:5212/api/payments';
+
+  private readonly requestTimeout = 15000;
 
   // ============================================================
   // GET WEEKLY SETTLEMENT SUMMARY
@@ -32,7 +42,11 @@ export class PaymentsService {
           weekStart,
         },
       })
-      .pipe(map((response) => this.mapWeeklySettlement(response)));
+      .pipe(
+        timeout(this.requestTimeout),
+
+        map((response) => this.mapWeeklySettlement(response)),
+      );
   }
 
   // ============================================================
@@ -43,13 +57,13 @@ export class PaymentsService {
   // ============================================================
 
   getPendingSettlements(): Observable<PractitionerSettlement[]> {
-    return this.http
-      .get<BackendPractitionerSettlement[]>(`${this.apiUrl}/pending`)
-      .pipe(
-        map((settlements) =>
-          settlements.map((settlement) => this.mapPractitionerSettlement(settlement)),
-        ),
-      );
+    return this.http.get<BackendPractitionerSettlement[]>(`${this.apiUrl}/pending`).pipe(
+      timeout(this.requestTimeout),
+
+      map((settlements) =>
+        settlements.map((settlement) => this.mapPractitionerSettlement(settlement)),
+      ),
+    );
   }
 
   // ============================================================
@@ -60,9 +74,11 @@ export class PaymentsService {
   // ============================================================
 
   getSettlementById(id: string): Observable<PractitionerSettlement> {
-    return this.http
-      .get<BackendPractitionerSettlement>(`${this.apiUrl}/${id}`)
-      .pipe(map((response) => this.mapPractitionerSettlement(response)));
+    return this.http.get<BackendPractitionerSettlement>(`${this.apiUrl}/${id}`).pipe(
+      timeout(this.requestTimeout),
+
+      map((response) => this.mapPractitionerSettlement(response)),
+    );
   }
 
   // ============================================================
@@ -73,9 +89,11 @@ export class PaymentsService {
   // ============================================================
 
   generateSettlement(request: GenerateSettlementRequest): Observable<PractitionerSettlement> {
-    return this.http
-      .post<BackendPractitionerSettlement>(`${this.apiUrl}/generate`, request)
-      .pipe(map((response) => this.mapPractitionerSettlement(response)));
+    return this.http.post<BackendPractitionerSettlement>(`${this.apiUrl}/generate`, request).pipe(
+      timeout(this.requestTimeout),
+
+      map((response) => this.mapPractitionerSettlement(response)),
+    );
   }
 
   // ============================================================
@@ -86,7 +104,9 @@ export class PaymentsService {
   // ============================================================
 
   markSettlementReceived(id: string): Observable<void> {
-    return this.http.put<void>(`${this.apiUrl}/${id}/received`, {});
+    return this.http
+      .put<void>(`${this.apiUrl}/${id}/received`, {})
+      .pipe(timeout(this.requestTimeout));
   }
 
   // ============================================================

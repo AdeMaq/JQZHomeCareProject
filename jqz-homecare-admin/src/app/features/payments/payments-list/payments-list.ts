@@ -1,6 +1,7 @@
 import { CommonModule, DatePipe, DecimalPipe } from '@angular/common';
-import { Component, OnInit, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { finalize, Subscription } from 'rxjs';
 
 import { PractitionerSettlement, WeeklySettlement } from '../payments.interface';
 
@@ -15,7 +16,7 @@ import { Practitioner, PractitionerService } from '../../../core/services/practi
   templateUrl: './payments-list.html',
   styleUrl: './payments-list.css',
 })
-export class PaymentsList implements OnInit {
+export class PaymentsList implements OnInit, OnDestroy {
   // ============================================================
   // SERVICES
   // ============================================================
@@ -23,6 +24,18 @@ export class PaymentsList implements OnInit {
   private readonly paymentsService = inject(PaymentsService);
 
   private readonly practitionerService = inject(PractitionerService);
+
+  /**
+   * Explicitly triggers Angular change detection after
+   * asynchronous API operations.
+   */
+  private readonly cdr = inject(ChangeDetectorRef);
+
+  // ============================================================
+  // SUBSCRIPTIONS
+  // ============================================================
+
+  private pendingSettlementsSubscription: Subscription | null = null;
 
   // ============================================================
   // DATA
@@ -74,6 +87,10 @@ export class PaymentsList implements OnInit {
     this.loadPendingSettlements();
   }
 
+  ngOnDestroy(): void {
+    this.cancelPendingSettlementsRequest();
+  }
+
   // ============================================================
   // SET CURRENT WEEK START
   // ============================================================
@@ -83,10 +100,10 @@ export class PaymentsList implements OnInit {
 
     const day = today.getDay();
 
-    // Convert Sunday from 0 to 7
+    // Convert Sunday from 0 to 7.
     const adjustedDay = day === 0 ? 7 : day;
 
-    // Monday as week start
+    // Monday as the start of the week.
     today.setDate(today.getDate() - adjustedDay + 1);
 
     this.selectedWeekStart = this.formatDate(today);
@@ -113,13 +130,17 @@ export class PaymentsList implements OnInit {
   loadPractitioners(): void {
     this.practitionerService.getPractitioners().subscribe({
       next: (response: Practitioner[]) => {
-        this.practitioners = response;
+        this.practitioners = response ?? [];
+
+        this.cdr.detectChanges();
       },
 
       error: (error: unknown) => {
         console.error('Error loading practitioners:', error);
 
         this.errorMessage = 'Failed to load practitioners. Please try again.';
+
+        this.cdr.detectChanges();
       },
     });
   }
@@ -132,6 +153,8 @@ export class PaymentsList implements OnInit {
     this.weeklySettlement = null;
 
     this.clearMessages();
+
+    this.cdr.detectChanges();
   }
 
   // ============================================================
@@ -142,6 +165,8 @@ export class PaymentsList implements OnInit {
     if (!this.selectedPractitionerId || !this.selectedWeekStart) {
       this.errorMessage = 'Please select both a practitioner and a week start date.';
 
+      this.cdr.detectChanges();
+
       return;
     }
 
@@ -151,21 +176,33 @@ export class PaymentsList implements OnInit {
 
     this.weeklySettlement = null;
 
+    this.cdr.detectChanges();
+
     this.paymentsService
       .getWeeklySummary(this.selectedPractitionerId, this.selectedWeekStart)
+      .pipe(
+        finalize(() => {
+          this.isLoadingSummary = false;
+
+          this.cdr.detectChanges();
+        }),
+      )
       .subscribe({
         next: (response: WeeklySettlement) => {
           this.weeklySettlement = response;
 
-          this.isLoadingSummary = false;
+          this.cdr.detectChanges();
         },
 
         error: (error: unknown) => {
           console.error('Error loading weekly settlement:', error);
 
-          this.errorMessage = 'Failed to load the weekly settlement summary. Please try again.';
+          this.errorMessage = this.getErrorMessage(
+            error,
+            'Failed to load the weekly settlement summary. Please try again.',
+          );
 
-          this.isLoadingSummary = false;
+          this.cdr.detectChanges();
         },
       });
   }
@@ -182,6 +219,8 @@ export class PaymentsList implements OnInit {
     if (this.weeklySettlement.visitCount === 0) {
       this.errorMessage = 'There are no completed visits available for settlement.';
 
+      this.cdr.detectChanges();
+
       return;
     }
 
@@ -189,18 +228,24 @@ export class PaymentsList implements OnInit {
 
     this.isGeneratingSettlement = true;
 
+    this.cdr.detectChanges();
+
     this.paymentsService
       .generateSettlement({
         practitionerId: this.weeklySettlement.practitionerId,
         weekStart: this.weeklySettlement.weekStart,
       })
+      .pipe(
+        finalize(() => {
+          this.isGeneratingSettlement = false;
+
+          this.cdr.detectChanges();
+        }),
+      )
       .subscribe({
         next: (response: PractitionerSettlement) => {
           this.successMessage = 'Weekly settlement generated successfully.';
 
-          this.isGeneratingSettlement = false;
-
-          // Update the currently displayed weekly settlement
           if (this.weeklySettlement) {
             this.weeklySettlement = {
               ...this.weeklySettlement,
@@ -210,7 +255,9 @@ export class PaymentsList implements OnInit {
             };
           }
 
-          // Refresh pending settlements
+          this.cdr.detectChanges();
+
+          // Refresh pending settlements after generation.
           this.loadPendingSettlements();
         },
 
@@ -222,7 +269,7 @@ export class PaymentsList implements OnInit {
             'Failed to generate the weekly settlement.',
           );
 
-          this.isGeneratingSettlement = false;
+          this.cdr.detectChanges();
         },
       });
   }
@@ -232,23 +279,69 @@ export class PaymentsList implements OnInit {
   // ============================================================
 
   loadPendingSettlements(): void {
+    // Cancel any existing pending request before starting
+    // a new request.
+    this.cancelPendingSettlementsRequest();
+
+    this.clearMessages();
+
+    // Set the loading state before making the API request.
     this.isLoadingPending = true;
 
-    this.paymentsService.getPendingSettlements().subscribe({
-      next: (response: PractitionerSettlement[]) => {
-        this.pendingSettlements = response;
+    // Immediately update the loading state in the view.
+    this.cdr.detectChanges();
 
-        this.isLoadingPending = false;
-      },
+    this.pendingSettlementsSubscription = this.paymentsService
+      .getPendingSettlements()
+      .pipe(
+        finalize(() => {
+          this.isLoadingPending = false;
 
-      error: (error: unknown) => {
-        console.error('Error loading pending settlements:', error);
+          this.pendingSettlementsSubscription = null;
 
-        this.errorMessage = 'Failed to load pending settlements. Please try again.';
+          // Ensure Angular reevaluates:
+          //
+          // @if (isLoadingPending)
+          // @else if (pendingSettlements.length > 0)
+          // @else
+          this.cdr.detectChanges();
+        }),
+      )
+      .subscribe({
+        next: (response: PractitionerSettlement[]) => {
+          this.pendingSettlements = response ?? [];
 
-        this.isLoadingPending = false;
-      },
-    });
+          // Update the template after receiving the API response.
+          this.cdr.detectChanges();
+        },
+
+        error: (error: unknown) => {
+          console.error('Error loading pending settlements:', error);
+
+          this.pendingSettlements = [];
+
+          this.errorMessage = this.getErrorMessage(
+            error,
+            'Failed to load pending settlements. Please try again.',
+          );
+
+          this.cdr.detectChanges();
+        },
+      });
+  }
+
+  // ============================================================
+  // CANCEL PENDING SETTLEMENTS REQUEST
+  // ============================================================
+
+  private cancelPendingSettlementsRequest(): void {
+    if (this.pendingSettlementsSubscription) {
+      this.pendingSettlementsSubscription.unsubscribe();
+
+      this.pendingSettlementsSubscription = null;
+    }
+
+    this.isLoadingPending = false;
   }
 
   // ============================================================
@@ -260,39 +353,50 @@ export class PaymentsList implements OnInit {
 
     this.processingSettlementId = id;
 
-    this.paymentsService.markSettlementReceived(id).subscribe({
-      next: () => {
-        this.successMessage = 'Settlement marked as received successfully.';
+    this.cdr.detectChanges();
 
-        this.processingSettlementId = null;
+    this.paymentsService
+      .markSettlementReceived(id)
+      .pipe(
+        finalize(() => {
+          this.processingSettlementId = null;
 
-        // Remove the settlement from pending list
-        this.pendingSettlements = this.pendingSettlements.filter(
-          (settlement) => settlement.id !== id,
-        );
+          this.cdr.detectChanges();
+        }),
+      )
+      .subscribe({
+        next: () => {
+          this.successMessage = 'Settlement marked as received successfully.';
 
-        // If currently viewing this settlement,
-        // update its status as well.
-        if (this.weeklySettlement && this.weeklySettlement.settlementId === id) {
-          this.weeklySettlement = {
-            ...this.weeklySettlement,
-            status: 'Received',
-            receivedDate: new Date().toISOString(),
-          };
-        }
-      },
+          // Remove the settlement from the pending list.
+          this.pendingSettlements = this.pendingSettlements.filter(
+            (settlement) => settlement.id !== id,
+          );
 
-      error: (error: unknown) => {
-        console.error('Error marking settlement as received:', error);
+          // Update the currently displayed weekly settlement,
+          // if it is the same settlement.
+          if (this.weeklySettlement && this.weeklySettlement.settlementId === id) {
+            this.weeklySettlement = {
+              ...this.weeklySettlement,
+              status: 'Received',
+              receivedDate: new Date().toISOString(),
+            };
+          }
 
-        this.errorMessage = this.getErrorMessage(
-          error,
-          'Failed to mark the settlement as received.',
-        );
+          this.cdr.detectChanges();
+        },
 
-        this.processingSettlementId = null;
-      },
-    });
+        error: (error: unknown) => {
+          console.error('Error marking settlement as received:', error);
+
+          this.errorMessage = this.getErrorMessage(
+            error,
+            'Failed to mark the settlement as received.',
+          );
+
+          this.cdr.detectChanges();
+        },
+      });
   }
 
   // ============================================================

@@ -1,10 +1,12 @@
-﻿using System;
+﻿using JQZHomeCareProject.Mobile.Models.Practitioners;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace JQZHomeCareProject.Mobile.Services.Api
 {
-    internal interface IPractitionersApi
+    public interface IPractitionersApi
     {
+        Task<PractitionerDto> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
     }
 }

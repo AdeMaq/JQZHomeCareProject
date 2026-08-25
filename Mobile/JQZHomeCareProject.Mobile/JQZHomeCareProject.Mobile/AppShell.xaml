@@ -2,6 +2,7 @@
 <Shell xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
        xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
        xmlns:home="clr-namespace:JQZHomeCareProject.Mobile.Views.Home"
+       xmlns:visits="clr-namespace:JQZHomeCareProject.Mobile.Views.Visits"
        x:Class="JQZHomeCareProject.Mobile.AppShell"
        FlyoutBehavior="Disabled"
        Shell.TabBarIsVisible="True">
@@ -10,6 +11,9 @@
         <ShellContent Title="Home"
                       Route="home"
                       ContentTemplate="{DataTemplate home:HomePage}" />
+        <ShellContent Title="Visits"
+                      Route="visits"
+                      ContentTemplate="{DataTemplate visits:VisitsPage}" />
     </TabBar>
 
 </Shell>

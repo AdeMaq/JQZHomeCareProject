@@ -1,9 +1,107 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:JQZHomeCareProject.Mobile.ViewModels.Home"
+             xmlns:models="clr-namespace:JQZHomeCareProject.Mobile.Models.Visits"
              x:Class="JQZHomeCareProject.Mobile.Views.Home.HomePage"
+             x:DataType="vm:HomeViewModel"
              Title="Home">
-    <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center">
-        <Label Text="Logged in successfully!" FontSize="20" />
-    </VerticalStackLayout>
+
+    <RefreshView IsRefreshing="{Binding IsRefreshing}" Command="{Binding RefreshCommand}">
+        <CollectionView ItemsSource="{Binding TodaysVisits}" SelectionMode="None">
+
+            <CollectionView.Header>
+                <VerticalStackLayout Padding="20,16,20,4" Spacing="20">
+
+                    <!-- Greeting -->
+                    <VerticalStackLayout Spacing="2">
+                        <Label Text="{Binding GreetingLine}"
+                               FontSize="22"
+                               FontAttributes="Bold" />
+                        <Label Text="{Binding TodayDateText}"
+                               FontSize="14"
+                               TextColor="Gray" />
+                    </VerticalStackLayout>
+
+                    <!-- Summary cards -->
+                    <Grid ColumnDefinitions="*,*,*" ColumnSpacing="10">
+
+                        <Border Grid.Column="0" StrokeShape="RoundRectangle 12" Padding="12" BackgroundColor="{StaticResource Primary}">
+                            <VerticalStackLayout Spacing="4">
+                                <Label Text="{Binding TodaysVisits.Count}" FontSize="22" FontAttributes="Bold" TextColor="White" />
+                                <Label Text="Today's Visits" FontSize="12" TextColor="White" />
+                            </VerticalStackLayout>
+                        </Border>
+
+                        <Border Grid.Column="1" StrokeShape="RoundRectangle 12" Padding="12" BackgroundColor="{StaticResource Primary}">
+                            <VerticalStackLayout Spacing="4">
+                                <Label Text="{Binding ExpectedAmountTodayDisplay}" FontSize="16" FontAttributes="Bold" TextColor="White" LineBreakMode="TailTruncation" />
+                                <Label Text="Expected Today" FontSize="12" TextColor="White" />
+                            </VerticalStackLayout>
+                        </Border>
+
+                        <Border Grid.Column="2" StrokeShape="RoundRectangle 12" Padding="12" BackgroundColor="{StaticResource Primary}">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding OpenRatingsCommand}" />
+                            </Border.GestureRecognizers>
+                            <VerticalStackLayout Spacing="4">
+                                <Label Text="{Binding LatestRatingDisplay}" FontSize="16" FontAttributes="Bold" TextColor="White" />
+                                <Label Text="My Rating" FontSize="12" TextColor="White" />
+                            </VerticalStackLayout>
+                        </Border>
+
+                    </Grid>
+
+                    <!-- Schedule header -->
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Grid.Column="0" Text="Today's Schedule" FontSize="16" FontAttributes="Bold" VerticalOptions="Center" />
+                        <Label Grid.Column="1" Text="View All"
+                               TextColor="{StaticResource Primary}"
+                               VerticalOptions="Center">
+                            <Label.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding ViewAllVisitsCommand}" />
+                            </Label.GestureRecognizers>
+                        </Label>
+                    </Grid>
+
+                    <Label Text="{Binding ErrorMessage}"
+                           TextColor="{StaticResource ErrorRed}"
+                           IsVisible="{Binding ErrorMessage, Converter={StaticResource StringNotEmptyConverter}}" />
+
+                </VerticalStackLayout>
+            </CollectionView.Header>
+
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="models:VisitDto">
+                    <Grid Padding="20,8">
+                        <Border StrokeShape="RoundRectangle 12" Padding="14" BackgroundColor="White" Stroke="LightGray">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:HomeViewModel}}, Path=OpenVisitCommand}"
+                                                       CommandParameter="{Binding .}" />
+                            </Border.GestureRecognizers>
+                            <Grid ColumnDefinitions="70,*" ColumnSpacing="12">
+                                <Label Grid.Column="0"
+                                       Text="{Binding TimeSlot}"
+                                       FontSize="13"
+                                       FontAttributes="Bold"
+                                       VerticalOptions="Start" />
+                                <VerticalStackLayout Grid.Column="1" Spacing="2">
+                                    <Label Text="{Binding PatientName}" FontSize="15" FontAttributes="Bold" />
+                                    <Label Text="{Binding PatientAddress}" FontSize="13" TextColor="Gray" />
+                                </VerticalStackLayout>
+                            </Grid>
+                        </Border>
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+
+            <CollectionView.EmptyView>
+                <VerticalStackLayout Padding="20,40" HorizontalOptions="Center" Spacing="8">
+                    <Label Text="No visits scheduled today" FontSize="14" TextColor="Gray" HorizontalTextAlignment="Center" />
+                </VerticalStackLayout>
+            </CollectionView.EmptyView>
+
+        </CollectionView>
+    </RefreshView>
+
 </ContentPage>

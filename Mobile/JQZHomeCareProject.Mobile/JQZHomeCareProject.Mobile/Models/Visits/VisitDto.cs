@@ -9,6 +9,7 @@ namespace JQZHomeCareProject.Mobile.Models.Visits
     {
         public Guid Id { get; set; }
         public string PatientName { get; set; } = string.Empty;
+        public string PatientAddress {  get; set; }= string.Empty;
 
         public Guid? PractitionerId { get; set; }
         public string? PractitionerName { get; set; }

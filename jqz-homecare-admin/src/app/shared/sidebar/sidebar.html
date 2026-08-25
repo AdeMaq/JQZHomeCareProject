@@ -42,7 +42,12 @@
     </div>
 
     <!-- ===============================================
-         DESKTOP HAMBURGER
+         TABLET / DESKTOP
+         SIDEBAR COLLAPSE / EXPAND CONTROL
+
+         ONLY ONE CONTROL
+         CHEVRON ONLY
+         NO HAMBURGER ICON
     ================================================ -->
 
     <button
@@ -52,11 +57,17 @@
       [attr.title]="isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'"
       (click)="toggleSidebar()"
     >
-      <i class="fa-solid fa-bars"></i>
+      <i
+        class="fa-solid"
+        [class.fa-chevron-right]="isCollapsed"
+        [class.fa-chevron-left]="!isCollapsed"
+      ></i>
     </button>
 
     <!-- ===============================================
-         MOBILE CLOSE
+         MOBILE CLOSE BUTTON
+
+         MOBILE ONLY
     ================================================ -->
 
     <button
@@ -77,9 +88,9 @@
   <nav class="sidebar-menu" aria-label="Main navigation">
     @for (section of menuSections; track section.label) {
       <div class="menu-section" [class.section-active]="isSectionActive(section.items)">
-        <!-- =============================================
+        <!-- ===========================================
              SECTION TITLE
-        ============================================== -->
+        ============================================ -->
 
         <div class="section-title">
           <span>
@@ -87,9 +98,9 @@
           </span>
         </div>
 
-        <!-- =============================================
+        <!-- ===========================================
              SECTION ITEMS
-        ============================================== -->
+        ============================================ -->
 
         <div class="section-items">
           @for (item of section.items; track item.route) {
@@ -119,40 +130,4 @@
       </div>
     }
   </nav>
-
-  <!-- ===================================================
-       SIDEBAR FOOTER
-  ==================================================== -->
-
-  <div class="sidebar-footer">
-    <div class="sidebar-footer-divider"></div>
-
-    <!-- ===============================================
-         EXPANDED FOOTER
-    ================================================ -->
-
-    @if (!isCollapsed) {
-      <div class="collapse-hint">
-        <i class="fa-solid fa-bars"></i>
-
-        <span> Use the menu button to collapse the sidebar </span>
-      </div>
-    }
-
-    <!-- ===============================================
-         COLLAPSED FOOTER
-    ================================================ -->
-
-    @if (isCollapsed) {
-      <button
-        type="button"
-        class="collapsed-expand-button"
-        title="Expand sidebar"
-        aria-label="Expand sidebar"
-        (click)="toggleSidebar()"
-      >
-        <i class="fa-solid fa-bars"></i>
-      </button>
-    }
-  </div>
 </aside>

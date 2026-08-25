@@ -1,6 +1,9 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, OnInit, OnDestroy } from '@angular/core';
+
 import { CommonModule } from '@angular/common';
+
 import { Router, NavigationEnd } from '@angular/router';
+
 import { filter } from 'rxjs/operators';
 
 @Component({
@@ -10,38 +13,26 @@ import { filter } from 'rxjs/operators';
   templateUrl: './sidebar.html',
   styleUrl: './sidebar.css',
 })
-export class Sidebar {
+export class Sidebar implements OnInit, OnDestroy {
   /*
    * =====================================================
    * INPUTS / OUTPUTS
    * =====================================================
    */
 
-  /*
-   * Mobile sidebar state.
-   *
-   * Controlled by AdminLayout.
-   */
   @Input() isOpen = false;
 
-  /*
-   * Emits when the mobile sidebar should be closed.
-   */
   @Output() closeSidebar = new EventEmitter<void>();
 
-  /*
-   * Emits whenever the desktop sidebar changes between
-   * expanded and collapsed.
-   *
-   * false = expanded
-   * true  = collapsed
-   */
   @Output() collapsedChange = new EventEmitter<boolean>();
 
   /*
    * =====================================================
-   * DESKTOP SIDEBAR STATE
+   * DESKTOP / TABLET SIDEBAR STATE
    * =====================================================
+   *
+   * false = expanded
+   * true  = collapsed
    */
 
   isCollapsed = false;
@@ -50,20 +41,6 @@ export class Sidebar {
    * =====================================================
    * SIDEBAR MENU
    * =====================================================
-   *
-   * Application workflow:
-   *
-   * Overview
-   *   Dashboard
-   *
-   * Healthcare
-   *   Services
-   *   Packages
-   *   Practitioners
-   *
-   * Locations
-   *   Cities
-   *   Areas
    */
 
   menuSections = [
@@ -80,15 +57,33 @@ export class Sidebar {
     },
 
     {
-      label: 'Healthcare',
+      label: 'Operations',
 
       items: [
         {
-          icon: 'fa-solid fa-briefcase-medical',
-          label: 'Services',
-          route: '/services',
+          icon: 'fa-solid fa-calendar-check',
+          label: 'Visits',
+          route: '/visits',
         },
 
+        {
+          icon: 'fa-solid fa-user-doctor',
+          label: 'Practitioners',
+          route: '/practitioners',
+        },
+
+        {
+          icon: 'fa-solid fa-money-bill-transfer',
+          label: 'Payments',
+          route: '/payments',
+        },
+      ],
+    },
+
+    {
+      label: 'Management',
+
+      items: [
         {
           icon: 'fa-solid fa-box-open',
           label: 'Packages',
@@ -96,9 +91,9 @@ export class Sidebar {
         },
 
         {
-          icon: 'fa-solid fa-user-doctor',
-          label: 'Practitioners',
-          route: '/practitioners',
+          icon: 'fa-solid fa-briefcase-medical',
+          label: 'Services',
+          route: '/services',
         },
       ],
     },
@@ -108,15 +103,27 @@ export class Sidebar {
 
       items: [
         {
+          icon: 'fa-solid fa-location-dot',
+          label: 'Areas',
+          route: '/areas',
+        },
+
+        {
           icon: 'fa-solid fa-city',
           label: 'Cities',
           route: '/cities',
         },
+      ],
+    },
 
+    {
+      label: 'Quality',
+
+      items: [
         {
-          icon: 'fa-solid fa-location-dot',
-          label: 'Areas',
-          route: '/areas',
+          icon: 'fa-solid fa-star',
+          label: 'Ratings',
+          route: '/ratings',
         },
       ],
     },
@@ -129,6 +136,16 @@ export class Sidebar {
    */
 
   currentRoute = '';
+
+  /*
+   * =====================================================
+   * RESPONSIVE BREAKPOINTS
+   * =====================================================
+   */
+
+  private readonly mobileBreakpoint = 768;
+
+  private readonly tabletBreakpoint = 1200;
 
   /*
    * =====================================================
@@ -150,16 +167,93 @@ export class Sidebar {
 
   /*
    * =====================================================
+   * LIFECYCLE
+   * =====================================================
+   */
+
+  ngOnInit(): void {
+    this.updateSidebarForViewport();
+  }
+
+  ngOnDestroy(): void {
+    window.removeEventListener('resize', this.onWindowResize);
+  }
+
+  /*
+   * =====================================================
+   * WINDOW RESIZE
+   * =====================================================
+   */
+
+  private onWindowResize = (): void => {
+    this.updateSidebarForViewport();
+  };
+
+  private updateSidebarForViewport(): void {
+    const width = window.innerWidth;
+
+    /*
+     * MOBILE
+     *
+     * Sidebar is always visually expanded when opened.
+     */
+
+    if (width <= this.mobileBreakpoint) {
+      this.isCollapsed = false;
+
+      this.collapsedChange.emit(false);
+
+      return;
+    }
+
+    /*
+     * TABLET / MEDIUM DESKTOP
+     *
+     * Default to compact icon sidebar.
+     */
+
+    if (width < this.tabletBreakpoint) {
+      this.isCollapsed = true;
+
+      this.collapsedChange.emit(true);
+
+      return;
+    }
+
+    /*
+     * LARGE DESKTOP
+     */
+
+    this.isCollapsed = false;
+
+    this.collapsedChange.emit(false);
+  }
+
+  /*
+   * =====================================================
+   * INITIALIZE RESIZE LISTENER
+   * =====================================================
+   */
+
+  ngAfterViewInit(): void {
+    window.addEventListener('resize', this.onWindowResize);
+  }
+
+  /*
+   * =====================================================
    * DESKTOP SIDEBAR TOGGLE
    * =====================================================
-   *
-   * Hamburger button:
-   *
-   * Expanded  -> Collapsed
-   * Collapsed -> Expanded
    */
 
   toggleSidebar(): void {
+    /*
+     * Sidebar should not collapse on mobile.
+     */
+
+    if (window.innerWidth <= this.mobileBreakpoint) {
+      return;
+    }
+
     this.isCollapsed = !this.isCollapsed;
 
     this.collapsedChange.emit(this.isCollapsed);
@@ -187,7 +281,10 @@ export class Sidebar {
     /*
      * Close mobile drawer after navigation.
      */
-    this.closeSidebar.emit();
+
+    if (window.innerWidth <= this.mobileBreakpoint) {
+      this.closeSidebar.emit();
+    }
   }
 
   /*

@@ -1,6 +1,6 @@
 /* =====================================================
    SIDEBAR
-   JQZ HOMECARE - CHERRY RED RESPONSIVE DESIGN
+   MOBILE-FIRST RESPONSIVE DESIGN
 ===================================================== */
 
 :host {
@@ -18,6 +18,8 @@
   left: 0;
 
   width: 288px;
+  max-width: calc(100vw - 24px);
+
   height: 100vh;
 
   display: flex;
@@ -31,11 +33,11 @@
 
   border-right: 1px solid #f2d9dc;
 
-  box-shadow: 6px 0 24px rgba(193, 18, 31, 0.06);
+  box-shadow: 8px 0 28px rgba(16, 24, 40, 0.16);
 
   z-index: 1000;
 
-  transform: translateX(0);
+  transform: translateX(-105%);
 
   transition:
     width 0.28s ease,
@@ -44,27 +46,44 @@
 }
 
 /* =====================================================
-   COLLAPSED DESKTOP
+   MOBILE OPEN STATE
 ===================================================== */
 
-.sidebar.sidebar-collapsed {
-  width: 78px;
+.sidebar.sidebar-open {
+  transform: translateX(0);
 }
 
 /* =====================================================
-   HEADER
+   MOBILE OVERLAY
+===================================================== */
+
+.sidebar-overlay {
+  position: fixed;
+
+  inset: 0;
+
+  background: rgba(16, 24, 40, 0.5);
+
+  backdrop-filter: blur(2px);
+
+  z-index: 999;
+
+  animation: fadeIn 0.2s ease;
+}
+
+/* =====================================================
+   SIDEBAR HEADER
 ===================================================== */
 
 .sidebar-header {
   position: relative;
 
-  min-height: 116px;
+  min-height: 112px;
 
   display: flex;
   align-items: center;
-  justify-content: center;
 
-  padding: 20px 18px;
+  padding: 20px 78px 20px 22px;
 
   box-sizing: border-box;
 
@@ -76,19 +95,14 @@
 ===================================================== */
 
 .sidebar-brand {
-  display: flex;
-
-  align-items: center;
-  justify-content: center;
-
   width: 100%;
+
+  display: flex;
+  align-items: center;
+
   min-width: 0;
 
-  gap: 12px;
-
-  transition:
-    opacity 0.2s ease,
-    transform 0.2s ease;
+  gap: 14px;
 }
 
 /* =====================================================
@@ -96,10 +110,10 @@
 ===================================================== */
 
 .logo-wrapper {
-  width: 54px;
-  min-width: 54px;
+  width: 52px;
+  min-width: 52px;
 
-  height: 54px;
+  height: 52px;
 
   display: flex;
   align-items: center;
@@ -131,13 +145,7 @@
 
   min-width: 0;
 
-  overflow: hidden;
-
   white-space: nowrap;
-
-  transition:
-    opacity 0.2s ease,
-    width 0.25s ease;
 }
 
 .brand-title {
@@ -161,40 +169,19 @@
 }
 
 /* =====================================================
-   COLLAPSED BRAND
+   MOBILE CLOSE BUTTON
+
+   MOBILE ONLY
 ===================================================== */
 
-.sidebar.sidebar-collapsed .sidebar-brand {
-  justify-content: center;
-}
-
-.sidebar.sidebar-collapsed .brand-text {
-  width: 0;
-
-  opacity: 0;
-
-  pointer-events: none;
-}
-
-.sidebar.sidebar-collapsed .logo-wrapper {
-  width: 46px;
-  min-width: 46px;
-
-  height: 46px;
-}
-
-/* =====================================================
-   DESKTOP HAMBURGER
-===================================================== */
-
-.sidebar-toggle {
+.mobile-close-button {
   position: absolute;
 
-  top: 16px;
-  right: -14px;
+  top: 50%;
+  right: 22px;
 
-  width: 30px;
-  height: 30px;
+  width: 38px;
+  height: 38px;
 
   display: flex;
   align-items: center;
@@ -202,77 +189,48 @@
 
   padding: 0;
 
-  border: 1px solid #f2d9dc;
-  border-radius: 50%;
-
-  background: #ffffff;
-
-  color: #cf102d;
-
-  font-size: 13px;
-
-  cursor: pointer;
-
-  box-shadow: 0 3px 10px rgba(193, 18, 31, 0.12);
-
-  z-index: 1001;
-
-  transition:
-    background-color 0.2s ease,
-    color 0.2s ease,
-    border-color 0.2s ease,
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
-}
-
-.sidebar-toggle:hover {
-  background: #cf102d;
-
-  color: #ffffff;
-
-  border-color: #cf102d;
-
-  transform: scale(1.05);
-
-  box-shadow: 0 5px 14px rgba(207, 16, 45, 0.2);
-}
-
-/* =====================================================
-   MOBILE CLOSE BUTTON
-===================================================== */
-
-.mobile-close-button {
-  display: none;
-
-  position: absolute;
-
-  top: 18px;
-  right: 18px;
-
-  width: 34px;
-  height: 34px;
-
-  align-items: center;
-  justify-content: center;
-
-  padding: 0;
+  transform: translateY(-50%);
 
   border: 1px solid #f2d9dc;
+
   border-radius: 10px;
 
   background: #ffffff;
 
   color: #cf102d;
 
-  font-size: 16px;
+  font-size: 17px;
 
   cursor: pointer;
+
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
 }
 
 .mobile-close-button:hover {
   background: #fff4f5;
 
   border-color: #cf102d;
+}
+
+.mobile-close-button:active {
+  transform: translateY(-50%) scale(0.96);
+}
+
+/* =====================================================
+   TABLET / DESKTOP TOGGLE
+
+   HIDDEN ON MOBILE
+
+   THIS IS THE ONLY SIDEBAR
+   COLLAPSE / EXPAND CONTROL
+===================================================== */
+
+.sidebar-toggle {
+  display: none;
 }
 
 /* =====================================================
@@ -284,7 +242,7 @@
 
   min-height: 0;
 
-  padding: 22px 12px;
+  padding: 20px 12px;
 
   overflow-y: auto;
   overflow-x: hidden;
@@ -297,7 +255,7 @@
 ===================================================== */
 
 .menu-section {
-  margin-bottom: 24px;
+  margin-bottom: 22px;
 }
 
 .menu-section:last-child {
@@ -321,28 +279,6 @@
   text-transform: uppercase;
 
   letter-spacing: 0.08em;
-
-  white-space: nowrap;
-
-  transition:
-    opacity 0.2s ease,
-    height 0.2s ease,
-    padding 0.2s ease;
-}
-
-/* =====================================================
-   COLLAPSED SECTION TITLE
-===================================================== */
-
-.sidebar.sidebar-collapsed .section-title {
-  height: 0;
-
-  padding-top: 0;
-  padding-bottom: 0;
-
-  opacity: 0;
-
-  overflow: hidden;
 }
 
 /* =====================================================
@@ -351,7 +287,6 @@
 
 .section-items {
   display: flex;
-
   flex-direction: column;
 
   gap: 5px;
@@ -365,11 +300,9 @@
   position: relative;
 
   width: 100%;
-
-  min-height: 46px;
+  min-height: 48px;
 
   display: flex;
-
   align-items: center;
 
   gap: 14px;
@@ -389,7 +322,6 @@
   font-family: inherit;
 
   font-size: 14px;
-
   font-weight: 500;
 
   text-align: left;
@@ -400,12 +332,11 @@
     background-color 0.2s ease,
     border-color 0.2s ease,
     color 0.2s ease,
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
+    transform 0.2s ease;
 }
 
 /* =====================================================
-   ICON
+   MENU ICON
 ===================================================== */
 
 .menu-icon {
@@ -415,7 +346,6 @@
   height: 22px;
 
   display: flex;
-
   align-items: center;
   justify-content: center;
 }
@@ -425,15 +355,13 @@
 
   font-size: 16px;
 
-  text-align: center;
-
   transition:
     color 0.2s ease,
     transform 0.2s ease;
 }
 
 /* =====================================================
-   LABEL
+   MENU LABEL
 ===================================================== */
 
 .menu-label {
@@ -444,34 +372,6 @@
   white-space: nowrap;
 
   text-overflow: ellipsis;
-
-  transition:
-    opacity 0.2s ease,
-    width 0.25s ease;
-}
-
-/* =====================================================
-   COLLAPSED MENU
-===================================================== */
-
-.sidebar.sidebar-collapsed .menu-item {
-  justify-content: center;
-
-  padding: 0;
-}
-
-.sidebar.sidebar-collapsed .menu-label {
-  width: 0;
-
-  opacity: 0;
-
-  pointer-events: none;
-}
-
-.sidebar.sidebar-collapsed .menu-icon {
-  width: 24px;
-
-  min-width: 24px;
 }
 
 /* =====================================================
@@ -484,18 +384,10 @@
   background: rgba(207, 16, 45, 0.07);
 
   border-color: rgba(207, 16, 45, 0.08);
-
-  transform: translateX(2px);
 }
 
 .menu-item:hover .menu-icon i {
-  color: #cf102d;
-
-  transform: scale(1.08);
-}
-
-.sidebar.sidebar-collapsed .menu-item:hover {
-  transform: none;
+  transform: scale(1.06);
 }
 
 /* =====================================================
@@ -520,114 +412,14 @@
   position: absolute;
 
   left: -12px;
-
   top: 8px;
 
   width: 3px;
-
   height: 30px;
 
   border-radius: 0 4px 4px 0;
 
   background: #cf102d;
-}
-
-.menu-item.active .menu-icon i {
-  color: #cf102d;
-}
-
-.menu-item.active:hover {
-  color: #cf102d;
-
-  background: #ffffff;
-
-  border-color: #f2d9dc;
-
-  transform: none;
-}
-
-/* =====================================================
-   FOOTER
-===================================================== */
-
-.sidebar-footer {
-  flex-shrink: 0;
-
-  padding: 0 12px 16px;
-
-  box-sizing: border-box;
-}
-
-.sidebar-footer-divider {
-  height: 1px;
-
-  margin-bottom: 14px;
-
-  background: #f2d9dc;
-}
-
-/* =====================================================
-   COLLAPSE HINT
-===================================================== */
-
-.collapse-hint {
-  display: flex;
-
-  align-items: center;
-
-  gap: 9px;
-
-  padding: 8px 10px;
-
-  color: #9b6b70;
-
-  font-size: 10px;
-
-  line-height: 1.4;
-}
-
-.collapse-hint i {
-  color: #cf102d;
-
-  font-size: 11px;
-}
-
-/* =====================================================
-   COLLAPSED EXPAND BUTTON
-===================================================== */
-
-.collapsed-expand-button {
-  width: 100%;
-
-  height: 40px;
-
-  display: flex;
-
-  align-items: center;
-  justify-content: center;
-
-  padding: 0;
-
-  border: 1px solid #f2d9dc;
-
-  border-radius: 10px;
-
-  background: #ffffff;
-
-  color: #cf102d;
-
-  cursor: pointer;
-
-  transition:
-    background-color 0.2s ease,
-    border-color 0.2s ease,
-    color 0.2s ease;
-}
-
-.collapsed-expand-button:hover {
-  background: #fff4f5;
-
-  border-color: #cf102d;
 }
 
 /* =====================================================
@@ -648,43 +440,282 @@
   border-radius: 10px;
 }
 
-.sidebar-menu::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(193, 18, 31, 0.3);
-}
-
 /* =====================================================
-   MOBILE OVERLAY
+   TABLET AND DESKTOP
+   769px AND ABOVE
+
+   IMPORTANT:
+
+   SIDEBAR IS ALWAYS VISIBLE.
+
+   THE CHEVRON IS THE ONLY
+   COLLAPSE / EXPAND CONTROL.
 ===================================================== */
 
-.sidebar-overlay {
-  position: fixed;
+@media (min-width: 769px) {
+  /* -------------------------------------------------
+     SIDEBAR
+  ------------------------------------------------- */
 
-  inset: 0;
-
-  background: rgba(16, 24, 40, 0.48);
-
-  z-index: 999;
-
-  animation: fadeIn 0.25s ease;
-}
-
-/* =====================================================
-   TABLET
-===================================================== */
-
-@media (max-width: 1024px) and (min-width: 768px) {
   .sidebar {
-    width: 250px;
+    width: 78px;
+
+    max-width: none;
+
+    transform: translateX(0);
+
+    box-shadow: 6px 0 24px rgba(193, 18, 31, 0.06);
+  }
+
+  .sidebar.sidebar-expanded {
+    width: 288px;
   }
 
   .sidebar.sidebar-collapsed {
-    width: 72px;
+    width: 78px;
+  }
+
+  /* -------------------------------------------------
+     HEADER
+  ------------------------------------------------- */
+
+  .sidebar-header {
+    min-height: 96px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 16px 12px;
+  }
+
+  .sidebar-brand {
+    justify-content: center;
+  }
+
+  .logo-wrapper {
+    width: 44px;
+    min-width: 44px;
+
+    height: 44px;
+  }
+
+  /* -------------------------------------------------
+     BRAND TEXT - COLLAPSED
+  ------------------------------------------------- */
+
+  .brand-text {
+    width: 0;
+
+    opacity: 0;
+
+    overflow: hidden;
+
+    pointer-events: none;
+
+    transition:
+      width 0.25s ease,
+      opacity 0.2s ease;
+  }
+
+  /* -------------------------------------------------
+     EXPANDED BRAND
+  ------------------------------------------------- */
+
+  .sidebar.sidebar-expanded .sidebar-header {
+    justify-content: flex-start;
+
+    padding: 20px 22px;
+  }
+
+  .sidebar.sidebar-expanded .sidebar-brand {
+    justify-content: flex-start;
+  }
+
+  .sidebar.sidebar-expanded .logo-wrapper {
+    width: 52px;
+    min-width: 52px;
+
+    height: 52px;
+  }
+
+  .sidebar.sidebar-expanded .brand-text {
+    width: auto;
+
+    opacity: 1;
+
+    pointer-events: auto;
+  }
+
+  /* -------------------------------------------------
+     CHEVRON TOGGLE
+
+     CLEANLY ATTACHED TO THE SIDEBAR EDGE
+  ------------------------------------------------- */
+
+  .sidebar-toggle {
+    position: absolute;
+
+    top: 50%;
+    right: -16px;
+
+    width: 32px;
+    height: 32px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 0;
+
+    transform: translateY(-50%);
+
+    border: 1px solid #f2d9dc;
+
+    border-radius: 50%;
+
+    background: #ffffff;
+
+    color: #cf102d;
+
+    font-size: 12px;
+
+    cursor: pointer;
+
+    box-shadow: 0 3px 10px rgba(193, 18, 31, 0.14);
+
+    z-index: 1002;
+
+    transition:
+      background-color 0.2s ease,
+      border-color 0.2s ease,
+      color 0.2s ease,
+      transform 0.2s ease;
+  }
+
+  .sidebar-toggle:hover {
+    background: #cf102d;
+
+    border-color: #cf102d;
+
+    color: #ffffff;
+
+    transform: translateY(-50%) scale(1.06);
+  }
+
+  /* -------------------------------------------------
+     MOBILE CLOSE HIDDEN
+  ------------------------------------------------- */
+
+  .mobile-close-button {
+    display: none;
+  }
+
+  /* -------------------------------------------------
+     MENU
+  ------------------------------------------------- */
+
+  .sidebar-menu {
+    padding: 20px 10px;
+  }
+
+  /* -------------------------------------------------
+     SECTION TITLE - COLLAPSED
+  ------------------------------------------------- */
+
+  .section-title {
+    height: 0;
+
+    padding: 0;
+
+    opacity: 0;
+
+    overflow: hidden;
+
+    transition: opacity 0.2s ease;
+  }
+
+  .sidebar.sidebar-expanded .section-title {
+    height: auto;
+
+    padding: 0 12px 9px;
+
+    opacity: 1;
+  }
+
+  /* -------------------------------------------------
+     MENU ITEM - COLLAPSED
+  ------------------------------------------------- */
+
+  .menu-item {
+    justify-content: center;
+
+    min-height: 46px;
+
+    padding: 0;
+  }
+
+  /* -------------------------------------------------
+     MENU LABEL - COLLAPSED
+  ------------------------------------------------- */
+
+  .menu-label {
+    width: 0;
+
+    opacity: 0;
+
+    overflow: hidden;
+
+    pointer-events: none;
+
+    transition:
+      width 0.25s ease,
+      opacity 0.2s ease;
+  }
+
+  /* -------------------------------------------------
+     EXPANDED MENU
+  ------------------------------------------------- */
+
+  .sidebar.sidebar-expanded .menu-item {
+    justify-content: flex-start;
+
+    padding: 0 14px;
+  }
+
+  .sidebar.sidebar-expanded .menu-label {
+    width: auto;
+
+    opacity: 1;
+
+    pointer-events: auto;
+  }
+
+  .menu-item.active::before {
+    left: -10px;
+  }
+}
+
+/* =====================================================
+   SMALL MOBILE
+===================================================== */
+
+@media (max-width: 480px) {
+  .sidebar {
+    width: 288px;
+
+    max-width: calc(100vw - 20px);
   }
 
   .sidebar-header {
-    min-height: 105px;
+    min-height: 110px;
 
-    padding: 18px 14px;
+    /*
+      Extra right space so the logo/text
+      never gets too close to the X button.
+    */
+    padding: 20px 82px 20px 20px;
   }
 
   .logo-wrapper {
@@ -698,217 +729,19 @@
     font-size: 14px;
   }
 
-  .menu-item {
-    min-height: 44px;
-
-    font-size: 13px;
-  }
-}
-
-/* =====================================================
-   MOBILE
-===================================================== */
-
-@media (max-width: 767px) {
-  .sidebar {
-    width: 288px;
-
-    max-width: calc(100vw - 48px);
-
-    transform: translateX(-105%);
-
-    box-shadow: none;
-  }
-
-  /*
-   * Mobile ignores desktop collapsed state.
-   */
-
-  .sidebar.sidebar-collapsed {
-    width: 288px;
-
-    max-width: calc(100vw - 48px);
-
-    transform: translateX(-105%);
-  }
-
-  /*
-   * Mobile open state.
-   */
-
-  .sidebar.sidebar-open,
-  .sidebar.sidebar-collapsed.sidebar-open {
-    transform: translateX(0);
-
-    box-shadow: 8px 0 28px rgba(16, 24, 40, 0.16);
-  }
-
-  /* -----------------------------------------------
-     MOBILE HEADER
-  ------------------------------------------------ */
-
-  .sidebar-header {
-    min-height: 126px;
-
-    padding: 20px 22px;
-  }
-
-  .sidebar-brand {
-    justify-content: center;
-  }
-
-  .brand-text {
-    width: auto;
-
-    opacity: 1;
-  }
-
-  .logo-wrapper {
-    width: 58px;
-    min-width: 58px;
-
-    height: 58px;
-  }
-
-  .brand-title {
-    font-size: 15px;
-  }
-
-  .brand-subtitle {
-    font-size: 11px;
-  }
-
-  /* -----------------------------------------------
-     DESKTOP TOGGLE HIDDEN ON MOBILE
-  ------------------------------------------------ */
-
-  .sidebar-toggle {
-    display: none;
-  }
-
-  /* -----------------------------------------------
-     MOBILE CLOSE
-  ------------------------------------------------ */
-
-  .mobile-close-button {
-    display: flex;
-  }
-
-  /* -----------------------------------------------
-     MOBILE MENU
-  ------------------------------------------------ */
-
-  .sidebar-menu {
-    padding: 20px 14px;
-  }
-
-  .section-title {
-    padding-left: 12px;
-
-    padding-right: 12px;
-  }
-
-  .sidebar.sidebar-collapsed .section-title {
-    height: auto;
-
-    padding-top: 0;
-
-    padding-bottom: 9px;
-
-    opacity: 1;
-  }
-
-  .menu-item {
-    min-height: 48px;
-
-    padding: 0 15px;
-
-    gap: 14px;
-  }
-
-  /*
-   * On mobile labels must always be visible.
-   */
-
-  .sidebar.sidebar-collapsed .menu-item {
-    justify-content: flex-start;
-
-    padding: 0 15px;
-  }
-
-  .sidebar.sidebar-collapsed .menu-label {
-    width: auto;
-
-    opacity: 1;
-
-    pointer-events: auto;
-  }
-
-  .sidebar.sidebar-collapsed .menu-icon {
-    width: 22px;
-
-    min-width: 22px;
-  }
-
-  /* -----------------------------------------------
-     MOBILE FOOTER
-  ------------------------------------------------ */
-
-  .sidebar-footer {
-    display: none;
-  }
-}
-
-/* =====================================================
-   SMALL MOBILE
-===================================================== */
-
-@media (max-width: 480px) {
-  .sidebar {
-    width: 280px;
-
-    max-width: calc(100vw - 32px);
-  }
-
-  .sidebar.sidebar-collapsed {
-    width: 280px;
-
-    max-width: calc(100vw - 32px);
-  }
-
-  .sidebar-header {
-    min-height: 118px;
-
-    padding: 18px;
-  }
-
-  .logo-wrapper {
-    width: 52px;
-    min-width: 52px;
-
-    height: 52px;
-  }
-
-  .brand-title {
-    font-size: 14px;
-  }
-
   .brand-subtitle {
     font-size: 10px;
   }
 
   .mobile-close-button {
-    top: 16px;
+    right: 20px;
 
-    right: 16px;
-
-    width: 32px;
-
-    height: 32px;
+    width: 36px;
+    height: 36px;
   }
 
   .sidebar-menu {
-    padding: 18px 12px;
+    padding: 18px 10px;
   }
 
   .menu-item {

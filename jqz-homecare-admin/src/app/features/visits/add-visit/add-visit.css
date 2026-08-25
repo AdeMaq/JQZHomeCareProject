@@ -9,7 +9,7 @@
 }
 
 /* ============================================================
-   BREADCRUMB
+   BREADCRB
 ============================================================ */
 
 .breadcrumb {
@@ -23,8 +23,8 @@
 }
 
 .breadcrumb i {
-  font-size: 11px;
   color: #b8a6a8;
+  font-size: 11px;
 }
 
 .breadcrumb .current {
@@ -120,6 +120,7 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  border: 1px solid #f6d2d5;
   border-radius: 13px;
   background: #fdebed;
   color: #cf102d;
@@ -184,6 +185,11 @@
   color: #cf102d;
 }
 
+.optional {
+  color: #829ab1;
+  font-weight: 500;
+}
+
 /* ============================================================
    INPUT WRAPPER
 ============================================================ */
@@ -197,11 +203,26 @@
 
 .input-wrapper > i {
   position: absolute;
-  left: 14px;
+  left: 8px;
   z-index: 1;
-  color: #9fb3c8;
-  font-size: 14px;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9px;
+  background: #fdebed;
+  color: #cf102d;
+  font-size: 13px;
   pointer-events: none;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+.input-wrapper:focus-within > i {
+  background: #cf102d;
+  color: #ffffff;
 }
 
 .input-wrapper input,
@@ -221,47 +242,51 @@
     background 0.2s ease;
 }
 
-/* Text / number / tel / date / time */
+/* ============================================================
+   TEXT / NUMBER / TEL / DATE / TIME
+============================================================ */
 
 .input-wrapper input {
   height: 46px;
-  padding: 0 14px 0 42px;
+  padding: 0 14px 0 48px;
 }
 
-/* Select */
+/* ============================================================
+   SELECT
+============================================================ */
 
 .input-wrapper select {
   height: 46px;
-  padding: 0 42px;
+  padding: 0 42px 0 48px;
   cursor: pointer;
 }
 
-/* Textarea */
+/* ============================================================
+   TEXTAREA
+============================================================ */
 
 .textarea-wrapper {
   align-items: flex-start;
 }
 
 .textarea-wrapper > i {
-  top: 16px;
+  top: 8px;
 }
 
 .input-wrapper textarea {
   min-height: 96px;
-  padding: 13px 14px 13px 42px;
+  padding: 13px 14px 13px 48px;
   line-height: 1.55;
   resize: vertical;
 }
 
-/* Inputs with currency prefix */
+/* ============================================================
+   INPUT WITH CURRENCY PREFIX
+============================================================ */
 
 .input-wrapper:has(.currency-prefix) input {
-  padding-left: 54px;
+  padding-left: 58px;
 }
-
-/* ============================================================
-   CURRENCY PREFIX
-============================================================ */
 
 .currency-prefix {
   position: absolute;
@@ -301,6 +326,13 @@
   background: #f5f7fa;
   color: #9fb3c8;
   cursor: not-allowed;
+}
+
+.input-wrapper:has(input:disabled) > i,
+.input-wrapper:has(select:disabled) > i,
+.input-wrapper:has(textarea:disabled) > i {
+  background: #eef1f5;
+  color: #9fb3c8;
 }
 
 /* ============================================================
@@ -432,6 +464,7 @@
   align-items: center;
   justify-content: center;
   margin-bottom: 16px;
+  border: 1px solid #f6d2d5;
   border-radius: 18px;
   background: #fdebed;
   color: #cf102d;
@@ -551,17 +584,32 @@
 
 .searchable-input-wrapper > i:first-child {
   position: absolute;
-  left: 14px;
+  left: 8px;
   z-index: 1;
-  color: #9fb3c8;
-  font-size: 14px;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9px;
+  background: #fdebed;
+  color: #cf102d;
+  font-size: 13px;
   pointer-events: none;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+.searchable-input-wrapper:focus-within > i:first-child {
+  background: #cf102d;
+  color: #ffffff;
 }
 
 .searchable-input-wrapper input {
   width: 100%;
   height: 46px;
-  padding: 0 42px;
+  padding: 0 42px 0 48px;
   border: 1px solid #d9e2ec;
   border-radius: 11px;
   outline: none;
@@ -571,7 +619,8 @@
   font-size: 14px;
   transition:
     border-color 0.2s ease,
-    box-shadow 0.2s ease;
+    box-shadow 0.2s ease,
+    background 0.2s ease;
 }
 
 .searchable-input-wrapper input:hover {
@@ -592,13 +641,27 @@
   cursor: not-allowed;
 }
 
+.searchable-input-wrapper:has(input:disabled) > i:first-child {
+  background: #eef1f5;
+  color: #9fb3c8;
+}
+
 .dropdown-arrow {
   position: absolute;
   right: 14px;
-  color: #9fb3c8;
-  font-size: 12px;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 7px;
+  background: #fff1f2;
+  color: #cf102d;
+  font-size: 10px;
   pointer-events: none;
-  transition: transform 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease;
 }
 
 .dropdown-arrow.open {
@@ -672,9 +735,16 @@
 }
 
 .dropdown-option > .fa-check {
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   margin-left: auto;
-  color: #cf102d;
-  font-size: 13px;
+  border-radius: 8px;
+  background: #cf102d;
+  color: #ffffff;
+  font-size: 11px;
 }
 
 .dropdown-option-icon {
@@ -684,6 +754,7 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  border: 1px solid #f6d2d5;
   border-radius: 9px;
   background: #fdebed;
   color: #cf102d;
@@ -739,8 +810,16 @@
 }
 
 .dropdown-empty i {
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #f6d2d5;
+  border-radius: 11px;
+  background: #fdebed;
   color: #cf102d;
-  font-size: 18px;
+  font-size: 16px;
 }
 
 /* ============================================================
@@ -751,78 +830,89 @@
   margin-top: 24px;
   overflow: hidden;
   border: 1px solid #f3d9dd;
-  border-radius: 16px;
+  border-radius: 18px;
   background: #fffdfd;
 }
 
 /* ============================================================
-   SCHEDULE HEADER
+   PRACTITIONER SCHEDULE HEADER
 ============================================================ */
 
 .practitioner-schedule-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 20px;
-  padding: 20px;
+  gap: 24px;
+  padding: 22px 24px;
   border-bottom: 1px solid #f5e3e6;
-  background: #ffffff;
+  background: linear-gradient(135deg, #ffffff, #fffafb);
 }
 
 .schedule-title {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
   min-width: 0;
 }
 
 .schedule-title-icon {
-  width: 40px;
-  height: 40px;
+  width: 46px;
+  height: 46px;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  border-radius: 11px;
+  border: 1px solid #f4cdd2;
+  border-radius: 14px;
   background: #fdebed;
   color: #cf102d;
-  font-size: 16px;
+  font-size: 18px;
 }
 
 .schedule-title h4 {
   margin: 0;
   color: #102a43;
-  font-size: 16px;
+  font-size: 17px;
   font-weight: 700;
 }
 
 .schedule-title p {
   overflow: hidden;
-  margin: 4px 0 0;
+  margin: 5px 0 0;
   color: #7b8794;
   font-size: 13px;
+  line-height: 1.5;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 /* ============================================================
-   SCHEDULE SUMMARY
+   SCHEDULE SUMMARY / BOOKED COUNTER
 ============================================================ */
 
 .schedule-summary {
   flex-shrink: 0;
-  padding: 7px 11px;
-  border: 1px solid #f1d7dc;
+  min-width: 105px;
+  min-height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 10px 17px;
+  border: 1px solid #cf102d;
   border-radius: 999px;
-  background: #fffafa;
-  color: #7b6570;
-  font-size: 12px;
-  font-weight: 600;
+  background: linear-gradient(135deg, #cf102d, #e25a6d);
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+  box-shadow: 0 6px 16px rgba(207, 16, 45, 0.2);
 }
 
-.schedule-summary strong {
-  color: #cf102d;
-  font-weight: 700;
+.schedule-summary i {
+  font-size: 13px;
+  color: #ffffff;
 }
 
 /* ============================================================
@@ -841,6 +931,13 @@
 }
 
 .schedule-loading i {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #fdebed;
   color: #cf102d;
 }
 
@@ -862,47 +959,14 @@
 }
 
 .schedule-error i {
-  flex-shrink: 0;
-}
-
-/* ============================================================
-   SCHEDULE LEGEND
-============================================================ */
-
-.schedule-legend {
+  width: 30px;
+  height: 30px;
   display: flex;
   align-items: center;
-  flex-wrap: wrap;
-  gap: 22px;
-  padding: 16px 20px;
-  border-bottom: 1px solid #f5e3e6;
-  background: #fffafa;
-}
-
-.legend-item {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  color: #6b7280;
-  font-size: 12px;
-  font-weight: 500;
-}
-
-.legend-dot {
-  width: 9px;
-  height: 9px;
+  justify-content: center;
   flex-shrink: 0;
-  border-radius: 50%;
-}
-
-.available-dot {
-  background: #4f9b6d;
-  box-shadow: 0 0 0 4px rgba(79, 155, 109, 0.1);
-}
-
-.booked-dot {
-  background: #cf102d;
-  box-shadow: 0 0 0 4px rgba(207, 16, 45, 0.08);
+  border-radius: 8px;
+  background: #ffe4e6;
 }
 
 /* ============================================================
@@ -912,10 +976,10 @@
 .schedule-slots {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
+  gap: 14px;
   max-height: 430px;
   overflow-y: auto;
-  padding: 18px 20px 20px;
+  padding: 20px 24px 24px;
   background: #ffffff;
   scrollbar-width: thin;
   scrollbar-color: #e9a3ad #fff5f6;
@@ -951,7 +1015,7 @@
   gap: 14px;
   padding: 16px;
   border: 1px solid #e8dfe2;
-  border-radius: 13px;
+  border-radius: 14px;
   background: #ffffff;
   transition:
     border-color 0.2s ease,
@@ -982,7 +1046,7 @@
 .schedule-time {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 9px;
   min-width: 0;
   color: #334e68;
   font-size: 13px;
@@ -990,9 +1054,26 @@
 }
 
 .schedule-time i {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
-  color: #8b9bab;
-  font-size: 13px;
+  border-radius: 9px;
+  background: #f1f5f9;
+  color: #627d98;
+  font-size: 12px;
+}
+
+.schedule-slot.available .schedule-time i {
+  background: #eaf6ee;
+  color: #397a53;
+}
+
+.schedule-slot.booked .schedule-time i {
+  background: #fdebed;
+  color: #cf102d;
 }
 
 .schedule-time span {
@@ -1000,7 +1081,7 @@
 }
 
 /* ============================================================
-   SCHEDULE SLOT CONTENT
+   SCHEDULE SLOT STATUS
 ============================================================ */
 
 .schedule-slot-status {
@@ -1085,8 +1166,14 @@
 }
 
 .assignment-warning i {
-  margin-top: 2px;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
+  border-radius: 8px;
+  background: #fff0c7;
   color: #d99b22;
 }
 
@@ -1106,9 +1193,16 @@
 }
 
 .assignment-info > i {
-  margin-top: 2px;
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: 10px;
+  background: #fdebed;
   color: #cf102d;
-  font-size: 17px;
+  font-size: 15px;
 }
 
 .assignment-info strong {
@@ -1140,9 +1234,14 @@
 }
 
 .form-alert > i {
-  margin-top: 2px;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
-  font-size: 19px;
+  border-radius: 10px;
+  font-size: 16px;
 }
 
 .form-alert strong {
@@ -1163,9 +1262,19 @@
   color: #b4232f;
 }
 
+.form-alert.error > i {
+  background: #ffe4e6;
+  color: #cf102d;
+}
+
 .form-alert.success {
   border: 1px solid #b9e0c5;
   background: #effaf2;
+  color: #217a3e;
+}
+
+.form-alert.success > i {
+  background: #dff3e5;
   color: #217a3e;
 }
 
@@ -1277,10 +1386,6 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .searchable-dropdown {
-    position: absolute;
-  }
-
   .practitioner-schedule-header {
     align-items: flex-start;
     flex-direction: column;
@@ -1358,10 +1463,14 @@
     border-bottom: none;
   }
 
+  .practitioner-schedule-header {
+    padding: 18px;
+  }
+
   .schedule-slots {
     grid-template-columns: 1fr;
     max-height: 380px;
-    padding: 14px;
+    padding: 16px;
   }
 
   .schedule-slot {
@@ -1381,10 +1490,6 @@
 
   .schedule-time span {
     white-space: normal;
-  }
-
-  .schedule-legend {
-    gap: 14px;
   }
 
   .time-selection-grid {
@@ -1441,10 +1546,6 @@
     font-size: 16px;
   }
 
-  .card-header h2 {
-    font-size: 16px;
-  }
-
   .assignment-header {
     gap: 10px;
     margin-bottom: 18px;
@@ -1466,14 +1567,24 @@
     padding: 14px;
   }
 
-  .schedule-summary {
-    width: 100%;
-    justify-content: center;
+  .schedule-title-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    font-size: 16px;
   }
 
-  .schedule-legend {
-    flex-direction: column;
-    align-items: flex-start;
+  .schedule-title h4 {
+    font-size: 15px;
+  }
+
+  .schedule-title p {
+    white-space: normal;
+  }
+
+  .schedule-summary {
+    width: 100%;
+    min-height: 44px;
   }
 
   .schedule-slots {

@@ -18,7 +18,7 @@
   <div class="page-header">
     <div class="page-header-left">
       <div class="page-header-icon">
-        <i class="fa-solid fa-calendar-pen"></i>
+        <i class="fa-solid fa-pen-to-square"></i>
       </div>
 
       <div>
@@ -90,32 +90,56 @@
 
         <div class="card-body">
           <div class="info-grid">
+            <!-- PATIENT -->
+
             <div class="info-item">
-              <span class="info-label"> Patient </span>
+              <div class="info-item-label">
+                <i class="fa-solid fa-user"></i>
+
+                <span>Patient</span>
+              </div>
 
               <strong>
                 {{ visit.patientName }}
               </strong>
             </div>
 
+            <!-- SERVICE -->
+
             <div class="info-item">
-              <span class="info-label"> Service </span>
+              <div class="info-item-label">
+                <i class="fa-solid fa-briefcase-medical"></i>
+
+                <span>Service</span>
+              </div>
 
               <strong>
                 {{ visit.serviceName || '—' }}
               </strong>
             </div>
 
+            <!-- PACKAGE -->
+
             <div class="info-item">
-              <span class="info-label"> Package </span>
+              <div class="info-item-label">
+                <i class="fa-solid fa-box-open"></i>
+
+                <span>Package</span>
+              </div>
 
               <strong>
                 {{ visit.packageName || '—' }}
               </strong>
             </div>
 
+            <!-- STATUS -->
+
             <div class="info-item">
-              <span class="info-label"> Status </span>
+              <div class="info-item-label">
+                <i class="fa-solid fa-circle-info"></i>
+
+                <span>Status</span>
+              </div>
 
               <span
                 class="status-badge"
@@ -128,14 +152,26 @@
               </span>
             </div>
 
+            <!-- AMOUNT DUE -->
+
             <div class="info-item">
-              <span class="info-label"> Amount Due </span>
+              <div class="info-item-label">
+                <i class="fa-solid fa-money-bill-wave"></i>
+
+                <span>Amount Due</span>
+              </div>
 
               <strong> PKR {{ visit.amountDue | number: '1.0-2' }} </strong>
             </div>
 
+            <!-- COLLECTION STATUS -->
+
             <div class="info-item">
-              <span class="info-label"> Collection Status </span>
+              <div class="info-item-label">
+                <i class="fa-solid fa-wallet"></i>
+
+                <span>Collection Status</span>
+              </div>
 
               <strong>
                 {{ visit.collectionStatus }}
@@ -211,7 +247,7 @@
                       <div class="no-results">
                         <i class="fa-solid fa-spinner fa-spin"></i>
 
-                        <span> Loading areas... </span>
+                        <span>Loading areas...</span>
                       </div>
                     } @else if (getFilteredAreas().length > 0) {
                       @for (area of getFilteredAreas(); track area.id) {
@@ -222,7 +258,9 @@
                           (click)="selectArea(area)"
                         >
                           <div class="option-main">
-                            <i class="fa-solid fa-location-dot"></i>
+                            <div class="option-icon">
+                              <i class="fa-solid fa-location-dot"></i>
+                            </div>
 
                             <div class="option-text">
                               <span class="option-title">
@@ -246,7 +284,7 @@
                       <div class="no-results">
                         <i class="fa-solid fa-magnifying-glass"></i>
 
-                        <span> No areas found </span>
+                        <span>No areas found</span>
                       </div>
                     }
                   </div>
@@ -304,7 +342,7 @@
                       <div class="no-results">
                         <i class="fa-solid fa-spinner fa-spin"></i>
 
-                        <span> Loading practitioners... </span>
+                        <span>Loading practitioners...</span>
                       </div>
                     } @else if (getFilteredPractitioners().length > 0) {
                       @for (practitioner of getFilteredPractitioners(); track practitioner.id) {
@@ -367,7 +405,7 @@
                       <div class="no-results">
                         <i class="fa-solid fa-user-slash"></i>
 
-                        <span> No practitioners found </span>
+                        <span>No practitioners found</span>
                       </div>
                     }
                   </div>
@@ -381,9 +419,11 @@
           @if (hasReassignment()) {
             <div class="reassignment-box">
               <div class="reassignment-title">
-                <i class="fa-solid fa-arrows-rotate"></i>
+                <div class="reassignment-icon">
+                  <i class="fa-solid fa-arrows-rotate"></i>
+                </div>
 
-                <strong> Reassignment Information </strong>
+                <strong>Reassignment Information</strong>
               </div>
 
               <p>A reason is required when changing the practitioner or assigned area.</p>
@@ -454,6 +494,8 @@
           <!-- SCHEDULE FIELDS -->
 
           <div class="schedule-fields">
+            <!-- DATE -->
+
             <div class="form-field">
               <label for="scheduledDate">
                 Scheduled Date
@@ -475,6 +517,8 @@
               </div>
             </div>
 
+            <!-- START TIME -->
+
             <div class="form-field">
               <label for="startTime">
                 Start Time
@@ -495,6 +539,8 @@
                 />
               </div>
             </div>
+
+            <!-- END TIME -->
 
             <div class="form-field">
               <label for="endTime">
@@ -716,7 +762,7 @@
           <i class="fa-solid fa-circle-check"></i>
 
           <div>
-            <strong> Success </strong>
+            <strong>Success</strong>
 
             <p>
               {{ successMessage }}

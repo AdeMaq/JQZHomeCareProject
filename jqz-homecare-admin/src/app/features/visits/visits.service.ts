@@ -14,6 +14,8 @@ export interface CreateVisitRequest {
   patientPhone: string;
   locationAddress: string;
 
+  description: string | null;
+
   packageId: string;
 
   /*

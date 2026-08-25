@@ -14,11 +14,18 @@
   ================================================== -->
 
   <div class="admin-main">
-    <!-- Navbar -->
+    <!-- =================================================
+         NAVBAR
+
+         Navbar only emits the mobile sidebar toggle event.
+         It does not control desktop/tablet collapse.
+    ================================================== -->
 
     <app-navbar (menuToggle)="toggleMobileSidebar()"></app-navbar>
 
-    <!-- Main Content -->
+    <!-- =================================================
+         MAIN CONTENT
+    ================================================== -->
 
     <main class="admin-content">
       <router-outlet></router-outlet>

@@ -47,7 +47,14 @@
 }
 
 /* =====================================================
-   MOBILE HAMBURGER
+   MOBILE MENU BUTTON
+
+   Hidden by default.
+
+   It must ONLY appear on screens 768px and below.
+
+   Tablet and desktop use the sidebar chevron arrow
+   for collapse / expand.
 ===================================================== */
 
 .mobile-menu-button {
@@ -91,6 +98,10 @@
   transform: translateY(-1px);
 
   box-shadow: 0 6px 16px rgba(207, 16, 45, 0.12);
+}
+
+.mobile-menu-button:active {
+  transform: scale(0.96);
 }
 
 /* =====================================================
@@ -281,9 +292,16 @@
 
 /* =====================================================
    TABLET
+
+   769px - 1024px
+
+   IMPORTANT:
+   No hamburger here.
+
+   Sidebar chevron arrow is the only sidebar control.
 ===================================================== */
 
-@media (max-width: 1024px) {
+@media (min-width: 769px) and (max-width: 1024px) {
   .navbar {
     height: 76px;
 
@@ -295,7 +313,7 @@
   }
 
   .mobile-menu-button {
-    display: flex;
+    display: none;
   }
 
   .profile-info,
@@ -306,6 +324,10 @@
 
 /* =====================================================
    MOBILE
+
+   768px and below.
+
+   Hamburger appears only here and opens the sidebar.
 ===================================================== */
 
 @media (max-width: 768px) {
@@ -324,6 +346,8 @@
 
     height: 40px;
 
+    display: flex;
+
     font-size: 17px;
   }
 
@@ -331,6 +355,11 @@
     width: 40px;
 
     height: 40px;
+  }
+
+  .profile-info,
+  .profile-arrow {
+    display: none;
   }
 
   .profile-avatar {
@@ -399,5 +428,16 @@
 
   .logout-button span {
     display: none;
+  }
+}
+
+/* =====================================================
+   REDUCED MOTION
+===================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .navbar *,
+  .navbar {
+    transition: none !important;
   }
 }

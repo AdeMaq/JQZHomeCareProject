@@ -12,50 +12,17 @@ import { Navbar } from '../../shared/components/navbar/navbar';
   styleUrl: './admin-layout.css',
 })
 export class AdminLayout {
-  /*
-   * =====================================================
-   * MOBILE SIDEBAR STATE
-   * =====================================================
-   */
-
   isMobileSidebarOpen = false;
 
-  /*
-   * =====================================================
-   * DESKTOP SIDEBAR STATE
-   * =====================================================
-   *
-   * false = expanded
-   * true  = collapsed
-   */
-
   isSidebarCollapsed = false;
-
-  /*
-   * =====================================================
-   * MOBILE HAMBURGER
-   * =====================================================
-   */
 
   toggleMobileSidebar(): void {
     this.isMobileSidebarOpen = !this.isMobileSidebarOpen;
   }
 
-  /*
-   * =====================================================
-   * CLOSE MOBILE SIDEBAR
-   * =====================================================
-   */
-
   closeMobileSidebar(): void {
     this.isMobileSidebarOpen = false;
   }
-
-  /*
-   * =====================================================
-   * DESKTOP SIDEBAR STATE
-   * =====================================================
-   */
 
   onSidebarCollapsedChange(collapsed: boolean): void {
     this.isSidebarCollapsed = collapsed;

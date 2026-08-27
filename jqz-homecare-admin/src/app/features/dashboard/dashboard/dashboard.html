@@ -25,13 +25,13 @@
     </div>
 
     <!-- ===============================================
-         DATE CONTROLS
-    ================================================ -->
+     DATE CONTROLS
+================================================ -->
 
     <div class="dashboard-controls-wrapper">
       <!-- =============================================
-           QUICK DATE FILTERS
-      ============================================== -->
+       QUICK DATE FILTERS
+  ============================================== -->
 
       <div class="quick-date-filters">
         <!-- TODAY -->
@@ -72,8 +72,8 @@
       </div>
 
       <!-- =============================================
-           CUSTOM DATE CONTROLS
-      ============================================== -->
+       CUSTOM DATE CONTROLS
+  ============================================== -->
 
       <div class="dashboard-controls">
         <!-- FROM DATE -->
@@ -141,9 +141,7 @@
 
   @if (errorMessage()) {
     <div class="dashboard-error" role="alert">
-      <div class="error-icon">
-        <i class="fa-solid fa-circle-exclamation"></i>
-      </div>
+      <div class="error-icon"><i class="fa-solid fa-circle-exclamation"></i></div>
 
       <div class="error-content">
         <strong>Unable to load dashboard</strong>
@@ -192,13 +190,13 @@
     </div>
 
     <!-- ===============================================
-         KPI GRID
-    ================================================ -->
+     KPI GRID
+================================================ -->
 
     <div class="kpi-grid">
       <!-- =============================================
-           EXPECTED VISITS
-      ============================================== -->
+       EXPECTED VISITS
+  ============================================== -->
 
       <article class="kpi-card expected-visits-card">
         <div class="kpi-card-top">
@@ -223,8 +221,8 @@
       </article>
 
       <!-- =============================================
-           ACTUAL VISITS DONE
-      ============================================== -->
+       ACTUAL VISITS DONE
+  ============================================== -->
 
       <article class="kpi-card completed-visits-card">
         <div class="kpi-card-top">
@@ -249,8 +247,8 @@
       </article>
 
       <!-- =============================================
-           PAYMENT RECEIVED
-      ============================================== -->
+       PAYMENT RECEIVED
+  ============================================== -->
 
       <article class="kpi-card payment-card">
         <div class="kpi-card-top">
@@ -276,8 +274,8 @@
       </article>
 
       <!-- =============================================
-           PENDING COLLECTION
-      ============================================== -->
+       PENDING COLLECTION
+  ============================================== -->
 
       <article class="kpi-card pending-card">
         <div class="kpi-card-top">
@@ -303,8 +301,40 @@
       </article>
 
       <!-- =============================================
-           PATIENT REFUSALS
-      ============================================== -->
+       AMOUNT DUE
+
+       Calculated from the Visits API.
+
+       Total of amountDue for all non-cancelled visits
+       inside the selected date range.
+  ============================================== -->
+
+      <article class="kpi-card amount-due-card">
+        <div class="kpi-card-top">
+          <div class="kpi-icon amount-due-icon">
+            <i class="fa-solid fa-hand-holding-dollar"></i>
+          </div>
+
+          <div class="kpi-status-icon amount-due-status-icon">
+            <i class="fa-solid fa-file-invoice-dollar"></i>
+          </div>
+        </div>
+
+        <div class="kpi-content">
+          <span class="kpi-label"> Amount Due </span>
+
+          <strong class="kpi-value currency-value">
+            Rs.
+            {{ paymentSummary.totalAmountDue | number: '1.0-2' }}
+          </strong>
+
+          <span class="kpi-description"> Total amount due for visits in this period </span>
+        </div>
+      </article>
+
+      <!-- =============================================
+       PATIENT REFUSALS
+  ============================================== -->
 
       <article class="kpi-card patient-refusal-card">
         <div class="kpi-card-top">
@@ -329,8 +359,8 @@
       </article>
 
       <!-- =============================================
-           PRACTITIONER REFUSALS
-      ============================================== -->
+       PRACTITIONER REFUSALS
+  ============================================== -->
 
       <article class="kpi-card practitioner-refusal-card">
         <div class="kpi-card-top">
@@ -356,8 +386,8 @@
     </div>
 
     <!-- ===============================================
-         DASHBOARD INFO NOTE
-    ================================================ -->
+     DASHBOARD INFO NOTE
+================================================ -->
 
     <div class="dashboard-info-note">
       <div class="info-note-icon">

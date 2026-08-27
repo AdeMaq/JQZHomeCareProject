@@ -5,6 +5,7 @@ using JQZHomeCareProject.Mobile.Services.Auth;
 using JQZHomeCareProject.Mobile.Services.Navigation;
 using JQZHomeCareProject.Mobile.ViewModels.Auth;
 using JQZHomeCareProject.Mobile.ViewModels.Home;
+using JQZHomeCareProject.Mobile.ViewModels.Visits;
 using JQZHomeCareProject.Mobile.Views.Auth;
 using JQZHomeCareProject.Mobile.Views.Home;
 using JQZHomeCareProject.Mobile.Views.Visits;
@@ -59,6 +60,8 @@ namespace JQZHomeCareProject.Mobile
             builder.Services.AddTransient<LoginViewModel>();
             builder.Services.AddTransient<HomePage>();
             builder.Services.AddTransient<HomeViewModel>();
+            builder.Services.AddTransient<VisitsListPage>();
+            builder.Services.AddTransient<VisitsListViewModel>();
             builder.Services.AddTransient<VisitsPage>();
             builder.Services.AddTransient<AppShell>();
 

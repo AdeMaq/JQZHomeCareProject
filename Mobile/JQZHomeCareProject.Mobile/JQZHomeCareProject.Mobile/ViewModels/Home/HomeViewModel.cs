@@ -114,7 +114,7 @@ namespace JQZHomeCareProject.Mobile.ViewModels.Home
         [RelayCommand]
         private async Task ViewAllVisitsAsync()
         {
-            await _navigation.GoToAsync("//visits");
+            await _navigation.GoToAsync(nameof(Views.Visits.VisitsListPage));
         }
 
         [RelayCommand]

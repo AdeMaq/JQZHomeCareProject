@@ -12,6 +12,7 @@ namespace JQZHomeCareProject.Mobile
 
             Routing.RegisterRoute(nameof(Views.Home.HomePage), typeof(Views.Home.HomePage));
             Routing.RegisterRoute(nameof(Views.Visits.VisitsPage),typeof(Views.Visits.VisitsPage));
+            Routing.RegisterRoute(nameof(Views.Visits.VisitsListPage), typeof(Views.Visits.VisitsListPage));
         }
     }
 }

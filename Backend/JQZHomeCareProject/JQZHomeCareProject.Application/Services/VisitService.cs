@@ -63,7 +63,7 @@ namespace JQZHomeCareProject.Application.Services
             }
 
             foreach (var assignment in dto.VisitAssignments)
-                await ValidateAssignmentAsync(assignment);
+                await ValidateAssignmentAsync(assignment, package.ServiceId, package.Name);
 
             var patient = await _patientService.GetOrCreateAsync(dto.PatientName, dto.PatientPhone, dto.LocationAddress, dto.PatientDescription);
 
@@ -168,7 +168,7 @@ namespace JQZHomeCareProject.Application.Services
             return aStart < bEnd && bStart < aEnd;
         }
 
-        private async Task ValidateAssignmentAsync(VisitAssignmentDto assignment)
+        private async Task ValidateAssignmentAsync(VisitAssignmentDto assignment, Guid packageServiceId, string packageName)
         {
             var hasAny = assignment.ScheduledDate.HasValue || assignment.SlotStart.HasValue || assignment.SlotEnd.HasValue;
             var hasAll = assignment.ScheduledDate.HasValue && assignment.SlotStart.HasValue && assignment.SlotEnd.HasValue;
@@ -181,8 +181,12 @@ namespace JQZHomeCareProject.Application.Services
 
             if (assignment.PractitionerId.HasValue)
             {
-                _ = await _practitionerRepository.GetByIdAsync(assignment.PractitionerId.Value)
+                var practitioner = await _practitionerRepository.GetByIdAsync(assignment.PractitionerId.Value)
                     ?? throw new NotFoundException($"Practitioner {assignment.PractitionerId.Value} not found.");
+
+                if (practitioner.ServiceId != packageServiceId)
+                    throw new ValidationException(
+                        $"Practitioner {practitioner.Id} does not provide the service required by package '{packageName}'.");
             }
 
             if (assignment.AreaId.HasValue)
@@ -273,8 +277,11 @@ namespace JQZHomeCareProject.Application.Services
             if (visit.Status is VisitStatus.Completed or VisitStatus.Cancelled)
                 throw new ValidationException($"Cannot assign a practitioner to a visit with status '{visit.Status}'.");
 
-            _ = await _practitionerRepository.GetByIdAsync(dto.PractitionerId)
+            var practitioner = await _practitionerRepository.GetByIdAsync(dto.PractitionerId)
                 ?? throw new NotFoundException($"Practitioner {dto.PractitionerId} not found.");
+
+            if (practitioner.ServiceId != visit.ServiceId)
+                throw new ValidationException("Selected practitioner does not provide the service required for this visit.");
 
             if (dto.AreaId.HasValue)
             {
@@ -299,8 +306,11 @@ namespace JQZHomeCareProject.Application.Services
             if (visit.Status is VisitStatus.Completed or VisitStatus.Cancelled)
                 throw new ValidationException($"Cannot reassign a practitioner on a visit with status '{visit.Status}'.");
 
-            _ = await _practitionerRepository.GetByIdAsync(dto.PractitionerId)
+            var practitioner = await _practitionerRepository.GetByIdAsync(dto.PractitionerId)
                 ?? throw new NotFoundException($"Practitioner {dto.PractitionerId} not found.");
+
+            if (practitioner.ServiceId != visit.ServiceId)
+                throw new ValidationException("Selected practitioner does not provide the service required for this visit.");
 
             if (dto.AreaId.HasValue)
             {

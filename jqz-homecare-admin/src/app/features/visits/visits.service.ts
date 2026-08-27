@@ -1,17 +1,22 @@
 import { Injectable, inject } from '@angular/core';
+
 import { HttpClient, HttpParams } from '@angular/common/http';
+
 import { Observable, map } from 'rxjs';
 
 import { CollectionStatus, Visit, VisitStatus } from './visits.interface';
 
-// ============================================================
-// CREATE VISIT REQUEST
-// Matches backend CreateVisitDto
-// ============================================================
+/* ============================================================
+   CREATE VISIT REQUEST
+
+   Matches backend CreateVisitDto
+============================================================ */
 
 export interface CreateVisitRequest {
   patientName: string;
+
   patientPhone: string;
+
   locationAddress: string;
 
   description: string | null;
@@ -24,90 +29,108 @@ export interface CreateVisitRequest {
    * FullAdvance = 0
    * Installment = 1
    */
+
   paymentType: 0 | 1;
 
   initialAmountPaid: number | null;
 
   visitAssignments: {
     practitionerId: string | null;
+
     areaId: string | null;
+
     scheduledDate: string | null;
+
     slotStart: string | null;
+
     slotEnd: string | null;
   }[];
 }
 
-// ============================================================
-// SCHEDULE VISIT REQUEST
-// Matches backend ScheduleVisitDto
-// ============================================================
+/* ============================================================
+   SCHEDULE VISIT REQUEST
+
+   Matches backend ScheduleVisitDto
+============================================================ */
 
 export interface ScheduleVisitRequest {
   scheduledDate: string;
+
   slotStart: string;
+
   slotEnd: string;
 }
 
-// ============================================================
-// REASSIGN PRACTITIONER REQUEST
-// Matches backend ReassignPractitionerDto
-// ============================================================
+/* ============================================================
+   REASSIGN PRACTITIONER REQUEST
+============================================================ */
 
 export interface ReassignPractitionerRequest {
   practitionerId: string;
+
   areaId: string | null;
+
   refusedBy: 'Patient' | 'Practitioner';
+
   reason: string;
 }
 
-// ============================================================
-// RAW BACKEND VISIT
-// ============================================================
-//
-// Backend returns enum values as numbers.
-//
-// VisitStatus:
-// 0 = Scheduled
-// 1 = Accepted
-// 2 = Completed
-// 3 = Cancelled
-//
-// CollectionStatus:
-// 0 = Pending
-// 1 = Received
-//
-// We convert these numeric values into the string values
-// expected by the frontend Visit interface.
-// ============================================================
+/* ============================================================
+   BACKEND ENUM VALUES
+
+   The backend may return enum values either as:
+
+   Numeric:
+
+   0, 1, 2, 3
+
+   Or strings:
+
+   "Scheduled"
+   "Accepted"
+   "Completed"
+   "Cancelled"
+
+   Therefore, the frontend supports both formats.
+============================================================ */
+
+type BackendVisitStatus = number | string;
+
+type BackendCollectionStatus = number | string;
+
+/* ============================================================
+   RAW BACKEND VISIT
+============================================================ */
 
 interface BackendVisit extends Omit<Visit, 'status' | 'collectionStatus'> {
-  status: number;
-  collectionStatus: number;
+  status: BackendVisitStatus;
+
+  collectionStatus: BackendCollectionStatus;
 }
 
-// ============================================================
-// VISITS SERVICE
-// ============================================================
+/* ============================================================
+   VISITS SERVICE
+============================================================ */
 
 @Injectable({
   providedIn: 'root',
 })
 export class VisitsService {
-  // ============================================================
-  // SERVICES
-  // ============================================================
+  /* ============================================================
+     SERVICES
+  ============================================================ */
 
   private readonly http = inject(HttpClient);
 
-  // ============================================================
-  // API ENDPOINT
-  // ============================================================
+  /* ============================================================
+     API ENDPOINT
+  ============================================================ */
 
   private readonly apiUrl = 'http://localhost:5212/api/visits';
 
-  // ============================================================
-  // GET ALL VISITS
-  // ============================================================
+  /* ============================================================
+     GET ALL VISITS
+  ============================================================ */
 
   getAll(): Observable<Visit[]> {
     return this.http
@@ -117,9 +140,9 @@ export class VisitsService {
       );
   }
 
-  // ============================================================
-  // GET VISIT BY ID
-  // ============================================================
+  /* ============================================================
+     GET VISIT BY ID
+  ============================================================ */
 
   getById(id: string): Observable<Visit> {
     return this.http
@@ -127,39 +150,33 @@ export class VisitsService {
       .pipe(map((visit: BackendVisit) => this.mapVisit(visit)));
   }
 
-  // ============================================================
-  // CREATE VISIT
-  // ============================================================
+  /* ============================================================
+     CREATE VISIT
+  ============================================================ */
 
   create(request: CreateVisitRequest): Observable<unknown> {
     return this.http.post<unknown>(this.apiUrl, request);
   }
 
-  // ============================================================
-  // SCHEDULE VISIT
-  // ============================================================
+  /* ============================================================
+     SCHEDULE VISIT
+  ============================================================ */
 
   schedule(id: string, request: ScheduleVisitRequest): Observable<void> {
     return this.http.put<void>(`${this.apiUrl}/${id}/schedule`, request);
   }
 
-  // ============================================================
-  // REASSIGN PRACTITIONER
-  // ============================================================
+  /* ============================================================
+     REASSIGN PRACTITIONER
+  ============================================================ */
 
   reassign(id: string, request: ReassignPractitionerRequest): Observable<void> {
     return this.http.put<void>(`${this.apiUrl}/${id}/reassign`, request);
   }
 
-  // ============================================================
-  // GET TODAY VISITS
-  //
-  // Backend:
-  // GET /api/visits/today
-  //
-  // Optional query:
-  // ?practitionerId={guid}
-  // ============================================================
+  /* ============================================================
+     GET TODAY VISITS
+  ============================================================ */
 
   getToday(practitionerId?: string): Observable<Visit[]> {
     let params = new HttpParams();
@@ -175,18 +192,9 @@ export class VisitsService {
       );
   }
 
-  // ============================================================
-  // GET VISITS BY DATE
-  //
-  // Backend:
-  // GET /api/visits/by-date
-  //
-  // Optional query:
-  //
-  // ?date=2026-08-21
-  //
-  // If no date is provided, backend returns all visits.
-  // ============================================================
+  /* ============================================================
+     GET VISITS BY DATE
+  ============================================================ */
 
   getByDate(date?: string): Observable<Visit[]> {
     let params = new HttpParams();
@@ -202,19 +210,9 @@ export class VisitsService {
       );
   }
 
-  // ============================================================
-  // GET PRACTITIONER VISITS BY DATE
-  //
-  // Backend:
-  //
-  // GET /api/visits/by-date?date=2026-08-21
-  //
-  // The backend returns visits for the selected date.
-  //
-  // We then filter those visits on the frontend so that
-  // only visits belonging to the selected practitioner
-  // are returned.
-  // ============================================================
+  /* ============================================================
+     GET PRACTITIONER VISITS BY DATE
+  ============================================================ */
 
   getPractitionerVisitsByDate(practitionerId: string, date: string): Observable<Visit[]> {
     return this.getByDate(date).pipe(
@@ -224,13 +222,17 @@ export class VisitsService {
     );
   }
 
-  // ============================================================
-  // MAP BACKEND VISIT
-  // ============================================================
+  /* ============================================================
+     MAP BACKEND VISIT
+  ============================================================ */
 
   private mapVisit(visit: BackendVisit): Visit {
     return {
       ...visit,
+
+      amountDue: Number(visit.amountDue ?? 0),
+
+      amountReceived: Number(visit.amountReceived ?? 0),
 
       status: this.mapVisitStatus(visit.status),
 
@@ -238,11 +240,41 @@ export class VisitsService {
     };
   }
 
-  // ============================================================
-  // MAP VISIT STATUS
-  // ============================================================
+  /* ============================================================
+     MAP VISIT STATUS
+  ============================================================ */
 
-  private mapVisitStatus(status: number): VisitStatus {
+  private mapVisitStatus(status: BackendVisitStatus): VisitStatus {
+    /*
+     * Backend returns string enum values.
+     */
+
+    if (typeof status === 'string') {
+      switch (status.trim().toLowerCase()) {
+        case 'scheduled':
+          return 'Scheduled';
+
+        case 'accepted':
+          return 'Accepted';
+
+        case 'completed':
+          return 'Completed';
+
+        case 'cancelled':
+        case 'canceled':
+          return 'Cancelled';
+
+        default:
+          console.warn('Unknown visit status received from API:', status);
+
+          return 'Scheduled';
+      }
+    }
+
+    /*
+     * Numeric enum support.
+     */
+
     switch (status) {
       case 0:
         return 'Scheduled';
@@ -263,11 +295,34 @@ export class VisitsService {
     }
   }
 
-  // ============================================================
-  // MAP COLLECTION STATUS
-  // ============================================================
+  /* ============================================================
+     MAP COLLECTION STATUS
+  ============================================================ */
 
-  private mapCollectionStatus(status: number): CollectionStatus {
+  private mapCollectionStatus(status: BackendCollectionStatus): CollectionStatus {
+    /*
+     * Backend returns string enum values.
+     */
+
+    if (typeof status === 'string') {
+      switch (status.trim().toLowerCase()) {
+        case 'pending':
+          return 'Pending';
+
+        case 'received':
+          return 'Received';
+
+        default:
+          console.warn('Unknown collection status received from API:', status);
+
+          return 'Pending';
+      }
+    }
+
+    /*
+     * Numeric enum support.
+     */
+
     switch (status) {
       case 0:
         return 'Pending';

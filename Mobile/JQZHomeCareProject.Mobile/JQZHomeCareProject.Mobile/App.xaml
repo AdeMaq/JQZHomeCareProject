@@ -13,6 +13,8 @@
             <conv:InverseBoolConverter x:Key="InverseBoolConverter" />
             <conv:StringNotEmptyConverter x:Key="StringNotEmptyConverter" />
             <conv:PasswordToggleTextConverter x:Key="PasswordToggleTextConverter" />
+            <conv:EnumEqualsConverter x:Key="EnumEqualsConverter" />
+            <conv:VisitStatusToColorConverter x:Key="VisitStatusToColorConverter" />
         </ResourceDictionary>
     </Application.Resources>
 </Application>

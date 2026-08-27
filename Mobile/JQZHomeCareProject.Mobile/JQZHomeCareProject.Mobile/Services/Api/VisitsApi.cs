@@ -28,5 +28,16 @@ namespace JQZHomeCareProject.Mobile.Services.Api
             var result = await response.Content.ReadFromJsonAsync<List<VisitDto>>(AppJsonOptions.Default, cancellationToken);
             return result ?? new List<VisitDto>();
         }
+        public async Task<List<VisitDto>> GetAllAsync(CancellationToken cancellationToken = default)
+        {
+            var response = await _http.GetAsync("visits", cancellationToken);
+            if (!response.IsSuccessStatusCode)
+            {
+                var error = await response.Content.ReadFromJsonAsync<ApiErrorResponse>(AppJsonOptions.Default, cancellationToken);
+                throw new ApiException(response.StatusCode, error?.Message ?? "Could not load all visits.");
+            }
+            var result = await response.Content.ReadFromJsonAsync<List<VisitDto>>(AppJsonOptions.Default, cancellationToken);
+            return result ?? new List<VisitDto>();
+        }
     }
 }

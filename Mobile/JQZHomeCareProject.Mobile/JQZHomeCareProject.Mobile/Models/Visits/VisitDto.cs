@@ -11,6 +11,10 @@ namespace JQZHomeCareProject.Mobile.Models.Visits
         public string PatientName { get; set; } = string.Empty;
         public string PatientAddress {  get; set; }= string.Empty;
 
+        public string PatientPhone { get; set; } = string.Empty;
+
+        public string PatientDescription { get; set; } = string.Empty;
+
         public Guid? PractitionerId { get; set; }
         public string? PractitionerName { get; set; }
 
@@ -22,9 +26,11 @@ namespace JQZHomeCareProject.Mobile.Models.Visits
 
         public DateTime? ScheduledDate { get; set; }
 
-        // Formatted display slot (e.g. "10:00 AM - 11:00 AM"), combining
-        // the backend's SlotStart/SlotEnd for direct binding on VisitCard.
-        public string? TimeSlot { get; set; }
+        public string? SlotStart { get; set; }
+        public string? SlotEnd { get; set; }
+
+        // Bind directly to this in VisitCard.
+        public string TimeSlot => !string.IsNullOrWhiteSpace(SlotStart) ? SlotStart : "—";
 
         public VisitStatus Status { get; set; }
 

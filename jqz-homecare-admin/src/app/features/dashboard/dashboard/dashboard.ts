@@ -9,6 +9,12 @@ import { DashboardDateRange, DashboardRefusal, DashboardSummary } from './dashbo
 import { DashboardService } from './dashboard.service';
 
 /* =====================================================
+   DASHBOARD DATE FILTER TYPE
+===================================================== */
+
+type DashboardDateFilter = 'today' | 'week' | 'month' | 'custom';
+
+/* =====================================================
    DASHBOARD COMPONENT
 ===================================================== */
 
@@ -62,6 +68,19 @@ export class Dashboard implements OnInit, OnDestroy {
   toDate = '';
 
   /* ===================================================
+     ACTIVE DATE FILTER
+
+     Possible values:
+
+     today
+     week
+     month
+     custom
+  =================================================== */
+
+  selectedDateFilter = signal<DashboardDateFilter>('today');
+
+  /* ===================================================
      REFUSAL COUNTS
   =================================================== */
 
@@ -71,9 +90,6 @@ export class Dashboard implements OnInit, OnDestroy {
 
   /* ===================================================
      UI STATE
-
-     Using Angular signals ensures that the template
-     always receives the latest loading state.
   =================================================== */
 
   readonly isRefreshing = signal(false);
@@ -85,27 +101,13 @@ export class Dashboard implements OnInit, OnDestroy {
   =================================================== */
 
   ngOnInit(): void {
-    this.initializeDefaultDateRange();
-
-    this.loadDashboardData();
+    this.applyTodayFilter();
   }
 
   ngOnDestroy(): void {
     this.destroy$.next();
 
     this.destroy$.complete();
-  }
-
-  /* ===================================================
-     DATE RANGE INITIALIZATION
-  =================================================== */
-
-  private initializeDefaultDateRange(): void {
-    const today = this.formatDate(new Date());
-
-    this.fromDate = today;
-
-    this.toDate = today;
   }
 
   /* ===================================================
@@ -261,6 +263,100 @@ export class Dashboard implements OnInit, OnDestroy {
   }
 
   /* ===================================================
+     TODAY FILTER
+  =================================================== */
+
+  applyTodayFilter(): void {
+    const today = new Date();
+
+    const formattedToday = this.formatDate(today);
+
+    this.fromDate = formattedToday;
+
+    this.toDate = formattedToday;
+
+    this.selectedDateFilter.set('today');
+
+    this.loadDashboardData();
+  }
+
+  /* ===================================================
+     THIS WEEK FILTER
+
+     Week starts on Monday and ends on Sunday.
+  =================================================== */
+
+  applyWeekFilter(): void {
+    const today = new Date();
+
+    const currentDay = today.getDay();
+
+    /*
+     * JavaScript:
+     *
+     * Sunday = 0
+     * Monday = 1
+     * Tuesday = 2
+     * ...
+     * Saturday = 6
+     */
+
+    const daysSinceMonday = currentDay === 0 ? 6 : currentDay - 1;
+
+    const startOfWeek = new Date(today);
+
+    startOfWeek.setDate(today.getDate() - daysSinceMonday);
+
+    const endOfWeek = new Date(startOfWeek);
+
+    endOfWeek.setDate(startOfWeek.getDate() + 6);
+
+    this.fromDate = this.formatDate(startOfWeek);
+
+    this.toDate = this.formatDate(endOfWeek);
+
+    this.selectedDateFilter.set('week');
+
+    this.loadDashboardData();
+  }
+
+  /* ===================================================
+     THIS MONTH FILTER
+  =================================================== */
+
+  applyMonthFilter(): void {
+    const today = new Date();
+
+    const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+
+    const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+
+    this.fromDate = this.formatDate(startOfMonth);
+
+    this.toDate = this.formatDate(endOfMonth);
+
+    this.selectedDateFilter.set('month');
+
+    this.loadDashboardData();
+  }
+
+  /* ===================================================
+     CUSTOM DATE FILTER
+  =================================================== */
+
+  applyCustomDateFilter(): void {
+    this.selectedDateFilter.set('custom');
+
+    this.errorMessage.set('');
+
+    if (!this.isDateRangeValid()) {
+      return;
+    }
+
+    this.loadDashboardData();
+  }
+
+  /* ===================================================
      FROM DATE CHANGE
   =================================================== */
 
@@ -268,6 +364,8 @@ export class Dashboard implements OnInit, OnDestroy {
     const input = event.target as HTMLInputElement;
 
     this.fromDate = input.value;
+
+    this.selectedDateFilter.set('custom');
 
     this.errorMessage.set('');
 
@@ -291,6 +389,8 @@ export class Dashboard implements OnInit, OnDestroy {
     const input = event.target as HTMLInputElement;
 
     this.toDate = input.value;
+
+    this.selectedDateFilter.set('custom');
 
     this.errorMessage.set('');
 

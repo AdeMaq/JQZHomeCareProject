@@ -54,8 +54,8 @@
   border-radius: 16px;
 
   background: linear-gradient(135deg, #cf102d, #e53950);
-  color: #ffffff;
 
+  color: #ffffff;
   font-size: 24px;
 
   box-shadow: 0 12px 26px rgba(207, 16, 45, 0.18);
@@ -85,6 +85,86 @@
 }
 
 /* =====================================================
+   DASHBOARD CONTROLS WRAPPER
+===================================================== */
+
+.dashboard-controls-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 12px;
+
+  min-width: 0;
+}
+
+/* =====================================================
+   QUICK DATE FILTERS
+===================================================== */
+
+.quick-date-filters {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+
+  gap: 4px;
+
+  padding: 4px;
+
+  border: 1px solid #f0dadd;
+  border-radius: 12px;
+
+  background: #fffafa;
+}
+
+/* =====================================================
+   DATE FILTER BUTTON
+===================================================== */
+
+.date-filter-button {
+  min-height: 34px;
+
+  padding: 0 13px;
+
+  border: none;
+  border-radius: 8px;
+
+  background: transparent;
+
+  color: #7b5259;
+
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  white-space: nowrap;
+
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+.date-filter-button:hover:not(:disabled) {
+  background: #fdebed;
+  color: #cf102d;
+}
+
+.date-filter-button.active {
+  background: #cf102d;
+  color: #ffffff;
+
+  box-shadow: 0 4px 10px rgba(207, 16, 45, 0.2);
+}
+
+.date-filter-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* =====================================================
    DASHBOARD CONTROLS
 ===================================================== */
 
@@ -92,6 +172,7 @@
   display: flex;
   align-items: flex-end;
   justify-content: flex-end;
+
   gap: 12px;
   flex-wrap: wrap;
 }
@@ -103,6 +184,7 @@
 .date-control {
   display: flex;
   flex-direction: column;
+
   gap: 7px;
 
   min-width: 0;
@@ -115,6 +197,7 @@
 
   font-size: 11px;
   font-weight: 700;
+
   text-transform: uppercase;
   letter-spacing: 0.06em;
 }
@@ -137,6 +220,7 @@
   font-size: 14px;
 
   pointer-events: none;
+
   z-index: 1;
 }
 
@@ -195,6 +279,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+
   gap: 9px;
 
   padding: 0 18px;
@@ -210,6 +295,7 @@
   font-weight: 700;
 
   cursor: pointer;
+
   white-space: nowrap;
 
   box-shadow: 0 8px 18px rgba(207, 16, 45, 0.16);
@@ -234,7 +320,6 @@
 
 .refresh-button:disabled {
   cursor: not-allowed;
-
   opacity: 0.65;
 }
 
@@ -249,9 +334,11 @@
 .dashboard-error {
   display: flex;
   align-items: center;
+
   gap: 14px;
 
   padding: 16px 18px;
+
   margin-bottom: 24px;
 
   border: 1px solid #f3c2c8;
@@ -283,12 +370,12 @@
 
   display: flex;
   flex-direction: column;
+
   gap: 3px;
 }
 
 .error-content strong {
   color: #9d1026;
-
   font-size: 14px;
 }
 
@@ -315,6 +402,7 @@
   font-weight: 700;
 
   cursor: pointer;
+
   white-space: nowrap;
 
   transition:
@@ -322,9 +410,14 @@
     color 0.2s ease;
 }
 
-.error-retry-button:hover {
+.error-retry-button:hover:not(:disabled) {
   background: #cf102d;
   color: #ffffff;
+}
+
+.error-retry-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
 }
 
 /* =====================================================
@@ -337,57 +430,6 @@
 }
 
 /* =====================================================
-   LOADING OVERLAY
-===================================================== */
-
-.dashboard-loading-overlay {
-  position: absolute;
-  inset: 0;
-
-  z-index: 20;
-
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
-
-  padding-top: 120px;
-
-  background: rgba(255, 255, 255, 0.78);
-
-  backdrop-filter: blur(2px);
-
-  border-radius: 18px;
-
-  box-sizing: border-box;
-}
-
-.dashboard-loading {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-
-  color: #627d98;
-
-  font-size: 14px;
-  font-weight: 600;
-
-  text-align: center;
-}
-
-.loading-spinner {
-  width: 42px;
-  height: 42px;
-
-  border: 4px solid #f4d7db;
-  border-top-color: #cf102d;
-  border-radius: 50%;
-
-  animation: dashboardSpin 0.8s linear infinite;
-}
-
-/* =====================================================
    SUMMARY SECTION HEADER
 ===================================================== */
 
@@ -395,6 +437,7 @@
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
+
   gap: 24px;
 
   margin-bottom: 22px;
@@ -409,6 +452,7 @@
 
   font-size: 10px;
   font-weight: 800;
+
   letter-spacing: 0.1em;
 }
 
@@ -438,6 +482,7 @@
 .date-range-badge {
   display: inline-flex;
   align-items: center;
+
   gap: 9px;
 
   padding: 10px 14px;
@@ -505,6 +550,7 @@
   content: '';
 
   position: absolute;
+
   top: 0;
   right: 0;
 
@@ -530,6 +576,7 @@
 
 .kpi-card-top {
   position: relative;
+
   z-index: 1;
 
   display: flex;
@@ -588,6 +635,7 @@
 
 .kpi-content {
   position: relative;
+
   z-index: 1;
 
   display: flex;
@@ -612,6 +660,7 @@
 
   font-size: 32px;
   font-weight: 800;
+
   line-height: 1.2;
 
   letter-spacing: -0.02em;
@@ -735,6 +784,7 @@
 .dashboard-info-note {
   display: flex;
   align-items: center;
+
   gap: 12px;
 
   margin-top: 24px;
@@ -784,6 +834,14 @@
     align-items: stretch;
   }
 
+  .dashboard-controls-wrapper {
+    align-items: flex-start;
+  }
+
+  .quick-date-filters {
+    justify-content: flex-start;
+  }
+
   .dashboard-controls {
     justify-content: flex-start;
   }
@@ -816,10 +874,6 @@
 
   .kpi-card {
     min-height: 205px;
-  }
-
-  .dashboard-loading-overlay {
-    padding-top: 100px;
   }
 }
 
@@ -854,6 +908,22 @@
 
   .dashboard-heading p {
     font-size: 13px;
+  }
+
+  .dashboard-controls-wrapper {
+    width: 100%;
+  }
+
+  .quick-date-filters {
+    width: 100%;
+
+    justify-content: stretch;
+  }
+
+  .date-filter-button {
+    flex: 1;
+
+    padding: 0 8px;
   }
 
   .dashboard-controls {
@@ -916,10 +986,6 @@
   .dashboard-info-note {
     align-items: flex-start;
   }
-
-  .dashboard-loading-overlay {
-    padding-top: 80px;
-  }
 }
 
 /* =====================================================
@@ -949,6 +1015,20 @@
     margin-top: 5px;
 
     font-size: 12px;
+  }
+
+  .quick-date-filters {
+    gap: 3px;
+
+    padding: 3px;
+  }
+
+  .date-filter-button {
+    min-height: 38px;
+
+    padding: 0 6px;
+
+    font-size: 11px;
   }
 
   .dashboard-controls {
@@ -1018,10 +1098,6 @@
   .dashboard-info-note {
     padding: 14px;
   }
-
-  .dashboard-loading-overlay {
-    padding-top: 70px;
-  }
 }
 
 /* =====================================================
@@ -1039,6 +1115,10 @@
     height: 42px;
 
     font-size: 16px;
+  }
+
+  .date-filter-button {
+    font-size: 10px;
   }
 
   .kpi-card {
@@ -1077,7 +1157,6 @@
   .dashboard-page *::before,
   .dashboard-page *::after {
     animation: none !important;
-
     transition: none !important;
   }
 }

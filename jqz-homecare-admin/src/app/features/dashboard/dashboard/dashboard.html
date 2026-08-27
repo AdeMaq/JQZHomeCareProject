@@ -1,108 +1,315 @@
-<!-- Dashboard Header -->
+<!-- =====================================================
+     DASHBOARD PAGE
+===================================================== -->
 
-<div class="dashboard-header">
-  <!-- Left Side -->
+<section class="dashboard-page">
+  <!-- ===================================================
+       PAGE HEADER
+  ==================================================== -->
 
-  <div>
-    <h1>Dashboard</h1>
+  <div class="dashboard-header">
+    <div class="dashboard-heading">
+      <div class="dashboard-icon">
+        <i class="fa-solid fa-chart-line"></i>
+      </div>
 
-    <p>Welcome back! Here is today's clinic overview.</p>
-  </div>
+      <div class="dashboard-heading-content">
+        <h1>Dashboard</h1>
 
-  <!-- Right Side -->
-
-  <div class="dashboard-actions">
-    <!-- Filters -->
-
-    <div class="filter-group">
-      @for (filter of filters; track filter) {
-        <button
-          type="button"
-          class="dashboard-filter-button"
-          [class.active-filter]="selectedFilter === filter"
-          (click)="selectFilter(filter)"
-        >
-          {{ filter }}
-        </button>
-      }
+        <p>Monitor visits, collections, and service performance.</p>
+      </div>
     </div>
 
-    <!-- Current Date -->
+    <!-- =================================================
+     DATE CONTROLS
+================================================== -->
 
-    <div class="dashboard-date">
-      <i class="fa-regular fa-calendar"></i>
+    <div class="dashboard-controls">
+      <!-- FROM DATE -->
 
-      <span>{{ displayDate }}</span>
+      <div class="date-control">
+        <label for="fromDate">From</label>
+
+        <div class="date-input-wrapper">
+          <i class="fa-regular fa-calendar"></i>
+
+          <input
+            id="fromDate"
+            type="date"
+            [value]="fromDate"
+            [disabled]="isRefreshing()"
+            (change)="onFromDateChange($event)"
+          />
+        </div>
+      </div>
+
+      <!-- TO DATE -->
+
+      <div class="date-control">
+        <label for="toDate">To</label>
+
+        <div class="date-input-wrapper">
+          <i class="fa-regular fa-calendar"></i>
+
+          <input
+            id="toDate"
+            type="date"
+            [value]="toDate"
+            [disabled]="isRefreshing()"
+            (change)="onToDateChange($event)"
+          />
+        </div>
+      </div>
+
+      <!-- REFRESH -->
+
+      <button
+        type="button"
+        class="refresh-button"
+        [class.is-loading]="isRefreshing()"
+        [disabled]="isRefreshing()"
+        (click)="loadDashboardData()"
+      >
+        <i class="fa-solid fa-rotate" [class.is-spinning]="isRefreshing()"></i>
+
+        <span>
+          @if (isRefreshing()) {
+            Loading...
+          } @else {
+            Refresh
+          }
+        </span>
+      </button>
     </div>
-
-    <!-- Add Visit -->
-
-    <button type="button" class="add-visit-button" (click)="addVisit()">
-      <i class="fa-solid fa-plus"></i>
-
-      <span>Add Visit</span>
-    </button>
   </div>
-</div>
 
-<!-- KPI Cards -->
+  <!-- ===================================================
+       ERROR STATE
+  ==================================================== -->
 
-<div class="cards-grid">
-  @for (card of stats; track card.title) {
-    <app-stat-card
-      [title]="card.title"
-      [value]="card.value"
-      [icon]="card.icon"
-      [color]="card.color"
-    >
-    </app-stat-card>
+  @if (errorMessage()) {
+    <div class="dashboard-error" role="alert">
+      <div class="error-icon"><i class="fa-solid fa-circle-exclamation"></i></div>
+
+      <div class="error-content">
+        <strong>Unable to load dashboard</strong>
+
+        <span>
+          {{ errorMessage() }}
+        </span>
+      </div>
+
+      <button
+        type="button"
+        class="error-retry-button"
+        [disabled]="isRefreshing()"
+        (click)="loadDashboardData()"
+      >
+        Try Again
+      </button>
+    </div>
   }
-</div>
 
-<!-- Refusals -->
+  <!-- ===================================================
+       DASHBOARD CONTENT
+  ==================================================== -->
 
-<div class="section-title">Refusals</div>
+  <div class="dashboard-content-wrapper" [attr.aria-busy]="isRefreshing()">
+    <!-- ===============================================
+         SUMMARY HEADER
+    ================================================ -->
+    <div class="summary-section-header">
+      <div>
+        <span class="section-eyebrow"> PERFORMANCE OVERVIEW </span>
 
-<div class="cards-grid refusal-grid">
-  @for (card of refusalStats; track card.title) {
-    <app-stat-card
-      [title]="card.title"
-      [value]="card.value"
-      [icon]="card.icon"
-      [color]="card.color"
-    >
-    </app-stat-card>
-  }
-</div>
+        <h2>Dashboard Summary</h2>
 
-<!-- Charts -->
+        <p>Overview of visits, payments, collections, and refusals for the selected date range.</p>
+      </div>
 
-<div class="charts-grid">
-  <div class="chart-card">
-    <h3>Visits Overview</h3>
+      <div class="date-range-badge">
+        <i class="fa-regular fa-calendar-days"></i>
 
-    <div class="chart-placeholder">
-      <i class="fa-solid fa-chart-column"></i>
+        <span> {{ fromDate }} — {{ toDate }} </span>
+      </div>
+    </div>
 
-      <p>Chart will be integrated with API</p>
+    <!-- ===============================================
+     KPI GRID
+================================================ -->
+
+    <div class="kpi-grid">
+      <!-- =============================================
+       EXPECTED VISITS
+  ============================================== -->
+
+      <article class="kpi-card expected-visits-card">
+        <div class="kpi-card-top">
+          <div class="kpi-icon expected-visits-icon">
+            <i class="fa-solid fa-calendar-check"></i>
+          </div>
+
+          <div class="kpi-status-icon">
+            <i class="fa-solid fa-arrow-trend-up"></i>
+          </div>
+        </div>
+
+        <div class="kpi-content">
+          <span class="kpi-label"> Expected Visits </span>
+
+          <strong class="kpi-value">
+            {{ summary?.expectedVisits ?? 0 }}
+          </strong>
+
+          <span class="kpi-description"> Scheduled visits in this period </span>
+        </div>
+      </article>
+
+      <!-- =============================================
+       ACTUAL VISITS DONE
+  ============================================== -->
+
+      <article class="kpi-card completed-visits-card">
+        <div class="kpi-card-top">
+          <div class="kpi-icon completed-visits-icon">
+            <i class="fa-solid fa-circle-check"></i>
+          </div>
+
+          <div class="kpi-status-icon">
+            <i class="fa-solid fa-check"></i>
+          </div>
+        </div>
+
+        <div class="kpi-content">
+          <span class="kpi-label"> Actual Visits Done </span>
+
+          <strong class="kpi-value">
+            {{ summary?.actualVisitsDone ?? 0 }}
+          </strong>
+
+          <span class="kpi-description"> Successfully completed visits </span>
+        </div>
+      </article>
+
+      <!-- =============================================
+       PAYMENT RECEIVED
+  ============================================== -->
+
+      <article class="kpi-card payment-card">
+        <div class="kpi-card-top">
+          <div class="kpi-icon payment-icon">
+            <i class="fa-solid fa-money-bill-wave"></i>
+          </div>
+
+          <div class="kpi-status-icon">
+            <i class="fa-solid fa-arrow-down"></i>
+          </div>
+        </div>
+
+        <div class="kpi-content">
+          <span class="kpi-label"> Payment Received </span>
+
+          <strong class="kpi-value currency-value">
+            Rs.
+            {{ summary?.paymentReceived ?? 0 | number: '1.0-2' }}
+          </strong>
+
+          <span class="kpi-description"> Amount collected from completed visits </span>
+        </div>
+      </article>
+
+      <!-- =============================================
+       PENDING COLLECTION
+  ============================================== -->
+
+      <article class="kpi-card pending-card">
+        <div class="kpi-card-top">
+          <div class="kpi-icon pending-icon">
+            <i class="fa-solid fa-clock"></i>
+          </div>
+
+          <div class="kpi-status-icon">
+            <i class="fa-solid fa-hourglass-half"></i>
+          </div>
+        </div>
+
+        <div class="kpi-content">
+          <span class="kpi-label"> Pending Collection </span>
+
+          <strong class="kpi-value currency-value">
+            Rs.
+            {{ summary?.pendingCollectionAmount ?? 0 | number: '1.0-2' }}
+          </strong>
+
+          <span class="kpi-description"> Outstanding amount from completed visits </span>
+        </div>
+      </article>
+
+      <!-- =============================================
+       PATIENT REFUSALS
+  ============================================== -->
+
+      <article class="kpi-card patient-refusal-card">
+        <div class="kpi-card-top">
+          <div class="kpi-icon patient-refusal-icon">
+            <i class="fa-solid fa-user-xmark"></i>
+          </div>
+
+          <div class="kpi-status-icon">
+            <i class="fa-solid fa-ban"></i>
+          </div>
+        </div>
+
+        <div class="kpi-content">
+          <span class="kpi-label"> Patient Refusals </span>
+
+          <strong class="kpi-value">
+            {{ patientRefusals }}
+          </strong>
+
+          <span class="kpi-description"> Visits refused by patients </span>
+        </div>
+      </article>
+
+      <!-- =============================================
+       PRACTITIONER REFUSALS
+  ============================================== -->
+
+      <article class="kpi-card practitioner-refusal-card">
+        <div class="kpi-card-top">
+          <div class="kpi-icon practitioner-refusal-icon">
+            <i class="fa-solid fa-user-doctor"></i>
+          </div>
+
+          <div class="kpi-status-icon">
+            <i class="fa-solid fa-ban"></i>
+          </div>
+        </div>
+
+        <div class="kpi-content">
+          <span class="kpi-label"> Practitioner Refusals </span>
+
+          <strong class="kpi-value">
+            {{ practitionerRefusals }}
+          </strong>
+
+          <span class="kpi-description"> Visits refused by practitioners </span>
+        </div>
+      </article>
+    </div>
+
+    <!-- ===============================================
+     DASHBOARD INFO NOTE
+================================================ -->
+
+    <div class="dashboard-info-note">
+      <div class="info-note-icon">
+        <i class="fa-solid fa-circle-info"></i>
+      </div>
+
+      <p>
+        Dashboard metrics are calculated from visits and refusals within the selected date range.
+      </p>
     </div>
   </div>
-
-  <div class="chart-card">
-    <h3>Revenue Overview</h3>
-
-    <div class="chart-placeholder">
-      <i class="fa-solid fa-chart-line"></i>
-
-      <p>Chart will be integrated with API</p>
-    </div>
-  </div>
-</div>
-
-<!-- Recent Visits -->
-
-<div class="table-section">
-  <h3>Recent Visits</h3>
-
-  <app-table [columns]="columns" [rows]="recentVisits"></app-table>
-</div>
+</section>

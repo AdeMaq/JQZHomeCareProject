@@ -1,94 +1,64 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 
-import { DashboardSummary, Refusal } from './dashboard.interface';
+import { HttpClient, HttpParams } from '@angular/common/http';
+
+import { Observable } from 'rxjs';
+
+import { DashboardDateRange, DashboardRefusal, DashboardSummary } from './dashboard.models';
+
+/* =====================================================
+   DASHBOARD SERVICE
+===================================================== */
 
 @Injectable({
   providedIn: 'root',
 })
 export class DashboardService {
-  private readonly summaryData: DashboardSummary = {
-    expectedVisits: 24,
-    actualVisitsDone: 18,
-    paymentReceived: 125000,
-  };
+  /* ===================================================
+     DEPENDENCIES
+  =================================================== */
 
-  private readonly refusalsData: Refusal[] = [
-    {
-      id: 1,
-      visitId: 101,
-      patientName: 'Ali Khan',
-      practitionerName: 'Dr. Sarah Ahmed',
-      refusedBy: 'Patient',
-      reason: 'Patient was unavailable',
-      date: '2026-07-25',
-    },
+  private readonly http = inject(HttpClient);
 
-    {
-      id: 2,
-      visitId: 102,
-      patientName: 'Usman Tariq',
-      practitionerName: 'Dr. Ahmed Raza',
-      refusedBy: 'Patient',
-      reason: 'Patient cancelled the visit',
-      date: '2026-07-25',
-    },
+  /* ===================================================
+     API BASE URL
+  =================================================== */
 
-    {
-      id: 3,
-      visitId: 103,
-      patientName: 'Hamza Ali',
-      practitionerName: 'Dr. Sara Khan',
-      refusedBy: 'Practitioner',
-      reason: 'Practitioner was unavailable',
-      date: '2026-07-25',
-    },
+  private readonly apiUrl = '/api/dashboard';
 
-    {
-      id: 4,
-      visitId: 104,
-      patientName: 'Bilal Ahmed',
-      practitionerName: 'Dr. Ayesha Malik',
-      refusedBy: 'Practitioner',
-      reason: 'Schedule conflict',
-      date: '2026-07-25',
-    },
+  /* ===================================================
+     DASHBOARD SUMMARY
+  =================================================== */
 
-    {
-      id: 5,
-      visitId: 105,
-      patientName: 'Hassan Raza',
-      practitionerName: 'Dr. Fatima Noor',
-      refusedBy: 'Patient',
-      reason: 'Patient requested cancellation',
-      date: '2026-07-25',
-    },
+  /**
+   * Gets dashboard KPI summary data.
+   *
+   * Endpoint:
+   * GET /api/dashboard/summary?from=&to=
+   */
+  getSummary(dateRange: DashboardDateRange): Observable<DashboardSummary> {
+    const params = new HttpParams().set('from', dateRange.from).set('to', dateRange.to);
 
-    {
-      id: 6,
-      visitId: 106,
-      patientName: 'Omar Farooq',
-      practitionerName: 'Dr. Zainab Ali',
-      refusedBy: 'Practitioner',
-      reason: 'Practitioner was sick',
-      date: '2026-07-25',
-    },
-
-    {
-      id: 7,
-      visitId: 107,
-      patientName: 'Ahmed Hassan',
-      practitionerName: 'Dr. Maria Khan',
-      refusedBy: 'Patient',
-      reason: 'Patient was not available',
-      date: '2026-07-25',
-    },
-  ];
-
-  getSummary(): DashboardSummary {
-    return this.summaryData;
+    return this.http.get<DashboardSummary>(`${this.apiUrl}/summary`, {
+      params,
+    });
   }
 
-  getRefusals(): Refusal[] {
-    return this.refusalsData;
+  /* ===================================================
+     DASHBOARD REFUSALS
+  =================================================== */
+
+  /**
+   * Gets refusal records for the selected date range.
+   *
+   * Endpoint:
+   * GET /api/dashboard/refusals?from=&to=
+   */
+  getRefusals(dateRange: DashboardDateRange): Observable<DashboardRefusal[]> {
+    const params = new HttpParams().set('from', dateRange.from).set('to', dateRange.to);
+
+    return this.http.get<DashboardRefusal[]>(`${this.apiUrl}/refusals`, {
+      params,
+    });
   }
 }

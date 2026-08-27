@@ -1,242 +1,348 @@
-import { Component, OnInit, inject, PLATFORM_ID } from '@angular/core';
-import { Router } from '@angular/router';
-import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
 
-import { StatCard } from '../../../shared/components/stat-card/stat-card';
-import { Table } from '../../../shared/components/table/table';
+import { DecimalPipe } from '@angular/common';
 
-import { DashboardStat, DashboardSummary, Refusal } from './dashboard.interface';
+import { Subject, catchError, finalize, forkJoin, of, takeUntil, timeout } from 'rxjs';
+
+import { DashboardDateRange, DashboardRefusal, DashboardSummary } from './dashboard.models';
 
 import { DashboardService } from './dashboard.service';
 
+/* =====================================================
+   DASHBOARD COMPONENT
+===================================================== */
+
 @Component({
   selector: 'app-dashboard',
+
   standalone: true,
 
-  imports: [CommonModule, StatCard, Table],
+  imports: [DecimalPipe],
 
   templateUrl: './dashboard.html',
+
   styleUrl: './dashboard.css',
 })
-export class Dashboard implements OnInit {
-  private dashboardService = inject(DashboardService);
+export class Dashboard implements OnInit, OnDestroy {
+  /* ===================================================
+     DEPENDENCIES
+  =================================================== */
 
-  private router = inject(Router);
+  private readonly dashboardService = inject(DashboardService);
 
-  private platformId = inject(PLATFORM_ID);
+  /* ===================================================
+     DESTROY SIGNAL
+  =================================================== */
 
-  /* ========================= */
-  /* DATE FILTER */
-  /* ========================= */
+  private readonly destroy$ = new Subject<void>();
 
-  selectedFilter = 'Today';
+  /* ===================================================
+     REQUEST ID
 
-  filters = ['Today', 'This Week', 'This Month'];
+     Prevents older requests from changing the UI after
+     a newer request has started.
+  =================================================== */
 
-  fromDate!: string;
+  private requestId = 0;
 
-  toDate!: string;
+  /* ===================================================
+     DASHBOARD DATA
+  =================================================== */
 
-  displayDate = '';
+  summary: DashboardSummary | null = null;
 
-  /* ========================= */
-  /* DASHBOARD DATA */
-  /* ========================= */
+  refusals: DashboardRefusal[] = [];
 
-  summary: DashboardSummary = {
-    expectedVisits: 0,
+  /* ===================================================
+     DATE RANGE
+  =================================================== */
 
-    actualVisitsDone: 0,
+  fromDate = '';
 
-    paymentReceived: 0,
-  };
+  toDate = '';
 
-  refusals: Refusal[] = [];
+  /* ===================================================
+     REFUSAL COUNTS
+  =================================================== */
 
-  /* ========================= */
-  /* KPI STATISTICS */
-  /* ========================= */
+  patientRefusals = 0;
 
-  stats: DashboardStat[] = [];
+  practitionerRefusals = 0;
 
-  /* ========================= */
-  /* REFUSAL STATISTICS */
-  /* ========================= */
+  /* ===================================================
+     UI STATE
 
-  refusalStats: DashboardStat[] = [];
+     Using Angular signals ensures that the template
+     always receives the latest loading state.
+  =================================================== */
 
-  /* ========================= */
-  /* RECENT VISITS */
-  /* ========================= */
+  readonly isRefreshing = signal(false);
 
-  columns = ['patient', 'therapist', 'date', 'status'];
+  readonly errorMessage = signal('');
 
-  recentVisits: any[] = [];
-
-  /* ========================= */
-  /* INITIALIZATION */
-  /* ========================= */
+  /* ===================================================
+     LIFECYCLE
+  =================================================== */
 
   ngOnInit(): void {
-    if (isPlatformBrowser(this.platformId)) {
-      this.selectFilter('Today');
-    }
-  }
-
-  /* ========================= */
-  /* FILTER SELECTION */
-  /* ========================= */
-
-  selectFilter(filter: string): void {
-    this.selectedFilter = filter;
-
-    const today = new Date();
-
-    let from = new Date(today);
-
-    const to = new Date(today);
-
-    if (filter === 'This Week') {
-      from = new Date(today);
-
-      from.setDate(today.getDate() - today.getDay());
-    }
-
-    if (filter === 'This Month') {
-      from = new Date(today.getFullYear(), today.getMonth(), 1);
-    }
-
-    this.fromDate = this.formatDate(from);
-
-    this.toDate = this.formatDate(to);
-
-    this.displayDate = this.formatDisplayDate(today);
+    this.initializeDefaultDateRange();
 
     this.loadDashboardData();
   }
 
-  /* ========================= */
-  /* LOAD STATIC DASHBOARD DATA */
-  /* ========================= */
+  ngOnDestroy(): void {
+    this.destroy$.next();
+
+    this.destroy$.complete();
+  }
+
+  /* ===================================================
+     DATE RANGE INITIALIZATION
+  =================================================== */
+
+  private initializeDefaultDateRange(): void {
+    const today = this.formatDate(new Date());
+
+    this.fromDate = today;
+
+    this.toDate = today;
+  }
+
+  /* ===================================================
+     LOAD DASHBOARD DATA
+  =================================================== */
 
   loadDashboardData(): void {
+    /* ===============================================
+       VALIDATE DATE RANGE
+    ================================================ */
+
+    if (!this.isDateRangeValid()) {
+      this.errorMessage.set('Please select a valid date range.');
+
+      return;
+    }
+
+    /* ===============================================
+       CREATE REQUEST ID
+    ================================================ */
+
+    const currentRequestId = ++this.requestId;
+
+    /* ===============================================
+       CAPTURE CURRENT DATE RANGE
+    ================================================ */
+
+    const requestDateRange: DashboardDateRange = {
+      from: this.fromDate,
+      to: this.toDate,
+    };
+
+    /* ===============================================
+       START LOADING
+    ================================================ */
+
+    this.isRefreshing.set(true);
+
+    this.errorMessage.set('');
+
+    console.log('=================================');
+    console.log('LOADING DASHBOARD DATA');
+    console.log('Request ID:', currentRequestId);
+    console.log('Date range:', requestDateRange);
+    console.log('=================================');
+
+    /* ===============================================
+       SUMMARY REQUEST
+    ================================================ */
+
+    const summaryRequest = this.dashboardService.getSummary(requestDateRange).pipe(
+      timeout(15000),
+
+      catchError((error: unknown) => {
+        console.error('Dashboard summary request failed:', error);
+
+        return of<DashboardSummary | null>(null);
+      }),
+    );
+
+    /* ===============================================
+       REFUSALS REQUEST
+    ================================================ */
+
+    const refusalsRequest = this.dashboardService.getRefusals(requestDateRange).pipe(
+      timeout(15000),
+
+      catchError((error: unknown) => {
+        console.error('Dashboard refusals request failed:', error);
+
+        return of<DashboardRefusal[]>([]);
+      }),
+    );
+
+    /* ===============================================
+       EXECUTE REQUESTS
+    ================================================ */
+
+    forkJoin({
+      summary: summaryRequest,
+
+      refusals: refusalsRequest,
+    })
+      .pipe(
+        takeUntil(this.destroy$),
+
+        finalize(() => {
+          /*
+           * Only the latest request can control
+           * the loading state.
+           */
+
+          if (currentRequestId !== this.requestId) {
+            return;
+          }
+
+          this.isRefreshing.set(false);
+
+          console.log('=================================');
+          console.log('DASHBOARD REQUEST FINISHED');
+          console.log('Request ID:', currentRequestId);
+          console.log('isRefreshing:', this.isRefreshing());
+          console.log('=================================');
+        }),
+      )
+      .subscribe({
+        next: ({ summary, refusals }) => {
+          /*
+           * Ignore old requests.
+           */
+
+          if (currentRequestId !== this.requestId) {
+            return;
+          }
+
+          /* ===========================================
+             SUMMARY
+          ============================================ */
+
+          if (summary) {
+            this.summary = summary;
+
+            console.log('Dashboard summary received:', summary);
+          } else {
+            this.errorMessage.set('Unable to load dashboard summary.');
+          }
+
+          /* ===========================================
+             REFUSALS
+          ============================================ */
+
+          this.refusals = refusals ?? [];
+
+          this.updateRefusalCounts();
+
+          console.log('Dashboard refusals received:', this.refusals);
+
+          console.log('Patient refusals:', this.patientRefusals);
+
+          console.log('Practitioner refusals:', this.practitionerRefusals);
+        },
+
+        error: (error: unknown) => {
+          console.error('Failed to load dashboard data:', error);
+
+          if (currentRequestId !== this.requestId) {
+            return;
+          }
+
+          this.errorMessage.set('Unable to load dashboard data. Please try again.');
+        },
+      });
+  }
+
+  /* ===================================================
+     FROM DATE CHANGE
+  =================================================== */
+
+  onFromDateChange(event: Event): void {
+    const input = event.target as HTMLInputElement;
+
+    this.fromDate = input.value;
+
+    this.errorMessage.set('');
+
     /*
-     * TEMPORARY STATIC DATA
-     *
-     * The backend Dashboard API is currently being updated.
-     * Therefore, we are using static mock data for now.
+     * Don't make an API request while the range
+     * is temporarily invalid.
      */
 
-    this.summary = this.dashboardService.getSummary();
+    if (!this.isDateRangeValid()) {
+      return;
+    }
 
-    this.refusals = this.dashboardService.getRefusals();
-
-    this.buildStats();
-
-    this.buildRefusalStats();
-
-    console.log('STATIC SUMMARY:', this.summary);
-
-    console.log('STATIC REFUSALS:', this.refusals);
+    this.loadDashboardData();
   }
 
-  /* ========================= */
-  /* BUILD KPI CARDS */
-  /* ========================= */
+  /* ===================================================
+     TO DATE CHANGE
+  =================================================== */
 
-  buildStats(): void {
-    this.stats = [
-      {
-        title: 'Expected Visits',
+  onToDateChange(event: Event): void {
+    const input = event.target as HTMLInputElement;
 
-        value: this.summary.expectedVisits,
+    this.toDate = input.value;
 
-        icon: 'fa-calendar-day',
+    this.errorMessage.set('');
 
-        color: '#14b8a6',
-      },
+    /*
+     * Don't make an API request while the range
+     * is temporarily invalid.
+     */
 
-      {
-        title: 'Completed Visits',
+    if (!this.isDateRangeValid()) {
+      return;
+    }
 
-        value: this.summary.actualVisitsDone,
-
-        icon: 'fa-circle-check',
-
-        color: '#22c55e',
-      },
-
-      {
-        title: 'Revenue',
-
-        value: `Rs. ${this.summary.paymentReceived.toLocaleString()}`,
-
-        icon: 'fa-sack-dollar',
-
-        color: '#f59e0b',
-      },
-    ];
+    this.loadDashboardData();
   }
 
-  /* ========================= */
-  /* BUILD REFUSAL CARDS */
-  /* ========================= */
+  /* ===================================================
+     REFUSAL CALCULATIONS
+  =================================================== */
 
-  buildRefusalStats(): void {
-    const patientRefusals = this.refusals.filter(
+  private updateRefusalCounts(): void {
+    this.patientRefusals = this.refusals.filter(
       (refusal) => refusal.refusedBy === 'Patient',
     ).length;
 
-    const practitionerRefusals = this.refusals.filter(
+    this.practitionerRefusals = this.refusals.filter(
       (refusal) => refusal.refusedBy === 'Practitioner',
     ).length;
-
-    this.refusalStats = [
-      {
-        title: 'Patient Refusals',
-
-        value: patientRefusals,
-
-        icon: 'fa-user-xmark',
-
-        color: '#ef4444',
-      },
-
-      {
-        title: 'Practitioner Refusals',
-
-        value: practitionerRefusals,
-
-        icon: 'fa-user-slash',
-
-        color: '#dc2626',
-      },
-    ];
   }
 
-  /* ========================= */
-  /* DATE FORMAT */
-  /* ========================= */
+  /* ===================================================
+     DATE RANGE VALIDATION
+  =================================================== */
+
+  private isDateRangeValid(): boolean {
+    if (!this.fromDate || !this.toDate) {
+      return false;
+    }
+
+    return this.fromDate <= this.toDate;
+  }
+
+  /* ===================================================
+     DATE FORMATTING
+  =================================================== */
 
   private formatDate(date: Date): string {
-    return date.toISOString().split('T')[0];
-  }
+    const year = date.getFullYear();
 
-  private formatDisplayDate(date: Date): string {
-    return date.toLocaleDateString('en-GB', {
-      day: 'numeric',
+    const month = String(date.getMonth() + 1).padStart(2, '0');
 
-      month: 'long',
+    const day = String(date.getDate()).padStart(2, '0');
 
-      year: 'numeric',
-    });
-  }
-
-  /* ========================= */
-  /* ADD VISIT */
-  /* ========================= */
-
-  addVisit(): void {
-    this.router.navigate(['/visits/add']);
+    return `${year}-${month}-${day}`;
   }
 }

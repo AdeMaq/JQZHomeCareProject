@@ -8,6 +8,10 @@
   ==================================================== -->
 
   <div class="dashboard-header">
+    <!-- ===============================================
+         DASHBOARD HEADING
+    ================================================ -->
+
     <div class="dashboard-heading">
       <div class="dashboard-icon">
         <i class="fa-solid fa-chart-line"></i>
@@ -20,66 +24,114 @@
       </div>
     </div>
 
-    <!-- =================================================
-     DATE CONTROLS
-================================================== -->
+    <!-- ===============================================
+         DATE CONTROLS
+    ================================================ -->
 
-    <div class="dashboard-controls">
-      <!-- FROM DATE -->
+    <div class="dashboard-controls-wrapper">
+      <!-- =============================================
+           QUICK DATE FILTERS
+      ============================================== -->
 
-      <div class="date-control">
-        <label for="fromDate">From</label>
+      <div class="quick-date-filters">
+        <!-- TODAY -->
 
-        <div class="date-input-wrapper">
-          <i class="fa-regular fa-calendar"></i>
+        <button
+          type="button"
+          class="date-filter-button"
+          [class.active]="selectedDateFilter() === 'today'"
+          [disabled]="isRefreshing()"
+          (click)="applyTodayFilter()"
+        >
+          Today
+        </button>
 
-          <input
-            id="fromDate"
-            type="date"
-            [value]="fromDate"
-            [disabled]="isRefreshing()"
-            (change)="onFromDateChange($event)"
-          />
-        </div>
+        <!-- THIS WEEK -->
+
+        <button
+          type="button"
+          class="date-filter-button"
+          [class.active]="selectedDateFilter() === 'week'"
+          [disabled]="isRefreshing()"
+          (click)="applyWeekFilter()"
+        >
+          This Week
+        </button>
+
+        <!-- THIS MONTH -->
+
+        <button
+          type="button"
+          class="date-filter-button"
+          [class.active]="selectedDateFilter() === 'month'"
+          [disabled]="isRefreshing()"
+          (click)="applyMonthFilter()"
+        >
+          This Month
+        </button>
       </div>
 
-      <!-- TO DATE -->
+      <!-- =============================================
+           CUSTOM DATE CONTROLS
+      ============================================== -->
 
-      <div class="date-control">
-        <label for="toDate">To</label>
+      <div class="dashboard-controls">
+        <!-- FROM DATE -->
 
-        <div class="date-input-wrapper">
-          <i class="fa-regular fa-calendar"></i>
+        <div class="date-control">
+          <label for="fromDate">From</label>
 
-          <input
-            id="toDate"
-            type="date"
-            [value]="toDate"
-            [disabled]="isRefreshing()"
-            (change)="onToDateChange($event)"
-          />
+          <div class="date-input-wrapper">
+            <i class="fa-regular fa-calendar"></i>
+
+            <input
+              id="fromDate"
+              type="date"
+              [value]="fromDate"
+              [disabled]="isRefreshing()"
+              (change)="onFromDateChange($event)"
+            />
+          </div>
         </div>
+
+        <!-- TO DATE -->
+
+        <div class="date-control">
+          <label for="toDate">To</label>
+
+          <div class="date-input-wrapper">
+            <i class="fa-regular fa-calendar"></i>
+
+            <input
+              id="toDate"
+              type="date"
+              [value]="toDate"
+              [disabled]="isRefreshing()"
+              (change)="onToDateChange($event)"
+            />
+          </div>
+        </div>
+
+        <!-- REFRESH -->
+
+        <button
+          type="button"
+          class="refresh-button"
+          [class.is-loading]="isRefreshing()"
+          [disabled]="isRefreshing()"
+          (click)="loadDashboardData()"
+        >
+          <i class="fa-solid fa-rotate" [class.is-spinning]="isRefreshing()"></i>
+
+          <span>
+            @if (isRefreshing()) {
+              Loading...
+            } @else {
+              Refresh
+            }
+          </span>
+        </button>
       </div>
-
-      <!-- REFRESH -->
-
-      <button
-        type="button"
-        class="refresh-button"
-        [class.is-loading]="isRefreshing()"
-        [disabled]="isRefreshing()"
-        (click)="loadDashboardData()"
-      >
-        <i class="fa-solid fa-rotate" [class.is-spinning]="isRefreshing()"></i>
-
-        <span>
-          @if (isRefreshing()) {
-            Loading...
-          } @else {
-            Refresh
-          }
-        </span>
-      </button>
     </div>
   </div>
 
@@ -89,7 +141,9 @@
 
   @if (errorMessage()) {
     <div class="dashboard-error" role="alert">
-      <div class="error-icon"><i class="fa-solid fa-circle-exclamation"></i></div>
+      <div class="error-icon">
+        <i class="fa-solid fa-circle-exclamation"></i>
+      </div>
 
       <div class="error-content">
         <strong>Unable to load dashboard</strong>
@@ -116,8 +170,9 @@
 
   <div class="dashboard-content-wrapper" [attr.aria-busy]="isRefreshing()">
     <!-- ===============================================
-         SUMMARY HEADER
+         SUMMARY SECTION HEADER
     ================================================ -->
+
     <div class="summary-section-header">
       <div>
         <span class="section-eyebrow"> PERFORMANCE OVERVIEW </span>
@@ -127,6 +182,8 @@
         <p>Overview of visits, payments, collections, and refusals for the selected date range.</p>
       </div>
 
+      <!-- DATE RANGE BADGE -->
+
       <div class="date-range-badge">
         <i class="fa-regular fa-calendar-days"></i>
 
@@ -135,13 +192,13 @@
     </div>
 
     <!-- ===============================================
-     KPI GRID
-================================================ -->
+         KPI GRID
+    ================================================ -->
 
     <div class="kpi-grid">
       <!-- =============================================
-       EXPECTED VISITS
-  ============================================== -->
+           EXPECTED VISITS
+      ============================================== -->
 
       <article class="kpi-card expected-visits-card">
         <div class="kpi-card-top">
@@ -166,8 +223,8 @@
       </article>
 
       <!-- =============================================
-       ACTUAL VISITS DONE
-  ============================================== -->
+           ACTUAL VISITS DONE
+      ============================================== -->
 
       <article class="kpi-card completed-visits-card">
         <div class="kpi-card-top">
@@ -192,8 +249,8 @@
       </article>
 
       <!-- =============================================
-       PAYMENT RECEIVED
-  ============================================== -->
+           PAYMENT RECEIVED
+      ============================================== -->
 
       <article class="kpi-card payment-card">
         <div class="kpi-card-top">
@@ -219,8 +276,8 @@
       </article>
 
       <!-- =============================================
-       PENDING COLLECTION
-  ============================================== -->
+           PENDING COLLECTION
+      ============================================== -->
 
       <article class="kpi-card pending-card">
         <div class="kpi-card-top">
@@ -246,8 +303,8 @@
       </article>
 
       <!-- =============================================
-       PATIENT REFUSALS
-  ============================================== -->
+           PATIENT REFUSALS
+      ============================================== -->
 
       <article class="kpi-card patient-refusal-card">
         <div class="kpi-card-top">
@@ -272,8 +329,8 @@
       </article>
 
       <!-- =============================================
-       PRACTITIONER REFUSALS
-  ============================================== -->
+           PRACTITIONER REFUSALS
+      ============================================== -->
 
       <article class="kpi-card practitioner-refusal-card">
         <div class="kpi-card-top">
@@ -299,8 +356,8 @@
     </div>
 
     <!-- ===============================================
-     DASHBOARD INFO NOTE
-================================================ -->
+         DASHBOARD INFO NOTE
+    ================================================ -->
 
     <div class="dashboard-info-note">
       <div class="info-note-icon">

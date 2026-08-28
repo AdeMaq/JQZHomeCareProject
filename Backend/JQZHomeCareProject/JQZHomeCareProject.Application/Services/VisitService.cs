@@ -441,5 +441,50 @@ namespace JQZHomeCareProject.Application.Services
                 ?? throw new NotFoundException($"Visit {id} not found.");
             return VisitMapper.ToDto(visit);
         }
+
+        public async Task CollectPaymentAsync(Guid visitId, CollectPaymentDto dto)
+        {
+            var visit = await _visitRepository.GetByIdAsync(visitId)
+                ?? throw new NotFoundException($"Visit {visitId} not found.");
+
+            if (visit.Status == VisitStatus.Cancelled)
+                throw new ValidationException("Cannot collect payment for a cancelled visit.");
+
+            if (visit.CollectionStatus == CollectionStatus.Received)
+                throw new ValidationException("Payment has already been collected for this visit.");
+
+            if (dto.Amount <= 0)
+                throw new ValidationException("Amount must be greater than zero.");
+
+            visit.ReceivedBy = ReceivedByType.Company;
+            visit.AmountReceived = dto.Amount;
+            visit.CollectionStatus = CollectionStatus.Received;
+
+            await _visitRepository.UpdateAsync(visit);
+        }
+
+        public async Task MarkPaymentReceivedAsync(Guid visitId, MarkPaymentReceivedDto dto)
+        {
+            var visit = await _visitRepository.GetByIdAsync(visitId)
+                ?? throw new NotFoundException($"Visit {visitId} not found.");
+
+            if (visit.Status == VisitStatus.Cancelled)
+                throw new ValidationException("Cannot mark payment received for a cancelled visit.");
+
+            if (visit.ReceivedBy == ReceivedByType.Company)
+                throw new ValidationException("Payment was already collected by the company for this visit; it cannot be marked received by the practitioner.");
+
+            if (visit.CollectionStatus == CollectionStatus.Received)
+                throw new ValidationException("Payment has already been marked as received for this visit.");
+
+            if (dto.Amount <= 0)
+                throw new ValidationException("Amount must be greater than zero.");
+
+            visit.ReceivedBy = ReceivedByType.Practitioner;
+            visit.AmountReceived = dto.Amount;
+            visit.CollectionStatus = CollectionStatus.Received;
+
+            await _visitRepository.UpdateAsync(visit);
+        }
     }
 }

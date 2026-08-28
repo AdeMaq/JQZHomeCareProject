@@ -4,58 +4,188 @@
              xmlns:vm="clr-namespace:JQZHomeCareProject.Mobile.ViewModels.Auth"
              x:Class="JQZHomeCareProject.Mobile.Views.Auth.LoginPage"
              x:DataType="vm:LoginViewModel"
-             BackgroundColor="Black">
+             Shell.NavBarIsVisible="False"
+             NavigationPage.HasNavigationBar="False"
+             BackgroundColor="#FBFBFD">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+
+            <Color x:Key="JqzRed">#E11B22</Color>
+            <Color x:Key="JqzRedDark">#B5121B</Color>
+            <Color x:Key="InkDark">#191A2E</Color>
+            <Color x:Key="InkMuted">#8A8FA3</Color>
+            <Color x:Key="FieldStroke">#E4E7EF</Color>
+
+            <!-- Soft tinted wash behind the top third, mirroring the reference -->
+            <LinearGradientBrush x:Key="WashBrush" StartPoint="0,0" EndPoint="0,1">
+                <GradientStop Color="#FCEDEE" Offset="0.0" />
+                <GradientStop Color="#FBFBFD" Offset="1.0" />
+            </LinearGradientBrush>
+
+            <Style x:Key="FieldLabel" TargetType="Label">
+                <Setter Property="FontSize" Value="13" />
+                <Setter Property="TextColor" Value="{StaticResource InkDark}" />
+                <Setter Property="Margin" Value="4,0,0,6" />
+            </Style>
+
+            <Style x:Key="FieldShell" TargetType="Border">
+                <Setter Property="StrokeShape" Value="RoundRectangle 14" />
+                <Setter Property="Stroke" Value="{StaticResource FieldStroke}" />
+                <Setter Property="StrokeThickness" Value="1" />
+                <Setter Property="BackgroundColor" Value="White" />
+                <Setter Property="Padding" Value="14,2" />
+                <Setter Property="HeightRequest" Value="54" />
+            </Style>
+
+            <Style x:Key="FieldEntry" TargetType="Entry">
+                <Setter Property="BackgroundColor" Value="Transparent" />
+                <Setter Property="FontSize" Value="15" />
+                <Setter Property="TextColor" Value="{StaticResource InkDark}" />
+                <Setter Property="PlaceholderColor" Value="#B6BBC9" />
+                <Setter Property="VerticalOptions" Value="Center" />
+            </Style>
+
+        </ResourceDictionary>
+    </ContentPage.Resources>
 
     <Grid>
+
+        <!-- Curved wash -->
+        <Border VerticalOptions="Start"
+                HeightRequest="300"
+                Background="{StaticResource WashBrush}"
+                Stroke="Transparent"
+                StrokeThickness="0"
+                StrokeShape="RoundRectangle 0,0,70,70" />
+
         <ScrollView VerticalOptions="Center">
-            <VerticalStackLayout Padding="30,0" Spacing="16" MaximumWidthRequest="400" HorizontalOptions="Center">
+            <VerticalStackLayout Padding="28,40"
+                                 Spacing="0"
+                                 MaximumWidthRequest="400"
+                                 HorizontalOptions="Center">
 
-                <Image Source="app_logo.png"
-                       HeightRequest="96"
-                       HorizontalOptions="Center"
-                       Margin="0,0,0,24" />
-
-                <Label Text="Practitioner Login"
-                       Style="{StaticResource HeaderLabel}"
+                <!-- Brand -->
+                <Image Source="jqz_transparent.png"
+                       HeightRequest="104"
+                       Aspect="AspectFit"
                        HorizontalOptions="Center" />
 
-                <Entry Placeholder="Email"
-                       Keyboard="Email"
-                       Text="{Binding Email}"
-                       IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}" />
+                <Label Text="Therapist App"
+                       FontSize="15"
+                       TextColor="{StaticResource InkMuted}"
+                       HorizontalOptions="Center"
+                       Margin="0,4,0,34" />
 
-                <Grid ColumnDefinitions="*,Auto">
-                    <Entry Grid.Column="0"
-                           Placeholder="Password"
-                           IsPassword="{Binding IsPasswordHidden}"
-                           Text="{Binding Password}"
+                <!-- Heading -->
+                <Label Text="Welcome back!"
+                       FontSize="24"
+                       FontAttributes="Bold"
+                       TextColor="{StaticResource InkDark}"
+                       HorizontalOptions="Center" />
+
+                <Label Text="Please sign in to continue"
+                       FontSize="14"
+                       TextColor="{StaticResource InkMuted}"
+                       HorizontalOptions="Center"
+                       Margin="0,6,0,28" />
+
+                <!-- Email -->
+                <Label Text="Email" Style="{StaticResource FieldLabel}" />
+                <Border Style="{StaticResource FieldShell}">
+                    <Entry Placeholder="you@jqz.com"
+                           Keyboard="Email"
+                           Text="{Binding Email}"
+                           Style="{StaticResource FieldEntry}"
                            IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}" />
-                    <Button Grid.Column="1"
-                            Text="{Binding IsPasswordHidden, Converter={StaticResource PasswordToggleTextConverter}}"
-                            Command="{Binding TogglePasswordVisibilityCommand}"
-                            BackgroundColor="Transparent"
-                            TextColor="{StaticResource Primary}" />
-                </Grid>
+                </Border>
 
-                <Label Text="{Binding ErrorMessage}"
-                       TextColor="{StaticResource ErrorRed}"
-                       IsVisible="{Binding ErrorMessage, Converter={StaticResource StringNotEmptyConverter}}"
-                       HorizontalTextAlignment="Center" />
+                <!-- Password -->
+                <Label Text="Password" Style="{StaticResource FieldLabel}" Margin="4,20,0,6" />
+                <Border Style="{StaticResource FieldShell}" Padding="14,2,6,2">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Entry Grid.Column="0"
+                               Placeholder="••••••••"
+                               IsPassword="{Binding IsPasswordHidden}"
+                               Text="{Binding Password}"
+                               Style="{StaticResource FieldEntry}"
+                               IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}" />
+                        <Button Grid.Column="1"
+                                Text="{Binding IsPasswordHidden, Converter={StaticResource PasswordToggleTextConverter}}"
+                                Command="{Binding TogglePasswordVisibilityCommand}"
+                                BackgroundColor="Transparent"
+                                TextColor="{StaticResource InkMuted}"
+                                FontSize="13"
+                                Padding="10,0"
+                                MinimumWidthRequest="48"
+                                VerticalOptions="Center" />
+                    </Grid>
+                </Border>
 
-                <Button Text="Log In"
+                <!-- Forgot password.
+                     Uncomment the gesture once ForgotPasswordCommand exists on the VM. -->
+                <Label Text="Forgot Password?"
+                       FontSize="13"
+                       FontAttributes="Bold"
+                       TextColor="{StaticResource JqzRed}"
+                       HorizontalOptions="End"
+                       Margin="0,14,4,0">
+                    <!--
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding ForgotPasswordCommand}" />
+                    </Label.GestureRecognizers>
+                    -->
+                </Label>
+
+                <!-- Error -->
+                <Border BackgroundColor="#FDECEC"
+                        Stroke="Transparent"
+                        StrokeThickness="0"
+                        StrokeShape="RoundRectangle 12"
+                        Padding="14,10"
+                        Margin="0,18,0,0"
+                        IsVisible="{Binding ErrorMessage, Converter={StaticResource StringNotEmptyConverter}}">
+                    <Label Text="{Binding ErrorMessage}"
+                           FontSize="13"
+                           TextColor="{StaticResource JqzRedDark}"
+                           HorizontalTextAlignment="Center" />
+                </Border>
+
+                <!-- Submit -->
+                <Button Text="Login"
                         Command="{Binding LoginCommand}"
                         IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}"
-                        Style="{StaticResource PrimaryButton}"
-                        Margin="0,8,0,0" />
+                        BackgroundColor="{StaticResource JqzRed}"
+                        TextColor="White"
+                        FontSize="16"
+                        FontAttributes="Bold"
+                        HeightRequest="54"
+                        CornerRadius="16"
+                        Margin="0,26,0,0">
+                    <Button.Shadow>
+                        <Shadow Brush="#E11B22" Offset="0,8" Radius="18" Opacity="0.35" />
+                    </Button.Shadow>
+                </Button>
 
             </VerticalStackLayout>
         </ScrollView>
 
-        <ActivityIndicator IsRunning="{Binding IsBusy}"
-                            IsVisible="{Binding IsBusy}"
-                            VerticalOptions="Center"
-                            HorizontalOptions="Center"
-                            Color="{StaticResource Primary}" />
+        <!-- Version stamp -->
+        <Label Text="Version 1.0.0"
+               FontSize="12"
+               TextColor="#B6BBC9"
+               HorizontalOptions="Center"
+               VerticalOptions="End"
+               Margin="0,0,0,22" />
+
+        <!-- Busy overlay -->
+        <Grid IsVisible="{Binding IsBusy}" BackgroundColor="#66FFFFFF">
+            <ActivityIndicator IsRunning="{Binding IsBusy}"
+                               VerticalOptions="Center"
+                               HorizontalOptions="Center"
+                               Color="{StaticResource JqzRed}" />
+        </Grid>
+
     </Grid>
 
 </ContentPage>

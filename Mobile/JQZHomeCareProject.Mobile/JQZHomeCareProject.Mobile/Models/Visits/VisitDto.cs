@@ -30,7 +30,19 @@ namespace JQZHomeCareProject.Mobile.Models.Visits
         public string? SlotEnd { get; set; }
 
         // Bind directly to this in VisitCard.
-        public string TimeSlot => !string.IsNullOrWhiteSpace(SlotStart) ? SlotStart : "—";
+        // Bind directly to this in VisitCard.
+        public string TimeSlot
+        {
+            get
+            {
+                if (string.IsNullOrWhiteSpace(SlotStart))
+                    return "—";
+
+                return TimeSpan.TryParse(SlotStart, out var time)
+                    ? time.ToString(@"hh\:mm")
+                    : SlotStart;
+            }
+        }
 
         public VisitStatus Status { get; set; }
 

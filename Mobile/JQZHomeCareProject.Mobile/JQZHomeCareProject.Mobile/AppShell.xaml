@@ -5,15 +5,50 @@
        xmlns:visits="clr-namespace:JQZHomeCareProject.Mobile.Views.Visits"
        x:Class="JQZHomeCareProject.Mobile.AppShell"
        FlyoutBehavior="Disabled"
-       Shell.TabBarIsVisible="True">
+       Shell.TabBarIsVisible="True"
+       Shell.TabBarBackgroundColor="White"
+       Shell.TabBarForegroundColor="#E11B22"
+       Shell.TabBarTitleColor="#E11B22"
+       Shell.TabBarUnselectedColor="#9AA0B0"
+       Shell.BackgroundColor="#E11B22"
+       Shell.ForegroundColor="White"
+       Shell.TitleColor="White">
+
+    <Shell.Resources>
+        <ResourceDictionary>
+
+            <Color x:Key="JqzRed">#E11B22</Color>
+            <Color x:Key="InkMuted">#9AA0B0</Color>
+
+            <!-- Applies the red theme to any nav bar that stays visible -->
+            <Style x:Key="BaseShellStyle" TargetType="Element" ApplyToDerivedTypes="True">
+                <Setter Property="Shell.BackgroundColor" Value="{StaticResource JqzRed}" />
+                <Setter Property="Shell.ForegroundColor" Value="White" />
+                <Setter Property="Shell.TitleColor" Value="White" />
+                <Setter Property="Shell.TabBarBackgroundColor" Value="White" />
+                <Setter Property="Shell.TabBarForegroundColor" Value="{StaticResource JqzRed}" />
+                <Setter Property="Shell.TabBarTitleColor" Value="{StaticResource JqzRed}" />
+                <Setter Property="Shell.TabBarUnselectedColor" Value="{StaticResource InkMuted}" />
+            </Style>
+
+            <Style TargetType="TabBar" BasedOn="{StaticResource BaseShellStyle}" />
+            <Style TargetType="ShellContent" BasedOn="{StaticResource BaseShellStyle}" />
+
+        </ResourceDictionary>
+    </Shell.Resources>
 
     <TabBar>
+
         <ShellContent Title="Home"
                       Route="home"
                       ContentTemplate="{DataTemplate home:HomePage}" />
+        <!-- Icon="home.png" -->
+
         <ShellContent Title="Visits"
                       Route="visits"
                       ContentTemplate="{DataTemplate visits:VisitsPage}" />
+        <!-- Icon="calendar.png" -->
+
     </TabBar>
 
 </Shell>

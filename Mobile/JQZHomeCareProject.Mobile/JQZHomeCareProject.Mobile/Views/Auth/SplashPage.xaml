@@ -2,9 +2,54 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="JQZHomeCareProject.Mobile.Views.Auth.SplashPage"
-             BackgroundColor="White">
-    <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="16">
-        <Image Source="app_logo.png" HeightRequest="120" />
-        <ActivityIndicator IsRunning="True" Color="{StaticResource Primary}" />
-    </VerticalStackLayout>
+             Shell.NavBarIsVisible="False"
+             NavigationPage.HasNavigationBar="False"
+             BackgroundColor="#FBFBFD">
+
+    <Grid>
+
+        <!-- Same curved wash as the login screen so the handoff is seamless -->
+        <Border VerticalOptions="Start"
+                HeightRequest="330"
+                Stroke="Transparent"
+                StrokeThickness="0"
+                StrokeShape="RoundRectangle 0,0,70,70">
+            <Border.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                    <GradientStop Color="#FCEDEE" Offset="0.0" />
+                    <GradientStop Color="#FBFBFD" Offset="1.0" />
+                </LinearGradientBrush>
+            </Border.Background>
+        </Border>
+
+        <VerticalStackLayout VerticalOptions="Center"
+                             HorizontalOptions="Center"
+                             Spacing="0">
+
+            <Image Source="jqz_transparent.png"
+                   HeightRequest="128"
+                   Aspect="AspectFit"
+                   HorizontalOptions="Center" />
+
+            <Label Text="Therapist App"
+                   FontSize="15"
+                   TextColor="#8A8FA3"
+                   HorizontalOptions="Center"
+                   Margin="0,6,0,36" />
+
+            <ActivityIndicator IsRunning="True"
+                               Color="#E11B22"
+                               HorizontalOptions="Center" />
+
+        </VerticalStackLayout>
+
+        <Label Text="Version 1.0.0"
+               FontSize="12"
+               TextColor="#B6BBC9"
+               HorizontalOptions="Center"
+               VerticalOptions="End"
+               Margin="0,0,22,22" />
+
+    </Grid>
+
 </ContentPage>

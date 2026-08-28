@@ -102,19 +102,34 @@ namespace JQZHomeCareProject.Mobile.ViewModels.Visits
         private void ApplyFilter()
         {
             var (start, end) = GetRange();
+            var today = DateTime.Today;
 
-            var filtered = _allVisits
+            var inRange = _allVisits
                 .Where(v => v.ScheduledDate.HasValue
                             && v.ScheduledDate.Value.Date >= start.Date
                             && v.ScheduledDate.Value.Date <= end.Date)
-                .OrderBy(v => v.ScheduledDate!.Value.Date)
-                .ThenBy(v => v.SlotStart)
                 .ToList();
 
-            var groups = filtered
-                .GroupBy(v => v.ScheduledDate!.Value.Date)
-                .OrderBy(g => g.Key)
-                .Select(g => new VisitDateGroup(g.Key, g));
+            var upcoming = inRange
+                .Where(v => v.ScheduledDate!.Value.Date >= today)
+                .OrderBy(v => v.ScheduledDate!.Value.Date)
+                .ThenBy(v => v.SlotStart);
+
+            var past = inRange
+                .Where(v => v.ScheduledDate!.Value.Date < today)
+                .OrderByDescending(v => v.ScheduledDate!.Value.Date)
+                .ThenBy(v => v.SlotStart);
+
+            var orderedDates = upcoming.Select(v => v.ScheduledDate!.Value.Date)
+                .Concat(past.Select(v => v.ScheduledDate!.Value.Date))
+                .Distinct()
+                .ToList();
+
+            var byDate = inRange.ToLookup(v => v.ScheduledDate!.Value.Date);
+
+            var groups = orderedDates
+                .Select(d => new VisitDateGroup(d, byDate[d].OrderBy(v => v.SlotStart)))
+                .ToList();
 
             GroupedVisits = new ObservableCollection<VisitDateGroup>(groups);
         }

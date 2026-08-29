@@ -47,12 +47,6 @@ interface AddVisitForm {
 
   packageId: string;
 
-  /*
-   * UI payment type.
-   *
-   * FullAdvance = 0
-   * Installment = 1
-   */
   paymentType: 'FullAdvance' | 'Installment';
 
   initialAmountPaid: number | null;
@@ -135,12 +129,6 @@ export class AddVisit implements OnInit {
 
   scheduleErrors: Record<number, string> = {};
 
-  /*
-   * Every schedule request gets a unique version number.
-   *
-   * If the practitioner or date changes while an older request
-   * is still running, the older response is ignored.
-   */
   private scheduleRequestVersions: Record<number, number> = {};
 
   // ============================================================
@@ -480,15 +468,58 @@ export class AddVisit implements OnInit {
     };
   }
 
+  // ============================================================
+  // GET PRACTITIONERS FOR ASSIGNMENT
+  //
+  // REQUIRED LOGIC:
+  //
+  // 1. Filter strictly by selected package service.
+  // 2. Exclude all practitioners with wrong service.
+  // 3. Move practitioners assigned to selected area to top.
+  // 4. Keep remaining same-service practitioners below.
+  // ============================================================
+
   getPractitionersForAssignment(index: number): Practitioner[] {
     const assignment = this.form.visitAssignments[index];
 
-    if (!assignment) {
+    if (!assignment || !this.selectedPackage) {
       return [];
     }
 
-    let result = [...this.practitioners];
+    /*
+     * ============================================================
+     * REQUIRED SERVICE
+     * ============================================================
+     *
+     * The selected package determines which service is required.
+     *
+     * Only practitioners belonging to this service are allowed
+     * to appear in the dropdown.
+     */
+    const requiredServiceId = this.selectedPackage.serviceId;
 
+    /*
+     * ============================================================
+     * STEP 1 — FILTER BY REQUIRED SERVICE
+     * ============================================================
+     *
+     * This is intentionally done BEFORE area sorting.
+     *
+     * Therefore, a practitioner belonging to the selected area
+     * but having a different service will NEVER appear.
+     */
+    let result = this.practitioners.filter(
+      (practitioner) => practitioner.serviceId === requiredServiceId,
+    );
+
+    /*
+     * ============================================================
+     * STEP 2 — SEARCH FILTER
+     * ============================================================
+     *
+     * Search is applied only to practitioners who already passed
+     * the required-service filter.
+     */
     const search = (this.practitionerSearchTerms[index] ?? '').trim().toLowerCase();
 
     if (search) {
@@ -498,8 +529,14 @@ export class AddVisit implements OnInit {
     }
 
     /*
-     * Practitioners assigned to the selected area
-     * are shown first.
+     * ============================================================
+     * STEP 3 — MOVE AREA-MATCHING PRACTITIONERS TO THE TOP
+     * ============================================================
+     *
+     * Practitioners belonging to the selected area are displayed
+     * first.
+     *
+     * Everyone below them still belongs to the REQUIRED SERVICE.
      */
     if (assignment.areaId) {
       const selectedAreaId = assignment.areaId;
@@ -692,12 +729,6 @@ export class AddVisit implements OnInit {
 
     this.cdr.markForCheck();
 
-    console.log(`Loading practitioner schedule for assignment ${index + 1}`, {
-      practitionerId,
-      scheduledDate,
-      requestVersion,
-    });
-
     this.visitsService.getPractitionerVisitsByDate(practitionerId, scheduledDate).subscribe({
       next: (visits) => {
         if (this.scheduleRequestVersions[index] !== requestVersion) {
@@ -738,9 +769,6 @@ export class AddVisit implements OnInit {
           [index]: '',
         };
 
-        console.log(`Schedule loaded for assignment ${index + 1}:`, practitionerVisits);
-
-        // Force Angular to refresh the schedule immediately.
         this.cdr.markForCheck();
       },
 
@@ -776,7 +804,6 @@ export class AddVisit implements OnInit {
           [index]: this.getErrorMessage(error, 'Unable to load the practitioner schedule.'),
         };
 
-        // Force Angular to refresh the error state immediately.
         this.cdr.markForCheck();
       },
     });
@@ -1191,10 +1218,6 @@ export class AddVisit implements OnInit {
 
     this.successMessage = '';
 
-    // ==========================================================
-    // BASIC VALIDATION
-    // ==========================================================
-
     if (!this.form.patientName.trim()) {
       this.errorMessage = 'Patient name is required.';
       return;
@@ -1220,10 +1243,6 @@ export class AddVisit implements OnInit {
       return;
     }
 
-    // ==========================================================
-    // INSTALLMENT VALIDATION
-    // ==========================================================
-
     if (this.form.paymentType === 'Installment') {
       if (this.form.initialAmountPaid === null || this.form.initialAmountPaid === undefined) {
         this.errorMessage = 'Initial amount paid is required for installment payment.';
@@ -1240,10 +1259,6 @@ export class AddVisit implements OnInit {
         return;
       }
     }
-
-    // ==========================================================
-    // ASSIGNMENT VALIDATION
-    // ==========================================================
 
     for (let i = 0; i < this.form.visitAssignments.length; i++) {
       const assignment = this.form.visitAssignments[i];
@@ -1290,10 +1305,6 @@ export class AddVisit implements OnInit {
       }
     }
 
-    // ==========================================================
-    // CREATE BACKEND PAYLOAD
-    // ==========================================================
-
     const payload: CreateVisitRequest = {
       patientName: this.form.patientName.trim(),
 
@@ -1323,47 +1334,13 @@ export class AddVisit implements OnInit {
       })),
     };
 
-    // ==========================================================
-    // DEBUG LOGGING
-    // ==========================================================
-
-    console.log('================================================');
-
-    console.log('CREATE VISIT REQUEST');
-
-    console.log('Payload sent to backend:', payload);
-
-    console.log(
-      'Payment Type:',
-      payload.paymentType,
-      payload.paymentType === 0 ? '(FullAdvance)' : '(Installment)',
-    );
-
-    console.log('Package:', this.selectedPackage);
-
-    console.log('Assignments:', payload.visitAssignments);
-
-    console.log('================================================');
-
-    // ==========================================================
-    // START SUBMISSION
-    // ==========================================================
+    console.log('CREATE VISIT REQUEST', payload);
 
     this.isSubmitting = true;
 
-    // ==========================================================
-    // API REQUEST
-    // ==========================================================
-
     this.visitsService.create(payload).subscribe({
       next: (response: unknown) => {
-        console.log('================================================');
-
-        console.log('VISIT CREATED SUCCESSFULLY');
-
-        console.log('API RESPONSE:', response);
-
-        console.log('================================================');
+        console.log('VISIT CREATED SUCCESSFULLY', response);
 
         this.isSubmitting = false;
 
@@ -1373,13 +1350,7 @@ export class AddVisit implements OnInit {
       },
 
       error: (error: unknown) => {
-        console.error('================================================');
-
-        console.error('FAILED TO CREATE VISIT');
-
-        console.error('HTTP ERROR:', error);
-
-        console.error('================================================');
+        console.error('FAILED TO CREATE VISIT', error);
 
         this.isSubmitting = false;
 
@@ -1387,8 +1358,6 @@ export class AddVisit implements OnInit {
           error,
           'Failed to create the visit. Please try again.',
         );
-
-        console.error('Create Visit Error Message:', this.errorMessage);
       },
 
       complete: () => {

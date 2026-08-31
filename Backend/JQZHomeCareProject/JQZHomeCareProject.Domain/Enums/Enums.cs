@@ -16,5 +16,5 @@ namespace JQZHomeCareProject.Domain.Enums
 
     public enum PatientPackageStatus { Active, Completed, Cancelled }
 
-    public enum CollectionStatus { Pending, Received }
+    public enum CollectionStatus { Pending, Received, InstallmentPending }
 }

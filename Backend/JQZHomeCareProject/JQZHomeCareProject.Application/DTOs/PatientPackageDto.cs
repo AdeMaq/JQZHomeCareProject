@@ -27,6 +27,7 @@ namespace JQZHomeCareProject.Application.DTOs
         public decimal TotalAmount { get; set; }
         public decimal AmountPaid { get; set; }
         public decimal AmountPending { get; set; }
+        public CollectionStatus CollectionStatus { get; set; }
         public PatientPackageStatus Status { get; set; }
         public DateTime PurchaseDate { get; set; }
         public List<VisitDto> Visits { get; set; } = new();

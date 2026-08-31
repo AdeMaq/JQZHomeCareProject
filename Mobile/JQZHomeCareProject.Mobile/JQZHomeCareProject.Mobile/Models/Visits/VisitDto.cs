@@ -53,5 +53,44 @@ namespace JQZHomeCareProject.Mobile.Models.Visits
         public ReceivedByType? ReceivedBy { get; set; }
         public CollectionStatus CollectionStatus { get; set; }
         public Guid? SettlementId { get; set; }
+
+        // Populated only for Status == Cancelled. Confirm this field name
+        // matches whatever your backend actually serializes for the reason.
+        public string? CancellationReason { get; set; }
+
+        // ---- Display-only computed properties, used across Visits pages ----
+        public string ExpectedAmountDisplay => $"PKR {AmountDue:N0} (Expected)";
+
+        public string PaymentSummary
+        {
+            get
+            {
+                var receivedByLabel = ReceivedBy switch
+                {
+                    ReceivedByType.Practitioner => "HomeCare Provider",
+                    ReceivedByType.Company => "Company",
+                    _ => "—"
+                };
+                return $"PKR {AmountReceived:N0} \u2022 Received by {receivedByLabel}";
+            }
+
+        }
+
+        public string ScheduledDateLabel
+        {
+            get
+            {
+                if (!ScheduledDate.HasValue) return string.Empty;
+
+                var date = ScheduledDate.Value.Date;
+                var today = DateTime.Today;
+
+                if (date == today) return "Today";
+                if (date == today.AddDays(-1)) return "Yesterday";
+                return date.ToString("d MMM yyyy");
+            }
+        }
+
+        public string ScheduledDateTimeLabel => $"{ScheduledDateLabel} | {TimeSlot}";
     }
 }

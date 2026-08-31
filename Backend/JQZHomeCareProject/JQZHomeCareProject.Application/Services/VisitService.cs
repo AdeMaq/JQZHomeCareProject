@@ -349,33 +349,16 @@ namespace JQZHomeCareProject.Application.Services
             await _visitRepository.UpdateAsync(visit);
         }
 
-        public async Task AcceptVisitAsync(Guid visitId, Guid practitionerId)
-        {
-            Guard.EnsureNotEmpty(practitionerId, "PractitionerId");
-
-            var visit = await _visitRepository.GetByIdAsync(visitId)
-                ?? throw new NotFoundException($"Visit {visitId} not found.");
-
-            if (visit.Status != VisitStatus.Scheduled)
-                throw new ValidationException($"Cannot accept a visit with status '{visit.Status}'.");
-
-            if (visit.PractitionerId is null)
-                throw new ValidationException("This visit has no assigned practitioner yet.");
-
-            if (visit.PractitionerId != practitionerId)
-                throw new ValidationException("This visit is not assigned to you.");
-
-            visit.Status = VisitStatus.Accepted;
-            await _visitRepository.UpdateAsync(visit);
-        }
-
         public async Task CheckInAsync(Guid visitId, CheckInDto dto)
         {
             var visit = await _visitRepository.GetByIdAsync(visitId)
                 ?? throw new NotFoundException($"Visit {visitId} not found.");
 
-            if (visit.Status != VisitStatus.Accepted)
-                throw new ValidationException($"Cannot check in a visit with status '{visit.Status}'. It must be Accepted first.");
+            if (visit.Status != VisitStatus.Scheduled)
+                throw new ValidationException($"Cannot check in a visit with status '{visit.Status}'. It must be Scheduled first.");
+
+            if (visit.PractitionerId is null)
+                throw new ValidationException("This visit has no assigned practitioner yet.");
 
             if (visit.CheckInTime is not null)
                 throw new ValidationException("This visit has already been checked in.");
@@ -384,6 +367,7 @@ namespace JQZHomeCareProject.Application.Services
 
             visit.CheckInTime = dto.Timestamp;
             visit.CheckInLocation = $"{dto.Latitude},{dto.Longitude}";
+            visit.Status = VisitStatus.InProgress;
             await _visitRepository.UpdateAsync(visit);
         }
 
@@ -392,8 +376,8 @@ namespace JQZHomeCareProject.Application.Services
             var visit = await _visitRepository.GetByIdAsync(visitId)
                 ?? throw new NotFoundException($"Visit {visitId} not found.");
 
-            if (visit.Status != VisitStatus.Accepted)
-                throw new ValidationException($"Cannot check out a visit with status '{visit.Status}'.");
+            if (visit.Status != VisitStatus.InProgress)
+                throw new ValidationException($"Cannot check out a visit with status '{visit.Status}'. It must be InProgress first.");
 
             if (visit.CheckInTime is null)
                 throw new ValidationException("This visit must be checked in before it can be checked out.");

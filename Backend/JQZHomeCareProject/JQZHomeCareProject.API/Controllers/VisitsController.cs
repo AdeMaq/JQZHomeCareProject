@@ -45,14 +45,6 @@ namespace JQZHomeCareProject.API.Controllers
         [HttpGet("{id:guid}")]
         public async Task<IActionResult> GetByIdAsync(Guid id) => Ok(await _visitService.GetByIdAsync(id));
 
-        [HttpPut("{id:guid}/accept")]
-        [Authorize(Roles = "Practitioner")]
-        public async Task<IActionResult> AcceptAsync(Guid id, [FromQuery] Guid practitionerId)
-        {
-            await _visitService.AcceptVisitAsync(id, practitionerId);
-            return NoContent();
-        }
-
         [HttpPut("{id:guid}/checkin")]
         [Authorize(Roles = "Practitioner")]
         public async Task<IActionResult> CheckInAsync(Guid id, [FromBody] CheckInDto dto)

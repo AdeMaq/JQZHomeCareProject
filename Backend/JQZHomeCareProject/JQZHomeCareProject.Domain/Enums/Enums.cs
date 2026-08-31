@@ -6,7 +6,7 @@ namespace JQZHomeCareProject.Domain.Enums
 {
     public enum UserRole { SuperAdmin, MiddlePowerAdmin, SimpleAdmin, Practitioner }
 
-    public enum VisitStatus { Scheduled, Accepted, Completed, Cancelled }
+    public enum VisitStatus { Scheduled, InProgress, Completed, Cancelled }
 
     public enum RefusedBy { Patient, Practitioner }
 

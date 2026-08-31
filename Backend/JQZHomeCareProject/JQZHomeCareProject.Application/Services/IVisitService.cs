@@ -16,7 +16,6 @@ namespace JQZHomeCareProject.Application.Services
         Task<IEnumerable<VisitDto>> GetByDateAsync(DateTime date);
         Task<IEnumerable<VisitDto>> GetAllAsync();
         Task<VisitDto> GetByIdAsync(Guid id);
-        Task AcceptVisitAsync(Guid visitId, Guid practitionerId);
         Task CheckInAsync(Guid visitId, CheckInDto dto);
         Task CheckOutAsync(Guid visitId, CheckOutDto dto);
         Task CancelVisitAsync(Guid visitId, CancelVisitDto dto);

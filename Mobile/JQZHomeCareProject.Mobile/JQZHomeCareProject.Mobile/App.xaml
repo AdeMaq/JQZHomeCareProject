@@ -15,6 +15,7 @@
             <conv:PasswordToggleTextConverter x:Key="PasswordToggleTextConverter" />
             <conv:EnumEqualsConverter x:Key="EnumEqualsConverter" />
             <conv:VisitStatusToColorConverter x:Key="VisitStatusToColorConverter" />
+            <conv:IntGreaterThanZeroConverter x:Key="IntGreaterThanZeroConverter" />
         </ResourceDictionary>
     </Application.Resources>
 </Application>

@@ -44,11 +44,19 @@ namespace JQZHomeCareProject.Mobile.Helpers.Converters
             => value switch
             {
                 VisitStatus.Scheduled => Color.FromArgb("#2196F3"),
-                VisitStatus.Accepted => Color.FromArgb("#FF9800"),
+                VisitStatus.InProgress => Color.FromArgb("#FF9800"),
                 VisitStatus.Completed => Color.FromArgb("#4CAF50"),
                 VisitStatus.Cancelled => Color.FromArgb("#F44336"),
                 _ => Colors.Gray
             };
+
+        public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+            => throw new NotImplementedException();
+    }
+    public class IntGreaterThanZeroConverter : IValueConverter
+    {
+        public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+            => value is int i && i > 0;
 
         public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
             => throw new NotImplementedException();

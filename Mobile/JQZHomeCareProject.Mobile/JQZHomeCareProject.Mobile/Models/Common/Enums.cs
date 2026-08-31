@@ -11,7 +11,7 @@
     public enum VisitStatus
     {
         Scheduled,
-        Accepted,
+        InProgress,
         Completed,
         Cancelled
     }

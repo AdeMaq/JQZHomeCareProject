@@ -81,6 +81,8 @@ namespace JQZHomeCareProject.Application.Services
                     ? package.Amount
                     : dto.InitialAmountPaid!.Value;
 
+                var amountPending = package.Amount - amountPaid;
+
                 patientPackage = new PatientPackage
                 {
                     Id = Guid.NewGuid(),
@@ -89,7 +91,10 @@ namespace JQZHomeCareProject.Application.Services
                     PaymentType = dto.PaymentType,
                     TotalAmount = package.Amount,
                     AmountPaid = amountPaid,
-                    AmountPending = package.Amount - amountPaid,
+                    AmountPending = amountPending,
+                    CollectionStatus = dto.PaymentType == PackagePaymentType.Installment && amountPending > 0
+                            ? CollectionStatus.InstallmentPending
+                            : CollectionStatus.Received,
                     Status = PatientPackageStatus.Active,
                     PurchaseDate = DateTime.UtcNow
                 };
@@ -134,6 +139,7 @@ namespace JQZHomeCareProject.Application.Services
                 TotalAmount = patientPackage.TotalAmount,
                 AmountPaid = patientPackage.AmountPaid,
                 AmountPending = patientPackage.AmountPending,
+                CollectionStatus = patientPackage.CollectionStatus,
                 Status = patientPackage.Status,
                 PurchaseDate = patientPackage.PurchaseDate,
                 Visits = visits.Select(VisitMapper.ToDto).ToList()
@@ -147,6 +153,9 @@ namespace JQZHomeCareProject.Application.Services
             var patientPackage = await _patientPackageRepository.GetByIdAsync(patientPackageId)
                 ?? throw new NotFoundException($"PatientPackage {patientPackageId} not found.");
 
+            if (patientPackage.PaymentType != PackagePaymentType.Installment)
+                throw new ValidationException("Installments can only be recorded on packages with PaymentType 'Installment'.");
+
             if (patientPackage.Status != PatientPackageStatus.Active)
                 throw new ValidationException($"Cannot record an installment on a package with status '{patientPackage.Status}'.");
 
@@ -157,8 +166,13 @@ namespace JQZHomeCareProject.Application.Services
 
             patientPackage.AmountPaid += dto.Amount;
             patientPackage.AmountPending -= dto.Amount;
-            if (patientPackage.AmountPending == 0 && patientPackage.Status == PatientPackageStatus.Active)
-                patientPackage.Status = PatientPackageStatus.Completed;
+
+            if (patientPackage.AmountPending == 0)
+            {
+                patientPackage.CollectionStatus = CollectionStatus.Received;
+                if (patientPackage.Status == PatientPackageStatus.Active)
+                    patientPackage.Status = PatientPackageStatus.Completed;
+            }
 
             await _patientPackageRepository.UpdateAsync(patientPackage);
         }

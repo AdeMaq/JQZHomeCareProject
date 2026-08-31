@@ -51,6 +51,7 @@ namespace JQZHomeCareProject.Application.Services
             TotalAmount = p.TotalAmount,
             AmountPaid = p.AmountPaid,
             AmountPending = p.AmountPending,
+            CollectionStatus = p.CollectionStatus,
             Status = p.Status,
             PurchaseDate = p.PurchaseDate,
             Visits = p.Visits.Select(VisitMapper.ToDto).ToList()

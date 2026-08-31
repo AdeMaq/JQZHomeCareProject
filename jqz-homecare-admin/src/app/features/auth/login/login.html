@@ -1,212 +1,194 @@
-<div class="min-h-screen flex bg-[#fff8f8]">
+<div class="min-h-screen w-full flex flex-col lg:flex-row bg-[#fff8f8] overflow-x-hidden">
   <!-- =========================================================
-     LEFT BRANDING SECTION
-     ========================================================= -->
-
+       LEFT BRANDING SECTION (Desktop)
+       ========================================================= -->
   <div
-    class="hidden lg:flex lg:w-1/2 items-center justify-center bg-[#fff8f8] border-r border-[#f5d9dc]"
+    class="hidden lg:flex lg:w-1/2 items-center justify-center bg-[#fff8f8] border-r border-[#f5d9dc] px-12 xl:px-20 py-8"
   >
-    <div class="w-full max-w-[620px] px-14">
-      <div class="flex flex-col items-start justify-center min-h-[760px]">
-        <!-- =======================
-           LOGO
-           ======================= -->
+    <!-- Constrained max-width centers the content nicely in the column -->
+    <div class="w-full max-w-[460px] flex flex-col items-start justify-center">
+      <!-- LOGO -->
+      <div class="-mb-7 xl:-mb-9 flex items-start">
+        <img
+          src="images/jqz_transparent(1).png"
+          alt="JQZ By Qalandars Clinics and Home-Care Services"
+          class="w-[230px] xl:w-[250px] object-contain"
+        />
+      </div>
 
-        <div class="mb-6 flex items-start">
-          <img
-            src="images/jqz_transparent(1).png"
-            alt="JQZ By Qalandars Clinics and Home-Care Services"
-            class="w-[260px] xl:w-[280px] object-contain"
-          />
-        </div>
+      <!-- PLATFORM BADGE -->
+      <div
+        class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#fdebed] border border-[#f6d2d5] mb-5"
+      >
+        <i class="fa-solid fa-heart-pulse text-[#cf102d] text-xs"></i>
+        <span class="text-xs xl:text-sm font-semibold text-[#cf102d] tracking-wide">
+          Healthcare Administration Platform
+        </span>
+      </div>
 
-        <!-- =======================
-           PLATFORM BADGE
-           ======================= -->
+      <!-- MAIN HEADING -->
+      <h1
+        class="text-4xl xl:text-[42px] font-extrabold leading-[1.15] tracking-tight text-[#102a43] mb-3.5"
+      >
+        Care Beyond
+        <span class="block text-[#cf102d] mt-0.5">Boundaries</span>
+      </h1>
 
-        <div
-          class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#fdebed] border border-[#f6d2d5] mb-7"
-        >
-          <i class="fa-solid fa-heart-pulse text-[#cf102d]"></i>
+      <!-- DESCRIPTION -->
+      <p class="text-sm xl:text-base leading-relaxed text-[#486581] mb-7">
+        Manage your healthcare operations with simplicity, efficiency, and confidence.
+      </p>
 
-          <span class="text-sm font-semibold text-[#cf102d]">
-            Healthcare Administration Platform
+      <!-- FEATURES -->
+      <div class="space-y-3 w-full">
+        <div class="flex items-center gap-3">
+          <div class="w-6 h-6 rounded-full bg-[#fdebed] flex items-center justify-center shrink-0">
+            <i class="fa-solid fa-check text-[#cf102d] text-xs"></i>
+          </div>
+          <span class="text-sm font-medium text-[#193b5a]">
+            Therapist &amp; Patient Management
           </span>
         </div>
 
-        <!-- =======================
-           MAIN HEADING
-           ======================= -->
-
-        <h1
-          class="text-5xl xl:text-6xl font-extrabold leading-[1.05] tracking-tight text-[#102a43]"
-        >
-          Care Beyond
-
-          <span class="block text-[#cf102d] mt-1"> Boundaries </span>
-        </h1>
-
-        <!-- =======================
-           DESCRIPTION
-           ======================= -->
-
-        <p class="mt-6 max-w-[500px] text-lg leading-relaxed text-[#486581]">
-          Manage your healthcare operations with simplicity, efficiency, and confidence.
-        </p>
-
-        <!-- =======================
-           FEATURES
-           ======================= -->
-
-        <div class="mt-10 space-y-5">
-          <div class="flex items-center gap-4">
-            <div
-              class="w-8 h-8 rounded-full bg-[#fdebed] flex items-center justify-center shrink-0"
-            >
-              <i class="fa-solid fa-check text-[#cf102d] text-sm"></i>
-            </div>
-
-            <span class="text-base font-medium text-[#193b5a]">
-              Therapist &amp; Patient Management
-            </span>
+        <div class="flex items-center gap-3">
+          <div class="w-6 h-6 rounded-full bg-[#fdebed] flex items-center justify-center shrink-0">
+            <i class="fa-solid fa-check text-[#cf102d] text-xs"></i>
           </div>
+          <span class="text-sm font-medium text-[#193b5a]"> Appointment Scheduling </span>
+        </div>
 
-          <div class="flex items-center gap-4">
-            <div
-              class="w-8 h-8 rounded-full bg-[#fdebed] flex items-center justify-center shrink-0"
-            >
-              <i class="fa-solid fa-check text-[#cf102d] text-sm"></i>
-            </div>
-
-            <span class="text-base font-medium text-[#193b5a]"> Appointment Scheduling </span>
+        <div class="flex items-center gap-3">
+          <div class="w-6 h-6 rounded-full bg-[#fdebed] flex items-center justify-center shrink-0">
+            <i class="fa-solid fa-check text-[#cf102d] text-xs"></i>
           </div>
-
-          <div class="flex items-center gap-4">
-            <div
-              class="w-8 h-8 rounded-full bg-[#fdebed] flex items-center justify-center shrink-0"
-            >
-              <i class="fa-solid fa-check text-[#cf102d] text-sm"></i>
-            </div>
-
-            <span class="text-base font-medium text-[#193b5a]"> Secure Medical Records </span>
-          </div>
+          <span class="text-sm font-medium text-[#193b5a]"> Secure Medical Records </span>
         </div>
       </div>
     </div>
   </div>
+
   <!-- =========================================================
        RIGHT LOGIN SECTION
        ========================================================= -->
-
-  <div class="flex-1 flex items-center justify-center px-6 py-10 bg-white">
-    <div class="w-full max-w-md">
+  <div class="flex-1 flex items-center justify-center px-4 sm:px-8 py-8 bg-white lg:bg-transparent">
+    <div class="w-full max-w-[420px]">
       <!-- Mobile Logo -->
-
-      <div class="text-center lg:hidden mb-8">
+      <div class="text-center lg:hidden mb-6 flex flex-col items-center">
         <img
           src="images/jqz_transparent(1).png"
           alt="JQZ Logo"
-          class="w-[180px] mx-auto object-contain"
+          class="w-[170px] mx-auto object-contain"
         />
+        <div
+          class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#fdebed] border border-[#f6d2d5] -mt-5"
+        >
+          <i class="fa-solid fa-heart-pulse text-[#cf102d] text-xs"></i>
+          <span class="text-xs font-semibold text-[#cf102d]">
+            Healthcare Administration Platform
+          </span>
+        </div>
       </div>
 
       <!-- Login Card -->
-
       <div
-        class="bg-white rounded-2xl shadow-[0_12px_35px_rgba(16,42,67,0.10)] border border-[#f2d9dc] px-8 py-9 sm:px-10"
+        class="bg-white rounded-2xl shadow-[0_12px_35px_rgba(16,42,67,0.08)] border border-[#f2d9dc] px-7 py-8 sm:px-9 sm:py-9"
       >
         <!-- Login Icon -->
-
-        <div class="flex justify-center mb-6">
-          <div class="w-16 h-16 rounded-full bg-[#fdebed] flex items-center justify-center">
-            <i class="fa-solid fa-user-doctor text-[#cf102d] text-2xl"></i>
+        <div class="flex justify-center mb-4">
+          <div class="w-13 h-13 rounded-full bg-[#fdebed] p-3 flex items-center justify-center">
+            <i class="fa-solid fa-user-doctor text-[#cf102d] text-xl"></i>
           </div>
         </div>
 
-        <h2 class="text-3xl font-bold text-[#102a43] text-center">Welcome Back</h2>
+        <h2 class="text-2xl sm:text-3xl font-bold text-[#102a43] text-center">Welcome Back</h2>
+        <p class="text-[#627d98] text-center text-sm mt-1 mb-6">
+          Sign in to access your admin dashboard.
+        </p>
 
-        <p class="text-[#627d98] text-center mt-2 mb-8">Sign in to access your admin dashboard.</p>
-
-        <!-- EMAIL -->
-
-        <div class="mb-5">
-          <label class="block text-sm font-semibold text-[#243b53] mb-2"> Email Address </label>
-
-          <div class="relative">
-            <i
-              class="fa-solid fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-[#9fb3c8]"
-            ></i>
-
-            <input
-              type="email"
-              [(ngModel)]="loginRequest.email"
-              name="email"
-              placeholder="Enter your email"
-              class="w-full rounded-xl border border-[#cbd5e1] bg-white pl-11 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#cf102d]/20 focus:border-[#cf102d]"
-            />
-          </div>
-        </div>
-
-        <!-- PASSWORD -->
-
-        <div class="mb-5">
-          <label class="block text-sm font-semibold text-[#243b53] mb-2"> Password </label>
-
-          <div class="relative">
-            <i class="fa-solid fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-[#9fb3c8]"></i>
-
-            <input
-              [type]="hidePassword ? 'password' : 'text'"
-              [(ngModel)]="loginRequest.password"
-              name="password"
-              placeholder="Enter your password"
-              class="w-full rounded-xl border border-[#cbd5e1] bg-white pl-11 pr-12 py-3 focus:outline-none focus:ring-2 focus:ring-[#cf102d]/20 focus:border-[#cf102d]"
-            />
-
-            <button
-              type="button"
-              (click)="togglePassword()"
-              class="absolute right-4 top-1/2 -translate-y-1/2 text-[#9fb3c8]"
+        <!-- FORM -->
+        <form (ngSubmit)="login()">
+          <!-- EMAIL -->
+          <div class="mb-4">
+            <label
+              class="block text-xs font-semibold uppercase tracking-wider text-[#243b53] mb-1.5"
             >
-              <i [class]="hidePassword ? 'fa-solid fa-eye' : 'fa-solid fa-eye-slash'"></i>
-            </button>
+              Email Address
+            </label>
+            <div class="relative">
+              <i
+                class="fa-solid fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-[#9fb3c8] text-sm"
+              ></i>
+              <input
+                type="email"
+                [(ngModel)]="loginRequest.email"
+                name="email"
+                required
+                placeholder="Enter your email"
+                class="w-full rounded-xl border border-[#cbd5e1] bg-white pl-11 pr-4 py-2.5 sm:py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#cf102d]/20 focus:border-[#cf102d] transition"
+              />
+            </div>
           </div>
-        </div>
 
-        <!-- Remember -->
+          <!-- PASSWORD -->
+          <div class="mb-4">
+            <label
+              class="block text-xs font-semibold uppercase tracking-wider text-[#243b53] mb-1.5"
+            >
+              Password
+            </label>
+            <div class="relative">
+              <i
+                class="fa-solid fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-[#9fb3c8] text-sm"
+              ></i>
+              <input
+                [type]="hidePassword ? 'password' : 'text'"
+                [(ngModel)]="loginRequest.password"
+                name="password"
+                required
+                placeholder="Enter your password"
+                class="w-full rounded-xl border border-[#cbd5e1] bg-white pl-11 pr-12 py-2.5 sm:py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#cf102d]/20 focus:border-[#cf102d] transition"
+              />
+              <button
+                type="button"
+                (click)="togglePassword()"
+                class="absolute right-4 top-1/2 -translate-y-1/2 text-[#9fb3c8] hover:text-[#486581] transition cursor-pointer"
+              >
+                <i
+                  [class]="hidePassword ? 'fa-solid fa-eye' : 'fa-solid fa-eye-slash'"
+                  class="text-sm"
+                ></i>
+              </button>
+            </div>
+          </div>
 
-        <div class="flex items-center justify-between mb-7">
-          <label class="flex items-center gap-2 text-sm text-[#486581]">
-            <input type="checkbox" />
+          <!-- Remember & Forgot -->
+          <div class="flex items-center justify-between mb-5">
+            <label class="flex items-center gap-2 text-xs sm:text-sm text-[#486581] cursor-pointer">
+              <input
+                type="checkbox"
+                class="rounded border-[#cbd5e1] text-[#cf102d] focus:ring-[#cf102d]/20"
+              />
+              Remember Me
+            </label>
+            <a href="#" class="text-[#cf102d] text-xs sm:text-sm font-semibold hover:underline">
+              Forgot Password?
+            </a>
+          </div>
 
-            Remember Me
-          </label>
-
-          <a href="#" class="text-[#cf102d] text-sm font-semibold hover:underline">
-            Forgot Password?
-          </a>
-        </div>
-
-        <!-- BUTTON -->
-
-        <button
-          type="button"
-          (click)="login()"
-          class="w-full bg-[#cf102d] hover:bg-[#b80e28] text-white py-3 rounded-xl font-semibold transition"
-        >
-          <i class="fa-solid fa-right-to-bracket mr-2"></i>
-
-          Sign In
-        </button>
+          <!-- BUTTON -->
+          <button
+            type="submit"
+            class="w-full bg-[#cf102d] hover:bg-[#b80e28] active:scale-[0.99] text-white py-2.5 sm:py-3 rounded-xl font-semibold text-sm transition flex items-center justify-center gap-2 cursor-pointer shadow-md shadow-[#cf102d]/15"
+          >
+            <i class="fa-solid fa-right-to-bracket"></i>
+            <span>Sign In</span>
+          </button>
+        </form>
 
         <!-- FOOTER -->
-
-        <div class="border-t border-[#e6edf3] mt-7 pt-5">
-          <p class="text-center text-sm text-[#627d98] leading-relaxed">
-            Therapists are added by an administrator.
-
-            <br />
-
+        <div class="border-t border-[#e6edf3] mt-5 pt-4">
+          <p class="text-center text-xs text-[#627d98] leading-relaxed">
+            Therapists are added by an administrator.<br />
             Contact your clinic administrator for access.
           </p>
         </div>

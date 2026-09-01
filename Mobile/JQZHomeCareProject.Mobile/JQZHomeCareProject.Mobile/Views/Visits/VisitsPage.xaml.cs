@@ -16,5 +16,12 @@ public partial class VisitsPage : ContentPage
         base.OnAppearing();
         if(_viewModel.LoadCommand.CanExecute(null))
 				_viewModel.LoadCommand.Execute(null);
+
+        _viewModel.StartOverdueTimer();
+    }
+    protected override void OnDisappearing()
+    {
+        base.OnDisappearing();
+        _viewModel.StopOverdueTimer();
     }
 }

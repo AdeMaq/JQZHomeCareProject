@@ -5,18 +5,33 @@
              xmlns:models="clr-namespace:JQZHomeCareProject.Mobile.Models.Visits"
              x:Class="JQZHomeCareProject.Mobile.Views.Visits.VisitsPage"
              x:DataType="vm:VisitsViewModel"
-             BackgroundColor="#F6F7FB"
+             BackgroundColor="#FBF4F4"
              Title="Visits">
 
     <ContentPage.Resources>
         <ResourceDictionary>
+
             <Color x:Key="JqzRed">#E11B22</Color>
+            <Color x:Key="JqzRedDark">#B5121B</Color>
+            <Color x:Key="JqzRedSoft">#FDECEC</Color>
             <Color x:Key="InkDark">#191A2E</Color>
             <Color x:Key="InkMuted">#8A8FA3</Color>
-            <Color x:Key="StatusUpcoming">#2196F3</Color>
-            <Color x:Key="StatusInProgress">#FF9800</Color>
-            <Color x:Key="StatusCompleted">#4CAF50</Color>
-            <Color x:Key="StatusCancelled">#F44336</Color>
+
+            <!-- Section status pill colors -->
+            <Color x:Key="UpcomingText">#E11B22</Color>
+            <Color x:Key="UpcomingBg">#FDECEC</Color>
+            <Color x:Key="InProgressText">#2E7D32</Color>
+            <Color x:Key="InProgressBg">#E6F4EA</Color>
+            <Color x:Key="CompletedText">#55606B</Color>
+            <Color x:Key="CompletedBg">#EEF1F4</Color>
+            <Color x:Key="CancelledText">#C62828</Color>
+            <Color x:Key="CancelledBg">#FBE4E4</Color>
+
+            <Shadow x:Key="CardShadow"
+                    Brush="#191A2E"
+                    Offset="0,4"
+                    Radius="12"
+                    Opacity="0.06" />
 
             <Style x:Key="SectionCard" TargetType="Border">
                 <Setter Property="StrokeShape" Value="RoundRectangle 16" />
@@ -24,16 +39,27 @@
                 <Setter Property="StrokeThickness" Value="0" />
                 <Setter Property="BackgroundColor" Value="White" />
                 <Setter Property="Padding" Value="14" />
-                <Setter Property="Shadow">
-                    <Shadow Brush="#191A2E" Offset="0,4" Radius="12" Opacity="0.06" />
-                </Setter>
+                <Setter Property="Shadow" Value="{StaticResource CardShadow}" />
             </Style>
 
             <Style x:Key="SectionHeaderLabel" TargetType="Label">
-                <Setter Property="FontSize" Value="15" />
+                <Setter Property="FontSize" Value="16" />
                 <Setter Property="FontAttributes" Value="Bold" />
                 <Setter Property="TextColor" Value="{StaticResource InkDark}" />
             </Style>
+
+            <Style x:Key="StatusPillLabel" TargetType="Label">
+                <Setter Property="FontSize" Value="12" />
+                <Setter Property="FontAttributes" Value="Bold" />
+            </Style>
+
+            <Style x:Key="ChevronLabel" TargetType="Label">
+                <Setter Property="Text" Value="&#x203A;" />
+                <Setter Property="FontSize" Value="24" />
+                <Setter Property="TextColor" Value="#C9CDDA" />
+                <Setter Property="VerticalOptions" Value="Center" />
+            </Style>
+
         </ResourceDictionary>
     </ContentPage.Resources>
 
@@ -44,41 +70,68 @@
         <ScrollView BackgroundColor="Transparent">
             <VerticalStackLayout Padding="20,16,20,28" Spacing="22">
 
-                <Label Text="Visits" FontSize="24" FontAttributes="Bold" TextColor="{StaticResource InkDark}" />
-
                 <Label Text="{Binding ErrorMessage}"
-                       TextColor="#B5121B"
+                       TextColor="{StaticResource JqzRedDark}"
                        IsVisible="{Binding ErrorMessage, Converter={StaticResource StringNotEmptyConverter}}" />
 
                 <!-- ===== UPCOMING ===== -->
                 <VerticalStackLayout Spacing="10"
                                       IsVisible="{Binding UpcomingVisits.Count, Converter={StaticResource IntGreaterThanZeroConverter}}">
-                    <Grid ColumnDefinitions="Auto,Auto">
-                        <BoxView Grid.Column="0" WidthRequest="8" HeightRequest="8" CornerRadius="4"
-                                 Color="{StaticResource StatusUpcoming}" VerticalOptions="Center" Margin="0,0,8,0" />
-                        <Label Grid.Column="1" Style="{StaticResource SectionHeaderLabel}"
+
+                    <Grid ColumnDefinitions="*,Auto" VerticalOptions="Center">
+                        <Label Grid.Column="0"
+                               Style="{StaticResource SectionHeaderLabel}"
                                Text="{Binding UpcomingVisits.Count, StringFormat='Upcoming ({0})'}" />
+                        <Border Grid.Column="1"
+                                StrokeShape="RoundRectangle 14"
+                                Stroke="Transparent"
+                                StrokeThickness="0"
+                                BackgroundColor="{StaticResource UpcomingBg}"
+                                Padding="12,6">
+                            <HorizontalStackLayout Spacing="6" VerticalOptions="Center">
+                                <Ellipse WidthRequest="6" HeightRequest="6" Fill="{StaticResource UpcomingText}" VerticalOptions="Center" />
+                                <Label Text="Upcoming" Style="{StaticResource StatusPillLabel}" TextColor="{StaticResource UpcomingText}" />
+                            </HorizontalStackLayout>
+                        </Border>
                     </Grid>
 
                     <VerticalStackLayout BindableLayout.ItemsSource="{Binding UpcomingVisits}" Spacing="10">
                         <BindableLayout.ItemTemplate>
-                            <DataTemplate x:DataType="models:VisitDto">
+                            <DataTemplate x:DataType="vm:UpcomingVisitItem">
                                 <Border Style="{StaticResource SectionCard}">
                                     <Border.GestureRecognizers>
                                         <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:VisitsViewModel}}, Path=OpenVisitCommand}"
-                                                               CommandParameter="{Binding .}" />
+                                                              CommandParameter="{Binding Visit}" />
                                     </Border.GestureRecognizers>
-                                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
-                                        <Border Grid.Column="0" WidthRequest="66" BackgroundColor="#E9F3FE"
-                                                StrokeShape="RoundRectangle 10" Padding="6,8" VerticalOptions="Start">
-                                            <Label Text="{Binding TimeSlot}" FontSize="12" FontAttributes="Bold"
-                                                   TextColor="{StaticResource StatusUpcoming}" HorizontalTextAlignment="Center" />
-                                        </Border>
-                                        <VerticalStackLayout Grid.Column="1" Spacing="3">
+
+                                    <Grid ColumnDefinitions="70,*,Auto" ColumnSpacing="10">
+
+                                        <!-- Time -->
+                                        <Label Grid.Column="0"
+                                               Text="{Binding TimeSlot}"
+                                               FontSize="13.5"
+                                               FontAttributes="Bold"
+                                               TextColor="{StaticResource JqzRed}"
+                                               VerticalOptions="Center" />
+
+                                        <VerticalStackLayout Grid.Column="1" Spacing="3" VerticalOptions="Center">
                                             <Label Text="{Binding PatientName}" FontSize="15" FontAttributes="Bold" TextColor="{StaticResource InkDark}" />
                                             <Label Text="{Binding PatientAddress}" FontSize="12.5" TextColor="{StaticResource InkMuted}" />
-                                            <Label Text="{Binding ExpectedAmountDisplay}" FontSize="12.5" FontAttributes="Bold" TextColor="{StaticResource StatusUpcoming}" />
+
+                                            <HorizontalStackLayout Spacing="8">
+                                                <Label Text="{Binding ExpectedAmountDisplay}" FontSize="12.5" FontAttributes="Bold" TextColor="{StaticResource InkDark}" />
+                                                <Border StrokeShape="RoundRectangle 8"
+                                                        Stroke="Transparent"
+                                                        StrokeThickness="0"
+                                                        BackgroundColor="{StaticResource JqzRedSoft}"
+                                                        Padding="7,3"
+                                                        IsVisible="{Binding IsOverdue}">
+                                                    <Label Text="{Binding OverdueLabel}" FontSize="10.5" FontAttributes="Bold" TextColor="{StaticResource JqzRedDark}" />
+                                                </Border>
+                                            </HorizontalStackLayout>
                                         </VerticalStackLayout>
+
+                                        <Label Grid.Column="2" Style="{StaticResource ChevronLabel}" />
                                     </Grid>
                                 </Border>
                             </DataTemplate>
@@ -89,11 +142,22 @@
                 <!-- ===== IN PROGRESS ===== -->
                 <VerticalStackLayout Spacing="10"
                                       IsVisible="{Binding InProgressVisits.Count, Converter={StaticResource IntGreaterThanZeroConverter}}">
-                    <Grid ColumnDefinitions="Auto,Auto">
-                        <BoxView Grid.Column="0" WidthRequest="8" HeightRequest="8" CornerRadius="4"
-                                 Color="{StaticResource StatusInProgress}" VerticalOptions="Center" Margin="0,0,8,0" />
-                        <Label Grid.Column="1" Style="{StaticResource SectionHeaderLabel}"
+
+                    <Grid ColumnDefinitions="*,Auto" VerticalOptions="Center">
+                        <Label Grid.Column="0"
+                               Style="{StaticResource SectionHeaderLabel}"
                                Text="{Binding InProgressVisits.Count, StringFormat='In Progress ({0})'}" />
+                        <Border Grid.Column="1"
+                                StrokeShape="RoundRectangle 14"
+                                Stroke="Transparent"
+                                StrokeThickness="0"
+                                BackgroundColor="{StaticResource InProgressBg}"
+                                Padding="12,6">
+                            <HorizontalStackLayout Spacing="6" VerticalOptions="Center">
+                                <Ellipse WidthRequest="6" HeightRequest="6" Fill="{StaticResource InProgressText}" VerticalOptions="Center" />
+                                <Label Text="In Progress" Style="{StaticResource StatusPillLabel}" TextColor="{StaticResource InProgressText}" />
+                            </HorizontalStackLayout>
+                        </Border>
                     </Grid>
 
                     <VerticalStackLayout BindableLayout.ItemsSource="{Binding InProgressVisits}" Spacing="10">
@@ -102,19 +166,26 @@
                                 <Border Style="{StaticResource SectionCard}">
                                     <Border.GestureRecognizers>
                                         <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:VisitsViewModel}}, Path=OpenVisitCommand}"
-                                                               CommandParameter="{Binding .}" />
+                                                              CommandParameter="{Binding .}" />
                                     </Border.GestureRecognizers>
-                                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
-                                        <Border Grid.Column="0" WidthRequest="66" BackgroundColor="#FFF1DE"
-                                                StrokeShape="RoundRectangle 10" Padding="6,8" VerticalOptions="Start">
-                                            <Label Text="{Binding TimeSlot}" FontSize="12" FontAttributes="Bold"
-                                                   TextColor="{StaticResource StatusInProgress}" HorizontalTextAlignment="Center" />
-                                        </Border>
-                                        <VerticalStackLayout Grid.Column="1" Spacing="3">
+
+                                    <Grid ColumnDefinitions="70,*,Auto" ColumnSpacing="10">
+
+                                        <!-- Time -->
+                                        <Label Grid.Column="0"
+                                               Text="{Binding TimeSlot}"
+                                               FontSize="13.5"
+                                               FontAttributes="Bold"
+                                               TextColor="{StaticResource JqzRed}"
+                                               VerticalOptions="Center" />
+
+                                        <VerticalStackLayout Grid.Column="1" Spacing="3" VerticalOptions="Center">
                                             <Label Text="{Binding PatientName}" FontSize="15" FontAttributes="Bold" TextColor="{StaticResource InkDark}" />
                                             <Label Text="{Binding PatientAddress}" FontSize="12.5" TextColor="{StaticResource InkMuted}" />
-                                            <Label Text="{Binding ExpectedAmountDisplay}" FontSize="12.5" FontAttributes="Bold" TextColor="{StaticResource StatusInProgress}" />
+                                            <Label Text="{Binding ExpectedAmountDisplay}" FontSize="12.5" FontAttributes="Bold" TextColor="{StaticResource InkDark}" />
                                         </VerticalStackLayout>
+
+                                        <Label Grid.Column="2" Style="{StaticResource ChevronLabel}" />
                                     </Grid>
                                 </Border>
                             </DataTemplate>
@@ -125,11 +196,22 @@
                 <!-- ===== COMPLETED ===== -->
                 <VerticalStackLayout Spacing="10"
                                       IsVisible="{Binding CompletedVisits.Count, Converter={StaticResource IntGreaterThanZeroConverter}}">
-                    <Grid ColumnDefinitions="Auto,Auto">
-                        <BoxView Grid.Column="0" WidthRequest="8" HeightRequest="8" CornerRadius="4"
-                                 Color="{StaticResource StatusCompleted}" VerticalOptions="Center" Margin="0,0,8,0" />
-                        <Label Grid.Column="1" Style="{StaticResource SectionHeaderLabel}"
+
+                    <Grid ColumnDefinitions="*,Auto" VerticalOptions="Center">
+                        <Label Grid.Column="0"
+                               Style="{StaticResource SectionHeaderLabel}"
                                Text="{Binding CompletedVisits.Count, StringFormat='Completed ({0})'}" />
+                        <Border Grid.Column="1"
+                                StrokeShape="RoundRectangle 14"
+                                Stroke="Transparent"
+                                StrokeThickness="0"
+                                BackgroundColor="{StaticResource CompletedBg}"
+                                Padding="12,6">
+                            <HorizontalStackLayout Spacing="6" VerticalOptions="Center">
+                                <Ellipse WidthRequest="6" HeightRequest="6" Fill="{StaticResource CompletedText}" VerticalOptions="Center" />
+                                <Label Text="Completed" Style="{StaticResource StatusPillLabel}" TextColor="{StaticResource CompletedText}" />
+                            </HorizontalStackLayout>
+                        </Border>
                     </Grid>
 
                     <VerticalStackLayout BindableLayout.ItemsSource="{Binding CompletedVisits}" Spacing="10">
@@ -138,14 +220,27 @@
                                 <Border Style="{StaticResource SectionCard}">
                                     <Border.GestureRecognizers>
                                         <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:VisitsViewModel}}, Path=OpenVisitCommand}"
-                                                               CommandParameter="{Binding .}" />
+                                                              CommandParameter="{Binding .}" />
                                     </Border.GestureRecognizers>
-                                    <VerticalStackLayout Spacing="4">
-                                        <Label Text="{Binding ScheduledDateTimeLabel}" FontSize="12" FontAttributes="Bold" TextColor="{StaticResource InkMuted}" />
-                                        <Label Text="{Binding PatientName}" FontSize="15" FontAttributes="Bold" TextColor="{StaticResource InkDark}" />
-                                        <Label Text="{Binding PatientAddress}" FontSize="12.5" TextColor="{StaticResource InkMuted}" />
-                                        <Label Text="{Binding PaymentSummary}" FontSize="12.5" FontAttributes="Bold" TextColor="{StaticResource StatusCompleted}" />
-                                    </VerticalStackLayout>
+
+                                    <Grid ColumnDefinitions="70,*,Auto" ColumnSpacing="10">
+
+                                        <Label Grid.Column="0"
+                                               Text="{Binding ScheduledDateTimeLabel}"
+                                               FontSize="12"
+                                               FontAttributes="Bold"
+                                               TextColor="{StaticResource InkMuted}"
+                                               VerticalOptions="Start"
+                                               Margin="0,2,0,0" />
+
+                                        <VerticalStackLayout Grid.Column="1" Spacing="3" VerticalOptions="Center">
+                                            <Label Text="{Binding PatientName}" FontSize="15" FontAttributes="Bold" TextColor="{StaticResource InkDark}" />
+                                            <Label Text="{Binding PatientAddress}" FontSize="12.5" TextColor="{StaticResource InkMuted}" />
+                                            <Label Text="{Binding PaymentSummary}" FontSize="12.5" TextColor="{StaticResource InkMuted}" />
+                                        </VerticalStackLayout>
+
+                                        <Label Grid.Column="2" Style="{StaticResource ChevronLabel}" />
+                                    </Grid>
                                 </Border>
                             </DataTemplate>
                         </BindableLayout.ItemTemplate>
@@ -155,11 +250,22 @@
                 <!-- ===== CANCELLED ===== -->
                 <VerticalStackLayout Spacing="10"
                                       IsVisible="{Binding CancelledVisits.Count, Converter={StaticResource IntGreaterThanZeroConverter}}">
-                    <Grid ColumnDefinitions="Auto,Auto">
-                        <BoxView Grid.Column="0" WidthRequest="8" HeightRequest="8" CornerRadius="4"
-                                 Color="{StaticResource StatusCancelled}" VerticalOptions="Center" Margin="0,0,8,0" />
-                        <Label Grid.Column="1" Style="{StaticResource SectionHeaderLabel}"
+
+                    <Grid ColumnDefinitions="*,Auto" VerticalOptions="Center">
+                        <Label Grid.Column="0"
+                               Style="{StaticResource SectionHeaderLabel}"
                                Text="{Binding CancelledVisits.Count, StringFormat='Cancelled ({0})'}" />
+                        <Border Grid.Column="1"
+                                StrokeShape="RoundRectangle 14"
+                                Stroke="Transparent"
+                                StrokeThickness="0"
+                                BackgroundColor="{StaticResource CancelledBg}"
+                                Padding="12,6">
+                            <HorizontalStackLayout Spacing="6" VerticalOptions="Center">
+                                <Ellipse WidthRequest="6" HeightRequest="6" Fill="{StaticResource CancelledText}" VerticalOptions="Center" />
+                                <Label Text="Cancelled" Style="{StaticResource StatusPillLabel}" TextColor="{StaticResource CancelledText}" />
+                            </HorizontalStackLayout>
+                        </Border>
                     </Grid>
 
                     <VerticalStackLayout BindableLayout.ItemsSource="{Binding CancelledVisits}" Spacing="10">
@@ -168,14 +274,27 @@
                                 <Border Style="{StaticResource SectionCard}">
                                     <Border.GestureRecognizers>
                                         <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:VisitsViewModel}}, Path=OpenVisitCommand}"
-                                                               CommandParameter="{Binding .}" />
+                                                              CommandParameter="{Binding .}" />
                                     </Border.GestureRecognizers>
-                                    <VerticalStackLayout Spacing="4">
-                                        <Label Text="{Binding ScheduledDateTimeLabel}" FontSize="12" FontAttributes="Bold" TextColor="{StaticResource InkMuted}" />
-                                        <Label Text="{Binding PatientName}" FontSize="15" FontAttributes="Bold" TextColor="{StaticResource InkDark}" />
-                                        <Label Text="{Binding PatientAddress}" FontSize="12.5" TextColor="{StaticResource InkMuted}" />
-                                        <Label Text="{Binding CancellationReason, StringFormat='Reason: {0}'}" FontSize="12.5" FontAttributes="Bold" TextColor="{StaticResource StatusCancelled}" />
-                                    </VerticalStackLayout>
+
+                                    <Grid ColumnDefinitions="70,*,Auto" ColumnSpacing="10">
+
+                                        <Label Grid.Column="0"
+                                               Text="{Binding ScheduledDateTimeLabel}"
+                                               FontSize="12"
+                                               FontAttributes="Bold"
+                                               TextColor="{StaticResource InkMuted}"
+                                               VerticalOptions="Start"
+                                               Margin="0,2,0,0" />
+
+                                        <VerticalStackLayout Grid.Column="1" Spacing="3" VerticalOptions="Center">
+                                            <Label Text="{Binding PatientName}" FontSize="15" FontAttributes="Bold" TextColor="{StaticResource InkDark}" />
+                                            <Label Text="{Binding PatientAddress}" FontSize="12.5" TextColor="{StaticResource InkMuted}" />
+                                            <Label Text="{Binding CancellationReason, StringFormat='Reason: {0}'}" FontSize="12.5" FontAttributes="Bold" TextColor="{StaticResource CancelledText}" />
+                                        </VerticalStackLayout>
+
+                                        <Label Grid.Column="2" Style="{StaticResource ChevronLabel}" />
+                                    </Grid>
                                 </Border>
                             </DataTemplate>
                         </BindableLayout.ItemTemplate>

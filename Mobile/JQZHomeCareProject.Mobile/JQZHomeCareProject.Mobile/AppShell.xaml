@@ -41,13 +41,13 @@
 
         <ShellContent Title="Home"
                       Route="home"
+                      Icon="home.png"
                       ContentTemplate="{DataTemplate home:HomePage}" />
-        <!-- Icon="home.png" -->
 
         <ShellContent Title="Visits"
                       Route="visits"
+                      Icon="calendar.png"
                       ContentTemplate="{DataTemplate visits:VisitsPage}" />
-        <!-- Icon="calendar.png" -->
 
     </TabBar>
 

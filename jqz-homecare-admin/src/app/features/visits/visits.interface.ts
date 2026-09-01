@@ -12,14 +12,20 @@ export type ReceivedByType = 'Practitioner' | 'Company';
 
 // ============================================================
 // COLLECTION STATUS
+//
+// Matches backend CollectionStatus enum:
+//
+// Pending = 0
+// Received = 1
+// InstallmentPending = 2
 // ============================================================
 
-export type CollectionStatus = 'Pending' | 'Received';
+export type CollectionStatus = 'Pending' | 'Received' | 'InstallmentPending';
 
 // ============================================================
 // VISIT DTO
 //
-// Matches Backend VisitDto
+// Matches backend VisitDto
 // ============================================================
 
 export interface Visit {
@@ -35,18 +41,8 @@ export interface Visit {
 
   patientPhone?: string | null;
 
-  /*
-   * Backend VisitDto property:
-   *
-   * public string PatientAddress { get; set; }
-   */
   patientAddress?: string | null;
 
-  /*
-   * Backend VisitDto property:
-   *
-   * public string? PatientDescription { get; set; }
-   */
   patientDescription?: string | null;
 
   // ==========================================================
@@ -101,14 +97,45 @@ export interface Visit {
   // PAYMENT INFORMATION
   // ==========================================================
 
+  /**
+   * Amount assigned to this individual visit.
+   */
   amountDue: number;
 
+  /**
+   * Amount actually received for this visit.
+   */
   amountReceived: number;
 
+  /**
+   * Who received the payment.
+   *
+   * Practitioner
+   * Company
+   * null when payment has not been received.
+   */
   receivedBy?: ReceivedByType | null;
 
+  /**
+   * AUTHORITATIVE PAYMENT/COLLECTION STATUS.
+   *
+   * Pending:
+   * Payment has not yet been fully received.
+   *
+   * Received:
+   * Full payment for the visit has been received.
+   *
+   * InstallmentPending:
+   * An installment/payment amount is still pending.
+   */
   collectionStatus: CollectionStatus;
 
+  /**
+   * Settlement created for the practitioner.
+   *
+   * null when the visit has not yet been included
+   * in a practitioner settlement.
+   */
   settlementId?: string | null;
 }
 

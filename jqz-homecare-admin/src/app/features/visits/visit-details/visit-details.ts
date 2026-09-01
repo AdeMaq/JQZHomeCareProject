@@ -1,12 +1,10 @@
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { catchError, forkJoin, of } from 'rxjs';
 
-import { Visit } from '../visits.interface';
 import { VisitsService } from '../visits.service';
 
-import { Practitioner, PractitionerService } from '../../../core/services/practitioner';
+import { CollectionStatus, ReceivedByType, Visit, VisitStatus } from '../visits.interface';
 
 @Component({
   selector: 'app-visit-details',
@@ -16,29 +14,27 @@ import { Practitioner, PractitionerService } from '../../../core/services/practi
   styleUrl: './visit-details.css',
 })
 export class VisitDetails implements OnInit {
-  private readonly visitsService = inject(VisitsService);
-
-  private readonly practitionerService = inject(PractitionerService);
-
-  private readonly route = inject(ActivatedRoute);
-
-  private readonly router = inject(Router);
-
-  private readonly cdr = inject(ChangeDetectorRef);
-
   // ============================================================
-  // DATA
+  // COMPONENT STATE
   // ============================================================
 
   visit: Visit | null = null;
 
-  // ============================================================
-  // UI STATE
-  // ============================================================
-
-  isLoading = false;
+  isLoading = true;
 
   errorMessage = '';
+
+  private visitId = '';
+
+  // ============================================================
+  // CONSTRUCTOR
+  // ============================================================
+
+  constructor(
+    private readonly route: ActivatedRoute,
+    private readonly router: Router,
+    private readonly visitsService: VisitsService,
+  ) {}
 
   // ============================================================
   // LIFECYCLE
@@ -49,162 +45,41 @@ export class VisitDetails implements OnInit {
   }
 
   // ============================================================
-  // LOAD VISIT + PRACTITIONERS
+  // LOAD VISIT
   // ============================================================
 
   loadVisit(): void {
-    console.log('=================================');
-    console.log('VISIT DETAILS: LOAD STARTED');
-    console.log('=================================');
-
     this.isLoading = true;
-
     this.errorMessage = '';
-
     this.visit = null;
 
-    const visitId = this.route.snapshot.paramMap.get('id');
+    const id = this.route.snapshot.paramMap.get('id');
 
-    console.log('VISIT ID:', visitId);
-
-    if (!visitId) {
-      this.errorMessage = 'Visit ID is missing or invalid.';
-
+    if (!id) {
       this.isLoading = false;
-
-      this.cdr.detectChanges();
-
+      this.errorMessage = 'Visit ID was not provided.';
       return;
     }
 
-    forkJoin({
-      visit: this.visitsService.getById(visitId),
+    this.visitId = id;
 
-      practitioners: this.practitionerService.getPractitioners().pipe(
-        catchError((error) => {
-          console.error('Unable to load practitioners for visit details:', error);
-
-          return of([]);
-        }),
-      ),
-    }).subscribe({
-      // ==========================================================
-      // SUCCESS
-      // ==========================================================
-
-      next: ({ visit, practitioners }) => {
-        console.log('=================================');
-        console.log('VISIT DETAILS: API REQUESTS SUCCESS');
-        console.log('=================================');
-
-        console.log('VISIT RESPONSE:', visit);
-
-        console.log('PRACTITIONERS RESPONSE:', practitioners);
-
-        const practitionerList = Array.isArray(practitioners) ? practitioners : [];
-
-        this.visit = this.resolvePractitionerName(visit, practitionerList);
-
-        console.log('=================================');
-        console.log('VISIT AFTER PRACTITIONER MAPPING');
-        console.log('=================================');
-
-        console.log('MAPPED VISIT:', this.visit);
-
+    this.visitsService.getById(this.visitId).subscribe({
+      next: (visit: Visit) => {
+        this.visit = visit;
         this.isLoading = false;
-
-        this.cdr.detectChanges();
-
-        console.log('VISIT DETAILS: VIEW UPDATED');
       },
-
-      // ==========================================================
-      // ERROR
-      // ==========================================================
 
       error: (error) => {
-        console.error('=================================');
-        console.error('VISIT DETAILS: API ERROR');
-        console.error('ERROR:', error);
-        console.error('ERROR STATUS:', error?.status);
-        console.error('ERROR MESSAGE:', error?.message);
-        console.error('ERROR BODY:', error?.error);
-        console.error('=================================');
-
-        if (error?.status === 404) {
-          this.errorMessage = 'The requested visit could not be found.';
-        } else {
-          this.errorMessage =
-            error?.error?.message ||
-            error?.message ||
-            'Unable to load visit details. Please try again.';
-        }
+        console.error('Failed to load visit details:', error);
 
         this.isLoading = false;
 
-        this.cdr.detectChanges();
-      },
-
-      // ==========================================================
-      // COMPLETE
-      // ==========================================================
-
-      complete: () => {
-        console.log('VISIT DETAILS: OBSERVABLE COMPLETED');
+        this.errorMessage =
+          error?.error?.message ||
+          error?.message ||
+          'Unable to load visit details. Please try again.';
       },
     });
-  }
-
-  // ============================================================
-  // RESOLVE PRACTITIONER NAME
-  // ============================================================
-
-  private resolvePractitionerName(visit: Visit, practitioners: Practitioner[]): Visit {
-    if (!visit.practitionerId) {
-      return {
-        ...visit,
-        practitionerName: visit.practitionerName ?? null,
-      };
-    }
-
-    const practitioner = practitioners.find(
-      (item) => item.id?.toLowerCase() === visit.practitionerId?.toLowerCase(),
-    );
-
-    console.log('=================================');
-    console.log('PRACTITIONER RESOLUTION');
-    console.log('=================================');
-
-    console.log('VISIT ID:', visit.id);
-
-    console.log('PRACTITIONER ID:', visit.practitionerId);
-
-    console.log('RESOLVED PRACTITIONER NAME:', practitioner?.name);
-
-    return {
-      ...visit,
-      practitionerName: practitioner?.name ?? visit.practitionerName ?? null,
-    };
-  }
-
-  // ============================================================
-  // BACK TO VISITS
-  // ============================================================
-
-  backToVisits(): void {
-    this.router.navigate(['/visits']);
-  }
-
-  // ============================================================
-  // EDIT VISIT
-  // ============================================================
-
-  editVisit(): void {
-    if (!this.visit?.id) {
-      return;
-    }
-
-    this.router.navigate(['/visits', this.visit.id, 'edit']);
   }
 
   // ============================================================
@@ -216,10 +91,100 @@ export class VisitDetails implements OnInit {
   }
 
   // ============================================================
-  // STATUS CLASS
+  // NAVIGATION
   // ============================================================
 
-  getStatusClass(status: Visit['status']): string {
+  backToVisits(): void {
+    this.router.navigate(['/visits']);
+  }
+
+  editVisit(): void {
+    if (!this.visit) {
+      return;
+    }
+
+    this.router.navigate(['/visits', this.visit.id, 'edit']);
+  }
+
+  // ============================================================
+  // DATE FORMATTING
+  // ============================================================
+
+  formatDate(date: string | null | undefined): string {
+    if (!date) {
+      return 'Not scheduled';
+    }
+
+    const parsedDate = new Date(date);
+
+    if (Number.isNaN(parsedDate.getTime())) {
+      return 'Invalid date';
+    }
+
+    return parsedDate.toLocaleDateString('en-GB', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+    });
+  }
+
+  // ============================================================
+  // TIME SLOT
+  // ============================================================
+
+  formatSlot(visit: Visit): string {
+    if (!visit.slotStart && !visit.slotEnd) {
+      return 'Not scheduled';
+    }
+
+    const start = this.formatTime(visit.slotStart);
+
+    const end = this.formatTime(visit.slotEnd);
+
+    if (start && end) {
+      return `${start} - ${end}`;
+    }
+
+    return start || end || 'Not scheduled';
+  }
+
+  // ============================================================
+  // TIME FORMAT
+  // ============================================================
+
+  private formatTime(time: string | null | undefined): string {
+    if (!time) {
+      return '';
+    }
+
+    const parts = time.split(':');
+
+    if (parts.length < 2) {
+      return time;
+    }
+
+    const hours = Number(parts[0]);
+    const minutes = Number(parts[1]);
+
+    if (Number.isNaN(hours) || Number.isNaN(minutes)) {
+      return time;
+    }
+
+    const date = new Date();
+
+    date.setHours(hours, minutes, 0, 0);
+
+    return date.toLocaleTimeString('en-US', {
+      hour: 'numeric',
+      minute: '2-digit',
+    });
+  }
+
+  // ============================================================
+  // VISIT STATUS CLASS
+  // ============================================================
+
+  getStatusClass(status: VisitStatus | string): string {
     switch (status) {
       case 'Scheduled':
         return 'status-scheduled';
@@ -234,27 +199,27 @@ export class VisitDetails implements OnInit {
         return 'status-cancelled';
 
       default:
-        return '';
+        return 'status-default';
     }
   }
 
   // ============================================================
-  // STATUS ICON
+  // VISIT STATUS ICON
   // ============================================================
 
-  getStatusIcon(status: Visit['status']): string {
+  getStatusIcon(status: VisitStatus | string): string {
     switch (status) {
       case 'Scheduled':
-        return 'fa-regular fa-calendar';
+        return 'fa-solid fa-calendar-check';
 
       case 'Accepted':
-        return 'fa-solid fa-check';
-
-      case 'Completed':
         return 'fa-solid fa-circle-check';
 
+      case 'Completed':
+        return 'fa-solid fa-check-double';
+
       case 'Cancelled':
-        return 'fa-solid fa-xmark';
+        return 'fa-solid fa-circle-xmark';
 
       default:
         return 'fa-solid fa-circle-info';
@@ -265,7 +230,7 @@ export class VisitDetails implements OnInit {
   // COLLECTION STATUS CLASS
   // ============================================================
 
-  getCollectionStatusClass(status: Visit['collectionStatus']): string {
+  getCollectionStatusClass(status: CollectionStatus | string | null | undefined): string {
     switch (status) {
       case 'Received':
         return 'collection-received';
@@ -273,16 +238,19 @@ export class VisitDetails implements OnInit {
       case 'Pending':
         return 'collection-pending';
 
+      case 'InstallmentPending':
+        return 'collection-installment-pending';
+
       default:
-        return '';
+        return 'collection-unknown';
     }
   }
 
   // ============================================================
-  // COLLECTION ICON
+  // COLLECTION STATUS ICON
   // ============================================================
 
-  getCollectionIcon(status: Visit['collectionStatus']): string {
+  getCollectionIcon(status: CollectionStatus | string | null | undefined): string {
     switch (status) {
       case 'Received':
         return 'fa-solid fa-circle-check';
@@ -290,90 +258,138 @@ export class VisitDetails implements OnInit {
       case 'Pending':
         return 'fa-solid fa-clock';
 
+      case 'InstallmentPending':
+        return 'fa-solid fa-hourglass-half';
+
       default:
-        return 'fa-solid fa-circle-info';
+        return 'fa-solid fa-circle-question';
     }
   }
 
   // ============================================================
-  // DATE FORMAT
+  // COLLECTION STATUS LABEL
   // ============================================================
 
-  formatDate(date: string | null | undefined): string {
-    if (!date) {
-      return '-';
+  getCollectionStatusLabel(status: CollectionStatus | string | null | undefined): string {
+    switch (status) {
+      case 'Received':
+        return 'Received';
+
+      case 'Pending':
+        return 'Pending';
+
+      case 'InstallmentPending':
+        return 'Installment Pending';
+
+      default:
+        return 'Unknown';
     }
-
-    const parsedDate = new Date(date);
-
-    if (Number.isNaN(parsedDate.getTime())) {
-      return '-';
-    }
-
-    return parsedDate.toLocaleDateString('en-GB', {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric',
-    });
   }
 
   // ============================================================
-  // TIME FORMAT
+  // PAYMENT PENDING
+  //
+  // collectionStatus is authoritative.
+  //
+  // Do NOT determine payment status only from
+  // amountReceived.
   // ============================================================
 
-  formatTime(time: string | null | undefined): string {
-    if (!time) {
-      return '-';
+  isPaymentPending(): boolean {
+    if (!this.visit) {
+      return false;
     }
 
-    const parts = time.split(':');
-
-    if (parts.length < 2) {
-      return time;
-    }
-
-    return `${parts[0]}:${parts[1]}`;
+    return (
+      this.visit.collectionStatus === 'Pending' ||
+      this.visit.collectionStatus === 'InstallmentPending'
+    );
   }
 
   // ============================================================
-  // VISIT SLOT
+  // PAYMENT RECEIVED
   // ============================================================
 
-  formatSlot(visit: Visit): string {
-    const start = this.formatTime(visit.slotStart);
-
-    const end = this.formatTime(visit.slotEnd);
-
-    if (start === '-' && end === '-') {
-      return '-';
+  isPaymentReceived(): boolean {
+    if (!this.visit) {
+      return false;
     }
 
-    if (start === '-') {
-      return end;
-    }
-
-    if (end === '-') {
-      return start;
-    }
-
-    return `${start} - ${end}`;
+    return this.visit.collectionStatus === 'Received';
   }
 
   // ============================================================
-  // AMOUNT FORMAT
+  // INSTALLMENT PENDING
   // ============================================================
 
-  formatAmount(amount: number | null | undefined): string {
-    const value = Number(amount ?? 0);
+  isInstallmentPending(): boolean {
+    if (!this.visit) {
+      return false;
+    }
 
-    return value.toLocaleString('en-PK', {
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 2,
-    });
+    return this.visit.collectionStatus === 'InstallmentPending';
+  }
+
+  // ============================================================
+  // MOBILE PAYMENT OPTION
+  //
+  // Pending / InstallmentPending:
+  // Payment collection can be available.
+  //
+  // Received:
+  // Payment option should be hidden.
+  // ============================================================
+
+  shouldShowMobilePaymentOption(): boolean {
+    return this.isPaymentPending();
+  }
+
+  // ============================================================
+  // MOBILE PAYMENT ACTION LABEL
+  // ============================================================
+
+  getMobilePaymentStatusLabel(): string {
+    if (!this.visit) {
+      return 'Unknown';
+    }
+
+    if (this.isPaymentReceived()) {
+      return 'Payment option hidden';
+    }
+
+    if (this.isInstallmentPending()) {
+      return 'Installment collection available';
+    }
+
+    return 'Collect payment available';
+  }
+
+  // ============================================================
+  // MOBILE PAYMENT ACTION DESCRIPTION
+  // ============================================================
+
+  getMobilePaymentStatusDescription(): string {
+    if (!this.visit) {
+      return '';
+    }
+
+    if (this.isPaymentReceived()) {
+      return 'Payment has already been collected. No further payment action is required.';
+    }
+
+    if (this.isInstallmentPending()) {
+      return 'An installment is still pending and can be collected by the practitioner.';
+    }
+
+    return 'Payment is pending. The practitioner can collect the payment from the mobile app.';
   }
 
   // ============================================================
   // PENDING AMOUNT
+  //
+  // This is a display calculation only.
+  //
+  // Payment status itself comes from collectionStatus.
   // ============================================================
 
   getPendingAmount(): number {
@@ -381,11 +397,28 @@ export class VisitDetails implements OnInit {
       return 0;
     }
 
-    const due = Number(this.visit.amountDue ?? 0);
+    const amountDue = Number(this.visit.amountDue) || 0;
 
-    const received = Number(this.visit.amountReceived ?? 0);
+    const amountReceived = Number(this.visit.amountReceived) || 0;
 
-    return Math.max(due - received, 0);
+    return Math.max(amountDue - amountReceived, 0);
+  }
+
+  // ============================================================
+  // AMOUNT FORMAT
+  // ============================================================
+
+  formatAmount(amount: number | null | undefined): string {
+    const value = Number(amount);
+
+    if (Number.isNaN(value)) {
+      return '0.00';
+    }
+
+    return value.toLocaleString('en-PK', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
   }
 
   // ============================================================
@@ -393,10 +426,40 @@ export class VisitDetails implements OnInit {
   // ============================================================
 
   getReceivedByLabel(): string {
-    if (!this.visit?.receivedBy) {
-      return '-';
+    if (!this.visit) {
+      return 'Not available';
     }
 
-    return this.visit.receivedBy;
+    if (!this.isPaymentReceived()) {
+      return 'Not received';
+    }
+
+    switch (this.visit.receivedBy) {
+      case 'Practitioner':
+        return 'Practitioner';
+
+      case 'Company':
+        return 'Company';
+
+      default:
+        return 'Not specified';
+    }
+  }
+
+  // ============================================================
+  // RECEIVED BY ICON
+  // ============================================================
+
+  getReceivedByIcon(receivedBy: ReceivedByType | null | undefined): string {
+    switch (receivedBy) {
+      case 'Practitioner':
+        return 'fa-solid fa-user-doctor';
+
+      case 'Company':
+        return 'fa-solid fa-building';
+
+      default:
+        return 'fa-solid fa-user';
+    }
   }
 }

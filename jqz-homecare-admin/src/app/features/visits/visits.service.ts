@@ -6,11 +6,11 @@ import { Observable, map } from 'rxjs';
 
 import { CollectionStatus, Visit, VisitStatus } from './visits.interface';
 
-/* ============================================================
-   CREATE VISIT REQUEST
-
-   Matches backend CreateVisitDto
-============================================================ */
+// ============================================================
+// CREATE VISIT REQUEST
+//
+// Matches backend CreateVisitDto
+// ============================================================
 
 export interface CreateVisitRequest {
   patientName: string;
@@ -29,7 +29,6 @@ export interface CreateVisitRequest {
    * FullAdvance = 0
    * Installment = 1
    */
-
   paymentType: 0 | 1;
 
   initialAmountPaid: number | null;
@@ -47,11 +46,11 @@ export interface CreateVisitRequest {
   }[];
 }
 
-/* ============================================================
-   SCHEDULE VISIT REQUEST
-
-   Matches backend ScheduleVisitDto
-============================================================ */
+// ============================================================
+// SCHEDULE VISIT REQUEST
+//
+// Matches backend ScheduleVisitDto
+// ============================================================
 
 export interface ScheduleVisitRequest {
   scheduledDate: string;
@@ -61,9 +60,9 @@ export interface ScheduleVisitRequest {
   slotEnd: string;
 }
 
-/* ============================================================
-   REASSIGN PRACTITIONER REQUEST
-============================================================ */
+// ============================================================
+// REASSIGN PRACTITIONER REQUEST
+// ============================================================
 
 export interface ReassignPractitionerRequest {
   practitionerId: string;
@@ -75,32 +74,70 @@ export interface ReassignPractitionerRequest {
   reason: string;
 }
 
-/* ============================================================
-   BACKEND ENUM VALUES
+// ============================================================
+// COLLECT PAYMENT REQUEST
+//
+// Used by Admin/Company to collect payment for a visit.
+//
+// Example:
+//
+// Amount Due      = 5000
+// Amount Received = 2000
+//
+// The backend should then keep the visit Pending
+// with 3000 remaining.
+//
+// When the remaining amount is collected:
+//
+// Amount Received = 5000
+// CollectionStatus = Received
+// ============================================================
 
-   The backend may return enum values either as:
+export interface CollectPaymentRequest {
+  amount: number;
+}
 
-   Numeric:
+// ============================================================
+// MARK PAYMENT RECEIVED REQUEST
+//
+// Used for the practitioner payment workflow.
+//
+// Matches backend MarkPaymentReceivedDto
+// ============================================================
 
-   0, 1, 2, 3
+export interface MarkPaymentReceivedRequest {
+  amount: number;
+}
 
-   Or strings:
-
-   "Scheduled"
-   "Accepted"
-   "Completed"
-   "Cancelled"
-
-   Therefore, the frontend supports both formats.
-============================================================ */
+// ============================================================
+// BACKEND ENUM VALUES
+//
+// Backend may return enum values as:
+//
+// Numeric:
+// 0, 1, 2, 3
+//
+// Or strings:
+// "Scheduled"
+// "Accepted"
+// "Completed"
+// "Cancelled"
+//
+// CollectionStatus:
+//
+// 0 = Pending
+// 1 = Received
+//
+// The frontend supports both formats.
+// ============================================================
 
 type BackendVisitStatus = number | string;
 
 type BackendCollectionStatus = number | string;
 
-/* ============================================================
-   RAW BACKEND VISIT
-============================================================ */
+// ============================================================
+// RAW BACKEND VISIT
+// ============================================================
 
 interface BackendVisit extends Omit<Visit, 'status' | 'collectionStatus'> {
   status: BackendVisitStatus;
@@ -108,29 +145,29 @@ interface BackendVisit extends Omit<Visit, 'status' | 'collectionStatus'> {
   collectionStatus: BackendCollectionStatus;
 }
 
-/* ============================================================
-   VISITS SERVICE
-============================================================ */
+// ============================================================
+// VISITS SERVICE
+// ============================================================
 
 @Injectable({
   providedIn: 'root',
 })
 export class VisitsService {
-  /* ============================================================
-     SERVICES
-  ============================================================ */
+  // ==========================================================
+  // SERVICES
+  // ==========================================================
 
   private readonly http = inject(HttpClient);
 
-  /* ============================================================
-     API ENDPOINT
-  ============================================================ */
+  // ==========================================================
+  // API ENDPOINT
+  // ==========================================================
 
   private readonly apiUrl = 'http://localhost:5212/api/visits';
 
-  /* ============================================================
-     GET ALL VISITS
-  ============================================================ */
+  // ==========================================================
+  // GET ALL VISITS
+  // ==========================================================
 
   getAll(): Observable<Visit[]> {
     return this.http
@@ -140,9 +177,9 @@ export class VisitsService {
       );
   }
 
-  /* ============================================================
-     GET VISIT BY ID
-  ============================================================ */
+  // ==========================================================
+  // GET VISIT BY ID
+  // ==========================================================
 
   getById(id: string): Observable<Visit> {
     return this.http
@@ -150,33 +187,33 @@ export class VisitsService {
       .pipe(map((visit: BackendVisit) => this.mapVisit(visit)));
   }
 
-  /* ============================================================
-     CREATE VISIT
-  ============================================================ */
+  // ==========================================================
+  // CREATE VISIT
+  // ==========================================================
 
   create(request: CreateVisitRequest): Observable<unknown> {
     return this.http.post<unknown>(this.apiUrl, request);
   }
 
-  /* ============================================================
-     SCHEDULE VISIT
-  ============================================================ */
+  // ==========================================================
+  // SCHEDULE VISIT
+  // ==========================================================
 
   schedule(id: string, request: ScheduleVisitRequest): Observable<void> {
     return this.http.put<void>(`${this.apiUrl}/${id}/schedule`, request);
   }
 
-  /* ============================================================
-     REASSIGN PRACTITIONER
-  ============================================================ */
+  // ==========================================================
+  // REASSIGN PRACTITIONER
+  // ==========================================================
 
   reassign(id: string, request: ReassignPractitionerRequest): Observable<void> {
     return this.http.put<void>(`${this.apiUrl}/${id}/reassign`, request);
   }
 
-  /* ============================================================
-     GET TODAY VISITS
-  ============================================================ */
+  // ==========================================================
+  // GET TODAY VISITS
+  // ==========================================================
 
   getToday(practitionerId?: string): Observable<Visit[]> {
     let params = new HttpParams();
@@ -192,9 +229,9 @@ export class VisitsService {
       );
   }
 
-  /* ============================================================
-     GET VISITS BY DATE
-  ============================================================ */
+  // ==========================================================
+  // GET VISITS BY DATE
+  // ==========================================================
 
   getByDate(date?: string): Observable<Visit[]> {
     let params = new HttpParams();
@@ -210,9 +247,9 @@ export class VisitsService {
       );
   }
 
-  /* ============================================================
-     GET PRACTITIONER VISITS BY DATE
-  ============================================================ */
+  // ==========================================================
+  // GET PRACTITIONER VISITS BY DATE
+  // ==========================================================
 
   getPractitionerVisitsByDate(practitionerId: string, date: string): Observable<Visit[]> {
     return this.getByDate(date).pipe(
@@ -222,9 +259,63 @@ export class VisitsService {
     );
   }
 
-  /* ============================================================
-     MAP BACKEND VISIT
-  ============================================================ */
+  // ==========================================================
+  // COLLECT PAYMENT
+  //
+  // Backend:
+  //
+  // PUT /api/visits/{id}/collect-payment
+  //
+  // This is the Admin/Company payment collection workflow.
+  //
+  // The amount supplied here represents the amount collected
+  // during this payment action.
+  //
+  // Example:
+  //
+  // Amount Due      = 5000
+  // Existing Received = 0
+  // Admin collects   = 2000
+  //
+  // Result expected from backend:
+  //
+  // Amount Received = 2000
+  // CollectionStatus = Pending
+  //
+  // Later:
+  //
+  // Admin collects remaining 3000
+  //
+  // Amount Received = 5000
+  // CollectionStatus = Received
+  // ==========================================================
+
+  collectPayment(id: string, request: CollectPaymentRequest): Observable<void> {
+    return this.http.put<void>(`${this.apiUrl}/${id}/collect-payment`, request);
+  }
+
+  // ==========================================================
+  // MARK PAYMENT RECEIVED
+  //
+  // Backend:
+  //
+  // PUT /api/visits/{id}/mark-payment-received
+  //
+  // This endpoint is available for the practitioner-payment
+  // workflow.
+  //
+  // The backend remains responsible for changing the
+  // CollectionStatus to Received when the full visit amount
+  // has been collected.
+  // ==========================================================
+
+  markPaymentReceived(id: string, request: MarkPaymentReceivedRequest): Observable<void> {
+    return this.http.put<void>(`${this.apiUrl}/${id}/mark-payment-received`, request);
+  }
+
+  // ==========================================================
+  // MAP BACKEND VISIT
+  // ==========================================================
 
   private mapVisit(visit: BackendVisit): Visit {
     return {
@@ -240,14 +331,14 @@ export class VisitsService {
     };
   }
 
-  /* ============================================================
-     MAP VISIT STATUS
-  ============================================================ */
+  // ==========================================================
+  // MAP VISIT STATUS
+  // ==========================================================
 
   private mapVisitStatus(status: BackendVisitStatus): VisitStatus {
-    /*
-     * Backend returns string enum values.
-     */
+    // --------------------------------------------------------
+    // STRING ENUM SUPPORT
+    // --------------------------------------------------------
 
     if (typeof status === 'string') {
       switch (status.trim().toLowerCase()) {
@@ -271,9 +362,9 @@ export class VisitsService {
       }
     }
 
-    /*
-     * Numeric enum support.
-     */
+    // --------------------------------------------------------
+    // NUMERIC ENUM SUPPORT
+    // --------------------------------------------------------
 
     switch (status) {
       case 0:
@@ -295,14 +386,24 @@ export class VisitsService {
     }
   }
 
-  /* ============================================================
-     MAP COLLECTION STATUS
-  ============================================================ */
+  // ==========================================================
+  // MAP COLLECTION STATUS
+  // ==========================================================
+
+  // ==========================================================
+  // MAP COLLECTION STATUS
+  //
+  // Backend enum:
+  //
+  // Pending = 0
+  // Received = 1
+  // InstallmentPending = 2
+  // ==========================================================
 
   private mapCollectionStatus(status: BackendCollectionStatus): CollectionStatus {
-    /*
-     * Backend returns string enum values.
-     */
+    // --------------------------------------------------------
+    // STRING ENUM SUPPORT
+    // --------------------------------------------------------
 
     if (typeof status === 'string') {
       switch (status.trim().toLowerCase()) {
@@ -312,16 +413,28 @@ export class VisitsService {
         case 'received':
           return 'Received';
 
+        case 'installmentpending':
+        case 'installment_pending':
+        case 'installment pending':
+          return 'InstallmentPending';
+
         default:
           console.warn('Unknown collection status received from API:', status);
+
+          /*
+           * Safe fallback:
+           *
+           * Unknown payment status must not accidentally
+           * hide a payment that could still be pending.
+           */
 
           return 'Pending';
       }
     }
 
-    /*
-     * Numeric enum support.
-     */
+    // --------------------------------------------------------
+    // NUMERIC ENUM SUPPORT
+    // --------------------------------------------------------
 
     switch (status) {
       case 0:
@@ -329,6 +442,9 @@ export class VisitsService {
 
       case 1:
         return 'Received';
+
+      case 2:
+        return 'InstallmentPending';
 
       default:
         console.warn('Unknown collection status received from API:', status);

@@ -73,6 +73,7 @@ import { EditRating } from './features/ratings/edit-rating/edit-rating';
 // ============================================================
 
 import { PaymentsList } from './features/payments/payments-list/payments-list';
+import { PaymentCollection } from './features/payments/payment-collection/payment-collection';
 
 // ============================================================
 // ROUTES
@@ -153,6 +154,11 @@ export const routes: Routes = [
       // ========================================================
       // PAYMENTS
       // ========================================================
+
+      {
+        path: 'payments/collection',
+        component: PaymentCollection,
+      },
 
       {
         path: 'payments',

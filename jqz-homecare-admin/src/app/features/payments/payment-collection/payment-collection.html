@@ -1,0 +1,582 @@
+<div class="payment-collection-page">
+  <!-- ========================================================= -->
+  <!-- PAGE HEADER -->
+  <!-- ========================================================= -->
+
+  <div class="page-header">
+    <div class="page-header-content">
+      <div class="page-title-section">
+        <div class="page-icon">
+          <i class="fa-solid fa-money-check-dollar"></i>
+        </div>
+
+        <div>
+          <h1>Payment &amp; Collection</h1>
+
+          <p>Monitor visit payments, outstanding balances, and collection status.</p>
+        </div>
+      </div>
+
+      <button
+        type="button"
+        class="refresh-button"
+        [disabled]="isLoading"
+        (click)="loadPaymentCollections()"
+      >
+        @if (isLoading) {
+          <i class="fa-solid fa-spinner fa-spin"></i>
+        } @else {
+          <i class="fa-solid fa-rotate-right"></i>
+        }
+
+        Refresh
+      </button>
+    </div>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- ALERTS -->
+  <!-- ========================================================= -->
+
+  @if (successMessage) {
+    <div class="alert alert-success">
+      <div class="alert-content">
+        <i class="fa-solid fa-circle-check"></i>
+
+        <span>{{ successMessage }}</span>
+      </div>
+
+      <button type="button" class="alert-close" (click)="successMessage = ''">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+  }
+
+  @if (errorMessage) {
+    <div class="alert alert-error">
+      <div class="alert-content">
+        <i class="fa-solid fa-circle-exclamation"></i>
+
+        <span>{{ errorMessage }}</span>
+      </div>
+
+      <button type="button" class="alert-close" (click)="errorMessage = ''">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+  }
+
+  <!-- ========================================================= -->
+  <!-- SUMMARY CARDS -->
+  <!-- ========================================================= -->
+
+  <div class="summary-grid">
+    <!-- TOTAL DUE -->
+
+    <div class="summary-card">
+      <div class="summary-card-icon due-icon">
+        <i class="fa-solid fa-file-invoice-dollar"></i>
+      </div>
+
+      <div class="summary-card-content">
+        <span>Total Amount Due</span>
+
+        <strong> PKR {{ formatAmount(totalAmountDue) }} </strong>
+      </div>
+    </div>
+
+    <!-- RECEIVED -->
+
+    <div class="summary-card">
+      <div class="summary-card-icon received-icon">
+        <i class="fa-solid fa-circle-check"></i>
+      </div>
+
+      <div class="summary-card-content">
+        <span>Total Amount Received</span>
+
+        <strong> PKR {{ formatAmount(totalAmountReceived) }} </strong>
+      </div>
+    </div>
+
+    <!-- PENDING -->
+
+    <div class="summary-card">
+      <div class="summary-card-icon pending-icon">
+        <i class="fa-solid fa-clock"></i>
+      </div>
+
+      <div class="summary-card-content">
+        <span>Total Amount Pending</span>
+
+        <strong> PKR {{ formatAmount(totalAmountPending) }} </strong>
+      </div>
+    </div>
+
+    <!-- VISITS -->
+
+    <div class="summary-card">
+      <div class="summary-card-icon visits-icon">
+        <i class="fa-solid fa-house-medical"></i>
+      </div>
+
+      <div class="summary-card-content">
+        <span>Payment Visits</span>
+
+        <strong>
+          {{ totalVisits }}
+        </strong>
+
+        <small>
+          {{ pendingVisits }} pending · {{ installmentVisits }} installment ·
+          {{ receivedVisits }} received
+        </small>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- FILTER CARD -->
+  <!-- ========================================================= -->
+
+  <div class="section-card">
+    <div class="section-header">
+      <div>
+        <h2>
+          <i class="fa-solid fa-filter"></i>
+          Payment Collections
+        </h2>
+
+        <p>Review payment information for every visit.</p>
+      </div>
+    </div>
+
+    <div class="filters">
+      <!-- SEARCH -->
+
+      <div class="form-group search-group">
+        <label for="paymentSearch"> Search </label>
+
+        <div class="search-input-wrapper">
+          <i class="fa-solid fa-magnifying-glass"></i>
+
+          <input
+            id="paymentSearch"
+            type="text"
+            [(ngModel)]="searchTerm"
+            placeholder="Search patient, practitioner, service..."
+          />
+        </div>
+      </div>
+
+      <!-- COLLECTION STATUS -->
+
+      <div class="form-group">
+        <label for="collectionStatus"> Collection Status </label>
+
+        <select id="collectionStatus" [(ngModel)]="selectedCollectionStatus">
+          <option value="All">All Statuses</option>
+
+          <option value="Pending">Pending</option>
+
+          <option value="InstallmentPending">Installment Pending</option>
+
+          <option value="Received">Received</option>
+        </select>
+      </div>
+
+      <!-- CLEAR -->
+
+      <div class="filter-action">
+        <button type="button" class="clear-button" (click)="clearFilters()">
+          <i class="fa-solid fa-filter-circle-xmark"></i>
+          Clear
+        </button>
+      </div>
+    </div>
+
+    <!-- ======================================================= -->
+    <!-- LOADING -->
+    <!-- ======================================================= -->
+
+    @if (isLoading) {
+      <div class="loading-state">
+        <i class="fa-solid fa-spinner fa-spin"></i>
+
+        <p>Loading payment collections...</p>
+      </div>
+    }
+
+    <!-- ======================================================= -->
+    <!-- TABLE -->
+    <!-- ======================================================= -->
+
+    @else if (filteredVisits.length > 0) {
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Patient</th>
+              <th>Practitioner</th>
+              <th>Visit</th>
+              <th>Payment &amp; Collection</th>
+              <th>Received By</th>
+              <th>Settlement</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            @for (visit of filteredVisits; track visit.id) {
+              <tr>
+                <!-- ================================================= -->
+                <!-- PATIENT -->
+                <!-- ================================================= -->
+
+                <td>
+                  <div class="patient-cell">
+                    <div class="patient-avatar">
+                      {{ visit.patientName.charAt(0).toUpperCase() }}
+                    </div>
+
+                    <div>
+                      <strong>
+                        {{ visit.patientName }}
+                      </strong>
+
+                      @if (visit.patientPhone) {
+                        <span>
+                          {{ visit.patientPhone }}
+                        </span>
+                      }
+                    </div>
+                  </div>
+                </td>
+
+                <!-- ================================================= -->
+                <!-- PRACTITIONER -->
+                <!-- ================================================= -->
+
+                <td>
+                  <div class="practitioner-cell">
+                    <i class="fa-solid fa-user-doctor"></i>
+
+                    <span>
+                      {{ visit.practitionerName || 'Not assigned' }}
+                    </span>
+                  </div>
+                </td>
+
+                <!-- ================================================= -->
+                <!-- VISIT -->
+                <!-- ================================================= -->
+
+                <td>
+                  <div class="visit-cell">
+                    <strong>
+                      {{ visit.serviceName || '-' }}
+                    </strong>
+
+                    <span>
+                      {{ visit.areaName || 'Area not available' }}
+                    </span>
+
+                    @if (visit.scheduledDate) {
+                      <small>
+                        {{ visit.scheduledDate | date: 'dd MMM yyyy' }}
+                      </small>
+                    }
+                  </div>
+                </td>
+
+                <!-- ================================================= -->
+                <!-- PAYMENT -->
+                <!-- ================================================= -->
+
+                <td>
+                  <div class="payment-cell">
+                    <div class="payment-state" [class]="getPaymentStateClass(visit)">
+                      {{ getPaymentState(visit) }}
+                    </div>
+
+                    <div class="payment-values">
+                      <div>
+                        <span>Amount Due</span>
+
+                        <strong> PKR {{ formatAmount(visit.amountDue) }} </strong>
+                      </div>
+
+                      <div>
+                        <span>Amount Received</span>
+
+                        <strong> PKR {{ formatAmount(visit.amountReceived) }} </strong>
+                      </div>
+
+                      <div>
+                        <span>Amount Pending</span>
+
+                        <strong class="pending-amount">
+                          PKR {{ formatAmount(getPendingAmount(visit)) }}
+                        </strong>
+                      </div>
+                    </div>
+
+                    <span
+                      class="collection-badge"
+                      [class]="getCollectionStatusClass(visit.collectionStatus)"
+                    >
+                      {{ getCollectionStatusLabel(visit.collectionStatus) }}
+                    </span>
+                  </div>
+                </td>
+
+                <!-- ================================================= -->
+                <!-- RECEIVED BY -->
+                <!-- ================================================= -->
+
+                <td>
+                  <span class="received-by-badge" [class]="getReceivedByClass(visit)">
+                    @if (visit.receivedBy === 'Practitioner') {
+                      <i class="fa-solid fa-user-doctor"></i>
+                    } @else if (visit.receivedBy === 'Company') {
+                      <i class="fa-solid fa-building"></i>
+                    } @else {
+                      <i class="fa-solid fa-minus"></i>
+                    }
+
+                    {{ getReceivedBy(visit) }}
+                  </span>
+                </td>
+
+                <!-- ================================================= -->
+                <!-- SETTLEMENT -->
+                <!-- ================================================= -->
+
+                <td>
+                  @if (visit.settlementId) {
+                    <div class="settlement-cell">
+                      <span class="settlement-available">
+                        <i class="fa-solid fa-link"></i>
+                        Available
+                      </span>
+
+                      <small>
+                        {{ visit.settlementId }}
+                      </small>
+                    </div>
+                  } @else {
+                    <span class="settlement-unavailable"> Not available </span>
+                  }
+                </td>
+
+                <!-- ================================================= -->
+                <!-- ACTION -->
+                <!-- ================================================= -->
+
+                <td>
+                  @if (getPendingAmount(visit) > 0) {
+                    <button
+                      type="button"
+                      class="collect-button"
+                      [disabled]="isCollecting"
+                      (click)="openCollection(visit)"
+                    >
+                      <i class="fa-solid fa-hand-holding-dollar"></i>
+
+                      Collect
+                    </button>
+                  } @else {
+                    <span class="paid-label">
+                      <i class="fa-solid fa-circle-check"></i>
+
+                      Paid
+                    </span>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+
+    <!-- ======================================================= -->
+    <!-- EMPTY STATE -->
+    <!-- ======================================================= -->
+
+    @else {
+      <div class="empty-state">
+        <div class="empty-icon">
+          <i class="fa-solid fa-money-bill-transfer"></i>
+        </div>
+
+        <h3>No Payment Records Found</h3>
+
+        <p>No visits match the selected payment collection filters.</p>
+
+        @if (searchTerm || selectedCollectionStatus !== 'All') {
+          <button type="button" class="clear-button empty-clear" (click)="clearFilters()">
+            <i class="fa-solid fa-filter-circle-xmark"></i>
+            Clear Filters
+          </button>
+        }
+      </div>
+    }
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- COLLECTION MODAL -->
+  <!-- ========================================================= -->
+
+  @if (selectedVisit) {
+    <div class="modal-backdrop" (click)="closeCollection()">
+      <div class="collection-modal" (click)="$event.stopPropagation()">
+        <!-- MODAL HEADER -->
+
+        <div class="modal-header">
+          <div>
+            <div class="modal-icon">
+              <i class="fa-solid fa-hand-holding-dollar"></i>
+            </div>
+
+            <div>
+              <h2>Collect Payment</h2>
+
+              <p>Record a payment received for this visit.</p>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            class="modal-close"
+            [disabled]="isCollecting"
+            (click)="closeCollection()"
+          >
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <!-- VISIT INFORMATION -->
+
+        <div class="modal-visit">
+          <div class="modal-patient-avatar">
+            {{ selectedVisit.patientName.charAt(0).toUpperCase() }}
+          </div>
+
+          <div>
+            <strong>
+              {{ selectedVisit.patientName }}
+            </strong>
+
+            <span>
+              {{ selectedVisit.serviceName || 'Visit' }}
+            </span>
+
+            @if (selectedVisit.practitionerName) {
+              <small>
+                Practitioner:
+                {{ selectedVisit.practitionerName }}
+              </small>
+            }
+          </div>
+        </div>
+
+        <!-- PAYMENT SUMMARY -->
+
+        <div class="modal-payment-summary">
+          <div>
+            <span>Amount Due</span>
+
+            <strong> PKR {{ formatAmount(selectedVisit.amountDue) }} </strong>
+          </div>
+
+          <div>
+            <span>Already Received</span>
+
+            <strong> PKR {{ formatAmount(selectedVisit.amountReceived) }} </strong>
+          </div>
+
+          <div class="modal-pending">
+            <span>Amount Pending</span>
+
+            <strong> PKR {{ formatAmount(getPendingAmount(selectedVisit)) }} </strong>
+          </div>
+        </div>
+
+        <!-- COLLECTION AMOUNT -->
+
+        <div class="collection-form">
+          <label for="collectionAmount"> Collection Amount </label>
+
+          <div class="amount-input-wrapper">
+            <span>PKR</span>
+
+            <input
+              id="collectionAmount"
+              type="number"
+              min="0.01"
+              [max]="getPendingAmount(selectedVisit)"
+              step="0.01"
+              [(ngModel)]="collectionAmount"
+            />
+          </div>
+
+          <button
+            type="button"
+            class="full-amount-button"
+            [disabled]="isCollecting"
+            (click)="setFullPendingAmount()"
+          >
+            Collect Full Pending Amount
+          </button>
+
+          <small>
+            Maximum collectible amount: PKR {{ formatAmount(getPendingAmount(selectedVisit)) }}
+          </small>
+        </div>
+
+        <!-- MODAL ERROR -->
+
+        @if (errorMessage) {
+          <div class="modal-error">
+            <i class="fa-solid fa-circle-exclamation"></i>
+
+            <span>
+              {{ errorMessage }}
+            </span>
+          </div>
+        }
+
+        <!-- MODAL ACTIONS -->
+
+        <div class="modal-actions">
+          <button
+            type="button"
+            class="cancel-button"
+            [disabled]="isCollecting"
+            (click)="closeCollection()"
+          >
+            Cancel
+          </button>
+
+          <button
+            type="button"
+            class="confirm-collect-button"
+            [disabled]="isCollecting || !collectionAmount || collectionAmount <= 0"
+            (click)="collectPayment()"
+          >
+            @if (isCollecting) {
+              <i class="fa-solid fa-spinner fa-spin"></i>
+
+              Collecting...
+            } @else {
+              <i class="fa-solid fa-circle-check"></i>
+
+              Confirm Collection
+            }
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

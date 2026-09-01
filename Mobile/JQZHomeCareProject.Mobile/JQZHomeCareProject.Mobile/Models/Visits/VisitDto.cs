@@ -29,8 +29,7 @@ namespace JQZHomeCareProject.Mobile.Models.Visits
         public string? SlotStart { get; set; }
         public string? SlotEnd { get; set; }
 
-        // Bind directly to this in VisitCard.
-        // Bind directly to this in VisitCard.
+        // Bind directly to this in VisitCard — 12-hour clock with AM/PM, no seconds.
         public string TimeSlot
         {
             get
@@ -38,9 +37,11 @@ namespace JQZHomeCareProject.Mobile.Models.Visits
                 if (string.IsNullOrWhiteSpace(SlotStart))
                     return "—";
 
-                return TimeSpan.TryParse(SlotStart, out var time)
-                    ? time.ToString(@"hh\:mm")
-                    : SlotStart;
+                if (!TimeSpan.TryParse(SlotStart, out var time))
+                    return SlotStart;
+
+                // TimeSpan has no native AM/PM formatting, so route through DateTime.
+                return DateTime.Today.Add(time).ToString("h:mm tt");
             }
         }
 
@@ -88,6 +89,19 @@ namespace JQZHomeCareProject.Mobile.Models.Visits
                 if (date == today) return "Today";
                 if (date == today.AddDays(-1)) return "Yesterday";
                 return date.ToString("d MMM yyyy");
+            }
+        }
+
+        // Combines ScheduledDate + SlotStart into a single comparable DateTime.
+        public DateTime? ScheduledDateTime
+        {
+            get
+            {
+                if (!ScheduledDate.HasValue) return null;
+
+                return TimeSpan.TryParse(SlotStart, out var time)
+                    ? ScheduledDate.Value.Date.Add(time)
+                    : ScheduledDate.Value.Date;
             }
         }
 

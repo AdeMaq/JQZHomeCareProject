@@ -5,10 +5,8 @@
              xmlns:models="clr-namespace:JQZHomeCareProject.Mobile.Models.Visits"
              x:Class="JQZHomeCareProject.Mobile.Views.Visits.VisitsListPage"
              x:DataType="vm:VisitsListViewModel"
-             Shell.NavBarIsVisible="False"
-             NavigationPage.HasNavigationBar="False"
-             BackgroundColor="#F6F7FB"
-             Title="Visits">
+             Title="Visits"
+             BackgroundColor="#FBF4F4">
 
     <ContentPage.Resources>
         <ResourceDictionary>
@@ -20,11 +18,11 @@
             <Color x:Key="InkMuted">#8A8FA3</Color>
             <Color x:Key="HairLine">#E4E7EF</Color>
 
-            <LinearGradientBrush x:Key="HeaderBrush" StartPoint="0,0" EndPoint="1,1">
-                <GradientStop Color="#C9101A" Offset="0.0" />
-                <GradientStop Color="#E11B22" Offset="0.55" />
-                <GradientStop Color="#FF4A50" Offset="1.0" />
-            </LinearGradientBrush>
+            <Shadow x:Key="CardShadow"
+                    Brush="#191A2E"
+                    Offset="0,6"
+                    Radius="16"
+                    Opacity="0.08" />
 
             <Style x:Key="FilterChip" TargetType="Button">
                 <Setter Property="BackgroundColor" Value="White" />
@@ -36,6 +34,16 @@
                 <Setter Property="FontSize" Value="13" />
                 <Setter Property="FontAttributes" Value="Bold" />
                 <Setter Property="HeightRequest" Value="38" />
+                <Setter Property="Shadow" Value="{StaticResource CardShadow}" />
+            </Style>
+
+            <Style x:Key="VisitCard" TargetType="Border">
+                <Setter Property="StrokeShape" Value="RoundRectangle 18" />
+                <Setter Property="Stroke" Value="Transparent" />
+                <Setter Property="StrokeThickness" Value="0" />
+                <Setter Property="BackgroundColor" Value="White" />
+                <Setter Property="Padding" Value="14" />
+                <Setter Property="Shadow" Value="{StaticResource CardShadow}" />
             </Style>
 
         </ResourceDictionary>
@@ -53,166 +61,125 @@
 
             <!-- ============ HEADER ============ -->
             <CollectionView.Header>
-                <Grid>
+                <VerticalStackLayout Padding="20,18,20,6" Spacing="16">
 
-                    <!-- Curved red wash -->
-                    <Border VerticalOptions="Start"
-                            HeightRequest="150"
-                            Background="{StaticResource HeaderBrush}"
+                    <!-- Filter chips -->
+                    <ScrollView Orientation="Horizontal"
+                                HorizontalScrollBarVisibility="Never">
+                        <HorizontalStackLayout Spacing="10" Padding="2,4,2,4">
+
+                            <Button Text="Week"
+                                    Style="{StaticResource FilterChip}"
+                                    Command="{Binding ChangeFilterCommand}"
+                                    CommandParameter="{x:Static vm:VisitDateFilter.Week}">
+                                <Button.Triggers>
+                                    <DataTrigger TargetType="Button"
+                                                 Binding="{Binding SelectedFilter, Converter={StaticResource EnumEqualsConverter}, ConverterParameter=Week}"
+                                                 Value="True">
+                                        <Setter Property="BackgroundColor" Value="{StaticResource JqzRed}" />
+                                        <Setter Property="TextColor" Value="White" />
+                                        <Setter Property="BorderColor" Value="{StaticResource JqzRed}" />
+                                    </DataTrigger>
+                                </Button.Triggers>
+                            </Button>
+
+                            <Button Text="Month"
+                                    Style="{StaticResource FilterChip}"
+                                    Command="{Binding ChangeFilterCommand}"
+                                    CommandParameter="{x:Static vm:VisitDateFilter.Month}">
+                                <Button.Triggers>
+                                    <DataTrigger TargetType="Button"
+                                                 Binding="{Binding SelectedFilter, Converter={StaticResource EnumEqualsConverter}, ConverterParameter=Month}"
+                                                 Value="True">
+                                        <Setter Property="BackgroundColor" Value="{StaticResource JqzRed}" />
+                                        <Setter Property="TextColor" Value="White" />
+                                        <Setter Property="BorderColor" Value="{StaticResource JqzRed}" />
+                                    </DataTrigger>
+                                </Button.Triggers>
+                            </Button>
+
+                            <Button Text="Custom"
+                                    Style="{StaticResource FilterChip}"
+                                    Command="{Binding ChangeFilterCommand}"
+                                    CommandParameter="{x:Static vm:VisitDateFilter.Custom}">
+                                <Button.Triggers>
+                                    <DataTrigger TargetType="Button"
+                                                 Binding="{Binding SelectedFilter, Converter={StaticResource EnumEqualsConverter}, ConverterParameter=Custom}"
+                                                 Value="True">
+                                        <Setter Property="BackgroundColor" Value="{StaticResource JqzRed}" />
+                                        <Setter Property="TextColor" Value="White" />
+                                        <Setter Property="BorderColor" Value="{StaticResource JqzRed}" />
+                                    </DataTrigger>
+                                </Button.Triggers>
+                            </Button>
+
+                        </HorizontalStackLayout>
+                    </ScrollView>
+
+                    <!-- Custom range card -->
+                    <Border IsVisible="{Binding IsCustomRangeVisible}"
+                            Style="{StaticResource VisitCard}">
+                        <VerticalStackLayout Spacing="10">
+
+                            <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                                <VerticalStackLayout Grid.Column="0" Spacing="4">
+                                    <Label Text="From" FontSize="11" TextColor="{StaticResource InkMuted}" Margin="4,0,0,0" />
+                                    <Border StrokeShape="RoundRectangle 12"
+                                            Stroke="{StaticResource HairLine}"
+                                            StrokeThickness="1"
+                                            Padding="10,0"
+                                            HeightRequest="44">
+                                        <DatePicker Date="{Binding CustomStartDate}"
+                                                    Format="dd MMM yyyy"
+                                                    FontSize="13"
+                                                    TextColor="{StaticResource InkDark}"
+                                                    BackgroundColor="Transparent"
+                                                    VerticalOptions="Center" />
+                                    </Border>
+                                </VerticalStackLayout>
+
+                                <VerticalStackLayout Grid.Column="1" Spacing="4">
+                                    <Label Text="To" FontSize="11" TextColor="{StaticResource InkMuted}" Margin="4,0,0,0" />
+                                    <Border StrokeShape="RoundRectangle 12"
+                                            Stroke="{StaticResource HairLine}"
+                                            StrokeThickness="1"
+                                            Padding="10,0"
+                                            HeightRequest="44">
+                                        <DatePicker Date="{Binding CustomEndDate}"
+                                                    Format="dd MMM yyyy"
+                                                    FontSize="13"
+                                                    TextColor="{StaticResource InkDark}"
+                                                    BackgroundColor="Transparent"
+                                                    VerticalOptions="Center" />
+                                    </Border>
+                                </VerticalStackLayout>
+                            </Grid>
+
+                            <Button Text="Apply Range"
+                                    Command="{Binding ApplyCustomRangeCommand}"
+                                    BackgroundColor="{StaticResource JqzRed}"
+                                    TextColor="White"
+                                    FontSize="14"
+                                    FontAttributes="Bold"
+                                    HeightRequest="44"
+                                    CornerRadius="12" />
+
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <!-- Error -->
+                    <Border BackgroundColor="{StaticResource JqzRedSoft}"
                             Stroke="Transparent"
                             StrokeThickness="0"
-                            StrokeShape="RoundRectangle 0,0,44,44" />
+                            StrokeShape="RoundRectangle 12"
+                            Padding="14,10"
+                            IsVisible="{Binding ErrorMessage, Converter={StaticResource StringNotEmptyConverter}}">
+                        <Label Text="{Binding ErrorMessage}"
+                               FontSize="13"
+                               TextColor="{StaticResource JqzRedDark}" />
+                    </Border>
 
-                    <VerticalStackLayout Padding="20,0,20,8" Spacing="0">
-
-                        <!-- Title block -->
-                        <VerticalStackLayout Spacing="3" Margin="2,22,0,0">
-                            <Label Text="Visits"
-                                   FontSize="26"
-                                   FontAttributes="Bold"
-                                   TextColor="White" />
-                            <Label Text="Your scheduled appointments"
-                                   FontSize="13"
-                                   TextColor="#FFCED1" />
-                        </VerticalStackLayout>
-
-                        <!-- Filter chips, floating over the curve -->
-                        <ScrollView Orientation="Horizontal"
-                                    HorizontalScrollBarVisibility="Never"
-                                    Margin="0,22,0,0">
-                            <HorizontalStackLayout Spacing="10" Padding="2,4,2,10">
-
-                                <Button Text="Week"
-                                        Style="{StaticResource FilterChip}"
-                                        Command="{Binding ChangeFilterCommand}"
-                                        CommandParameter="{x:Static vm:VisitDateFilter.Week}">
-                                    <Button.Shadow>
-                                        <Shadow Brush="#191A2E" Offset="0,4" Radius="12" Opacity="0.10" />
-                                    </Button.Shadow>
-                                    <Button.Triggers>
-                                        <DataTrigger TargetType="Button"
-                                                     Binding="{Binding SelectedFilter, Converter={StaticResource EnumEqualsConverter}, ConverterParameter=Week}"
-                                                     Value="True">
-                                            <Setter Property="BackgroundColor" Value="{StaticResource JqzRed}" />
-                                            <Setter Property="TextColor" Value="White" />
-                                            <Setter Property="BorderColor" Value="{StaticResource JqzRed}" />
-                                        </DataTrigger>
-                                    </Button.Triggers>
-                                </Button>
-
-                                <Button Text="Month"
-                                        Style="{StaticResource FilterChip}"
-                                        Command="{Binding ChangeFilterCommand}"
-                                        CommandParameter="{x:Static vm:VisitDateFilter.Month}">
-                                    <Button.Shadow>
-                                        <Shadow Brush="#191A2E" Offset="0,4" Radius="12" Opacity="0.10" />
-                                    </Button.Shadow>
-                                    <Button.Triggers>
-                                        <DataTrigger TargetType="Button"
-                                                     Binding="{Binding SelectedFilter, Converter={StaticResource EnumEqualsConverter}, ConverterParameter=Month}"
-                                                     Value="True">
-                                            <Setter Property="BackgroundColor" Value="{StaticResource JqzRed}" />
-                                            <Setter Property="TextColor" Value="White" />
-                                            <Setter Property="BorderColor" Value="{StaticResource JqzRed}" />
-                                        </DataTrigger>
-                                    </Button.Triggers>
-                                </Button>
-
-                                <Button Text="Custom"
-                                        Style="{StaticResource FilterChip}"
-                                        Command="{Binding ChangeFilterCommand}"
-                                        CommandParameter="{x:Static vm:VisitDateFilter.Custom}">
-                                    <Button.Shadow>
-                                        <Shadow Brush="#191A2E" Offset="0,4" Radius="12" Opacity="0.10" />
-                                    </Button.Shadow>
-                                    <Button.Triggers>
-                                        <DataTrigger TargetType="Button"
-                                                     Binding="{Binding SelectedFilter, Converter={StaticResource EnumEqualsConverter}, ConverterParameter=Custom}"
-                                                     Value="True">
-                                            <Setter Property="BackgroundColor" Value="{StaticResource JqzRed}" />
-                                            <Setter Property="TextColor" Value="White" />
-                                            <Setter Property="BorderColor" Value="{StaticResource JqzRed}" />
-                                        </DataTrigger>
-                                    </Button.Triggers>
-                                </Button>
-
-                            </HorizontalStackLayout>
-                        </ScrollView>
-
-                        <!-- Custom range card -->
-                        <Border IsVisible="{Binding IsCustomRangeVisible}"
-                                BackgroundColor="White"
-                                Stroke="Transparent"
-                                StrokeThickness="0"
-                                StrokeShape="RoundRectangle 18"
-                                Padding="14"
-                                Margin="0,6,0,0">
-                            <Border.Shadow>
-                                <Shadow Brush="#191A2E" Offset="0,6" Radius="16" Opacity="0.08" />
-                            </Border.Shadow>
-                            <VerticalStackLayout Spacing="10">
-
-                                <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
-                                    <VerticalStackLayout Grid.Column="0" Spacing="4">
-                                        <Label Text="From" FontSize="11" TextColor="{StaticResource InkMuted}" Margin="4,0,0,0" />
-                                        <Border StrokeShape="RoundRectangle 12"
-                                                Stroke="{StaticResource HairLine}"
-                                                StrokeThickness="1"
-                                                Padding="10,0"
-                                                HeightRequest="44">
-                                            <DatePicker Date="{Binding CustomStartDate}"
-                                                        Format="dd MMM yyyy"
-                                                        FontSize="13"
-                                                        TextColor="{StaticResource InkDark}"
-                                                        BackgroundColor="Transparent"
-                                                        VerticalOptions="Center" />
-                                        </Border>
-                                    </VerticalStackLayout>
-
-                                    <VerticalStackLayout Grid.Column="1" Spacing="4">
-                                        <Label Text="To" FontSize="11" TextColor="{StaticResource InkMuted}" Margin="4,0,0,0" />
-                                        <Border StrokeShape="RoundRectangle 12"
-                                                Stroke="{StaticResource HairLine}"
-                                                StrokeThickness="1"
-                                                Padding="10,0"
-                                                HeightRequest="44">
-                                            <DatePicker Date="{Binding CustomEndDate}"
-                                                        Format="dd MMM yyyy"
-                                                        FontSize="13"
-                                                        TextColor="{StaticResource InkDark}"
-                                                        BackgroundColor="Transparent"
-                                                        VerticalOptions="Center" />
-                                        </Border>
-                                    </VerticalStackLayout>
-                                </Grid>
-
-                                <Button Text="Apply Range"
-                                        Command="{Binding ApplyCustomRangeCommand}"
-                                        BackgroundColor="{StaticResource JqzRed}"
-                                        TextColor="White"
-                                        FontSize="14"
-                                        FontAttributes="Bold"
-                                        HeightRequest="44"
-                                        CornerRadius="12" />
-
-                            </VerticalStackLayout>
-                        </Border>
-
-                        <!-- Error -->
-                        <Border BackgroundColor="{StaticResource JqzRedSoft}"
-                                Stroke="Transparent"
-                                StrokeThickness="0"
-                                StrokeShape="RoundRectangle 12"
-                                Padding="14,10"
-                                Margin="0,10,0,0"
-                                IsVisible="{Binding ErrorMessage, Converter={StaticResource StringNotEmptyConverter}}">
-                            <Label Text="{Binding ErrorMessage}"
-                                   FontSize="13"
-                                   TextColor="{StaticResource JqzRedDark}" />
-                        </Border>
-
-                    </VerticalStackLayout>
-                </Grid>
+                </VerticalStackLayout>
             </CollectionView.Header>
 
             <!-- ============ DATE GROUP HEADER ============ -->
@@ -223,17 +190,17 @@
                                  WidthRequest="6"
                                  HeightRequest="6"
                                  CornerRadius="3"
-                                 Color="#E11B22"
+                                 Color="{StaticResource JqzRed}"
                                  VerticalOptions="Center" />
                         <Label Grid.Column="1"
                                Text="{Binding DateLabel}"
                                FontSize="13"
                                FontAttributes="Bold"
-                               TextColor="#191A2E"
+                               TextColor="{StaticResource InkDark}"
                                VerticalOptions="Center" />
                         <BoxView Grid.Column="2"
                                  HeightRequest="1"
-                                 Color="#E9EBF2"
+                                 Color="{StaticResource HairLine}"
                                  VerticalOptions="Center"
                                  Margin="6,0,0,0" />
                     </Grid>
@@ -244,57 +211,35 @@
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="models:VisitDto">
                     <Grid Padding="20,6">
-                        <Border StrokeShape="RoundRectangle 18"
-                                Stroke="Transparent"
-                                StrokeThickness="0"
-                                BackgroundColor="White"
-                                Padding="14">
-                            <Border.Shadow>
-                                <Shadow Brush="#191A2E" Offset="0,6" Radius="16" Opacity="0.07" />
-                            </Border.Shadow>
+                        <Border Style="{StaticResource VisitCard}">
                             <Border.GestureRecognizers>
                                 <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:VisitsListViewModel}}, Path=OpenVisitCommand}"
                                                       CommandParameter="{Binding .}" />
                             </Border.GestureRecognizers>
 
-                            <Grid ColumnDefinitions="Auto,4,*,Auto" ColumnSpacing="12">
+                            <Grid ColumnDefinitions="70,*,Auto" ColumnSpacing="10">
 
-                                <!-- Time pill -->
-                                <Border Grid.Column="0"
-                                        WidthRequest="66"
-                                        BackgroundColor="#FDECEC"
-                                        Stroke="Transparent"
-                                        StrokeThickness="0"
-                                        StrokeShape="RoundRectangle 12"
-                                        Padding="6,10"
-                                        VerticalOptions="Center">
-                                    <Label Text="{Binding TimeSlot}"
-                                           FontSize="12"
-                                           FontAttributes="Bold"
-                                           TextColor="#C9101A"
-                                           HorizontalTextAlignment="Center" />
-                                </Border>
+                                <!-- Time -->
+                                <Label Grid.Column="0"
+                                       Text="{Binding TimeSlot}"
+                                       FontSize="13.5"
+                                       FontAttributes="Bold"
+                                       TextColor="{StaticResource JqzRed}"
+                                       VerticalOptions="Center" />
 
-                                <BoxView Grid.Column="1"
-                                         WidthRequest="3"
-                                         HeightRequest="34"
-                                         CornerRadius="2"
-                                         Color="#F3D5D6"
-                                         VerticalOptions="Center" />
-
-                                <VerticalStackLayout Grid.Column="2" Spacing="3" VerticalOptions="Center">
+                                <VerticalStackLayout Grid.Column="1" Spacing="3" VerticalOptions="Center">
                                     <Label Text="{Binding PatientName}"
                                            FontSize="15"
                                            FontAttributes="Bold"
-                                           TextColor="#191A2E" />
+                                           TextColor="{StaticResource InkDark}" />
                                     <Label Text="{Binding AreaName}"
                                            FontSize="12.5"
-                                           TextColor="#8A8FA3"
+                                           TextColor="{StaticResource InkMuted}"
                                            LineBreakMode="TailTruncation" />
                                 </VerticalStackLayout>
 
                                 <!-- Status badge -->
-                                <Border Grid.Column="3"
+                                <Border Grid.Column="2"
                                         StrokeShape="RoundRectangle 9"
                                         Stroke="Transparent"
                                         StrokeThickness="0"
@@ -317,7 +262,7 @@
                 <VerticalStackLayout Padding="30,36" Spacing="14" HorizontalOptions="Center">
                     <Border WidthRequest="76"
                             HeightRequest="76"
-                            BackgroundColor="#FDECEC"
+                            BackgroundColor="{StaticResource JqzRedSoft}"
                             Stroke="Transparent"
                             StrokeThickness="0"
                             StrokeShape="RoundRectangle 26"
@@ -330,11 +275,11 @@
                     <Label Text="No visits in this range"
                            FontSize="15"
                            FontAttributes="Bold"
-                           TextColor="#191A2E"
+                           TextColor="{StaticResource InkDark}"
                            HorizontalTextAlignment="Center" />
                     <Label Text="Try a different date filter."
                            FontSize="13"
-                           TextColor="#8A8FA3"
+                           TextColor="{StaticResource InkMuted}"
                            HorizontalTextAlignment="Center" />
                 </VerticalStackLayout>
             </CollectionView.EmptyView>

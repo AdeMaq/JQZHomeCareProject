@@ -7,6 +7,7 @@ using JQZHomeCareProject.Mobile.Services.Api;
 using JQZHomeCareProject.Mobile.Services.Auth;
 using JQZHomeCareProject.Mobile.Services.Navigation;
 using JQZHomeCareProject.Mobile.ViewModels.Base;
+using Microsoft.Maui.Dispatching;
 
 namespace JQZHomeCareProject.Mobile.ViewModels.Visits
 {
@@ -15,21 +16,40 @@ namespace JQZHomeCareProject.Mobile.ViewModels.Visits
         private readonly IVisitsApi _visitsApi;
         private readonly ISessionService _session;
         private readonly INavigationService _navigation;
+        private readonly IDispatcherTimer _overdueTimer;
 
         private Guid _practitionerId;
 
-        [ObservableProperty] private ObservableCollection<VisitDto> upcomingVisits = new();
+        [ObservableProperty] private ObservableCollection<UpcomingVisitItem> upcomingVisits = new();
         [ObservableProperty] private ObservableCollection<VisitDto> inProgressVisits = new();
         [ObservableProperty] private ObservableCollection<VisitDto> completedVisits = new();
         [ObservableProperty] private ObservableCollection<VisitDto> cancelledVisits = new();
         [ObservableProperty] private bool hasNoVisits;
 
-        public VisitsViewModel(IVisitsApi visitsApi, ISessionService session, INavigationService navigation)
+        public VisitsViewModel(
+            IVisitsApi visitsApi,
+            ISessionService session,
+            INavigationService navigation,
+            IDispatcher dispatcher)
         {
             _visitsApi = visitsApi;
             _session = session;
             _navigation = navigation;
             Title = "Visits";
+
+            // Ticks every 30s to recalc "X min/hrs/days late" labels on Upcoming items.
+            _overdueTimer = dispatcher.CreateTimer();
+            _overdueTimer.Interval = TimeSpan.FromSeconds(30);
+            _overdueTimer.Tick += (_, _) => RefreshOverdueFlags();
+        }
+
+        public void StartOverdueTimer() => _overdueTimer.Start();
+        public void StopOverdueTimer() => _overdueTimer.Stop();
+
+        private void RefreshOverdueFlags()
+        {
+            foreach (var item in UpcomingVisits)
+                item.Refresh();
         }
 
         [RelayCommand]
@@ -45,15 +65,14 @@ namespace JQZHomeCareProject.Mobile.ViewModels.Visits
                 }
                 _practitionerId = practitionerId.Value;
 
-                // NOTE: same client-side filtering pattern used in VisitsListViewModel —
-                // GET /api/visits currently returns every practitioner's visits.
                 var all = await _visitsApi.GetAllAsync();
                 var mine = all.Where(v => v.PractitionerId == _practitionerId).ToList();
 
-                UpcomingVisits = new ObservableCollection<VisitDto>(
+                UpcomingVisits = new ObservableCollection<UpcomingVisitItem>(
                     mine.Where(v => v.Status == VisitStatus.Scheduled)
                         .OrderBy(v => v.ScheduledDate)
-                        .ThenBy(v => v.SlotStart));
+                        .ThenBy(v => v.SlotStart)
+                        .Select(v => new UpcomingVisitItem(v)));
 
                 InProgressVisits = new ObservableCollection<VisitDto>(
                     mine.Where(v => v.Status == VisitStatus.InProgress)

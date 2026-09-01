@@ -85,7 +85,7 @@
       </div>
     </div>
 
-    <!-- RECEIVED -->
+    <!-- TOTAL RECEIVED -->
 
     <div class="summary-card">
       <div class="summary-card-icon received-icon">
@@ -99,7 +99,7 @@
       </div>
     </div>
 
-    <!-- PENDING -->
+    <!-- TOTAL PENDING -->
 
     <div class="summary-card">
       <div class="summary-card-icon pending-icon">
@@ -113,7 +113,7 @@
       </div>
     </div>
 
-    <!-- VISITS -->
+    <!-- PAYMENT VISITS -->
 
     <div class="summary-card">
       <div class="summary-card-icon visits-icon">
@@ -136,10 +136,12 @@
   </div>
 
   <!-- ========================================================= -->
-  <!-- FILTER CARD -->
+  <!-- PAYMENT COLLECTION SECTION -->
   <!-- ========================================================= -->
 
   <div class="section-card">
+    <!-- SECTION HEADER -->
+
     <div class="section-header">
       <div>
         <h2>
@@ -150,6 +152,10 @@
         <p>Review payment information for every visit.</p>
       </div>
     </div>
+
+    <!-- ======================================================= -->
+    <!-- FILTERS -->
+    <!-- ======================================================= -->
 
     <div class="filters">
       <!-- SEARCH -->
@@ -239,7 +245,7 @@
                       {{ visit.patientName.charAt(0).toUpperCase() }}
                     </div>
 
-                    <div>
+                    <div class="patient-details">
                       <strong>
                         {{ visit.patientName }}
                       </strong>
@@ -290,7 +296,7 @@
                 </td>
 
                 <!-- ================================================= -->
-                <!-- PAYMENT -->
+                <!-- PAYMENT & COLLECTION -->
                 <!-- ================================================= -->
 
                 <td>
@@ -301,19 +307,19 @@
 
                     <div class="payment-values">
                       <div>
-                        <span>Amount Due</span>
+                        <span> Amount Due </span>
 
                         <strong> PKR {{ formatAmount(visit.amountDue) }} </strong>
                       </div>
 
                       <div>
-                        <span>Amount Received</span>
+                        <span> Amount Received </span>
 
                         <strong> PKR {{ formatAmount(visit.amountReceived) }} </strong>
                       </div>
 
                       <div>
-                        <span>Amount Pending</span>
+                        <span> Amount Pending </span>
 
                         <strong class="pending-amount">
                           PKR {{ formatAmount(getPendingAmount(visit)) }}
@@ -341,7 +347,7 @@
                     } @else if (visit.receivedBy === 'Company') {
                       <i class="fa-solid fa-building"></i>
                     } @else {
-                      <i class="fa-solid fa-minus"></i>
+                      <i class="fa-solid fa-clock"></i>
                     }
 
                     {{ getReceivedBy(visit) }}
@@ -357,6 +363,7 @@
                     <div class="settlement-cell">
                       <span class="settlement-available">
                         <i class="fa-solid fa-link"></i>
+
                         Available
                       </span>
 
@@ -365,7 +372,11 @@
                       </small>
                     </div>
                   } @else {
-                    <span class="settlement-unavailable"> Not available </span>
+                    <span class="settlement-unavailable">
+                      <i class="fa-solid fa-circle-minus"></i>
+
+                      Not available
+                    </span>
                   }
                 </td>
 
@@ -431,10 +442,12 @@
   @if (selectedVisit) {
     <div class="modal-backdrop" (click)="closeCollection()">
       <div class="collection-modal" (click)="$event.stopPropagation()">
+        <!-- ===================================================== -->
         <!-- MODAL HEADER -->
+        <!-- ===================================================== -->
 
         <div class="modal-header">
-          <div>
+          <div class="modal-header-content">
             <div class="modal-icon">
               <i class="fa-solid fa-hand-holding-dollar"></i>
             </div>
@@ -456,14 +469,16 @@
           </button>
         </div>
 
+        <!-- ===================================================== -->
         <!-- VISIT INFORMATION -->
+        <!-- ===================================================== -->
 
         <div class="modal-visit">
           <div class="modal-patient-avatar">
             {{ selectedVisit.patientName.charAt(0).toUpperCase() }}
           </div>
 
-          <div>
+          <div class="modal-visit-details">
             <strong>
               {{ selectedVisit.patientName }}
             </strong>
@@ -481,35 +496,39 @@
           </div>
         </div>
 
+        <!-- ===================================================== -->
         <!-- PAYMENT SUMMARY -->
+        <!-- ===================================================== -->
 
         <div class="modal-payment-summary">
           <div>
-            <span>Amount Due</span>
+            <span> Amount Due </span>
 
             <strong> PKR {{ formatAmount(selectedVisit.amountDue) }} </strong>
           </div>
 
           <div>
-            <span>Already Received</span>
+            <span> Already Received </span>
 
             <strong> PKR {{ formatAmount(selectedVisit.amountReceived) }} </strong>
           </div>
 
           <div class="modal-pending">
-            <span>Amount Pending</span>
+            <span> Amount Pending </span>
 
             <strong> PKR {{ formatAmount(getPendingAmount(selectedVisit)) }} </strong>
           </div>
         </div>
 
-        <!-- COLLECTION AMOUNT -->
+        <!-- ===================================================== -->
+        <!-- COLLECTION FORM -->
+        <!-- ===================================================== -->
 
         <div class="collection-form">
           <label for="collectionAmount"> Collection Amount </label>
 
           <div class="amount-input-wrapper">
-            <span>PKR</span>
+            <span> PKR </span>
 
             <input
               id="collectionAmount"
@@ -535,7 +554,9 @@
           </small>
         </div>
 
+        <!-- ===================================================== -->
         <!-- MODAL ERROR -->
+        <!-- ===================================================== -->
 
         @if (errorMessage) {
           <div class="modal-error">
@@ -547,7 +568,9 @@
           </div>
         }
 
+        <!-- ===================================================== -->
         <!-- MODAL ACTIONS -->
+        <!-- ===================================================== -->
 
         <div class="modal-actions">
           <button
@@ -562,7 +585,12 @@
           <button
             type="button"
             class="confirm-collect-button"
-            [disabled]="isCollecting || !collectionAmount || collectionAmount <= 0"
+            [disabled]="
+              isCollecting ||
+              !collectionAmount ||
+              collectionAmount <= 0 ||
+              collectionAmount > getPendingAmount(selectedVisit)
+            "
             (click)="collectPayment()"
           >
             @if (isCollecting) {

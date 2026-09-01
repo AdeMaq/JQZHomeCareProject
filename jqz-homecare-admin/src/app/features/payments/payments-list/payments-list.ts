@@ -1,6 +1,7 @@
 import { CommonModule, DatePipe, DecimalPipe } from '@angular/common';
 import { ChangeDetectorRef, Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { finalize, Subscription } from 'rxjs';
 
 import { PractitionerSettlement, WeeklySettlement } from '../payments.interface';
@@ -12,7 +13,7 @@ import { Practitioner, PractitionerService } from '../../../core/services/practi
 @Component({
   selector: 'app-payments-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, DatePipe, DecimalPipe],
+  imports: [CommonModule, FormsModule, DatePipe, DecimalPipe, RouterLink],
   templateUrl: './payments-list.html',
   styleUrl: './payments-list.css',
 })

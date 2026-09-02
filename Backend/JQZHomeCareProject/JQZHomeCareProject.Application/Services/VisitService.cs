@@ -78,10 +78,22 @@ namespace JQZHomeCareProject.Application.Services
             await _unitOfWork.ExecuteInTransactionAsync(async () =>
             {
                 var amountPaid = dto.PaymentType == PackagePaymentType.FullAdvance
-                    ? package.Amount
-                    : dto.InitialAmountPaid!.Value;
+                                ? package.Amount
+                                : dto.InitialAmountPaid!.Value;
 
                 var amountPending = package.Amount - amountPaid;
+
+                CollectionStatus initialCollectionStatus;
+                if (dto.PaymentType == PackagePaymentType.FullAdvance)
+                {
+                    initialCollectionStatus = CollectionStatus.Received;
+                }
+                else 
+                {
+                    initialCollectionStatus = amountPending > 0
+                        ? CollectionStatus.InstallmentPending
+                        : CollectionStatus.Received;
+                }
 
                 patientPackage = new PatientPackage
                 {
@@ -92,9 +104,7 @@ namespace JQZHomeCareProject.Application.Services
                     TotalAmount = package.Amount,
                     AmountPaid = amountPaid,
                     AmountPending = amountPending,
-                    CollectionStatus = dto.PaymentType == PackagePaymentType.Installment && amountPending > 0
-                            ? CollectionStatus.InstallmentPending
-                            : CollectionStatus.Received,
+                    CollectionStatus = initialCollectionStatus,
                     Status = PatientPackageStatus.Active,
                     PurchaseDate = DateTime.UtcNow
                 };
@@ -161,6 +171,7 @@ namespace JQZHomeCareProject.Application.Services
 
             if (dto.Amount <= 0)
                 throw new ValidationException("Installment amount must be greater than zero.");
+
             if (dto.Amount > patientPackage.AmountPending)
                 throw new ValidationException("Installment amount exceeds the amount pending.");
 
@@ -449,14 +460,23 @@ namespace JQZHomeCareProject.Application.Services
                 throw new ValidationException("Cannot collect payment for a cancelled visit.");
 
             if (visit.CollectionStatus == CollectionStatus.Received)
-                throw new ValidationException("Payment has already been collected for this visit.");
+                throw new ValidationException("Payment has already been fully collected for this visit.");
+
+            if (visit.ReceivedBy == ReceivedByType.Practitioner)
+                throw new ValidationException("Payment is already being collected by the practitioner for this visit; it cannot also be collected by the company.");
 
             if (dto.Amount <= 0)
                 throw new ValidationException("Amount must be greater than zero.");
 
+            var remainingDue = visit.AmountDue - visit.AmountReceived;
+            if (dto.Amount > remainingDue)
+                throw new ValidationException($"Amount ({dto.Amount}) exceeds the remaining balance due ({remainingDue}) for this visit.");
+
             visit.ReceivedBy = ReceivedByType.Company;
-            visit.AmountReceived = dto.Amount;
-            visit.CollectionStatus = CollectionStatus.Received;
+            visit.AmountReceived += dto.Amount;
+            visit.CollectionStatus = visit.AmountReceived == visit.AmountDue
+                ? CollectionStatus.Received
+                : CollectionStatus.InstallmentPending;
 
             await _visitRepository.UpdateAsync(visit);
         }
@@ -473,14 +493,20 @@ namespace JQZHomeCareProject.Application.Services
                 throw new ValidationException("Payment was already collected by the company for this visit; it cannot be marked received by the practitioner.");
 
             if (visit.CollectionStatus == CollectionStatus.Received)
-                throw new ValidationException("Payment has already been marked as received for this visit.");
+                throw new ValidationException("Payment has already been fully received for this visit.");
 
             if (dto.Amount <= 0)
                 throw new ValidationException("Amount must be greater than zero.");
 
+            var remainingDue = visit.AmountDue - visit.AmountReceived;
+            if (dto.Amount > remainingDue)
+                throw new ValidationException($"Amount ({dto.Amount}) exceeds the remaining balance due ({remainingDue}) for this visit.");
+
             visit.ReceivedBy = ReceivedByType.Practitioner;
-            visit.AmountReceived = dto.Amount;
-            visit.CollectionStatus = CollectionStatus.Received;
+            visit.AmountReceived += dto.Amount;
+            visit.CollectionStatus = visit.AmountReceived == visit.AmountDue
+                ? CollectionStatus.Received
+                : CollectionStatus.InstallmentPending;
 
             await _visitRepository.UpdateAsync(visit);
         }

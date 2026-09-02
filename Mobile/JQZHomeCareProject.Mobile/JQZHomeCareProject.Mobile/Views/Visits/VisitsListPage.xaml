@@ -2,11 +2,17 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:JQZHomeCareProject.Mobile.ViewModels.Visits"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              xmlns:models="clr-namespace:JQZHomeCareProject.Mobile.Models.Visits"
              x:Class="JQZHomeCareProject.Mobile.Views.Visits.VisitsListPage"
              x:DataType="vm:VisitsListViewModel"
              Title="Visits"
              BackgroundColor="#FBF4F4">
+
+    <ContentPage.Behaviors>
+        <toolkit:StatusBarBehavior StatusBarColor="#E11B22"
+                                     StatusBarStyle="LightContent" />
+    </ContentPage.Behaviors>
 
     <ContentPage.Resources>
         <ResourceDictionary>

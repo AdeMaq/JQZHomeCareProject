@@ -501,6 +501,9 @@ export class VisitsList implements OnInit {
       case 'Pending':
         return 'collection-pending';
 
+      case 'InstallmentPending':
+        return 'collection-installment-pending';
+
       default:
         return '';
     }

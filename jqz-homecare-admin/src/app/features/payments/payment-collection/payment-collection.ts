@@ -19,7 +19,6 @@ export class PaymentCollection implements OnInit {
   // ============================================================
 
   private readonly visitsService = inject(VisitsService);
-
   private readonly cdr = inject(ChangeDetectorRef);
 
   // ============================================================
@@ -52,10 +51,10 @@ export class PaymentCollection implements OnInit {
 
   searchTerm = '';
 
-  selectedCollectionStatus: CollectionStatus | 'All' = 'All';
+  selectedCollectionStatus: 'All' | CollectionStatus = 'All';
 
   // ============================================================
-  // COLLECTION FORM
+  // COLLECTION MODAL
   // ============================================================
 
   collectionAmount = 0;
@@ -76,38 +75,27 @@ export class PaymentCollection implements OnInit {
 
   loadPaymentCollections(): void {
     this.isLoading = true;
-
     this.errorMessage = '';
-
-    this.cdr.detectChanges();
 
     this.visitsService
       .getAll()
       .pipe(
         finalize(() => {
           this.isLoading = false;
-
           this.cdr.detectChanges();
         }),
       )
       .subscribe({
-        next: (visits: Visit[]) => {
-          this.visits = Array.isArray(visits) ? visits : [];
-
-          this.cdr.detectChanges();
+        next: (visits) => {
+          this.visits = visits;
         },
 
-        error: (error: unknown) => {
-          console.error('Error loading payment collections:', error);
+        error: (error) => {
+          console.error('Failed to load payment collections:', error);
+
+          this.errorMessage = this.getErrorMessage(error, 'Failed to load payment collections.');
 
           this.visits = [];
-
-          this.errorMessage = this.getErrorMessage(
-            error,
-            'Unable to load payment collection information. Please try again.',
-          );
-
-          this.cdr.detectChanges();
         },
       });
   }
@@ -120,23 +108,32 @@ export class PaymentCollection implements OnInit {
     const search = this.searchTerm.trim().toLowerCase();
 
     return this.visits.filter((visit) => {
+      // ----------------------------------------------------------
+      // SEARCH FILTER
+      // ----------------------------------------------------------
+
       const matchesSearch =
         !search ||
-        visit.patientName?.toLowerCase().includes(search) ||
-        visit.practitionerName?.toLowerCase().includes(search) ||
-        visit.serviceName?.toLowerCase().includes(search) ||
-        visit.areaName?.toLowerCase().includes(search);
+        (visit.patientName ?? '').toLowerCase().includes(search) ||
+        (visit.practitionerName ?? '').toLowerCase().includes(search) ||
+        (visit.serviceName ?? '').toLowerCase().includes(search) ||
+        (visit.areaName ?? '').toLowerCase().includes(search) ||
+        (visit.packageName ?? '').toLowerCase().includes(search);
 
-      const matchesCollection =
+      // ----------------------------------------------------------
+      // COLLECTION STATUS FILTER
+      // ----------------------------------------------------------
+
+      const matchesCollectionStatus =
         this.selectedCollectionStatus === 'All' ||
         visit.collectionStatus === this.selectedCollectionStatus;
 
-      return matchesSearch && matchesCollection;
+      return matchesSearch && matchesCollectionStatus;
     });
   }
 
   // ============================================================
-  // SUMMARY COUNTS
+  // SUMMARY - COUNTS
   // ============================================================
 
   get totalVisits(): number {
@@ -156,15 +153,15 @@ export class PaymentCollection implements OnInit {
   }
 
   // ============================================================
-  // SUMMARY AMOUNTS
+  // SUMMARY - AMOUNTS
   // ============================================================
 
   get totalAmountDue(): number {
-    return this.visits.reduce((total, visit) => total + Number(visit.amountDue ?? 0), 0);
+    return this.visits.reduce((total, visit) => total + (Number(visit.amountDue) || 0), 0);
   }
 
   get totalAmountReceived(): number {
-    return this.visits.reduce((total, visit) => total + Number(visit.amountReceived ?? 0), 0);
+    return this.visits.reduce((total, visit) => total + (Number(visit.amountReceived) || 0), 0);
   }
 
   get totalAmountPending(): number {
@@ -172,13 +169,19 @@ export class PaymentCollection implements OnInit {
   }
 
   // ============================================================
-  // PENDING AMOUNT
+  // PAYMENT AMOUNTS
   // ============================================================
 
+  /**
+   * Display-only calculation.
+   *
+   * CollectionStatus remains the authoritative
+   * payment state from the backend.
+   */
   getPendingAmount(visit: Visit): number {
-    const amountDue = Number(visit.amountDue ?? 0);
+    const amountDue = Number(visit.amountDue) || 0;
 
-    const amountReceived = Number(visit.amountReceived ?? 0);
+    const amountReceived = Number(visit.amountReceived) || 0;
 
     return Math.max(amountDue - amountReceived, 0);
   }
@@ -187,20 +190,26 @@ export class PaymentCollection implements OnInit {
   // PAYMENT STATE
   // ============================================================
 
+  /**
+   * CollectionStatus is authoritative.
+   *
+   * Do NOT derive the payment state from
+   * amountDue / amountReceived.
+   */
   getPaymentState(visit: Visit): string {
-    const amountDue = Number(visit.amountDue ?? 0);
+    switch (visit.collectionStatus) {
+      case 'Received':
+        return 'Payment Received';
 
-    const amountReceived = Number(visit.amountReceived ?? 0);
+      case 'InstallmentPending':
+        return 'Payment Partially Received';
 
-    if (amountReceived <= 0) {
-      return 'Payment Pending';
+      case 'Pending':
+        return 'Payment Pending';
+
+      default:
+        return 'Payment Status Unknown';
     }
-
-    if (amountReceived < amountDue) {
-      return 'Payment Partially Received';
-    }
-
-    return 'Payment Received';
   }
 
   // ============================================================
@@ -208,38 +217,26 @@ export class PaymentCollection implements OnInit {
   // ============================================================
 
   getPaymentStateClass(visit: Visit): string {
-    const amountDue = Number(visit.amountDue ?? 0);
+    switch (visit.collectionStatus) {
+      case 'Received':
+        return 'payment-received';
 
-    const amountReceived = Number(visit.amountReceived ?? 0);
+      case 'InstallmentPending':
+        return 'payment-partial';
 
-    if (amountReceived <= 0) {
-      return 'payment-pending';
+      case 'Pending':
+        return 'payment-pending';
+
+      default:
+        return 'payment-unknown';
     }
-
-    if (amountReceived < amountDue) {
-      return 'payment-partial';
-    }
-
-    return 'payment-received';
-  }
-
-  // ============================================================
-  // RECEIVED BY
-  // ============================================================
-
-  getReceivedBy(visit: Visit): string {
-    if (!visit.receivedBy) {
-      return 'Not received';
-    }
-
-    return visit.receivedBy;
   }
 
   // ============================================================
   // COLLECTION STATUS LABEL
   // ============================================================
 
-  getCollectionStatusLabel(status: CollectionStatus): string {
+  getCollectionStatusLabel(status: CollectionStatus | string | null | undefined): string {
     switch (status) {
       case 'Received':
         return 'Received';
@@ -248,8 +245,10 @@ export class PaymentCollection implements OnInit {
         return 'Installment Pending';
 
       case 'Pending':
-      default:
         return 'Pending';
+
+      default:
+        return 'Unknown';
     }
   }
 
@@ -257,7 +256,7 @@ export class PaymentCollection implements OnInit {
   // COLLECTION STATUS CLASS
   // ============================================================
 
-  getCollectionStatusClass(status: CollectionStatus): string {
+  getCollectionStatusClass(status: CollectionStatus | string | null | undefined): string {
     switch (status) {
       case 'Received':
         return 'collection-received';
@@ -266,62 +265,189 @@ export class PaymentCollection implements OnInit {
         return 'collection-installment';
 
       case 'Pending':
-      default:
         return 'collection-pending';
+
+      default:
+        return 'collection-unknown';
     }
   }
 
   // ============================================================
-  // RECEIVED BY CLASS
+  // RECEIVED BY
   // ============================================================
 
+  getReceivedBy(visit: Visit): string {
+    switch (visit.receivedBy) {
+      case 'Practitioner':
+        return 'Practitioner';
+
+      case 'Company':
+        return 'Company';
+
+      default:
+        return 'Not received';
+    }
+  }
+
   getReceivedByClass(visit: Visit): string {
-    if (!visit.receivedBy) {
-      return 'received-by-none';
+    switch (visit.receivedBy) {
+      case 'Practitioner':
+        return 'received-by-practitioner';
+
+      case 'Company':
+        return 'received-by-company';
+
+      default:
+        return 'received-by-none';
+    }
+  }
+
+  // ============================================================
+  // PAYMENT COLLECTION PERMISSION
+  // ============================================================
+
+  /**
+   * Determines whether the admin/company can collect
+   * payment through this screen.
+   *
+   * Backend rules:
+   *
+   * - Cancelled visits cannot be collected.
+   * - Received visits cannot be collected again.
+   * - Practitioner-collected payments cannot also be
+   *   collected by the company.
+   * - There must be a remaining amount to collect.
+   */
+  canCollectPayment(visit: Visit): boolean {
+    if (visit.status === 'Cancelled') {
+      return false;
+    }
+
+    if (visit.collectionStatus === 'Received') {
+      return false;
     }
 
     if (visit.receivedBy === 'Practitioner') {
-      return 'received-by-practitioner';
+      return false;
     }
 
-    return 'received-by-company';
+    if (this.getPendingAmount(visit) <= 0) {
+      return false;
+    }
+
+    return true;
   }
 
   // ============================================================
-  // FORMAT AMOUNT
+  // COLLECTION ACTION LABEL
   // ============================================================
 
-  formatAmount(amount: number | null | undefined): string {
-    return Number(amount ?? 0).toLocaleString('en-PK', {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    });
+  getCollectionActionLabel(visit: Visit): string {
+    if (visit.status === 'Cancelled') {
+      return 'Cancelled';
+    }
+
+    if (visit.collectionStatus === 'Received') {
+      return 'Paid';
+    }
+
+    if (visit.receivedBy === 'Practitioner') {
+      return 'Practitioner';
+    }
+
+    if (this.getPendingAmount(visit) <= 0) {
+      return 'Recorded';
+    }
+
+    return 'Collect';
   }
 
   // ============================================================
-  // OPEN COLLECTION
+  // COLLECTION ACTION DESCRIPTION
+  // ============================================================
+
+  getCollectionActionDescription(visit: Visit): string {
+    if (visit.status === 'Cancelled') {
+      return 'Payment cannot be collected for a cancelled visit.';
+    }
+
+    if (visit.collectionStatus === 'Received') {
+      return 'Payment has already been fully received.';
+    }
+
+    if (visit.receivedBy === 'Practitioner') {
+      return 'Payment is being collected by the practitioner.';
+    }
+
+    if (this.getPendingAmount(visit) <= 0) {
+      return 'No remaining balance is available for company collection.';
+    }
+
+    return 'Collect payment';
+  }
+
+  // ============================================================
+  // OPEN COLLECTION MODAL
   // ============================================================
 
   openCollection(visit: Visit): void {
-    const pendingAmount = this.getPendingAmount(visit);
-
-    if (pendingAmount <= 0 || visit.collectionStatus === 'Received') {
-      return;
-    }
-
-    this.selectedVisit = visit;
-
-    this.collectionAmount = pendingAmount;
-
     this.errorMessage = '';
 
     this.successMessage = '';
 
-    this.cdr.detectChanges();
+    // ----------------------------------------------------------
+    // CANCELLED VISIT
+    // ----------------------------------------------------------
+
+    if (visit.status === 'Cancelled') {
+      this.errorMessage = 'Payment cannot be collected for a cancelled visit.';
+
+      return;
+    }
+
+    // ----------------------------------------------------------
+    // ALREADY RECEIVED
+    // ----------------------------------------------------------
+
+    if (visit.collectionStatus === 'Received') {
+      this.errorMessage = 'Payment has already been fully collected for this visit.';
+
+      return;
+    }
+
+    // ----------------------------------------------------------
+    // PRACTITIONER COLLECTION
+    // ----------------------------------------------------------
+
+    if (visit.receivedBy === 'Practitioner') {
+      this.errorMessage = 'Payment is already being collected by the practitioner for this visit.';
+
+      return;
+    }
+
+    // ----------------------------------------------------------
+    // REMAINING BALANCE
+    // ----------------------------------------------------------
+
+    const pendingAmount = this.getPendingAmount(visit);
+
+    if (pendingAmount <= 0) {
+      this.errorMessage = 'There is no remaining balance to collect for this visit.';
+
+      return;
+    }
+
+    // ----------------------------------------------------------
+    // OPEN MODAL
+    // ----------------------------------------------------------
+
+    this.selectedVisit = visit;
+
+    this.collectionAmount = pendingAmount;
   }
 
   // ============================================================
-  // CLOSE COLLECTION
+  // CLOSE COLLECTION MODAL
   // ============================================================
 
   closeCollection(): void {
@@ -334,8 +460,6 @@ export class PaymentCollection implements OnInit {
     this.collectionAmount = 0;
 
     this.errorMessage = '';
-
-    this.cdr.detectChanges();
   }
 
   // ============================================================
@@ -348,8 +472,6 @@ export class PaymentCollection implements OnInit {
     }
 
     this.collectionAmount = this.getPendingAmount(this.selectedVisit);
-
-    this.cdr.detectChanges();
   }
 
   // ============================================================
@@ -357,58 +479,105 @@ export class PaymentCollection implements OnInit {
   // ============================================================
 
   collectPayment(): void {
-    if (!this.selectedVisit) {
-      return;
-    }
-
-    const pendingAmount = this.getPendingAmount(this.selectedVisit);
-
-    const amount = Number(this.collectionAmount);
-
-    if (!Number.isFinite(amount) || amount <= 0) {
-      this.errorMessage = 'Please enter a valid payment amount.';
-
-      this.cdr.detectChanges();
-
-      return;
-    }
-
-    if (amount > pendingAmount) {
-      this.errorMessage = `The collection amount cannot exceed the pending amount of PKR ${this.formatAmount(
-        pendingAmount,
-      )}.`;
-
-      this.cdr.detectChanges();
-
-      return;
-    }
-
-    const visitId = this.selectedVisit.id;
-
-    this.isCollecting = true;
-
-    this.collectingVisitId = visitId;
-
     this.errorMessage = '';
 
     this.successMessage = '';
 
-    this.cdr.detectChanges();
+    // ----------------------------------------------------------
+    // SELECTED VISIT
+    // ----------------------------------------------------------
+
+    if (!this.selectedVisit) {
+      this.errorMessage = 'Please select a visit first.';
+
+      return;
+    }
+
+    const visit = this.selectedVisit;
+
+    // ----------------------------------------------------------
+    // CANCELLED VISIT
+    // ----------------------------------------------------------
+
+    if (visit.status === 'Cancelled') {
+      this.errorMessage = 'Payment cannot be collected for a cancelled visit.';
+
+      return;
+    }
+
+    // ----------------------------------------------------------
+    // ALREADY RECEIVED
+    // ----------------------------------------------------------
+
+    if (visit.collectionStatus === 'Received') {
+      this.errorMessage = 'Payment has already been fully collected for this visit.';
+
+      return;
+    }
+
+    // ----------------------------------------------------------
+    // PRACTITIONER COLLECTION
+    // ----------------------------------------------------------
+
+    if (visit.receivedBy === 'Practitioner') {
+      this.errorMessage =
+        'Payment is already being collected by the practitioner for this visit; it cannot also be collected by the company.';
+
+      return;
+    }
+
+    // ----------------------------------------------------------
+    // AMOUNT
+    // ----------------------------------------------------------
+
+    const amount = Number(this.collectionAmount);
+
+    const pendingAmount = this.getPendingAmount(visit);
+
+    // ----------------------------------------------------------
+    // POSITIVE AMOUNT
+    // ----------------------------------------------------------
+
+    if (!Number.isFinite(amount) || amount <= 0) {
+      this.errorMessage = 'Collection amount must be greater than zero.';
+
+      return;
+    }
+
+    // ----------------------------------------------------------
+    // MAXIMUM AMOUNT
+    // ----------------------------------------------------------
+
+    if (amount > pendingAmount) {
+      this.errorMessage = `Collection amount cannot exceed the remaining balance of ${this.formatAmount(pendingAmount)}.`;
+
+      return;
+    }
+
+    // ----------------------------------------------------------
+    // START COLLECTION
+    // ----------------------------------------------------------
+
+    this.isCollecting = true;
+
+    this.collectingVisitId = visit.id;
 
     this.visitsService
-      .collectPayment(visitId, {
+      .collectPayment(visit.id, {
         amount,
       })
       .pipe(
         finalize(() => {
           this.isCollecting = false;
-
           this.collectingVisitId = null;
-
           this.cdr.detectChanges();
         }),
       )
       .subscribe({
+        // --------------------------------------------------------
+        // SUCCESS
+        // --------------------------------------------------------
+
         next: () => {
           this.successMessage = 'Payment collected successfully.';
 
@@ -416,20 +585,17 @@ export class PaymentCollection implements OnInit {
 
           this.collectionAmount = 0;
 
-          // Reload the visits so the UI reflects the
-          // authoritative values returned by the backend.
           this.loadPaymentCollections();
         },
 
-        error: (error: unknown) => {
-          console.error('Error collecting payment:', error);
+        // --------------------------------------------------------
+        // ERROR
+        // --------------------------------------------------------
 
-          this.errorMessage = this.getErrorMessage(
-            error,
-            'Failed to collect the payment. Please try again.',
-          );
+        error: (error) => {
+          console.error('Failed to collect payment:', error);
 
-          this.cdr.detectChanges();
+          this.errorMessage = this.getErrorMessage(error, 'Failed to collect payment.');
         },
       });
   }
@@ -442,8 +608,6 @@ export class PaymentCollection implements OnInit {
     this.searchTerm = '';
 
     this.selectedCollectionStatus = 'All';
-
-    this.cdr.detectChanges();
   }
 
   // ============================================================
@@ -451,35 +615,49 @@ export class PaymentCollection implements OnInit {
   // ============================================================
 
   retry(): void {
+    this.successMessage = '';
+
+    this.errorMessage = '';
+
     this.loadPaymentCollections();
   }
 
   // ============================================================
-  // BACKEND ERROR MESSAGE
+  // FORMAT AMOUNT
   // ============================================================
 
-  private getErrorMessage(error: unknown, fallbackMessage: string): string {
-    if (typeof error === 'object' && error !== null && 'error' in error) {
-      const httpError = error as {
-        error?: {
-          message?: string;
-          title?: string;
-        };
-      };
+  formatAmount(amount: number | null | undefined): string {
+    return new Intl.NumberFormat('en-PK', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(Number(amount) || 0);
+  }
 
-      if (httpError.error?.message) {
-        return httpError.error.message;
-      }
+  // ============================================================
+  // ERROR MESSAGE
+  // ============================================================
 
-      if (httpError.error?.title) {
-        return httpError.error.title;
-      }
+  private getErrorMessage(error: any, fallback: string): string {
+    if (typeof error === 'string' && error.trim()) {
+      return error;
     }
 
-    if (error instanceof Error && error.message) {
+    if (error?.error?.message) {
+      return error.error.message;
+    }
+
+    if (error?.error?.title) {
+      return error.error.title;
+    }
+
+    if (error?.message) {
       return error.message;
     }
 
-    return fallbackMessage;
+    if (Array.isArray(error?.error?.errors)) {
+      return error.error.errors.join(', ');
+    }
+
+    return fallback;
   }
 }

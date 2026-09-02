@@ -1,49 +1,51 @@
 <div class="payment-collection-page">
-  <!-- ========================================================= -->
-  <!-- PAGE HEADER -->
-  <!-- ========================================================= -->
+  <!-- ============================================================
+       PAGE HEADER
+  ============================================================ -->
 
   <div class="page-header">
-    <div class="page-header-content">
-      <div class="page-title-section">
-        <div class="page-icon">
-          <i class="fa-solid fa-money-check-dollar"></i>
-        </div>
+    <div class="page-header-left">
+      <div class="breadcrumb">
+        <span>Payments</span>
 
-        <div>
-          <h1>Payment &amp; Collection</h1>
+        <i class="fa-solid fa-chevron-right"> </i>
 
-          <p>Monitor visit payments, outstanding balances, and collection status.</p>
-        </div>
+        <span class="current"> Payment & Collection </span>
       </div>
 
+      <h1 class="page-title">Payment & Collection</h1>
+
+      <p class="page-description">
+        View visit payment status and collect outstanding company payments.
+      </p>
+    </div>
+
+    <div class="page-header-right">
       <button
         type="button"
         class="refresh-button"
         [disabled]="isLoading"
         (click)="loadPaymentCollections()"
       >
-        @if (isLoading) {
-          <i class="fa-solid fa-spinner fa-spin"></i>
-        } @else {
-          <i class="fa-solid fa-rotate-right"></i>
-        }
+        <i class="fa-solid fa-rotate" [class.fa-spin]="isLoading"> </i>
 
-        Refresh
+        <span>Refresh</span>
       </button>
     </div>
   </div>
 
-  <!-- ========================================================= -->
-  <!-- ALERTS -->
-  <!-- ========================================================= -->
+  <!-- ============================================================
+       SUCCESS MESSAGE
+  ============================================================ -->
 
   @if (successMessage) {
     <div class="alert alert-success">
-      <div class="alert-content">
+      <div class="alert-icon">
         <i class="fa-solid fa-circle-check"></i>
+      </div>
 
-        <span>{{ successMessage }}</span>
+      <div class="alert-content">
+        {{ successMessage }}
       </div>
 
       <button type="button" class="alert-close" (click)="successMessage = ''">
@@ -52,12 +54,18 @@
     </div>
   }
 
-  @if (errorMessage) {
-    <div class="alert alert-error">
-      <div class="alert-content">
-        <i class="fa-solid fa-circle-exclamation"></i>
+  <!-- ============================================================
+       ERROR MESSAGE
+  ============================================================ -->
 
-        <span>{{ errorMessage }}</span>
+  @if (errorMessage && !selectedVisit) {
+    <div class="alert alert-error">
+      <div class="alert-icon">
+        <i class="fa-solid fa-circle-exclamation"></i>
+      </div>
+
+      <div class="alert-content">
+        {{ errorMessage }}
       </div>
 
       <button type="button" class="alert-close" (click)="errorMessage = ''">
@@ -66,122 +74,145 @@
     </div>
   }
 
-  <!-- ========================================================= -->
-  <!-- SUMMARY CARDS -->
-  <!-- ========================================================= -->
+  <!-- ============================================================
+       SUMMARY CARDS
+  ============================================================ -->
 
-  <div class="summary-grid">
-    <!-- TOTAL DUE -->
+  @if (!isLoading && !errorMessage) {
+    <div class="summary-grid">
+      <!-- --------------------------------------------------------
+           TOTAL AMOUNT DUE
+      --------------------------------------------------------- -->
 
-    <div class="summary-card">
-      <div class="summary-card-icon due-icon">
-        <i class="fa-solid fa-file-invoice-dollar"></i>
-      </div>
+      <div class="summary-card">
+        <div class="summary-card-icon">
+          <i class="fa-solid fa-file-invoice-dollar"></i>
+        </div>
 
-      <div class="summary-card-content">
-        <span>Total Amount Due</span>
+        <div class="summary-card-content">
+          <span class="summary-card-label"> Total Amount Due </span>
 
-        <strong> PKR {{ formatAmount(totalAmountDue) }} </strong>
-      </div>
-    </div>
-
-    <!-- TOTAL RECEIVED -->
-
-    <div class="summary-card">
-      <div class="summary-card-icon received-icon">
-        <i class="fa-solid fa-circle-check"></i>
-      </div>
-
-      <div class="summary-card-content">
-        <span>Total Amount Received</span>
-
-        <strong> PKR {{ formatAmount(totalAmountReceived) }} </strong>
-      </div>
-    </div>
-
-    <!-- TOTAL PENDING -->
-
-    <div class="summary-card">
-      <div class="summary-card-icon pending-icon">
-        <i class="fa-solid fa-clock"></i>
-      </div>
-
-      <div class="summary-card-content">
-        <span>Total Amount Pending</span>
-
-        <strong> PKR {{ formatAmount(totalAmountPending) }} </strong>
-      </div>
-    </div>
-
-    <!-- PAYMENT VISITS -->
-
-    <div class="summary-card">
-      <div class="summary-card-icon visits-icon">
-        <i class="fa-solid fa-house-medical"></i>
-      </div>
-
-      <div class="summary-card-content">
-        <span>Payment Visits</span>
-
-        <strong>
-          {{ totalVisits }}
-        </strong>
-
-        <small>
-          {{ pendingVisits }} pending · {{ installmentVisits }} installment ·
-          {{ receivedVisits }} received
-        </small>
-      </div>
-    </div>
-  </div>
-
-  <!-- ========================================================= -->
-  <!-- PAYMENT COLLECTION SECTION -->
-  <!-- ========================================================= -->
-
-  <div class="section-card">
-    <!-- SECTION HEADER -->
-
-    <div class="section-header">
-      <div>
-        <h2>
-          <i class="fa-solid fa-filter"></i>
-          Payment Collections
-        </h2>
-
-        <p>Review payment information for every visit.</p>
-      </div>
-    </div>
-
-    <!-- ======================================================= -->
-    <!-- FILTERS -->
-    <!-- ======================================================= -->
-
-    <div class="filters">
-      <!-- SEARCH -->
-
-      <div class="form-group search-group">
-        <label for="paymentSearch"> Search </label>
-
-        <div class="search-input-wrapper">
-          <i class="fa-solid fa-magnifying-glass"></i>
-
-          <input
-            id="paymentSearch"
-            type="text"
-            [(ngModel)]="searchTerm"
-            placeholder="Search patient, practitioner, service..."
-          />
+          <strong class="summary-card-value"> Rs. {{ formatAmount(totalAmountDue) }} </strong>
         </div>
       </div>
 
-      <!-- COLLECTION STATUS -->
+      <!-- --------------------------------------------------------
+           TOTAL AMOUNT RECEIVED
+      --------------------------------------------------------- -->
 
-      <div class="form-group">
+      <div class="summary-card">
+        <div class="summary-card-icon">
+          <i class="fa-solid fa-circle-check"></i>
+        </div>
+
+        <div class="summary-card-content">
+          <span class="summary-card-label"> Total Amount Received </span>
+
+          <strong class="summary-card-value"> Rs. {{ formatAmount(totalAmountReceived) }} </strong>
+        </div>
+      </div>
+
+      <!-- --------------------------------------------------------
+           TOTAL AMOUNT PENDING
+      --------------------------------------------------------- -->
+
+      <div class="summary-card">
+        <div class="summary-card-icon">
+          <i class="fa-solid fa-clock"></i>
+        </div>
+
+        <div class="summary-card-content">
+          <span class="summary-card-label"> Total Amount Pending </span>
+
+          <strong class="summary-card-value"> Rs. {{ formatAmount(totalAmountPending) }} </strong>
+        </div>
+      </div>
+
+      <!-- --------------------------------------------------------
+           PAYMENT VISITS
+      --------------------------------------------------------- -->
+
+      <div class="summary-card">
+        <div class="summary-card-icon">
+          <i class="fa-solid fa-money-check-dollar"></i>
+        </div>
+
+        <div class="summary-card-content">
+          <span class="summary-card-label"> Payment Visits </span>
+
+          <strong class="summary-card-value">
+            {{ totalVisits }}
+          </strong>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- ============================================================
+       COLLECTION STATUS SUMMARY
+  ============================================================ -->
+
+  @if (!isLoading && !errorMessage) {
+    <div class="status-summary">
+      <div class="status-summary-item">
+        <span class="status-summary-dot pending"></span>
+
+        <span>
+          Pending:
+          <strong>{{ pendingVisits }}</strong>
+        </span>
+      </div>
+
+      <div class="status-summary-item">
+        <span class="status-summary-dot installment"></span>
+
+        <span>
+          Installment Pending:
+          <strong>{{ installmentVisits }}</strong>
+        </span>
+      </div>
+
+      <div class="status-summary-item">
+        <span class="status-summary-dot received"></span>
+
+        <span>
+          Received:
+          <strong>{{ receivedVisits }}</strong>
+        </span>
+      </div>
+    </div>
+  }
+
+  <!-- ============================================================
+       FILTERS
+  ============================================================ -->
+
+  @if (!isLoading && !errorMessage) {
+    <div class="filters-card">
+      <!-- --------------------------------------------------------
+           SEARCH
+      --------------------------------------------------------- -->
+
+      <div class="search-wrapper">
+        <i class="fa-solid fa-magnifying-glass"></i>
+
+        <input
+          type="text"
+          [(ngModel)]="searchTerm"
+          placeholder="Search patient, practitioner, service, area or package..."
+          class="search-input"
+        />
+      </div>
+
+      <!-- --------------------------------------------------------
+           COLLECTION STATUS
+      --------------------------------------------------------- -->
+
+      <div class="filter-group">
         <label for="collectionStatus"> Collection Status </label>
 
-        <select id="collectionStatus" [(ngModel)]="selectedCollectionStatus">
-          <option value="All">All Statuses</option>
+        <select id="collectionStatus" [(ngModel)]="selectedCollectionStatus" class="filter-select">
+          <option value="All">All</option>
 
           <option value="Pending">Pending</option>
 
@@ -191,67 +222,112 @@
         </select>
       </div>
 
-      <!-- CLEAR -->
+      <!-- --------------------------------------------------------
+           CLEAR FILTERS
+      --------------------------------------------------------- -->
 
-      <div class="filter-action">
-        <button type="button" class="clear-button" (click)="clearFilters()">
+      @if (searchTerm || selectedCollectionStatus !== 'All') {
+        <button type="button" class="clear-filters-button" (click)="clearFilters()">
           <i class="fa-solid fa-filter-circle-xmark"></i>
-          Clear
+
+          <span> Clear Filters </span>
         </button>
-      </div>
+      }
     </div>
+  }
 
-    <!-- ======================================================= -->
-    <!-- LOADING -->
-    <!-- ======================================================= -->
+  <!-- ============================================================
+       LOADING STATE
+  ============================================================ -->
 
-    @if (isLoading) {
-      <div class="loading-state">
-        <i class="fa-solid fa-spinner fa-spin"></i>
+  @if (isLoading) {
+    <div class="state-container loading-state">
+      <div class="spinner"></div>
 
-        <p>Loading payment collections...</p>
+      <h3>Loading payment collections...</h3>
+
+      <p>Please wait while the payment information is being loaded.</p>
+    </div>
+  }
+
+  <!-- ============================================================
+       ERROR STATE
+  ============================================================ -->
+
+  @if (!isLoading && errorMessage && !selectedVisit) {
+    <div class="state-container error-state">
+      <div class="state-icon">
+        <i class="fa-solid fa-triangle-exclamation"></i>
       </div>
-    }
 
-    <!-- ======================================================= -->
-    <!-- TABLE -->
-    <!-- ======================================================= -->
+      <h3>Unable to Load Payment Collections</h3>
 
-    @else if (filteredVisits.length > 0) {
+      <p>
+        {{ errorMessage }}
+      </p>
+
+      <button type="button" class="retry-button" (click)="retry()">
+        <i class="fa-solid fa-rotate-right"></i>
+
+        Retry
+      </button>
+    </div>
+  }
+
+  <!-- ============================================================
+       PAYMENT COLLECTION TABLE
+  ============================================================ -->
+
+  @if (!isLoading && !errorMessage && filteredVisits.length > 0) {
+    <div class="table-card">
       <div class="table-wrapper">
-        <table>
+        <table class="payment-table">
+          <!-- ==================================================
+               TABLE HEADER
+          ================================================== -->
+
           <thead>
             <tr>
               <th>Patient</th>
+
               <th>Practitioner</th>
+
               <th>Visit</th>
-              <th>Payment &amp; Collection</th>
+
+              <th>Payment & Collection</th>
+
               <th>Received By</th>
+
               <th>Settlement</th>
+
               <th>Action</th>
             </tr>
           </thead>
 
+          <!-- ==================================================
+               TABLE BODY
+          ================================================== -->
+
           <tbody>
             @for (visit of filteredVisits; track visit.id) {
               <tr>
-                <!-- ================================================= -->
-                <!-- PATIENT -->
-                <!-- ================================================= -->
+                <!-- ============================================
+                     PATIENT
+                ============================================= -->
 
                 <td>
                   <div class="patient-cell">
                     <div class="patient-avatar">
-                      {{ visit.patientName.charAt(0).toUpperCase() }}
+                      <i class="fa-solid fa-user"></i>
                     </div>
 
-                    <div class="patient-details">
-                      <strong>
-                        {{ visit.patientName }}
-                      </strong>
+                    <div class="patient-info">
+                      <span class="patient-name">
+                        {{ visit.patientName || 'Unknown Patient' }}
+                      </span>
 
                       @if (visit.patientPhone) {
-                        <span>
+                        <span class="patient-phone">
                           {{ visit.patientPhone }}
                         </span>
                       }
@@ -259,195 +335,273 @@
                   </div>
                 </td>
 
-                <!-- ================================================= -->
-                <!-- PRACTITIONER -->
-                <!-- ================================================= -->
+                <!-- ============================================
+                     PRACTITIONER
+                ============================================= -->
 
                 <td>
-                  <div class="practitioner-cell">
-                    <i class="fa-solid fa-user-doctor"></i>
+                  @if (visit.practitionerName) {
+                    <div class="practitioner-cell">
+                      <i class="fa-solid fa-user-doctor"></i>
 
-                    <span>
-                      {{ visit.practitionerName || 'Not assigned' }}
-                    </span>
-                  </div>
+                      <span>
+                        {{ visit.practitionerName }}
+                      </span>
+                    </div>
+                  } @else {
+                    <span class="not-assigned"> Not Assigned </span>
+                  }
                 </td>
 
-                <!-- ================================================= -->
-                <!-- VISIT -->
-                <!-- ================================================= -->
+                <!-- ============================================
+                     VISIT
+                ============================================= -->
 
                 <td>
                   <div class="visit-cell">
-                    <strong>
-                      {{ visit.serviceName || '-' }}
-                    </strong>
-
-                    <span>
-                      {{ visit.areaName || 'Area not available' }}
+                    <span class="service-name">
+                      {{ visit.serviceName || 'N/A' }}
                     </span>
 
+                    @if (visit.packageName) {
+                      <span class="package-name">
+                        {{ visit.packageName }}
+                      </span>
+                    }
+
                     @if (visit.scheduledDate) {
-                      <small>
+                      <span class="visit-date">
+                        <i class="fa-regular fa-calendar"></i>
+
                         {{ visit.scheduledDate | date: 'dd MMM yyyy' }}
-                      </small>
+                      </span>
                     }
                   </div>
                 </td>
 
-                <!-- ================================================= -->
-                <!-- PAYMENT & COLLECTION -->
-                <!-- ================================================= -->
+                <!-- ============================================
+                     PAYMENT & COLLECTION
+                ============================================= -->
 
                 <td>
                   <div class="payment-cell">
-                    <div class="payment-state" [class]="getPaymentStateClass(visit)">
-                      {{ getPaymentState(visit) }}
+                    <!-- Payment state -->
+
+                    <div class="payment-state" [ngClass]="getPaymentStateClass(visit)">
+                      <i
+                        class="fa-solid"
+                        [ngClass]="{
+                          'fa-circle-check': visit.collectionStatus === 'Received',
+
+                          'fa-hourglass-half': visit.collectionStatus === 'InstallmentPending',
+
+                          'fa-clock': visit.collectionStatus === 'Pending',
+                        }"
+                      >
+                      </i>
+
+                      <span>
+                        {{ getPaymentState(visit) }}
+                      </span>
                     </div>
 
-                    <div class="payment-values">
-                      <div>
-                        <span> Amount Due </span>
+                    <!-- Amount details -->
 
-                        <strong> PKR {{ formatAmount(visit.amountDue) }} </strong>
+                    <div class="payment-amounts">
+                      <div class="payment-amount-row">
+                        <span> Due </span>
+
+                        <strong>
+                          Rs.
+                          {{ formatAmount(visit.amountDue) }}
+                        </strong>
                       </div>
 
-                      <div>
-                        <span> Amount Received </span>
+                      <div class="payment-amount-row">
+                        <span> Received </span>
 
-                        <strong> PKR {{ formatAmount(visit.amountReceived) }} </strong>
+                        <strong>
+                          Rs.
+                          {{ formatAmount(visit.amountReceived) }}
+                        </strong>
                       </div>
 
-                      <div>
-                        <span> Amount Pending </span>
+                      <div class="payment-amount-row pending-row">
+                        <span> Pending </span>
 
-                        <strong class="pending-amount">
-                          PKR {{ formatAmount(getPendingAmount(visit)) }}
+                        <strong>
+                          Rs.
+                          {{ formatAmount(getPendingAmount(visit)) }}
                         </strong>
                       </div>
                     </div>
 
+                    <!-- Collection status -->
+
                     <span
-                      class="collection-badge"
-                      [class]="getCollectionStatusClass(visit.collectionStatus)"
+                      class="collection-status-badge"
+                      [ngClass]="getCollectionStatusClass(visit.collectionStatus)"
                     >
                       {{ getCollectionStatusLabel(visit.collectionStatus) }}
                     </span>
                   </div>
                 </td>
 
-                <!-- ================================================= -->
-                <!-- RECEIVED BY -->
-                <!-- ================================================= -->
+                <!-- ============================================
+                     RECEIVED BY
+                ============================================= -->
 
                 <td>
-                  <span class="received-by-badge" [class]="getReceivedByClass(visit)">
+                  <span class="received-by-badge" [ngClass]="getReceivedByClass(visit)">
                     @if (visit.receivedBy === 'Practitioner') {
-                      <i class="fa-solid fa-user-doctor"></i>
+                      <i class="fa-solid fa-user-doctor"> </i>
                     } @else if (visit.receivedBy === 'Company') {
-                      <i class="fa-solid fa-building"></i>
+                      <i class="fa-solid fa-building"> </i>
                     } @else {
-                      <i class="fa-solid fa-clock"></i>
+                      <i class="fa-solid fa-minus"> </i>
                     }
 
-                    {{ getReceivedBy(visit) }}
+                    <span>
+                      {{ getReceivedBy(visit) }}
+                    </span>
                   </span>
                 </td>
 
-                <!-- ================================================= -->
-                <!-- SETTLEMENT -->
-                <!-- ================================================= -->
+                <!-- ============================================
+                     SETTLEMENT
+                ============================================= -->
 
                 <td>
                   @if (visit.settlementId) {
-                    <div class="settlement-cell">
-                      <span class="settlement-available">
-                        <i class="fa-solid fa-link"></i>
+                    <span class="settlement-badge settlement-available">
+                      <i class="fa-solid fa-circle-check"> </i>
 
-                        Available
-                      </span>
-
-                      <small>
-                        {{ visit.settlementId }}
-                      </small>
-                    </div>
+                      Available
+                    </span>
                   } @else {
-                    <span class="settlement-unavailable">
-                      <i class="fa-solid fa-circle-minus"></i>
+                    <span class="settlement-badge settlement-unavailable">
+                      <i class="fa-solid fa-minus-circle"> </i>
 
-                      Not available
+                      Not Available
                     </span>
                   }
                 </td>
 
-                <!-- ================================================= -->
-                <!-- ACTION -->
-                <!-- ================================================= -->
+                <!-- ============================================
+                     ACTION
+                ============================================= -->
 
                 <td>
-                  @if (getPendingAmount(visit) > 0) {
-                    <button
-                      type="button"
-                      class="collect-button"
-                      [disabled]="isCollecting"
-                      (click)="openCollection(visit)"
-                    >
-                      <i class="fa-solid fa-hand-holding-dollar"></i>
+                  <div class="action-cell">
+                    @if (canCollectPayment(visit)) {
+                      <button
+                        type="button"
+                        class="collect-button"
+                        [disabled]="isCollecting"
+                        [title]="getCollectionActionDescription(visit)"
+                        (click)="openCollection(visit)"
+                      >
+                        @if (isCollecting && collectingVisitId === visit.id) {
+                          <i class="fa-solid fa-spinner fa-spin"> </i>
 
-                      Collect
-                    </button>
-                  } @else {
-                    <span class="paid-label">
-                      <i class="fa-solid fa-circle-check"></i>
+                          Collecting...
+                        } @else {
+                          <i class="fa-solid fa-hand-holding-dollar"> </i>
 
-                      Paid
-                    </span>
-                  }
+                          Collect
+                        }
+                      </button>
+                    } @else {
+                      <span
+                        class="action-status"
+                        [ngClass]="{
+                          'action-paid': visit.collectionStatus === 'Received',
+
+                          'action-practitioner': visit.receivedBy === 'Practitioner',
+
+                          'action-cancelled': visit.status === 'Cancelled',
+
+                          'action-recorded':
+                            getPendingAmount(visit) <= 0 &&
+                            visit.collectionStatus !== 'Received' &&
+                            visit.receivedBy !== 'Practitioner' &&
+                            visit.status !== 'Cancelled',
+                        }"
+                      >
+                        @if (visit.status === 'Cancelled') {
+                          <i class="fa-solid fa-ban"> </i>
+                        } @else if (visit.collectionStatus === 'Received') {
+                          <i class="fa-solid fa-circle-check"> </i>
+                        } @else if (visit.receivedBy === 'Practitioner') {
+                          <i class="fa-solid fa-user-doctor"> </i>
+                        } @else {
+                          <i class="fa-solid fa-circle-info"> </i>
+                        }
+
+                        {{ getCollectionActionLabel(visit) }}
+                      </span>
+                    }
+                  </div>
                 </td>
               </tr>
             }
           </tbody>
         </table>
       </div>
-    }
+    </div>
+  }
 
-    <!-- ======================================================= -->
-    <!-- EMPTY STATE -->
-    <!-- ======================================================= -->
+  <!-- ============================================================
+       EMPTY STATE - NO VISITS
+  ============================================================ -->
 
-    @else {
-      <div class="empty-state">
-        <div class="empty-icon">
-          <i class="fa-solid fa-money-bill-transfer"></i>
-        </div>
-
-        <h3>No Payment Records Found</h3>
-
-        <p>No visits match the selected payment collection filters.</p>
-
-        @if (searchTerm || selectedCollectionStatus !== 'All') {
-          <button type="button" class="clear-button empty-clear" (click)="clearFilters()">
-            <i class="fa-solid fa-filter-circle-xmark"></i>
-            Clear Filters
-          </button>
-        }
+  @if (!isLoading && !errorMessage && visits.length === 0) {
+    <div class="state-container empty-state">
+      <div class="state-icon">
+        <i class="fa-solid fa-money-check-dollar"></i>
       </div>
-    }
-  </div>
 
-  <!-- ========================================================= -->
-  <!-- COLLECTION MODAL -->
-  <!-- ========================================================= -->
+      <h3>No Payment Records</h3>
+
+      <p>There are currently no visit payment records available.</p>
+    </div>
+  }
+
+  <!-- ============================================================
+       EMPTY STATE - FILTERED
+  ============================================================ -->
+
+  @if (!isLoading && !errorMessage && visits.length > 0 && filteredVisits.length === 0) {
+    <div class="state-container empty-state">
+      <div class="state-icon">
+        <i class="fa-solid fa-filter-circle-xmark"></i>
+      </div>
+
+      <h3>No Matching Payment Records</h3>
+
+      <p>No payment records match your current search or collection status filter.</p>
+
+      <button type="button" class="clear-filters-state-button" (click)="clearFilters()">
+        <i class="fa-solid fa-filter-circle-xmark"></i>
+
+        Clear Filters
+      </button>
+    </div>
+  }
+
+  <!-- ============================================================
+       COLLECTION MODAL
+  ============================================================ -->
 
   @if (selectedVisit) {
     <div class="modal-backdrop" (click)="closeCollection()">
       <div class="collection-modal" (click)="$event.stopPropagation()">
-        <!-- ===================================================== -->
-        <!-- MODAL HEADER -->
-        <!-- ===================================================== -->
+        <!-- ======================================================
+             MODAL HEADER
+        ====================================================== -->
 
         <div class="modal-header">
-          <div class="modal-header-content">
+          <div class="modal-title-wrapper">
             <div class="modal-icon">
               <i class="fa-solid fa-hand-holding-dollar"></i>
             </div>
@@ -455,7 +609,7 @@
             <div>
               <h2>Collect Payment</h2>
 
-              <p>Record a payment received for this visit.</p>
+              <p>Record company payment for this visit.</p>
             </div>
           </div>
 
@@ -469,76 +623,160 @@
           </button>
         </div>
 
-        <!-- ===================================================== -->
-        <!-- VISIT INFORMATION -->
-        <!-- ===================================================== -->
+        <!-- ======================================================
+             MODAL BODY
+        ====================================================== -->
 
-        <div class="modal-visit">
-          <div class="modal-patient-avatar">
-            {{ selectedVisit.patientName.charAt(0).toUpperCase() }}
+        <div class="modal-body">
+          <!-- ----------------------------------------------------
+               PATIENT INFORMATION
+          ----------------------------------------------------- -->
+
+          <div class="modal-patient-card">
+            <div class="modal-patient-avatar">
+              <i class="fa-solid fa-user"></i>
+            </div>
+
+            <div class="modal-patient-info">
+              <strong>
+                {{ selectedVisit.patientName || 'Unknown Patient' }}
+              </strong>
+
+              <span>
+                {{ selectedVisit.serviceName || 'Service not specified' }}
+              </span>
+            </div>
           </div>
 
-          <div class="modal-visit-details">
-            <strong>
-              {{ selectedVisit.patientName }}
-            </strong>
+          <!-- ----------------------------------------------------
+               PRACTITIONER
+          ----------------------------------------------------- -->
 
-            <span>
-              {{ selectedVisit.serviceName || 'Visit' }}
-            </span>
+          @if (selectedVisit.practitionerName) {
+            <div class="modal-detail-row">
+              <span class="modal-detail-label"> Practitioner </span>
 
-            @if (selectedVisit.practitionerName) {
-              <small>
-                Practitioner:
+              <span class="modal-detail-value">
+                <i class="fa-solid fa-user-doctor"> </i>
+
                 {{ selectedVisit.practitionerName }}
-              </small>
-            }
+              </span>
+            </div>
+          }
+
+          <!-- ----------------------------------------------------
+               PAYMENT SUMMARY
+          ----------------------------------------------------- -->
+
+          <div class="modal-payment-summary">
+            <div class="modal-summary-row">
+              <span> Amount Due </span>
+
+              <strong>
+                Rs.
+                {{ formatAmount(selectedVisit.amountDue) }}
+              </strong>
+            </div>
+
+            <div class="modal-summary-row">
+              <span> Already Received </span>
+
+              <strong>
+                Rs.
+                {{ formatAmount(selectedVisit.amountReceived) }}
+              </strong>
+            </div>
+
+            <div class="modal-summary-row modal-pending-row">
+              <span> Remaining Balance </span>
+
+              <strong>
+                Rs.
+                {{ formatAmount(getPendingAmount(selectedVisit)) }}
+              </strong>
+            </div>
           </div>
-        </div>
 
-        <!-- ===================================================== -->
-        <!-- PAYMENT SUMMARY -->
-        <!-- ===================================================== -->
+          <!-- ----------------------------------------------------
+               COLLECTION STATUS
+          ----------------------------------------------------- -->
 
-        <div class="modal-payment-summary">
-          <div>
-            <span> Amount Due </span>
+          <div class="modal-status-row">
+            <span> Current Collection Status </span>
 
-            <strong> PKR {{ formatAmount(selectedVisit.amountDue) }} </strong>
+            <span
+              class="collection-status-badge"
+              [ngClass]="getCollectionStatusClass(selectedVisit.collectionStatus)"
+            >
+              {{ getCollectionStatusLabel(selectedVisit.collectionStatus) }}
+            </span>
           </div>
 
-          <div>
-            <span> Already Received </span>
+          <!-- ----------------------------------------------------
+               RECEIVED BY
+          ----------------------------------------------------- -->
 
-            <strong> PKR {{ formatAmount(selectedVisit.amountReceived) }} </strong>
+          <div class="modal-status-row">
+            <span> Received By </span>
+
+            <span class="received-by-badge" [ngClass]="getReceivedByClass(selectedVisit)">
+              {{ getReceivedBy(selectedVisit) }}
+            </span>
           </div>
 
-          <div class="modal-pending">
-            <span> Amount Pending </span>
+          <!-- ----------------------------------------------------
+               MODAL ERROR
+          ----------------------------------------------------- -->
 
-            <strong> PKR {{ formatAmount(getPendingAmount(selectedVisit)) }} </strong>
+          @if (errorMessage) {
+            <div class="modal-error">
+              <i class="fa-solid fa-circle-exclamation"> </i>
+
+              <span>
+                {{ errorMessage }}
+              </span>
+            </div>
+          }
+
+          <!-- ----------------------------------------------------
+               COLLECTION AMOUNT
+          ----------------------------------------------------- -->
+
+          <div class="form-group">
+            <label for="collectionAmount">
+              Collection Amount
+
+              <span class="required"> * </span>
+            </label>
+
+            <div class="amount-input-wrapper">
+              <span class="currency-prefix"> Rs. </span>
+
+              <input
+                id="collectionAmount"
+                type="number"
+                min="0"
+                step="0.01"
+                [(ngModel)]="collectionAmount"
+                [disabled]="isCollecting"
+                placeholder="Enter amount"
+                class="amount-input"
+              />
+            </div>
+
+            <div class="amount-helper">
+              <span> Maximum collectible: </span>
+
+              <strong>
+                Rs.
+                {{ formatAmount(getPendingAmount(selectedVisit)) }}
+              </strong>
+            </div>
           </div>
-        </div>
 
-        <!-- ===================================================== -->
-        <!-- COLLECTION FORM -->
-        <!-- ===================================================== -->
-
-        <div class="collection-form">
-          <label for="collectionAmount"> Collection Amount </label>
-
-          <div class="amount-input-wrapper">
-            <span> PKR </span>
-
-            <input
-              id="collectionAmount"
-              type="number"
-              min="0.01"
-              [max]="getPendingAmount(selectedVisit)"
-              step="0.01"
-              [(ngModel)]="collectionAmount"
-            />
-          </div>
+          <!-- ----------------------------------------------------
+               FULL AMOUNT BUTTON
+          ----------------------------------------------------- -->
 
           <button
             type="button"
@@ -546,36 +784,20 @@
             [disabled]="isCollecting"
             (click)="setFullPendingAmount()"
           >
-            Collect Full Pending Amount
-          </button>
+            <i class="fa-solid fa-money-bill-transfer"> </i>
 
-          <small>
-            Maximum collectible amount: PKR {{ formatAmount(getPendingAmount(selectedVisit)) }}
-          </small>
+            Collect Full Remaining Amount
+          </button>
         </div>
 
-        <!-- ===================================================== -->
-        <!-- MODAL ERROR -->
-        <!-- ===================================================== -->
+        <!-- ======================================================
+             MODAL FOOTER
+        ====================================================== -->
 
-        @if (errorMessage) {
-          <div class="modal-error">
-            <i class="fa-solid fa-circle-exclamation"></i>
-
-            <span>
-              {{ errorMessage }}
-            </span>
-          </div>
-        }
-
-        <!-- ===================================================== -->
-        <!-- MODAL ACTIONS -->
-        <!-- ===================================================== -->
-
-        <div class="modal-actions">
+        <div class="modal-footer">
           <button
             type="button"
-            class="cancel-button"
+            class="modal-cancel-button"
             [disabled]="isCollecting"
             (click)="closeCollection()"
           >
@@ -584,21 +806,20 @@
 
           <button
             type="button"
-            class="confirm-collect-button"
+            class="modal-confirm-button"
             [disabled]="
               isCollecting ||
-              !collectionAmount ||
               collectionAmount <= 0 ||
               collectionAmount > getPendingAmount(selectedVisit)
             "
             (click)="collectPayment()"
           >
             @if (isCollecting) {
-              <i class="fa-solid fa-spinner fa-spin"></i>
+              <i class="fa-solid fa-spinner fa-spin"> </i>
 
-              Collecting...
+              Processing...
             } @else {
-              <i class="fa-solid fa-circle-check"></i>
+              <i class="fa-solid fa-circle-check"> </i>
 
               Confirm Collection
             }

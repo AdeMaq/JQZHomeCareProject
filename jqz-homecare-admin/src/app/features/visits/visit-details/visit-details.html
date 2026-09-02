@@ -47,7 +47,7 @@
   ========================================================== -->
 
   @if (isLoading) {
-    <div class="state-card">
+    <div class="state-card loading-state">
       <div class="loading-spinner"></div>
 
       <h3>Loading visit details...</h3>
@@ -104,7 +104,7 @@
         </div>
 
         <div class="visit-overview-content">
-          <span class="eyebrow"> Patient Visit </span>
+          <span class="eyebrow">Patient Visit</span>
 
           <h2>
             {{ visit.serviceName || 'Home Care Visit' }}
@@ -121,6 +121,8 @@
       </div>
 
       <div class="visit-overview-meta">
+        <!-- SCHEDULED DATE -->
+
         <div class="overview-meta-item">
           <span>Scheduled Date</span>
 
@@ -129,6 +131,8 @@
           </strong>
         </div>
 
+        <!-- TIME SLOT -->
+
         <div class="overview-meta-item">
           <span>Time Slot</span>
 
@@ -136,6 +140,8 @@
             {{ formatSlot(visit) }}
           </strong>
         </div>
+
+        <!-- VISIT STATUS -->
 
         <span class="status-badge" [ngClass]="getStatusClass(visit.status)">
           <i [class]="getStatusIcon(visit.status)"></i>
@@ -159,7 +165,9 @@
       </div>
 
       <div class="patient-information-card">
-        <!-- PATIENT NAME -->
+        <!-- ===================================================
+             PATIENT PRIMARY INFORMATION
+        ==================================================== -->
 
         <div class="patient-primary">
           <div class="patient-avatar">
@@ -167,7 +175,7 @@
           </div>
 
           <div>
-            <span class="eyebrow"> Patient </span>
+            <span class="eyebrow">Patient</span>
 
             <strong>
               {{ visit.patientName || 'Unknown Patient' }}
@@ -175,7 +183,9 @@
           </div>
         </div>
 
-        <!-- PATIENT DETAILS -->
+        <!-- ===================================================
+             PATIENT DETAILS
+        ==================================================== -->
 
         <div class="patient-details-grid">
           <!-- PHONE -->
@@ -211,7 +221,9 @@
           </div>
         </div>
 
-        <!-- DESCRIPTION -->
+        <!-- ===================================================
+             PATIENT DESCRIPTION
+        ==================================================== -->
 
         <div class="patient-description">
           <div class="description-header">
@@ -219,11 +231,11 @@
               <i class="fa-solid fa-align-left"></i>
             </div>
 
-            <span>Description</span>
+            <span>Patient Description</span>
           </div>
 
           <p>
-            {{ visit.patientDescription || 'No description provided' }}
+            {{ visit.patientDescription || 'No description provided.' }}
           </p>
         </div>
       </div>
@@ -243,7 +255,9 @@
       </div>
 
       <div class="information-grid">
-        <!-- PRACTITIONER -->
+        <!-- ===================================================
+             PRACTITIONER
+        ==================================================== -->
 
         <div class="info-card">
           <div class="info-card-icon practitioner-icon">
@@ -256,10 +270,16 @@
             <strong>
               {{ visit.practitionerName || 'Not assigned' }}
             </strong>
+
+            @if (visit.practitionerId && !visit.practitionerName) {
+              <small class="info-card-subtext"> Practitioner assigned </small>
+            }
           </div>
         </div>
 
-        <!-- SERVICE -->
+        <!-- ===================================================
+             SERVICE
+        ==================================================== -->
 
         <div class="info-card">
           <div class="info-card-icon service-icon">
@@ -270,12 +290,14 @@
             <span>Service</span>
 
             <strong>
-              {{ visit.serviceName || '-' }}
+              {{ visit.serviceName || 'Not available' }}
             </strong>
           </div>
         </div>
 
-        <!-- PACKAGE -->
+        <!-- ===================================================
+             PACKAGE
+        ==================================================== -->
 
         <div class="info-card">
           <div class="info-card-icon package-icon">
@@ -286,12 +308,14 @@
             <span>Package</span>
 
             <strong>
-              {{ visit.packageName || '-' }}
+              {{ visit.packageName || 'Not available' }}
             </strong>
           </div>
         </div>
 
-        <!-- ASSIGNED AREA -->
+        <!-- ===================================================
+             ASSIGNED AREA
+        ==================================================== -->
 
         <div class="info-card">
           <div class="info-card-icon area-icon">
@@ -323,7 +347,9 @@
       </div>
 
       <div class="schedule-card">
-        <!-- DATE -->
+        <!-- ===================================================
+             DATE
+        ==================================================== -->
 
         <div class="schedule-item">
           <div class="info-card-icon date-icon">
@@ -339,7 +365,9 @@
           </div>
         </div>
 
-        <!-- TIME -->
+        <!-- ===================================================
+             TIME
+        ==================================================== -->
 
         <div class="schedule-item">
           <div class="info-card-icon time-icon">
@@ -355,17 +383,19 @@
           </div>
         </div>
 
-        <!-- STATUS -->
+        <!-- ===================================================
+             STATUS
+        ==================================================== -->
 
         <div class="schedule-item">
-          <div class="info-card-icon visit-status-icon">
+          <div class="info-card-icon visit-status-icon" [ngClass]="getStatusClass(visit.status)">
             <i [class]="getStatusIcon(visit.status)"></i>
           </div>
 
           <div class="schedule-content">
             <span>Visit Status</span>
 
-            <strong>
+            <strong [ngClass]="getStatusClass(visit.status)">
               {{ visit.status }}
             </strong>
           </div>
@@ -380,12 +410,14 @@
     <section class="details-section">
       <div class="section-heading payment-heading">
         <div>
-          <h2>Payment & Collection</h2>
+          <h2>Payment &amp; Collection</h2>
 
           <p>Financial summary and collection information.</p>
         </div>
 
-        <!-- COLLECTION STATUS -->
+        <!-- =================================================
+             COLLECTION STATUS
+        ================================================== -->
 
         <span class="collection-badge" [ngClass]="getCollectionStatusClass(visit.collectionStatus)">
           <i [class]="getCollectionIcon(visit.collectionStatus)"></i>
@@ -405,10 +437,10 @@
           </div>
 
           <div>
-            <strong> Payment Received </strong>
+            <strong>Payment Received</strong>
 
             <p>
-              Payment has already been collected for this visit. No further payment action is
+              The full payment due for this visit has been received. No further collection is
               required.
             </p>
           </div>
@@ -421,9 +453,12 @@
           </div>
 
           <div>
-            <strong> Installment Pending </strong>
+            <strong>Installment Pending</strong>
 
-            <p>An installment is still pending and can be collected by the practitioner.</p>
+            <p>
+              Part of the payment has been received and a remaining balance is still pending. The
+              outstanding amount can be collected by the company or practitioner.
+            </p>
           </div>
         </div>
 
@@ -434,9 +469,12 @@
           </div>
 
           <div>
-            <strong> Payment Pending </strong>
+            <strong>Payment Pending</strong>
 
-            <p>Payment has not been fully received for this visit yet.</p>
+            <p>
+              Payment has not yet been received for this visit. The outstanding amount remains
+              available for collection.
+            </p>
           </div>
         </div>
       }
@@ -446,49 +484,46 @@
       ====================================================== -->
 
       <div class="payment-grid">
-        <!-- AMOUNT DUE -->
+        <!-- ===================================================
+             AMOUNT DUE
+        ==================================================== -->
 
         <div class="payment-stat due-stat">
           <div class="payment-stat-header">
-            <span> Amount Due </span>
+            <span>Amount Due</span>
 
             <i class="fa-solid fa-money-bill-wave"></i>
           </div>
 
-          <strong>
-            PKR
-            {{ formatAmount(visit.amountDue) }}
-          </strong>
+          <strong> PKR {{ formatAmount(visit.amountDue) }} </strong>
         </div>
 
-        <!-- AMOUNT RECEIVED -->
+        <!-- ===================================================
+             AMOUNT RECEIVED
+        ==================================================== -->
 
         <div class="payment-stat received-stat">
           <div class="payment-stat-header">
-            <span> Amount Received </span>
+            <span>Amount Received</span>
 
             <i class="fa-solid fa-circle-check"></i>
           </div>
 
-          <strong>
-            PKR
-            {{ formatAmount(visit.amountReceived) }}
-          </strong>
+          <strong> PKR {{ formatAmount(visit.amountReceived) }} </strong>
         </div>
 
-        <!-- AMOUNT PENDING -->
+        <!-- ===================================================
+             AMOUNT PENDING
+        ==================================================== -->
 
         <div class="payment-stat pending-stat">
           <div class="payment-stat-header">
-            <span> Amount Pending </span>
+            <span>Amount Pending</span>
 
             <i class="fa-solid fa-clock"></i>
           </div>
 
-          <strong>
-            PKR
-            {{ formatAmount(getPendingAmount()) }}
-          </strong>
+          <strong> PKR {{ formatAmount(getPendingAmount()) }} </strong>
         </div>
       </div>
 
@@ -497,13 +532,15 @@
       ====================================================== -->
 
       <div class="payment-details-card">
-        <!-- RECEIVED BY -->
+        <!-- ===================================================
+             RECEIVED BY
+        ==================================================== -->
 
         <div class="payment-detail-row">
           <div class="payment-detail-label">
             <i [class]="getReceivedByIcon(visit.receivedBy)"></i>
 
-            <span> Received By </span>
+            <span>Received By</span>
           </div>
 
           <strong>
@@ -511,34 +548,120 @@
           </strong>
         </div>
 
-        <!-- SETTLEMENT ID -->
+        <!-- ===================================================
+             SETTLEMENT ID
+        ==================================================== -->
 
         <div class="payment-detail-row">
           <div class="payment-detail-label">
             <i class="fa-solid fa-file-invoice"></i>
 
-            <span> Settlement ID </span>
+            <span>Settlement ID</span>
           </div>
 
-          <strong>
+          <strong class="settlement-value">
             {{ visit.settlementId || 'Not available' }}
           </strong>
         </div>
 
-        <!-- COLLECTION STATUS -->
+        <!-- ===================================================
+             COLLECTION STATUS
+        ==================================================== -->
 
         <div class="payment-detail-row">
           <div class="payment-detail-label">
             <i class="fa-solid fa-receipt"></i>
 
-            <span> Collection Status </span>
+            <span>Collection Status</span>
           </div>
 
-          <strong [ngClass]="getCollectionStatusClass(visit.collectionStatus)">
+          <strong
+            class="collection-status-value"
+            [ngClass]="getCollectionStatusClass(visit.collectionStatus)"
+          >
             {{ getCollectionStatusLabel(visit.collectionStatus) }}
           </strong>
         </div>
       </div>
+
+      <!-- =====================================================
+           PAYMENT BREAKDOWN
+      ====================================================== -->
+
+      <div class="payment-breakdown-card">
+        <div class="payment-breakdown-header">
+          <div>
+            <span class="eyebrow">Payment Overview</span>
+
+            <h3>Visit payment breakdown</h3>
+          </div>
+
+          <div
+            class="payment-breakdown-status"
+            [ngClass]="getCollectionStatusClass(visit.collectionStatus)"
+          >
+            <i [class]="getCollectionIcon(visit.collectionStatus)"></i>
+
+            {{ getCollectionStatusLabel(visit.collectionStatus) }}
+          </div>
+        </div>
+
+        <div class="payment-breakdown-list">
+          <!-- TOTAL DUE -->
+
+          <div class="payment-breakdown-row">
+            <span>Total Amount Due</span>
+
+            <strong> PKR {{ formatAmount(visit.amountDue) }} </strong>
+          </div>
+
+          <!-- TOTAL RECEIVED -->
+
+          <div class="payment-breakdown-row received-row">
+            <span>Total Amount Received</span>
+
+            <strong> PKR {{ formatAmount(visit.amountReceived) }} </strong>
+          </div>
+
+          <!-- REMAINING BALANCE -->
+
+          <div class="payment-breakdown-row pending-row">
+            <span>Remaining Balance</span>
+
+            <strong> PKR {{ formatAmount(getPendingAmount()) }} </strong>
+          </div>
+        </div>
+      </div>
     </section>
+  }
+
+  <!-- =========================================================
+       UNEXPECTED EMPTY STATE
+  ========================================================== -->
+
+  @else {
+    <div class="state-card empty-state">
+      <div class="state-icon">
+        <i class="fa-solid fa-circle-info"></i>
+      </div>
+
+      <h3>Visit information unavailable</h3>
+
+      <p>We could not find the requested visit information.</p>
+
+      <div class="state-actions">
+        <button type="button" class="secondary-button" (click)="backToVisits()">
+          <i class="fa-solid fa-arrow-left"></i>
+
+          <span>Back to Visits</span>
+        </button>
+
+        <button type="button" class="primary-button" (click)="retry()">
+          <i class="fa-solid fa-rotate-right"></i>
+
+          <span>Try Again</span>
+        </button>
+      </div>
+    </div>
   }
 </div>

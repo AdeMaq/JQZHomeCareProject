@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 
@@ -34,6 +35,7 @@ export class VisitDetails implements OnInit {
     private readonly route: ActivatedRoute,
     private readonly router: Router,
     private readonly visitsService: VisitsService,
+    private readonly cdr: ChangeDetectorRef,
   ) {}
 
   // ============================================================
@@ -41,6 +43,10 @@ export class VisitDetails implements OnInit {
   // ============================================================
 
   ngOnInit(): void {
+    console.log('=================================');
+    console.log('VISIT DETAILS COMPONENT INITIALIZED');
+    console.log('=================================');
+
     this.loadVisit();
   }
 
@@ -49,35 +55,105 @@ export class VisitDetails implements OnInit {
   // ============================================================
 
   loadVisit(): void {
+    console.log('=================================');
+    console.log('LOADING VISIT DETAILS');
+    console.log('=================================');
+
     this.isLoading = true;
     this.errorMessage = '';
     this.visit = null;
 
     const id = this.route.snapshot.paramMap.get('id');
 
+    console.log('ROUTE VISIT ID:', id);
+
     if (!id) {
+      console.error('VISIT ID WAS NOT PROVIDED');
+
       this.isLoading = false;
       this.errorMessage = 'Visit ID was not provided.';
+
+      this.cdr.detectChanges();
+
       return;
     }
 
     this.visitId = id;
 
+    console.log('CALLING VISITS SERVICE');
+    console.log('VISIT ID:', this.visitId);
+
     this.visitsService.getById(this.visitId).subscribe({
+      // ========================================================
+      // SUCCESS
+      // ========================================================
+
       next: (visit: Visit) => {
+        console.log('=================================');
+        console.log('VISIT API RESPONSE RECEIVED');
+        console.log('=================================');
+
+        console.log('VISIT:', visit);
+
         this.visit = visit;
         this.isLoading = false;
+        this.errorMessage = '';
+
+        console.log('visit assigned:', this.visit);
+        console.log('isLoading:', this.isLoading);
+        console.log('errorMessage:', this.errorMessage);
+
+        /*
+         * Explicitly trigger Angular change detection.
+         *
+         * The API request is successful (HTTP 200), so the UI
+         * must now move from the loading state to the details
+         * state.
+         */
+        this.cdr.detectChanges();
+
+        console.log('CHANGE DETECTION TRIGGERED');
       },
 
-      error: (error) => {
-        console.error('Failed to load visit details:', error);
+      // ========================================================
+      // ERROR
+      // ========================================================
 
+      error: (error) => {
+        console.error('=================================');
+        console.error('FAILED TO LOAD VISIT DETAILS');
+        console.error('=================================');
+
+        console.error('ERROR:', error);
+        console.error('ERROR BODY:', error?.error);
+        console.error('ERROR MESSAGE:', error?.message);
+
+        this.visit = null;
         this.isLoading = false;
 
         this.errorMessage =
           error?.error?.message ||
           error?.message ||
           'Unable to load visit details. Please try again.';
+
+        this.cdr.detectChanges();
+      },
+
+      // ========================================================
+      // COMPLETE
+      // ========================================================
+
+      complete: () => {
+        console.log('=================================');
+        console.log('VISIT API REQUEST COMPLETED');
+        console.log('=================================');
+
+        /*
+         * This is intentionally NOT responsible for changing
+         * isLoading.
+         *
+         * The success/error handlers handle that explicitly.
+         */
       },
     });
   }
@@ -87,6 +163,8 @@ export class VisitDetails implements OnInit {
   // ============================================================
 
   retry(): void {
+    console.log('RETRYING VISIT DETAILS LOAD...');
+
     this.loadVisit();
   }
 
@@ -138,7 +216,6 @@ export class VisitDetails implements OnInit {
     }
 
     const start = this.formatTime(visit.slotStart);
-
     const end = this.formatTime(visit.slotEnd);
 
     if (start && end) {
@@ -289,10 +366,7 @@ export class VisitDetails implements OnInit {
   // ============================================================
   // PAYMENT PENDING
   //
-  // collectionStatus is authoritative.
-  //
-  // Do NOT determine payment status only from
-  // amountReceived.
+  // CollectionStatus is authoritative.
   // ============================================================
 
   isPaymentPending(): boolean {
@@ -332,12 +406,6 @@ export class VisitDetails implements OnInit {
 
   // ============================================================
   // MOBILE PAYMENT OPTION
-  //
-  // Pending / InstallmentPending:
-  // Payment collection can be available.
-  //
-  // Received:
-  // Payment option should be hidden.
   // ============================================================
 
   shouldShowMobilePaymentOption(): boolean {
@@ -386,10 +454,6 @@ export class VisitDetails implements OnInit {
 
   // ============================================================
   // PENDING AMOUNT
-  //
-  // This is a display calculation only.
-  //
-  // Payment status itself comes from collectionStatus.
   // ============================================================
 
   getPendingAmount(): number {
@@ -398,7 +462,6 @@ export class VisitDetails implements OnInit {
     }
 
     const amountDue = Number(this.visit.amountDue) || 0;
-
     const amountReceived = Number(this.visit.amountReceived) || 0;
 
     return Math.max(amountDue - amountReceived, 0);
@@ -423,15 +486,20 @@ export class VisitDetails implements OnInit {
 
   // ============================================================
   // RECEIVED BY LABEL
+  //
+  // Important:
+  // ReceivedBy is independent from CollectionStatus.
+  //
+  // Example:
+  // CollectionStatus = InstallmentPending
+  // ReceivedBy       = Company
+  //
+  // We should still display Company.
   // ============================================================
 
   getReceivedByLabel(): string {
     if (!this.visit) {
       return 'Not available';
-    }
-
-    if (!this.isPaymentReceived()) {
-      return 'Not received';
     }
 
     switch (this.visit.receivedBy) {
@@ -442,7 +510,7 @@ export class VisitDetails implements OnInit {
         return 'Company';
 
       default:
-        return 'Not specified';
+        return 'Not received';
     }
   }
 

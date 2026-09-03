@@ -2,8 +2,6 @@ import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
-import { AuthService } from '../../../core/services/auth.service';
-
 import {
   Practitioner,
   PractitionerService,
@@ -24,7 +22,6 @@ export class EditPractitioner implements OnInit {
   private readonly router = inject(Router);
   private readonly practitionerService = inject(PractitionerService);
   private readonly changeDetector = inject(ChangeDetectorRef);
-  private readonly authService = inject(AuthService);
 
   // ============================================================
   // BASIC DATA
@@ -126,6 +123,9 @@ export class EditPractitioner implements OnInit {
     const role = localStorage.getItem('role');
 
     /*
+     * The application may store the authenticated role either
+     * as the backend enum name or as its numeric enum value.
+     *
      * Backend UserRole enum:
      *
      * SuperAdmin       = 0
@@ -133,20 +133,33 @@ export class EditPractitioner implements OnInit {
      * SimpleAdmin      = 2
      * Practitioner     = 3
      *
-     * localStorage stores the numeric enum value as a string.
+     * Current application localStorage value:
      *
-     * Therefore:
+     * "SuperAdmin"
      *
-     * "0" = SuperAdmin
-     * "1" = MiddlePowerAdmin
-     * "2" = SimpleAdmin
-     * "3" = Practitioner
+     * Reset-password permission:
+     *
+     * SuperAdmin       -> allowed
+     * MiddlePowerAdmin -> allowed
+     * SimpleAdmin      -> not allowed
+     * Practitioner     -> not allowed
      */
 
-    this.canResetPassword = role === '0' || role === '1';
+    const normalizedRole = role?.trim().toLowerCase() ?? '';
 
-    console.log('Logged-in admin role:', role);
+    this.canResetPassword =
+      normalizedRole === 'superadmin' ||
+      normalizedRole === 'middlepoweradmin' ||
+      normalizedRole === '0' ||
+      normalizedRole === '1';
+
+    console.log('=================================');
+    console.log('RESET PASSWORD PERMISSION');
+    console.log('=================================');
+    console.log('Raw logged-in admin role:', role);
+    console.log('Normalized role:', normalizedRole);
     console.log('Can reset practitioner password:', this.canResetPassword);
+    console.log('=================================');
   }
 
   // ============================================================
@@ -185,7 +198,6 @@ export class EditPractitioner implements OnInit {
           this.isLoading = false;
 
           console.log('Practitioner assigned:', this.practitioner);
-
           console.log('Form populated:', this.form);
 
           this.changeDetector.detectChanges();
@@ -379,6 +391,8 @@ export class EditPractitioner implements OnInit {
     if (!this.canResetPassword) {
       this.resetPasswordError = 'You do not have permission to reset this practitioner password.';
 
+      this.changeDetector.detectChanges();
+
       return;
     }
 
@@ -391,11 +405,15 @@ export class EditPractitioner implements OnInit {
     if (!newPassword) {
       this.resetPasswordError = 'New password is required.';
 
+      this.changeDetector.detectChanges();
+
       return;
     }
 
     if (newPassword.length < 8) {
       this.resetPasswordError = 'Password must be at least 8 characters.';
+
+      this.changeDetector.detectChanges();
 
       return;
     }

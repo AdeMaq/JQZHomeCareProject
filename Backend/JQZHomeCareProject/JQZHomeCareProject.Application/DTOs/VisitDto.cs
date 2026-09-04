@@ -28,6 +28,7 @@ namespace JQZHomeCareProject.Application.DTOs
         public decimal AmountReceived { get; set; }
         public ReceivedByType? ReceivedBy { get; set; }
         public CollectionStatus CollectionStatus { get; set; }
+        public PackagePaymentType? PaymentType { get; set; }
         public Guid? SettlementId { get; set; }
 
     }

@@ -84,15 +84,19 @@ namespace JQZHomeCareProject.Application.Services
                 var amountPending = package.Amount - amountPaid;
 
                 CollectionStatus initialCollectionStatus;
+                ReceivedByType? initialReceivedBy;
+
                 if (dto.PaymentType == PackagePaymentType.FullAdvance)
                 {
                     initialCollectionStatus = CollectionStatus.Received;
+                    initialReceivedBy = ReceivedByType.Company;
                 }
-                else 
+                else
                 {
                     initialCollectionStatus = amountPending > 0
                         ? CollectionStatus.InstallmentPending
                         : CollectionStatus.Received;
+                    initialReceivedBy = null;
                 }
 
                 patientPackage = new PatientPackage
@@ -105,6 +109,7 @@ namespace JQZHomeCareProject.Application.Services
                     AmountPaid = amountPaid,
                     AmountPending = amountPending,
                     CollectionStatus = initialCollectionStatus,
+                    ReceivedBy = initialReceivedBy,
                     Status = PatientPackageStatus.Active,
                     PurchaseDate = DateTime.UtcNow
                 };

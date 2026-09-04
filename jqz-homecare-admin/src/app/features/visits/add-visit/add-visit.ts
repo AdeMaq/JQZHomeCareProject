@@ -1312,7 +1312,7 @@ export class AddVisit implements OnInit {
 
       locationAddress: this.form.locationAddress.trim(),
 
-      description: this.form.description.trim() || null,
+      patientDescription: this.form.description.trim() || null,
 
       packageId: this.form.packageId,
 

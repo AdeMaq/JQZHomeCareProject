@@ -4,7 +4,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 
 import { Observable, map } from 'rxjs';
 
-import { CollectionStatus, Visit, VisitStatus } from './visits.interface';
+import { CollectionStatus, PackagePaymentType, Visit, VisitStatus } from './visits.interface';
 
 // ============================================================
 // CREATE VISIT REQUEST
@@ -19,7 +19,10 @@ export interface CreateVisitRequest {
 
   locationAddress: string;
 
-  description: string | null;
+  /**
+   * Matches backend CreateVisitDto.PatientDescription.
+   */
+  patientDescription: string | null;
 
   packageId: string;
 
@@ -81,16 +84,15 @@ export interface ReassignPractitionerRequest {
 //
 // Example:
 //
-// Amount Due      = 5000
-// Amount Received = 2000
+// Amount Due       = 5000
+// Amount Received  = 2000
+// Remaining        = 3000
 //
-// The backend should then keep the visit Pending
-// with 3000 remaining.
+// A later collection can record the remaining balance.
 //
-// When the remaining amount is collected:
-//
-// Amount Received = 5000
-// CollectionStatus = Received
+// FullAdvance visits should never reach this endpoint from
+// the Payment Collection screen because their package amount
+// has already been received by the company.
 // ============================================================
 
 export interface CollectPaymentRequest {
@@ -115,18 +117,34 @@ export interface MarkPaymentReceivedRequest {
 // Backend may return enum values as:
 //
 // Numeric:
-// 0, 1, 2, 3
+// VisitStatus:
+// 0 = Scheduled
+// 1 = Accepted
+// 2 = Completed
+// 3 = Cancelled
 //
-// Or strings:
+// CollectionStatus:
+// 0 = Pending
+// 1 = Received
+// 2 = InstallmentPending
+//
+// PackagePaymentType:
+// 0 = FullAdvance
+// 1 = Installment
+//
+// Or as strings:
+//
 // "Scheduled"
 // "Accepted"
 // "Completed"
 // "Cancelled"
 //
-// CollectionStatus:
+// "Pending"
+// "Received"
+// "InstallmentPending"
 //
-// 0 = Pending
-// 1 = Received
+// "FullAdvance"
+// "Installment"
 //
 // The frontend supports both formats.
 // ============================================================
@@ -135,14 +153,18 @@ type BackendVisitStatus = number | string;
 
 type BackendCollectionStatus = number | string;
 
+type BackendPaymentType = number | string;
+
 // ============================================================
 // RAW BACKEND VISIT
 // ============================================================
 
-interface BackendVisit extends Omit<Visit, 'status' | 'collectionStatus'> {
+interface BackendVisit extends Omit<Visit, 'status' | 'collectionStatus' | 'paymentType'> {
   status: BackendVisitStatus;
 
   collectionStatus: BackendCollectionStatus;
+
+  paymentType?: BackendPaymentType | null;
 }
 
 // ============================================================
@@ -268,26 +290,8 @@ export class VisitsService {
   //
   // This is the Admin/Company payment collection workflow.
   //
-  // The amount supplied here represents the amount collected
-  // during this payment action.
-  //
-  // Example:
-  //
-  // Amount Due      = 5000
-  // Existing Received = 0
-  // Admin collects   = 2000
-  //
-  // Result expected from backend:
-  //
-  // Amount Received = 2000
-  // CollectionStatus = Pending
-  //
-  // Later:
-  //
-  // Admin collects remaining 3000
-  //
-  // Amount Received = 5000
-  // CollectionStatus = Received
+  // FullAdvance visits should not call this endpoint because
+  // their package amount has already been received by Company.
   // ==========================================================
 
   collectPayment(id: string, request: CollectPaymentRequest): Observable<void> {
@@ -328,6 +332,8 @@ export class VisitsService {
       status: this.mapVisitStatus(visit.status),
 
       collectionStatus: this.mapCollectionStatus(visit.collectionStatus),
+
+      paymentType: this.mapPaymentType(visit.paymentType),
     };
   }
 
@@ -385,10 +391,6 @@ export class VisitsService {
         return 'Scheduled';
     }
   }
-
-  // ==========================================================
-  // MAP COLLECTION STATUS
-  // ==========================================================
 
   // ==========================================================
   // MAP COLLECTION STATUS
@@ -450,6 +452,67 @@ export class VisitsService {
         console.warn('Unknown collection status received from API:', status);
 
         return 'Pending';
+    }
+  }
+
+  // ==========================================================
+  // MAP PACKAGE PAYMENT TYPE
+  //
+  // Backend enum:
+  //
+  // FullAdvance = 0
+  // Installment = 1
+  //
+  // Supports both numeric and string JSON enum responses.
+  // ==========================================================
+
+  private mapPaymentType(
+    paymentType: BackendPaymentType | null | undefined,
+  ): PackagePaymentType | null {
+    // --------------------------------------------------------
+    // NULL / UNDEFINED
+    // --------------------------------------------------------
+
+    if (paymentType === null || paymentType === undefined) {
+      return null;
+    }
+
+    // --------------------------------------------------------
+    // STRING ENUM SUPPORT
+    // --------------------------------------------------------
+
+    if (typeof paymentType === 'string') {
+      switch (paymentType.trim().toLowerCase()) {
+        case 'fulladvance':
+        case 'full_advance':
+        case 'full advance':
+          return 'FullAdvance';
+
+        case 'installment':
+          return 'Installment';
+
+        default:
+          console.warn('Unknown payment type received from API:', paymentType);
+
+          return null;
+      }
+    }
+
+    // --------------------------------------------------------
+    // NUMERIC ENUM SUPPORT
+    // --------------------------------------------------------
+
+    switch (paymentType) {
+      case 0:
+        return 'FullAdvance';
+
+      case 1:
+        return 'Installment';
+
+      default:
+        console.warn('Unknown payment type received from API:', paymentType);
+
+        return null;
     }
   }
 }

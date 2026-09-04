@@ -11,6 +11,17 @@ export type VisitStatus = 'Scheduled' | 'Accepted' | 'Completed' | 'Cancelled';
 export type ReceivedByType = 'Practitioner' | 'Company';
 
 // ============================================================
+// PACKAGE PAYMENT TYPE
+//
+// Matches backend PackagePaymentType enum:
+//
+// FullAdvance = 0
+// Installment = 1
+// ============================================================
+
+export type PackagePaymentType = 'FullAdvance' | 'Installment';
+
+// ============================================================
 // COLLECTION STATUS
 //
 // Matches backend CollectionStatus enum:
@@ -77,6 +88,18 @@ export interface Visit {
 
   packageName?: string | null;
 
+  /**
+   * Payment type of the patient's package.
+   *
+   * FullAdvance:
+   * The package amount was already paid to the company
+   * at the time of package purchase.
+   *
+   * Installment:
+   * The package/visit balance may still require collection.
+   */
+  paymentType?: PackagePaymentType | null;
+
   // ==========================================================
   // SCHEDULE
   // ==========================================================
@@ -113,6 +136,9 @@ export interface Visit {
    * Practitioner
    * Company
    * null when payment has not been received.
+   *
+   * This is informational/audit data and should not be
+   * treated as an exclusive collection lock.
    */
   receivedBy?: ReceivedByType | null;
 
@@ -120,15 +146,19 @@ export interface Visit {
    * AUTHORITATIVE PAYMENT/COLLECTION STATUS.
    *
    * Pending:
-   * Payment has not yet been fully received.
+   * Payment has not yet been received/recorded for the visit.
    *
    * Received:
    * Full payment for the visit has been received.
    *
    * InstallmentPending:
-   * An installment/payment amount is still pending.
+   * A partial payment has been received and a balance remains.
    */
   collectionStatus: CollectionStatus;
+
+  // ==========================================================
+  // SETTLEMENT
+  // ==========================================================
 
   /**
    * Settlement created for the practitioner.

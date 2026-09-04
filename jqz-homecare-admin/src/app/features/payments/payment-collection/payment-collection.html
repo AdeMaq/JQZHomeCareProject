@@ -8,12 +8,12 @@
       <div class="breadcrumb">
         <span>Payments</span>
 
-        <i class="fa-solid fa-chevron-right"> </i>
+        <i class="fa-solid fa-chevron-right"></i>
 
-        <span class="current"> Payment & Collection </span>
+        <span class="current">Payment &amp; Collection</span>
       </div>
 
-      <h1 class="page-title">Payment & Collection</h1>
+      <h1 class="page-title">Payment &amp; Collection</h1>
 
       <p class="page-description">
         View visit payment status and collect outstanding company payments.
@@ -27,7 +27,7 @@
         [disabled]="isLoading"
         (click)="loadPaymentCollections()"
       >
-        <i class="fa-solid fa-rotate" [class.fa-spin]="isLoading"> </i>
+        <i class="fa-solid fa-rotate" [class.fa-spin]="isLoading"></i>
 
         <span>Refresh</span>
       </button>
@@ -92,7 +92,10 @@
         <div class="summary-card-content">
           <span class="summary-card-label"> Total Amount Due </span>
 
-          <strong class="summary-card-value"> Rs. {{ formatAmount(totalAmountDue) }} </strong>
+          <strong class="summary-card-value">
+            Rs.
+            {{ formatAmount(totalAmountDue) }}
+          </strong>
         </div>
       </div>
 
@@ -108,7 +111,10 @@
         <div class="summary-card-content">
           <span class="summary-card-label"> Total Amount Received </span>
 
-          <strong class="summary-card-value"> Rs. {{ formatAmount(totalAmountReceived) }} </strong>
+          <strong class="summary-card-value">
+            Rs.
+            {{ formatAmount(totalAmountReceived) }}
+          </strong>
         </div>
       </div>
 
@@ -124,7 +130,10 @@
         <div class="summary-card-content">
           <span class="summary-card-label"> Total Amount Pending </span>
 
-          <strong class="summary-card-value"> Rs. {{ formatAmount(totalAmountPending) }} </strong>
+          <strong class="summary-card-value">
+            Rs.
+            {{ formatAmount(totalAmountPending) }}
+          </strong>
         </div>
       </div>
 
@@ -230,7 +239,7 @@
         <button type="button" class="clear-filters-button" (click)="clearFilters()">
           <i class="fa-solid fa-filter-circle-xmark"></i>
 
-          <span> Clear Filters </span>
+          <span>Clear Filters</span>
         </button>
       }
     </div>
@@ -294,7 +303,7 @@
 
               <th>Visit</th>
 
-              <th>Payment & Collection</th>
+              <th>Payment &amp; Collection</th>
 
               <th>Received By</th>
 
@@ -397,8 +406,7 @@
 
                           'fa-clock': visit.collectionStatus === 'Pending',
                         }"
-                      >
-                      </i>
+                      ></i>
 
                       <span>
                         {{ getPaymentState(visit) }}
@@ -409,7 +417,7 @@
 
                     <div class="payment-amounts">
                       <div class="payment-amount-row">
-                        <span> Due </span>
+                        <span>Due</span>
 
                         <strong>
                           Rs.
@@ -418,7 +426,7 @@
                       </div>
 
                       <div class="payment-amount-row">
-                        <span> Received </span>
+                        <span>Received</span>
 
                         <strong>
                           Rs.
@@ -427,7 +435,7 @@
                       </div>
 
                       <div class="payment-amount-row pending-row">
-                        <span> Pending </span>
+                        <span>Pending</span>
 
                         <strong>
                           Rs.
@@ -454,11 +462,11 @@
                 <td>
                   <span class="received-by-badge" [ngClass]="getReceivedByClass(visit)">
                     @if (visit.receivedBy === 'Practitioner') {
-                      <i class="fa-solid fa-user-doctor"> </i>
+                      <i class="fa-solid fa-user-doctor"></i>
                     } @else if (visit.receivedBy === 'Company') {
-                      <i class="fa-solid fa-building"> </i>
+                      <i class="fa-solid fa-building"></i>
                     } @else {
-                      <i class="fa-solid fa-minus"> </i>
+                      <i class="fa-solid fa-minus"></i>
                     }
 
                     <span>
@@ -474,13 +482,13 @@
                 <td>
                   @if (visit.settlementId) {
                     <span class="settlement-badge settlement-available">
-                      <i class="fa-solid fa-circle-check"> </i>
+                      <i class="fa-solid fa-circle-check"></i>
 
                       Available
                     </span>
                   } @else {
                     <span class="settlement-badge settlement-unavailable">
-                      <i class="fa-solid fa-minus-circle"> </i>
+                      <i class="fa-solid fa-minus-circle"></i>
 
                       Not Available
                     </span>
@@ -502,11 +510,11 @@
                         (click)="openCollection(visit)"
                       >
                         @if (isCollecting && collectingVisitId === visit.id) {
-                          <i class="fa-solid fa-spinner fa-spin"> </i>
+                          <i class="fa-solid fa-spinner fa-spin"></i>
 
                           Collecting...
                         } @else {
-                          <i class="fa-solid fa-hand-holding-dollar"> </i>
+                          <i class="fa-solid fa-hand-holding-dollar"></i>
 
                           Collect
                         }
@@ -517,25 +525,26 @@
                         [ngClass]="{
                           'action-paid': visit.collectionStatus === 'Received',
 
-                          'action-practitioner': visit.receivedBy === 'Practitioner',
+                          'action-full-advance': visit.paymentType === 'FullAdvance',
 
                           'action-cancelled': visit.status === 'Cancelled',
 
                           'action-recorded':
                             getPendingAmount(visit) <= 0 &&
                             visit.collectionStatus !== 'Received' &&
-                            visit.receivedBy !== 'Practitioner' &&
+                            visit.paymentType !== 'FullAdvance' &&
                             visit.status !== 'Cancelled',
                         }"
+                        [title]="getCollectionActionDescription(visit)"
                       >
                         @if (visit.status === 'Cancelled') {
-                          <i class="fa-solid fa-ban"> </i>
+                          <i class="fa-solid fa-ban"></i>
+                        } @else if (visit.paymentType === 'FullAdvance') {
+                          <i class="fa-solid fa-building"></i>
                         } @else if (visit.collectionStatus === 'Received') {
-                          <i class="fa-solid fa-circle-check"> </i>
-                        } @else if (visit.receivedBy === 'Practitioner') {
-                          <i class="fa-solid fa-user-doctor"> </i>
+                          <i class="fa-solid fa-circle-check"></i>
                         } @else {
-                          <i class="fa-solid fa-circle-info"> </i>
+                          <i class="fa-solid fa-circle-info"></i>
                         }
 
                         {{ getCollectionActionLabel(visit) }}
@@ -657,7 +666,7 @@
               <span class="modal-detail-label"> Practitioner </span>
 
               <span class="modal-detail-value">
-                <i class="fa-solid fa-user-doctor"> </i>
+                <i class="fa-solid fa-user-doctor"></i>
 
                 {{ selectedVisit.practitionerName }}
               </span>
@@ -670,7 +679,7 @@
 
           <div class="modal-payment-summary">
             <div class="modal-summary-row">
-              <span> Amount Due </span>
+              <span>Amount Due</span>
 
               <strong>
                 Rs.
@@ -679,7 +688,7 @@
             </div>
 
             <div class="modal-summary-row">
-              <span> Already Received </span>
+              <span>Already Received</span>
 
               <strong>
                 Rs.
@@ -688,7 +697,7 @@
             </div>
 
             <div class="modal-summary-row modal-pending-row">
-              <span> Remaining Balance </span>
+              <span>Remaining Balance</span>
 
               <strong>
                 Rs.
@@ -702,7 +711,7 @@
           ----------------------------------------------------- -->
 
           <div class="modal-status-row">
-            <span> Current Collection Status </span>
+            <span>Current Collection Status</span>
 
             <span
               class="collection-status-badge"
@@ -717,7 +726,7 @@
           ----------------------------------------------------- -->
 
           <div class="modal-status-row">
-            <span> Received By </span>
+            <span>Received By</span>
 
             <span class="received-by-badge" [ngClass]="getReceivedByClass(selectedVisit)">
               {{ getReceivedBy(selectedVisit) }}
@@ -730,7 +739,7 @@
 
           @if (errorMessage) {
             <div class="modal-error">
-              <i class="fa-solid fa-circle-exclamation"> </i>
+              <i class="fa-solid fa-circle-exclamation"></i>
 
               <span>
                 {{ errorMessage }}
@@ -746,7 +755,7 @@
             <label for="collectionAmount">
               Collection Amount
 
-              <span class="required"> * </span>
+              <span class="required">*</span>
             </label>
 
             <div class="amount-input-wrapper">
@@ -765,7 +774,7 @@
             </div>
 
             <div class="amount-helper">
-              <span> Maximum collectible: </span>
+              <span>Maximum collectible:</span>
 
               <strong>
                 Rs.
@@ -784,7 +793,7 @@
             [disabled]="isCollecting"
             (click)="setFullPendingAmount()"
           >
-            <i class="fa-solid fa-money-bill-transfer"> </i>
+            <i class="fa-solid fa-money-bill-transfer"></i>
 
             Collect Full Remaining Amount
           </button>
@@ -815,11 +824,11 @@
             (click)="collectPayment()"
           >
             @if (isCollecting) {
-              <i class="fa-solid fa-spinner fa-spin"> </i>
+              <i class="fa-solid fa-spinner fa-spin"></i>
 
               Processing...
             } @else {
-              <i class="fa-solid fa-circle-check"> </i>
+              <i class="fa-solid fa-circle-check"></i>
 
               Confirm Collection
             }

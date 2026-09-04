@@ -52,6 +52,7 @@ namespace JQZHomeCareProject.Application.Services
             AmountPaid = p.AmountPaid,
             AmountPending = p.AmountPending,
             CollectionStatus = p.CollectionStatus,
+            ReceivedBy = p.ReceivedBy,
             Status = p.Status,
             PurchaseDate = p.PurchaseDate,
             Visits = p.Visits.Select(VisitMapper.ToDto).ToList()
@@ -85,6 +86,7 @@ namespace JQZHomeCareProject.Application.Services
             AmountReceived = v.AmountReceived,
             ReceivedBy = v.ReceivedBy,
             CollectionStatus = v.CollectionStatus,
+            PaymentType = v.PatientPackage?.PaymentType,
             SettlementId = v.SettlementId
         };
     }

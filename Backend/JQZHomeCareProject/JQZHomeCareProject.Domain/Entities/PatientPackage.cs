@@ -19,6 +19,7 @@ namespace JQZHomeCareProject.Domain.Entities
         public decimal AmountPaid { get; set; }
         public decimal AmountPending { get; set; }
         public CollectionStatus CollectionStatus { get; set; } = CollectionStatus.Pending;
+        public ReceivedByType? ReceivedBy { get; set; }
         public PatientPackageStatus Status { get; set; }
         public DateTime PurchaseDate { get; set; }
 

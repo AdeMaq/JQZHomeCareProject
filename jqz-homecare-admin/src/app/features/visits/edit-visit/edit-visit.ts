@@ -6,7 +6,7 @@ import { FormsModule } from '@angular/forms';
 
 import { ActivatedRoute, Router } from '@angular/router';
 
-import { forkJoin, Observable, Subject, takeUntil } from 'rxjs';
+import { Observable, forkJoin, Subject, takeUntil } from 'rxjs';
 
 import { Practitioner, PractitionerService } from '../../../core/services/practitioner';
 
@@ -271,6 +271,11 @@ export class EditVisit implements OnInit, OnDestroy {
 
           // ------------------------------------------------------
           // INITIALIZE FILTERED LISTS
+          //
+          // IMPORTANT:
+          //
+          // The practitioner list is filtered by the visit's
+          // service first and then prioritized by area.
           // ------------------------------------------------------
 
           this.filteredAreas = [...this.areas];
@@ -470,6 +475,18 @@ export class EditVisit implements OnInit, OnDestroy {
 
     this.filteredAreas = [...this.areas];
 
+    // ----------------------------------------------------------
+    // IMPORTANT:
+    //
+    // Changing the area must recalculate practitioner priority.
+    //
+    // Practitioners who:
+    //   1. provide the visit service
+    //   2. are assigned to the newly selected area
+    //
+    // are placed first.
+    // ----------------------------------------------------------
+
     this.filteredPractitioners = this.getPrioritizedPractitioners();
 
     this.closeAreaDropdown();
@@ -481,6 +498,11 @@ export class EditVisit implements OnInit, OnDestroy {
     this.areaSearchTerm = '';
 
     this.filteredAreas = [...this.areas];
+
+    // ----------------------------------------------------------
+    // If no area is selected, practitioners are still restricted
+    // to the visit's service.
+    // ----------------------------------------------------------
 
     this.filteredPractitioners = this.getPrioritizedPractitioners();
   }
@@ -530,6 +552,17 @@ export class EditVisit implements OnInit, OnDestroy {
   }
 
   filterPractitioners(): void {
+    // ----------------------------------------------------------
+    // IMPORTANT:
+    //
+    // getPrioritizedPractitioners() already performs:
+    //
+    // 1. Service filtering
+    // 2. Area prioritization
+    //
+    // Search is then performed against that resulting list.
+    // ----------------------------------------------------------
+
     const practitioners = this.getPrioritizedPractitioners();
 
     const searchTerm = this.practitionerSearchTerm.trim().toLowerCase();
@@ -606,6 +639,34 @@ export class EditVisit implements OnInit, OnDestroy {
   }
 
   // ============================================================
+  // CHECK PRACTITIONER SERVICE
+  // ============================================================
+  //
+  // Only practitioners who provide the service of the current
+  // visit are allowed to appear in the practitioner dropdown.
+  //
+  // Example:
+  //
+  // Visit Service = General Fever
+  //
+  // General Fever practitioner     -> SHOW
+  // General Fever practitioner     -> SHOW
+  // Physiotherapy practitioner     -> HIDE
+  // Occupational Therapy           -> HIDE
+  //
+  // ============================================================
+
+  isPractitionerForSelectedService(practitioner: Practitioner): boolean {
+    const selectedServiceId = this.visit?.serviceId;
+
+    if (!selectedServiceId) {
+      return false;
+    }
+
+    return this.areIdsEqual(practitioner.serviceId, selectedServiceId);
+  }
+
+  // ============================================================
   // CHECK PRACTITIONER AREA
   // ============================================================
 
@@ -614,27 +675,128 @@ export class EditVisit implements OnInit, OnDestroy {
       return false;
     }
 
-    return practitioner.areas?.some((area) => area.id === this.form.areaId) ?? false;
+    return (
+      practitioner.areas?.some((area) => this.areIdsEqual(area.id, this.form.areaId!)) ?? false
+    );
   }
 
   // ============================================================
   // PRIORITIZED PRACTITIONERS
   // ============================================================
+  //
+  // REQUIRED BUSINESS RULE:
+  //
+  // Only practitioners having the visit's service are included.
+  //
+  // Among those practitioners:
+  //
+  // Priority 1:
+  // Service + Selected Area
+  //
+  // Priority 2:
+  // Service but NOT Selected Area
+  //
+  // Example:
+  //
+  // Visit:
+  // Service = General Fever
+  // Area    = M Block Lahore
+  //
+  // Result:
+  //
+  // 1. Practitioner A -> General Fever + M Block Lahore
+  // 2. Practitioner B -> General Fever + M Block Lahore
+  // 3. Practitioner C -> General Fever + M Block Lahore
+  // 4. Practitioner D -> General Fever + another area
+  // 5. Practitioner E -> General Fever + no selected area
+  //
+  // Other services are never included.
+  // ============================================================
 
   getPrioritizedPractitioners(): Practitioner[] {
-    if (!this.form.areaId) {
-      return [...this.practitioners];
+    // ----------------------------------------------------------
+    // STEP 1:
+    // Get the service of the current visit.
+    // ----------------------------------------------------------
+
+    const selectedServiceId = this.visit?.serviceId;
+
+    if (!selectedServiceId) {
+      return [];
     }
 
-    const assignedToArea = this.practitioners.filter((practitioner) =>
+    // ----------------------------------------------------------
+    // STEP 2:
+    // Filter ONLY practitioners who provide this service.
+    // ----------------------------------------------------------
+
+    const servicePractitioners = this.practitioners.filter((practitioner) =>
+      this.areIdsEqual(practitioner.serviceId, selectedServiceId),
+    );
+
+    // ----------------------------------------------------------
+    // STEP 3:
+    // If no area is selected, return all practitioners for the
+    // visit service.
+    //
+    // IMPORTANT:
+    //
+    // We do NOT return this.practitioners here because that would
+    // incorrectly display practitioners from other services.
+    // ----------------------------------------------------------
+
+    if (!this.form.areaId) {
+      return [...servicePractitioners];
+    }
+
+    // ----------------------------------------------------------
+    // STEP 4:
+    // Separate service practitioners into:
+    //
+    // A. Assigned to selected area
+    // B. Not assigned to selected area
+    // ----------------------------------------------------------
+
+    const assignedToArea = servicePractitioners.filter((practitioner) =>
       this.isPractitionerAssignedToSelectedArea(practitioner),
     );
 
-    const otherPractitioners = this.practitioners.filter(
+    const otherServicePractitioners = servicePractitioners.filter(
       (practitioner) => !this.isPractitionerAssignedToSelectedArea(practitioner),
     );
 
-    return [...assignedToArea, ...otherPractitioners];
+    // ----------------------------------------------------------
+    // STEP 5:
+    // Area-assigned practitioners first.
+    // Other practitioners with the same service after them.
+    // ----------------------------------------------------------
+
+    return [...assignedToArea, ...otherServicePractitioners];
+  }
+
+  // ============================================================
+  // ID COMPARISON
+  // ============================================================
+  //
+  // Backend IDs are normally GUID strings.
+  //
+  // This helper makes comparison slightly safer by:
+  //
+  // - handling null/undefined safely
+  // - ignoring casing differences
+  // - avoiding accidental whitespace mismatch
+  //
+  // ============================================================
+
+  private areIdsEqual(
+    firstId: string | null | undefined,
+    secondId: string | null | undefined,
+  ): boolean {
+    if (!firstId || !secondId) {
+      return false;
+    }
+
+    return firstId.trim().toLowerCase() === secondId.trim().toLowerCase();
   }
 
   // ============================================================
@@ -733,8 +895,8 @@ export class EditVisit implements OnInit, OnDestroy {
           //
           // DO NOT EXCLUDE THE CURRENT VISIT HERE.
           //
-          // We need it in the schedule so that its current
-          // 08:30 - 09:30 slot is visible.
+          // We need it in the schedule so that its current slot
+          // remains visible.
           //
           // The current visit is excluded ONLY during overlap
           // validation.
@@ -822,12 +984,6 @@ export class EditVisit implements OnInit, OnDestroy {
   // 08:00 - 08:30 AVAILABLE
   // 08:30 - 09:30 CURRENT VISIT
   // 09:30 - 10:00 AVAILABLE
-  //
-  // This allows non-hourly visits such as:
-  //
-  // 08:30 - 09:30
-  // 09:15 - 10:45
-  // 13:20 - 14:10
   // ============================================================
 
   getPractitionerSchedule(): PractitionerScheduleItem[] {
@@ -843,9 +999,6 @@ export class EditVisit implements OnInit, OnDestroy {
 
     // ----------------------------------------------------------
     // Create exact booked/current visit slots.
-    //
-    // Example:
-    // 08:30 - 09:30
     // ----------------------------------------------------------
 
     const occupiedSlots = relevantVisits.map((visit) => {
@@ -907,8 +1060,6 @@ export class EditVisit implements OnInit, OnDestroy {
 
   // ============================================================
   // GET BOOKED VISIT COUNT
-  //
-  // Counts actual visits, not schedule blocks.
   // ============================================================
 
   getBookedVisitCount(): number {
@@ -995,20 +1146,6 @@ export class EditVisit implements OnInit, OnDestroy {
 
   // ============================================================
   // GET TIME RANGE ERROR
-  //
-  // IMPORTANT:
-  //
-  // Current visit is excluded here.
-  //
-  // Therefore:
-  //
-  // Existing visit:
-  // 08:30 - 09:30
-  //
-  // Editing page can keep:
-  // 08:30 - 09:30
-  //
-  // But another visit cannot overlap it.
   // ============================================================
 
   getTimeRangeError(): string {
@@ -1021,7 +1158,7 @@ export class EditVisit implements OnInit, OnDestroy {
     }
 
     if (!this.isWithinWorkingHours(this.form.startTime, this.form.endTime)) {
-      return 'The selected time must be between ' + '12:00 AM and 11:59 PM.';
+      return 'The selected time must be between 12:00 AM and 11:59 PM.';
     }
 
     // ==========================================================
@@ -1042,7 +1179,7 @@ export class EditVisit implements OnInit, OnDestroy {
     if (conflictingVisit) {
       const patientName = conflictingVisit.patientName || 'another patient';
 
-      return `The selected time conflicts with an ` + `existing visit for ${patientName}.`;
+      return `The selected time conflicts with an existing visit for ${patientName}.`;
     }
 
     return '';

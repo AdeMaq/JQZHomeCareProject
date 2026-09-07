@@ -84,18 +84,6 @@ namespace JQZHomeCareProject.API.Controllers
             return NoContent();
         }
 
-        [HttpPut("{id}/collect-payment")]
-        public async Task<IActionResult> CollectPayment(Guid id, [FromBody] CollectPaymentDto dto)
-        {
-            await _visitService.CollectPaymentAsync(id, dto);
-            return NoContent();
-        }
-
-        [HttpPut("{id}/mark-payment-received")]
-        public async Task<IActionResult> MarkPaymentReceived(Guid id, [FromBody] MarkPaymentReceivedDto dto)
-        {
-            await _visitService.MarkPaymentReceivedAsync(id, dto);
-            return NoContent();
-        }
+        
     }
 }

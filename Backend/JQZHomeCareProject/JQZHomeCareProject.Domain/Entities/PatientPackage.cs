@@ -24,5 +24,6 @@ namespace JQZHomeCareProject.Domain.Entities
         public DateTime PurchaseDate { get; set; }
 
         public ICollection<Visit> Visits { get; set; } = new List<Visit>();
+        public ICollection<InstallmentPayment> InstallmentPayments { get; set; } = new List<InstallmentPayment>();
     }
 }

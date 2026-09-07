@@ -40,6 +40,16 @@ namespace JQZHomeCareProject.Application.Services
             return entity.Visits.Select(VisitMapper.ToDto);
         }
 
+        public async Task<IEnumerable<InstallmentPaymentDto>> GetInstallmentHistoryAsync(Guid patientPackageId)
+        {
+            var entity = await _patientPackageRepository.GetByIdAsync(patientPackageId)
+                ?? throw new NotFoundException($"PatientPackage {patientPackageId} not found.");
+
+            return entity.InstallmentPayments
+                .OrderBy(ip => ip.Date)
+                .Select(VisitMapper.ToInstallmentDto);
+        }
+
         private static PatientPackageDto MapToDto(PatientPackage p) => new()
         {
             Id = p.Id,
@@ -55,9 +65,12 @@ namespace JQZHomeCareProject.Application.Services
             ReceivedBy = p.ReceivedBy,
             Status = p.Status,
             PurchaseDate = p.PurchaseDate,
-            Visits = p.Visits.Select(VisitMapper.ToDto).ToList()
+            Visits = p.Visits.Select(VisitMapper.ToDto).ToList(),
+            InstallmentPayments = p.InstallmentPayments
+        .OrderBy(ip => ip.Date)
+        .Select(VisitMapper.ToInstallmentDto)
+        .ToList()
         };
-
 
     }
     public static class VisitMapper
@@ -82,12 +95,18 @@ namespace JQZHomeCareProject.Application.Services
             SlotStart = v.SlotStart,
             SlotEnd = v.SlotEnd,
             Status = v.Status,
-            AmountDue = v.AmountDue,
-            AmountReceived = v.AmountReceived,
-            ReceivedBy = v.ReceivedBy,
-            CollectionStatus = v.CollectionStatus,
             PaymentType = v.PatientPackage?.PaymentType,
             SettlementId = v.SettlementId
+        };
+
+        public static InstallmentPaymentDto ToInstallmentDto(InstallmentPayment ip) => new()
+        {
+            Id = ip.Id,
+            PatientPackageId = ip.PatientPackageId,
+            VisitId = ip.VisitId,
+            Amount = ip.Amount,
+            ReceivedBy = ip.ReceivedBy,
+            Date = ip.Date
         };
     }
 }

@@ -10,6 +10,7 @@ namespace JQZHomeCareProject.Domain.Entities
         public DateTime WeekStartDate { get; set; }
         public DateTime WeekEndDate { get; set; }
         public decimal TotalVisitAmount { get; set; }
+        public decimal AmountCollectedByPractitioner { get; set; }
         public decimal PractitionerShareAmount { get; set; }
         public decimal CompanyShareAmount { get; set; }
         public CollectionStatus Status { get; set; } = CollectionStatus.Pending;

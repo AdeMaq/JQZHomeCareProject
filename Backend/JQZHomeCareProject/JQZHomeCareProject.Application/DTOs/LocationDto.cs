@@ -24,6 +24,6 @@ namespace JQZHomeCareProject.Application.DTOs
         public double Longitude { get; set; }
         public DateTime Timestamp { get; set; }
         public ReceivedByType ReceivedBy { get; set; }
-        public decimal? AmountReceived { get; set; }
+        public decimal Amount { get; set; } = 0; // amount collected at this visit; 0 = nothing collected here
     }
 }

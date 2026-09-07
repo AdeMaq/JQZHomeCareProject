@@ -32,9 +32,18 @@ namespace JQZHomeCareProject.Application.DTOs
         public PatientPackageStatus Status { get; set; }
         public DateTime PurchaseDate { get; set; }
         public List<VisitDto> Visits { get; set; } = new();
+        public List<InstallmentPaymentDto> InstallmentPayments { get; set; } = new();
     }
 
-
+    public class InstallmentPaymentDto
+    {
+        public Guid Id { get; set; }
+        public Guid PatientPackageId { get; set; }
+        public Guid? VisitId { get; set; }
+        public decimal Amount { get; set; }
+        public ReceivedByType ReceivedBy { get; set; }
+        public DateTime Date { get; set; }
+    }
 
     public class RecordInstallmentDto
     {

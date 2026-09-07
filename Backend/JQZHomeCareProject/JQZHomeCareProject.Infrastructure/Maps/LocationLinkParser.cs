@@ -7,50 +7,79 @@ namespace JQZHomeCareProject.Infrastructure.Maps
     public class LocationLinkParser : ILocationLinkParser
     {
         private readonly HttpClient _httpClient;
-        private readonly IMapsService _mapsService; // your existing Geoapify wrapper
-
-        // Domains that hand back short links needing a redirect resolve first.
+        private readonly IMapsService _mapsService; 
         private static readonly string[] ShortLinkHosts =
         {
             "maps.app.goo.gl", "goo.gl", "g.co", "app.goo.gl"
         };
 
-        // --- Regex patterns, tried in order ------------------------------------
+        // --- Regex patterns ------------------------------------------------
 
         // geo:12.34,56.78 or geo:12.34,56.78?q=...
         private static readonly Regex GeoUriPattern = new(
             @"geo:\s*(-?\d{1,3}\.\d+)\s*,\s*(-?\d{1,3}\.\d+)",
             RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
-        // Google Maps "@lat,lng,zoom" — appears in /maps/@..., /maps/place/.../@...
+        // Google Maps "@lat,lng,zoom" — the map VIEWPORT center, not necessarily the pin.
         private static readonly Regex AtSignPattern = new(
             @"@(-?\d{1,3}\.\d+),(-?\d{1,3}\.\d+)",
             RegexOptions.Compiled);
 
-        // Google Maps place-page internal coords: !3dLAT!4dLNG
+        // Google Maps place-page precise pin coords: !3dLAT!4dLNG
         private static readonly Regex BangCoordPattern = new(
             @"!3d(-?\d{1,3}\.\d+)!4d(-?\d{1,3}\.\d+)",
             RegexOptions.Compiled);
 
-        // ?q=lat,lng or &q=lat,lng  (Google Maps AND WhatsApp shared-location links use this)
+        // ?q=lat,lng or &q=lat,lng (Google Maps AND WhatsApp shared-location links)
         private static readonly Regex QParamPattern = new(
             @"[?&]q=(-?\d{1,3}\.\d+),(-?\d{1,3}\.\d+)",
             RegexOptions.Compiled);
 
-        // ?ll=lat,lng or &ll=lat,lng (Apple Maps, and Google "ll" fallback)
+        // ?ll=lat,lng or &ll=lat,lng (Apple Maps, Google "ll" fallback)
         private static readonly Regex LlParamPattern = new(
             @"[?&]ll=(-?\d{1,3}\.\d+),(-?\d{1,3}\.\d+)",
             RegexOptions.Compiled);
 
-        // Apple Maps "center=lat,lng" (rare variant) and "sll=lat,lng"
+        // Apple Maps "center=lat,lng" / "sll=lat,lng"
         private static readonly Regex CenterParamPattern = new(
             @"[?&](?:center|sll)=(-?\d{1,3}\.\d+),(-?\d{1,3}\.\d+)",
             RegexOptions.Compiled);
 
-        // Plain "lat, lng" text with no URL at all — e.g. pasted from WhatsApp
-        // live-location caption "12.9716, 77.5946" or "12.9716,77.5946"
+        // "Get directions" links — destination pin
+        private static readonly Regex DaddrParamPattern = new(
+            @"[?&]daddr=(-?\d{1,3}\.\d+),(-?\d{1,3}\.\d+)",
+            RegexOptions.Compiled);
+
+        private static readonly Regex DestinationParamPattern = new(
+            @"[?&]destination=(-?\d{1,3}\.\d+),(-?\d{1,3}\.\d+)",
+            RegexOptions.Compiled);
+
+        // "Get directions" links — origin pin (last resort only)
+        private static readonly Regex SaddrParamPattern = new(
+            @"[?&]saddr=(-?\d{1,3}\.\d+),(-?\d{1,3}\.\d+)",
+            RegexOptions.Compiled);
+
+        // Plain "lat, lng" text with no URL at all
         private static readonly Regex RawPairPattern = new(
             @"^\s*(-?\d{1,3}\.\d{3,})\s*,\s*(-?\d{1,3}\.\d{3,})\s*$",
+            RegexOptions.Compiled);
+
+        // Google Maps "directions" links put the destination as a path segment:
+        // .../maps/dir/Origin/31.531231,74.321724/@31.49,74.29,13z
+        // Take the LAST lat,lng-shaped path segment before "/@" or end of path —
+        // that's the destination, not the origin.
+        private static readonly Regex DirPathCoordPattern = new(
+            @"/dir/(?:[^/@]+/)*(-?\d{1,3}\.\d+),(-?\d{1,3}\.\d+)(?:/@|/?(?:\?|$))",
+            RegexOptions.Compiled);
+
+        // Apple Maps links that carry only a text address, no ll=
+        private static readonly Regex AppleAddressParamPattern = new(
+            @"[?&]address=([^&]+)",
+            RegexOptions.Compiled);
+
+        // Google Maps search links with only a text query, no coordinates
+        private static readonly Regex QueryParamPattern = new(
+            @"[?&]query=([^&]+)",
             RegexOptions.Compiled);
 
         public LocationLinkParser(HttpClient httpClient, IMapsService mapsService)
@@ -66,34 +95,42 @@ namespace JQZHomeCareProject.Infrastructure.Maps
 
             var text = input.Trim();
 
-            // 1. Raw "lat,lng" pasted directly (no URL) — cheapest check, do first.
+            // 1. Raw "lat,lng" pasted directly (no URL).
             var rawMatch = RawPairPattern.Match(text);
             if (rawMatch.Success && TryParseCoords(rawMatch, out var rawLat, out var rawLng))
                 return (rawLat, rawLng, null);
 
-            // 2. If it looks like a URL, resolve short links then run regex passes on it.
-            if (Uri.TryCreate(text, UriKind.Absolute, out var uri) &&
-                (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps))
+            // 2. Looks like a URL — resolve short links then extract.
+            if (Uri.TryCreate(text, UriKind.Absolute, out var uri) && (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps))
             {
                 var resolvedUrl = await ResolveIfShortLinkAsync(uri);
 
                 if (TryExtractFromUrl(resolvedUrl, out var lat, out var lng))
                     return (lat, lng, null);
 
-                // It was a URL but we couldn't find coordinates in it
-                // (e.g. a plain place-name Google Maps search link with no lat/lng).
-                // Fall through to geocoding as a last resort using the URL's text params if present,
-                // otherwise fail clearly rather than silently geocoding a URL string.
+                // No coordinates in the link itself — see if it carries a text
+                // address/query we can geocode instead (Apple `address=`, Google `query=`).
+                var addressMatch = AppleAddressParamPattern.Match(resolvedUrl);
+                if (!addressMatch.Success)
+                    addressMatch = QueryParamPattern.Match(resolvedUrl);
+
+                if (addressMatch.Success)
+                {
+                    var decodedAddress = Uri.UnescapeDataString(addressMatch.Groups[1].Value.Replace('+', ' '));
+                    var (addressLat, addressLng) = await _mapsService.GeocodeAsync(decodedAddress);
+                    return (addressLat, addressLng, decodedAddress);
+                }
+
                 throw new ValidationException(
-                    "Could not extract coordinates from this link. Please paste a Google Maps / WhatsApp / Apple Maps location link that includes coordinates, or the plain address instead.");
+                    "Could not extract a location from this link. If it's a Plus Code or a live-location share, please open it and paste the coordinates or full address directly.");
             }
 
-            // 3. geo: URIs aren't parsed by Uri.TryCreate as http(s), handle separately.
-            var geoMatch = GeoUriPattern.Match(text);
-            if (geoMatch.Success && TryParseCoords(geoMatch, out var geoLat, out var geoLng))
-                return (geoLat, geoLng, null);
+            // 3. geo: URIs.
+            var geoUriMatch = GeoUriPattern.Match(text);
+            if (geoUriMatch.Success && TryParseCoords(geoUriMatch, out var geoUriLat, out var geoUriLng))
+                return (geoUriLat, geoUriLng, null);
 
-            // 4. Not a link at all — treat as a plain address and geocode via Geoapify.
+            // 4. Plain text address — geocode via Geoapify.
             var (geocodedLat, geocodedLng) = await _mapsService.GeocodeAsync(text);
             return (geocodedLat, geocodedLng, text);
         }
@@ -102,14 +139,28 @@ namespace JQZHomeCareProject.Infrastructure.Maps
         {
             lat = 0; lng = 0;
 
-            foreach (var pattern in new[] { AtSignPattern, BangCoordPattern, QParamPattern, LlParamPattern, CenterParamPattern })
+            // Order matters: !3d/!4d is the precise pin and should win over
+            // @lat,lng (viewport center, can be meaningfully off on place links).
+            // daddr/destination (explicit destination pin) also outrank the
+            // viewport. saddr (origin) is last resort.
+            foreach (var pattern in new[]
+            {
+                BangCoordPattern,
+                DaddrParamPattern,
+                DestinationParamPattern,
+                DirPathCoordPattern,  
+                QParamPattern,
+                LlParamPattern,
+                CenterParamPattern,
+                AtSignPattern,
+                SaddrParamPattern
+            })
             {
                 var match = pattern.Match(url);
                 if (match.Success && TryParseCoords(match, out lat, out lng))
                     return true;
             }
 
-            // geo: can also appear embedded inside some app-share URLs
             var geoMatch = GeoUriPattern.Match(url);
             if (geoMatch.Success && TryParseCoords(geoMatch, out lat, out lng))
                 return true;
@@ -126,7 +177,6 @@ namespace JQZHomeCareProject.Infrastructure.Maps
             if (!double.TryParse(match.Groups[2].Value, System.Globalization.CultureInfo.InvariantCulture, out lng))
                 return false;
 
-            // Sanity-check ranges so a mis-fired regex (e.g. matching zoom level as lng) doesn't slip through.
             if (lat < -90 || lat > 90 || lng < -180 || lng > 180)
                 return false;
 
@@ -144,8 +194,6 @@ namespace JQZHomeCareProject.Infrastructure.Maps
 
             try
             {
-                // HttpClient here must be configured with an HttpClientHandler that has
-                // AllowAutoRedirect = true (default) so we land on the final expanded URL.
                 using var response = await _httpClient.GetAsync(uri, HttpCompletionOption.ResponseHeadersRead);
                 var finalUrl = response.RequestMessage?.RequestUri?.ToString();
                 return string.IsNullOrEmpty(finalUrl) ? uri.ToString() : finalUrl;

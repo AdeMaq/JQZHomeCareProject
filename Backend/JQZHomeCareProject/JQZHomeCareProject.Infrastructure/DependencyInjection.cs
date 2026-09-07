@@ -36,6 +36,10 @@ namespace JQZHomeCareProject.Infrastructure
             services.AddHttpClient<IMapsService, MapsService>();
             services.AddScoped<IApiKeyHasher, ApiKeyHasher>();
             services.AddScoped<IApiClientService, ApiClientService>();
+            services.AddHttpClient<ILocationLinkParser, LocationLinkParser>(client =>
+            {
+                client.Timeout = TimeSpan.FromSeconds(8);
+            });
 
 
             return services;

@@ -141,7 +141,6 @@ namespace JQZHomeCareProject.Application.Services
 
     // Patient information captured for this specific visit.
     PatientNameSnapshot = dto.PatientName.Trim(),
-    PatientPhoneSnapshot = dto.PatientPhone.Trim(),
     PatientAddressSnapshot = dto.LocationAddress.Trim(),
     PatientDescriptionSnapshot = string.IsNullOrWhiteSpace(dto.PatientDescription)
         ? null

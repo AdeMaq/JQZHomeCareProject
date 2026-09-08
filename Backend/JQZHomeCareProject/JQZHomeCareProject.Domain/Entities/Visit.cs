@@ -12,7 +12,6 @@ namespace JQZHomeCareProject.Domain.Entities
 
         // Patient information captured at the time this visit was created.
 public string? PatientNameSnapshot { get; set; }
-public string? PatientPhoneSnapshot { get; set; }
 public string? PatientAddressSnapshot { get; set; }
 public string? PatientDescriptionSnapshot { get; set; }
 

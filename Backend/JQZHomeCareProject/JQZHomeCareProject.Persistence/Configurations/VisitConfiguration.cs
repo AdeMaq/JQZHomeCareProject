@@ -16,8 +16,6 @@ namespace JQZHomeCareProject.Persistence.Configurations
             builder.Property(v => v.SlotEnd).HasColumnType("time");
             builder.Property(v => v.CheckInLocation).HasMaxLength(500);
             builder.Property(v => v.CheckOutLocation).HasMaxLength(500);
-            builder.Property(v => v.AmountDue).HasColumnType("decimal(12,2)");
-            builder.Property(v => v.AmountReceived).HasColumnType("decimal(12,2)");
 
             builder.HasOne(v => v.Patient)
                 .WithMany(p => p.Visits)

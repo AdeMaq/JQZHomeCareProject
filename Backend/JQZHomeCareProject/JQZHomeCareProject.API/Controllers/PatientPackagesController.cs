@@ -42,5 +42,8 @@ namespace JQZHomeCareProject.API.Controllers
             await _visitService.RecordInstallmentAsync(id, dto);
             return NoContent();
         }
+
+        [HttpGet("{id:guid}/installments")]
+        public async Task<IActionResult> GetInstallmentHistoryAsync(Guid id) => Ok(await _patientPackageService.GetInstallmentHistoryAsync(id));
     }
 }

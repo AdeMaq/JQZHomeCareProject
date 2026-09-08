@@ -24,6 +24,19 @@ namespace JQZHomeCareProject.Application.DTOs
         public double Longitude { get; set; }
         public DateTime Timestamp { get; set; }
         public ReceivedByType ReceivedBy { get; set; }
-        public decimal? AmountReceived { get; set; }
+        public decimal Amount { get; set; } = 0; // amount collected at this visit; 0 = nothing collected here
+    }
+    public class ParseLocationLinkDto
+    {
+        [Required, StringLength(2000, MinimumLength = 1)]
+        public string Link { get; set; } = string.Empty;
+    }
+
+    public class LocationCoordinatesDto
+    {
+        public double Latitude { get; set; }
+        public double Longitude { get; set; }
+        public string? FormattedAddress { get; set; }
+        public string Source { get; set; } = string.Empty; // "link" or "geocoded"
     }
 }

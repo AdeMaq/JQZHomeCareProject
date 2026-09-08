@@ -4,6 +4,7 @@ using JQZHomeCareProject.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace JQZHomeCareProject.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260907080753_InstallmentsLoga")]
+    partial class InstallmentsLoga
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -659,23 +662,11 @@ namespace JQZHomeCareProject.Persistence.Migrations
                     b.Property<Guid>("CreatedByUserId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("PatientAddressSnapshot")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PatientDescriptionSnapshot")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<Guid>("PatientId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("PatientNameSnapshot")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<Guid?>("PatientPackageId")
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("PatientPhoneSnapshot")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid?>("PractitionerId")
                         .HasColumnType("uniqueidentifier");

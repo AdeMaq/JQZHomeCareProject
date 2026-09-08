@@ -26,6 +26,8 @@ namespace JQZHomeCareProject.Persistence.Configurations
                 .WithMany()
                 .HasForeignKey(ps => ps.ReceivedByUserId)
                 .OnDelete(DeleteBehavior.SetNull);
+            builder.Property(s => s.AmountCollectedByPractitioner)
+                .HasColumnType("decimal(18,2)");
 
             builder.HasIndex(ps => new { ps.PractitionerId, ps.WeekStartDate, ps.WeekEndDate });
         }

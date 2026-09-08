@@ -11,15 +11,18 @@ namespace JQZHomeCareProject.Application.Services
         private readonly IPractitionerSettlementRepository _settlementRepository;
         private readonly IVisitRepository _visitRepository;
         private readonly IPractitionerRepository _practitionerRepository;
+        private readonly IInstallmentPaymentRepository _installmentPaymentRepository;
 
         public PaymentService(
             IPractitionerSettlementRepository settlementRepository,
             IVisitRepository visitRepository,
-            IPractitionerRepository practitionerRepository)
+            IPractitionerRepository practitionerRepository,
+            IInstallmentPaymentRepository installmentPaymentRepository)
         {
             _settlementRepository = settlementRepository;
             _visitRepository = visitRepository;
             _practitionerRepository = practitionerRepository;
+            _installmentPaymentRepository = installmentPaymentRepository;
         }
 
         public async Task<PractitionerSettlementDto> GenerateWeeklySettlementAsync(Guid practitionerId, DateTime weekStart)
@@ -37,7 +40,13 @@ namespace JQZHomeCareProject.Application.Services
             if (visits.Count == 0)
                 throw new ValidationException("No unsettled completed visits found for this practitioner in the given week.");
 
-            var totalVisitAmount = visits.Sum(v => v.AmountDue);
+            var payments = (await _installmentPaymentRepository.GetByVisitIdsAsync(visits.Select(v => v.Id))).ToList();
+
+            var totalVisitAmount = payments.Sum(p => p.Amount);
+            var amountCollectedByPractitioner = payments
+                .Where(p => p.ReceivedBy == ReceivedByType.Practitioner)
+                .Sum(p => p.Amount);
+
             var practitionerShareAmount = Math.Round(totalVisitAmount * practitioner.SharePercentage / 100m, 2);
             var companyShareAmount = totalVisitAmount - practitionerShareAmount;
 
@@ -48,6 +57,7 @@ namespace JQZHomeCareProject.Application.Services
                 WeekStartDate = weekStart.Date,
                 WeekEndDate = weekEnd,
                 TotalVisitAmount = totalVisitAmount,
+                AmountCollectedByPractitioner = amountCollectedByPractitioner,
                 PractitionerShareAmount = practitionerShareAmount,
                 CompanyShareAmount = companyShareAmount,
                 Status = CollectionStatus.Pending,
@@ -79,11 +89,10 @@ namespace JQZHomeCareProject.Application.Services
 
             await _settlementRepository.UpdateAsync(settlement);
 
-            foreach (var visit in settlement.Visits)
-            {
-                visit.CollectionStatus = CollectionStatus.Received;
-                await _visitRepository.UpdateAsync(visit);
-            }
+            // Note: individual visits no longer carry their own CollectionStatus —
+            // that concept now lives entirely on PractitionerSettlement (here) and
+            // on PatientPackage (via RecordInstallmentAsync / CheckOutAsync).
+            // Nothing further needs to cascade down to the visits themselves.
         }
 
         public async Task<IEnumerable<PractitionerSettlementDto>> GetPendingSettlementsAsync()
@@ -120,6 +129,7 @@ namespace JQZHomeCareProject.Application.Services
                     WeekEnd = existing.WeekEndDate,
                     VisitCount = existing.Visits.Count,
                     TotalVisitAmount = existing.TotalVisitAmount,
+                    AmountCollectedByPractitioner = existing.AmountCollectedByPractitioner,
                     PractitionerShareAmount = existing.PractitionerShareAmount,
                     CompanyShareAmount = existing.CompanyShareAmount,
                     Status = existing.Status,
@@ -129,7 +139,13 @@ namespace JQZHomeCareProject.Application.Services
             }
 
             var visits = (await _visitRepository.GetUnsettledCompletedAsync(practitionerId, weekStartDate, weekEnd)).ToList();
-            var totalVisitAmount = visits.Sum(v => v.AmountDue);
+            var payments = (await _installmentPaymentRepository.GetByVisitIdsAsync(visits.Select(v => v.Id))).ToList();
+
+            var totalVisitAmount = payments.Sum(p => p.Amount);
+            var amountCollectedByPractitioner = payments
+                .Where(p => p.ReceivedBy == ReceivedByType.Practitioner)
+                .Sum(p => p.Amount);
+
             var practitionerShareAmount = Math.Round(totalVisitAmount * practitioner.SharePercentage / 100m, 2);
             var companyShareAmount = totalVisitAmount - practitionerShareAmount;
 
@@ -142,6 +158,7 @@ namespace JQZHomeCareProject.Application.Services
                 WeekEnd = weekEnd,
                 VisitCount = visits.Count,
                 TotalVisitAmount = totalVisitAmount,
+                AmountCollectedByPractitioner = amountCollectedByPractitioner,
                 PractitionerShareAmount = practitionerShareAmount,
                 CompanyShareAmount = companyShareAmount,
                 Status = CollectionStatus.Pending,
@@ -149,48 +166,41 @@ namespace JQZHomeCareProject.Application.Services
                 Visits = visits.Select(ToVisitDto).ToList()
             };
         }
-        private static VisitDto ToVisitDto(Visit v)
-        {
-            return new VisitDto
-            {
-                Id = v.Id,
-                PatientId = v.PatientId,
-                PatientName = v.Patient?.Name ?? string.Empty,
-                PractitionerId = v.PractitionerId,
-                PractitionerName = v.Practitioner?.User?.Name ?? string.Empty,
-                AreaId = v.AreaId,
-                AreaName = v.Area?.Name ?? string.Empty,
-                ServiceId = v.ServiceId,
-                ServiceName = v.Service?.Name ?? string.Empty,
-                PatientPackageId = v.PatientPackageId,
-                PackageName = v.PatientPackage?.Package?.Name,
-                ScheduledDate = v.ScheduledDate,
-                SlotStart = v.SlotStart,
-                SlotEnd = v.SlotEnd,
-                Status = v.Status,
-                AmountDue = v.AmountDue,
-                AmountReceived = v.AmountReceived,
-                ReceivedBy = v.ReceivedBy,
-                CollectionStatus = v.CollectionStatus,
-                SettlementId = v.SettlementId
-            };
-        }
 
-        private static PractitionerSettlementDto MapToDto(PractitionerSettlement settlement, string practitionerName)
+        private static VisitDto ToVisitDto(Visit v) => new()
         {
-            return new PractitionerSettlementDto
-            {
-                Id = settlement.Id,
-                PractitionerId = settlement.PractitionerId,
-                PractitionerName = practitionerName,
-                WeekStart = settlement.WeekStartDate,
-                WeekEnd = settlement.WeekEndDate,
-                TotalVisitAmount = settlement.TotalVisitAmount,
-                PractitionerShareAmount = settlement.PractitionerShareAmount,
-                CompanyShareAmount = settlement.CompanyShareAmount,
-                Status = settlement.Status,
-                ReceivedDate = settlement.ReceivedDate
-            };
-        }
+            Id = v.Id,
+            PatientId = v.PatientId,
+            PatientName = v.Patient?.Name ?? string.Empty,
+            PractitionerId = v.PractitionerId,
+            PractitionerName = v.Practitioner?.User?.Name ?? string.Empty,
+            AreaId = v.AreaId,
+            AreaName = v.Area?.Name ?? string.Empty,
+            ServiceId = v.ServiceId,
+            ServiceName = v.Service?.Name ?? string.Empty,
+            PatientPackageId = v.PatientPackageId,
+            PackageName = v.PatientPackage?.Package?.Name,
+            ScheduledDate = v.ScheduledDate,
+            SlotStart = v.SlotStart,
+            SlotEnd = v.SlotEnd,
+            Status = v.Status,
+            PaymentType = v.PatientPackage?.PaymentType,
+            SettlementId = v.SettlementId
+        };
+
+        private static PractitionerSettlementDto MapToDto(PractitionerSettlement settlement, string practitionerName) => new()
+        {
+            Id = settlement.Id,
+            PractitionerId = settlement.PractitionerId,
+            PractitionerName = practitionerName,
+            WeekStart = settlement.WeekStartDate,
+            WeekEnd = settlement.WeekEndDate,
+            TotalVisitAmount = settlement.TotalVisitAmount,
+            AmountCollectedByPractitioner = settlement.AmountCollectedByPractitioner,
+            PractitionerShareAmount = settlement.PractitionerShareAmount,
+            CompanyShareAmount = settlement.CompanyShareAmount,
+            Status = settlement.Status,
+            ReceivedDate = settlement.ReceivedDate
+        };
     }
 }

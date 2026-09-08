@@ -20,17 +20,11 @@ namespace JQZHomeCareProject.Application.DTOs
         public Guid? PatientPackageId { get; set; }
         public string? PackageName { get; set; }
         public DateTime? ScheduledDate { get; set; }
-        //public string? TimeSlot { get; set; }
         public TimeSpan? SlotStart { get; set; }
         public TimeSpan? SlotEnd { get; set; }
         public VisitStatus Status { get; set; }
-        public decimal AmountDue { get; set; }
-        public decimal AmountReceived { get; set; }
-        public ReceivedByType? ReceivedBy { get; set; }
-        public CollectionStatus CollectionStatus { get; set; }
         public PackagePaymentType? PaymentType { get; set; }
         public Guid? SettlementId { get; set; }
-
     }
 
     public class CreateVisitDto

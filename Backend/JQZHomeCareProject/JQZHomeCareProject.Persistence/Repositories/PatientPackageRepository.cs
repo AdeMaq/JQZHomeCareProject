@@ -17,6 +17,7 @@ namespace JQZHomeCareProject.Persistence.Repositories
                 .Include(pp => pp.Visits).ThenInclude(v => v.Practitioner)
                 .Include(pp => pp.Visits).ThenInclude(v => v.Area)
                 .Include(pp => pp.Visits).ThenInclude(v => v.Service)
+                .Include(pp => pp.InstallmentPayments)
                 .FirstOrDefaultAsync(pp => pp.Id == id);
 
         public async Task<IEnumerable<PatientPackage>> GetAllAsync() =>

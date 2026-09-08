@@ -9,7 +9,7 @@
 }
 
 /* ============================================================
-   BREADCRB
+   BREADCRUMB
 ============================================================ */
 
 .breadcrumb {
@@ -346,6 +346,114 @@
   font-size: 12px;
   font-weight: 500;
   line-height: 1.45;
+}
+
+/* ============================================================
+   PATIENT LOOKUP
+============================================================ */
+
+/*
+   Existing patient recommendation.
+   The HTML currently uses assignment-info for this element,
+   but these classes are also available for future refinement.
+*/
+
+.patient-lookup-suggestion {
+  display: flex;
+  align-items: flex-start;
+  gap: 13px;
+  margin-top: 12px;
+  padding: 17px 19px;
+  border: 1px solid #f2c7cc;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #fff5f6, #ffffff);
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.15s ease;
+}
+
+.patient-lookup-suggestion:hover {
+  border-color: #ee7b7d;
+  background: #fff1f2;
+  box-shadow: 0 6px 18px rgba(207, 16, 45, 0.08);
+  transform: translateY(-1px);
+}
+
+.patient-lookup-suggestion > i {
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: 10px;
+  background: #fdebed;
+  color: #cf102d;
+  font-size: 15px;
+}
+
+.patient-lookup-suggestion strong {
+  display: block;
+  margin-bottom: 4px;
+  color: #334e68;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.patient-lookup-suggestion p {
+  margin: 2px 0 0;
+  color: #627d98;
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.patient-lookup-suggestion small {
+  display: block;
+  margin-top: 7px;
+  color: #cf102d;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.patient-lookup-message {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 10px;
+  padding: 12px 14px;
+  border: 1px solid #e8dfe2;
+  border-radius: 11px;
+  background: #fffdfd;
+  color: #627d98;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.patient-lookup-message > i {
+  color: #cf102d;
+  font-size: 13px;
+}
+
+.patient-lookup-error {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 10px;
+  padding: 12px 14px;
+  border: 1px solid #f5c2c7;
+  border-radius: 11px;
+  background: #fff1f2;
+  color: #b4232f;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.patient-lookup-error > i {
+  color: #cf102d;
+  font-size: 13px;
 }
 
 /* ============================================================
@@ -1504,6 +1612,11 @@
   .btn {
     width: 100%;
   }
+
+  /* Patient lookup responsive adjustments */
+  .patient-lookup-suggestion {
+    padding: 15px;
+  }
 }
 
 /* ============================================================
@@ -1589,5 +1702,17 @@
 
   .schedule-slots {
     padding: 12px;
+  }
+
+  /* Patient lookup responsive adjustments */
+  .patient-lookup-suggestion {
+    gap: 10px;
+    padding: 14px;
+  }
+
+  .patient-lookup-suggestion > i {
+    width: 32px;
+    height: 32px;
+    font-size: 14px;
   }
 }

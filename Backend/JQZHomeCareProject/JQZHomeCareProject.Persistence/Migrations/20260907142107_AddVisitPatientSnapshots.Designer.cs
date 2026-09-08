@@ -4,6 +4,7 @@ using JQZHomeCareProject.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace JQZHomeCareProject.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260907142107_AddVisitPatientSnapshots")]
+    partial class AddVisitPatientSnapshots
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -117,42 +120,6 @@ namespace JQZHomeCareProject.Persistence.Migrations
                         .IsUnique();
 
                     b.ToTable("Cities", (string)null);
-                });
-
-            modelBuilder.Entity("JQZHomeCareProject.Domain.Entities.InstallmentPayment", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<decimal>("Amount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("Date")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("PatientPackageId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("ReceivedBy")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("VisitId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("VisitId");
-
-                    b.HasIndex("PatientPackageId", "Date");
-
-                    b.ToTable("InstallmentPayments", (string)null);
                 });
 
             modelBuilder.Entity("JQZHomeCareProject.Domain.Entities.Location", b =>
@@ -384,9 +351,6 @@ namespace JQZHomeCareProject.Persistence.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<decimal>("AmountCollectedByPractitioner")
-                        .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("CompanyShareAmount")
                         .HasColumnType("decimal(12,2)");
@@ -636,6 +600,12 @@ namespace JQZHomeCareProject.Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<decimal>("AmountDue")
+                        .HasColumnType("decimal(12,2)");
+
+                    b.Property<decimal>("AmountReceived")
+                        .HasColumnType("decimal(12,2)");
+
                     b.Property<Guid?>("AreaId")
                         .HasColumnType("uniqueidentifier");
 
@@ -652,6 +622,9 @@ namespace JQZHomeCareProject.Persistence.Migrations
 
                     b.Property<DateTime?>("CheckOutTime")
                         .HasColumnType("datetime2");
+
+                    b.Property<int>("CollectionStatus")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -679,6 +652,9 @@ namespace JQZHomeCareProject.Persistence.Migrations
 
                     b.Property<Guid?>("PractitionerId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<int?>("ReceivedBy")
+                        .HasColumnType("int");
 
                     b.Property<DateTime?>("ScheduledDate")
                         .HasColumnType("datetime2");
@@ -729,24 +705,6 @@ namespace JQZHomeCareProject.Persistence.Migrations
                         .IsRequired();
 
                     b.Navigation("City");
-                });
-
-            modelBuilder.Entity("JQZHomeCareProject.Domain.Entities.InstallmentPayment", b =>
-                {
-                    b.HasOne("JQZHomeCareProject.Domain.Entities.PatientPackage", "PatientPackage")
-                        .WithMany("InstallmentPayments")
-                        .HasForeignKey("PatientPackageId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("JQZHomeCareProject.Domain.Entities.Visit", "Visit")
-                        .WithMany("InstallmentPayments")
-                        .HasForeignKey("VisitId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("PatientPackage");
-
-                    b.Navigation("Visit");
                 });
 
             modelBuilder.Entity("JQZHomeCareProject.Domain.Entities.Package", b =>
@@ -975,8 +933,6 @@ namespace JQZHomeCareProject.Persistence.Migrations
 
             modelBuilder.Entity("JQZHomeCareProject.Domain.Entities.PatientPackage", b =>
                 {
-                    b.Navigation("InstallmentPayments");
-
                     b.Navigation("Visits");
                 });
 
@@ -1012,8 +968,6 @@ namespace JQZHomeCareProject.Persistence.Migrations
 
             modelBuilder.Entity("JQZHomeCareProject.Domain.Entities.Visit", b =>
                 {
-                    b.Navigation("InstallmentPayments");
-
                     b.Navigation("Refusals");
                 });
 #pragma warning restore 612, 618

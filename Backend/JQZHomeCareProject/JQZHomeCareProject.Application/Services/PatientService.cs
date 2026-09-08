@@ -12,21 +12,31 @@ namespace JQZHomeCareProject.Application.Services
         private readonly ILocationRepository _locationRepository;
         private readonly IMapsService _mapsService;
 
-        public PatientService(IPatientRepository patientRepository,ILocationRepository locationRepository,IMapsService mapsService)
+        public PatientService(
+            IPatientRepository patientRepository,
+            ILocationRepository locationRepository,
+            IMapsService mapsService)
         {
             _patientRepository = patientRepository;
             _locationRepository = locationRepository;
             _mapsService = mapsService;
         }
 
-        public async Task<PatientDto> GetOrCreateAsync(string name, string phone, string locationAddress, string? patientDescription = null)
+        public async Task<PatientDto> GetOrCreateAsync(
+            string name,
+            string phone,
+            string locationAddress,
+            string? patientDescription = null)
         {
             var normalizedPhone = Guard.NormalizePhone(phone);
             var normalizedName = NameValidator.NormalizeRequired(name, "Patient name", 150);
             var normalizedAddress = NameValidator.NormalizeRequired(locationAddress, "Location address", 500);
-            var normalizedDescription = string.IsNullOrWhiteSpace(patientDescription) ? null : patientDescription.Trim();
+            var normalizedDescription = string.IsNullOrWhiteSpace(patientDescription)
+                ? null
+                : patientDescription.Trim();
 
             var existing = await _patientRepository.GetByPhoneAsync(normalizedPhone);
+
             if (existing is not null)
             {
                 return Map(existing);
@@ -40,6 +50,7 @@ namespace JQZHomeCareProject.Application.Services
                 Latitude = latitude,
                 Longitude = longitude
             };
+
             await _locationRepository.AddAsync(location);
 
             var patient = new Patient
@@ -51,6 +62,7 @@ namespace JQZHomeCareProject.Application.Services
                 Location = location,
                 PatientDescription = normalizedDescription
             };
+
             await _patientRepository.AddAsync(patient);
 
             return Map(patient);
@@ -59,44 +71,79 @@ namespace JQZHomeCareProject.Application.Services
         public async Task<PatientDto?> GetByIdAsync(Guid id)
         {
             var patient = await _patientRepository.GetByIdAsync(id);
+
             return patient is null ? null : Map(patient);
         }
 
-public async Task<PatientDto?> GetByPhoneAsync(string phone)
-{
-    var normalizedPhone = Guard.NormalizePhone(phone);
+        public async Task<PatientDto?> GetByPhoneAsync(string phone)
+        {
+            var normalizedPhone = Guard.NormalizePhone(phone);
 
-    var patient = await _patientRepository.GetByPhoneAsync(normalizedPhone);
+            var patient = await _patientRepository.GetByPhoneAsync(normalizedPhone);
 
-    return patient is null ? null : Map(patient);
-}
+            return patient is null ? null : Map(patient);
+        }
 
         public async Task<IEnumerable<PatientDto>> GetAllAsync()
         {
             var patients = await _patientRepository.GetAllAsync();
+
             return patients.Select(Map);
         }
 
         public async Task<PatientDto> UpdateAsync(Guid id, UpdatePatientDto dto)
         {
             var patient = await _patientRepository.GetByIdAsync(id)
-                ?? throw new NotFoundException($"Patient with id {id} was not found.");
+                ?? throw new NotFoundException(
+                    $"Patient with id {id} was not found.");
 
-            var name = NameValidator.NormalizeRequired(dto.Name, "Patient name", 150);
-            var phone = Guard.NormalizePhone(dto.Phone, "Phone");
-            var address = NameValidator.NormalizeRequired(dto.LocationAddress, "Location address", 500);
+            var name = NameValidator.NormalizeRequired(
+                dto.Name,
+                "Patient name",
+                150);
 
-            var byPhone = await _patientRepository.GetByPhoneAsync(phone);
-            if (byPhone is not null && byPhone.Id != id)
-                throw new ValidationException($"Phone number {phone} is already in use by another patient.");
+            var phone = Guard.NormalizePhone(
+                dto.Phone,
+                "Phone");
+
+            var address = NameValidator.NormalizeRequired(
+                dto.LocationAddress,
+                "Location address",
+                500);
+
+            /*
+             * Patient phone numbers are unique and immutable.
+             *
+             * The phone is still accepted by UpdatePatientDto because
+             * the existing Edit Patient workflow needs to send/display
+             * the patient's phone number.
+             *
+             * However, the submitted phone must always match the
+             * patient's existing permanent phone number.
+             */
+            if (!string.Equals(
+                    phone,
+                    patient.Phone,
+                    StringComparison.Ordinal))
+            {
+                throw new ValidationException(
+                    "Patient phone number cannot be changed.");
+            }
 
             patient.Name = name;
-            patient.Phone = phone;
-            patient.PatientDescription = string.IsNullOrWhiteSpace(dto.PatientDescription) ? null : dto.PatientDescription.Trim();
 
-            if (!string.Equals(patient.Location?.Address, address, StringComparison.OrdinalIgnoreCase))
+            patient.PatientDescription =
+                string.IsNullOrWhiteSpace(dto.PatientDescription)
+                    ? null
+                    : dto.PatientDescription.Trim();
+
+            if (!string.Equals(
+                    patient.Location?.Address,
+                    address,
+                    StringComparison.OrdinalIgnoreCase))
             {
-                var (latitude, longitude) = await _mapsService.GeocodeAsync(address);
+                var (latitude, longitude) =
+                    await _mapsService.GeocodeAsync(address);
 
                 if (patient.Location is null)
                 {
@@ -106,7 +153,9 @@ public async Task<PatientDto?> GetByPhoneAsync(string phone)
                         Latitude = latitude,
                         Longitude = longitude
                     };
+
                     await _locationRepository.AddAsync(location);
+
                     patient.LocationId = location.Id;
                     patient.Location = location;
                 }
@@ -115,11 +164,14 @@ public async Task<PatientDto?> GetByPhoneAsync(string phone)
                     patient.Location.Address = address;
                     patient.Location.Latitude = latitude;
                     patient.Location.Longitude = longitude;
-                    await _locationRepository.UpdateAsync(patient.Location);
+
+                    await _locationRepository.UpdateAsync(
+                        patient.Location);
                 }
             }
 
             patient.UpdatedAt = DateTime.UtcNow;
+
             await _patientRepository.UpdateAsync(patient);
 
             return Map(patient);

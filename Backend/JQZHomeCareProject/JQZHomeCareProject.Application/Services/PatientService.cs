@@ -62,11 +62,14 @@ namespace JQZHomeCareProject.Application.Services
             return patient is null ? null : Map(patient);
         }
 
-        public async Task<PatientDto?> GetByPhoneAsync(string phone)
-        {
-            var patient = await _patientRepository.GetByPhoneAsync(phone);
-            return patient is null ? null : Map(patient);
-        }
+public async Task<PatientDto?> GetByPhoneAsync(string phone)
+{
+    var normalizedPhone = Guard.NormalizePhone(phone);
+
+    var patient = await _patientRepository.GetByPhoneAsync(normalizedPhone);
+
+    return patient is null ? null : Map(patient);
+}
 
         public async Task<IEnumerable<PatientDto>> GetAllAsync()
         {

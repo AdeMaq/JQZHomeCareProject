@@ -123,21 +123,31 @@ namespace JQZHomeCareProject.Application.Services
                     var assignment = i < dto.VisitAssignments.Count ? dto.VisitAssignments[i] : null;
 
                     visits.Add(new Visit
-                    {
-                        Id = Guid.NewGuid(),
-                        PatientId = patient.Id,
-                        PractitionerId = assignment?.PractitionerId,
-                        AreaId = assignment?.AreaId,
-                        ServiceId = package.ServiceId,
-                        PatientPackageId = patientPackage.Id,
-                        ScheduledDate = assignment?.ScheduledDate,
-                        SlotStart = assignment?.SlotStart,
-                        SlotEnd = assignment?.SlotEnd,
-                        Status = VisitStatus.Scheduled,
-                        AmountDue = amountDuePerVisit,
-                        CollectionStatus = CollectionStatus.Pending,
-                        CreatedByUserId = createdByUserId
-                    });
+{
+    Id = Guid.NewGuid(),
+
+    PatientId = patient.Id,
+
+    // Patient information snapshot for this specific visit.
+    PatientNameSnapshot = dto.PatientName.Trim(),
+    PatientPhoneSnapshot = dto.PatientPhone.Trim(),
+    PatientAddressSnapshot = dto.LocationAddress.Trim(),
+    PatientDescriptionSnapshot = string.IsNullOrWhiteSpace(dto.PatientDescription)
+        ? null
+        : dto.PatientDescription.Trim(),
+
+    PractitionerId = assignment?.PractitionerId,
+    AreaId = assignment?.AreaId,
+    ServiceId = package.ServiceId,
+    PatientPackageId = patientPackage.Id,
+    ScheduledDate = assignment?.ScheduledDate,
+    SlotStart = assignment?.SlotStart,
+    SlotEnd = assignment?.SlotEnd,
+    Status = VisitStatus.Scheduled,
+    AmountDue = amountDuePerVisit,
+    CollectionStatus = CollectionStatus.Pending,
+    CreatedByUserId = createdByUserId
+});
                 }
                 await _visitRepository.AddRangeAsync(visits);
                 await _patientRepository.IncrementVisitCountAsync(patient.Id, package.NumberOfVisits);

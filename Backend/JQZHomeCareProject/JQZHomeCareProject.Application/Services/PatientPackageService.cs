@@ -62,32 +62,34 @@ namespace JQZHomeCareProject.Application.Services
     }
     public static class VisitMapper
     {
-        public static VisitDto ToDto(Visit v) => new()
-        {
-            Id = v.Id,
-            PatientId = v.PatientId,
-            PatientName = v.Patient?.Name ?? string.Empty,
-            PatientPhone = v.Patient?.Phone ?? string.Empty,
-            PatientAddress = v.Patient?.Location?.Address ?? string.Empty,
-            PatientDescription = v.Patient?.PatientDescription,
-            PractitionerId = v.PractitionerId,
-            PractitionerName = v.Practitioner?.User?.Name,
-            AreaId = v.AreaId,
-            AreaName = v.Area?.Name,
-            ServiceId = v.ServiceId,
-            ServiceName = v.Service?.Name ?? string.Empty,
-            PatientPackageId = v.PatientPackageId,
-            PackageName = v.PatientPackage?.Package?.Name,
-            ScheduledDate = v.ScheduledDate,
-            SlotStart = v.SlotStart,
-            SlotEnd = v.SlotEnd,
-            Status = v.Status,
-            AmountDue = v.AmountDue,
-            AmountReceived = v.AmountReceived,
-            ReceivedBy = v.ReceivedBy,
-            CollectionStatus = v.CollectionStatus,
-            PaymentType = v.PatientPackage?.PaymentType,
-            SettlementId = v.SettlementId
-        };
+public static VisitDto ToDto(Visit v) => new()
+{
+    Id = v.Id,
+    PatientId = v.PatientId,
+
+    PatientName = v.PatientNameSnapshot ?? v.Patient?.Name ?? string.Empty,
+    PatientPhone = v.PatientPhoneSnapshot ?? v.Patient?.Phone ?? string.Empty,
+    PatientAddress = v.PatientAddressSnapshot ?? v.Patient?.Location?.Address ?? string.Empty,
+    PatientDescription = v.PatientDescriptionSnapshot ?? v.Patient?.PatientDescription,
+
+    PractitionerId = v.PractitionerId,
+    PractitionerName = v.Practitioner?.User?.Name,
+    AreaId = v.AreaId,
+    AreaName = v.Area?.Name,
+    ServiceId = v.ServiceId,
+    ServiceName = v.Service?.Name ?? string.Empty,
+    PatientPackageId = v.PatientPackageId,
+    PackageName = v.PatientPackage?.Package?.Name,
+    ScheduledDate = v.ScheduledDate,
+    SlotStart = v.SlotStart,
+    SlotEnd = v.SlotEnd,
+    Status = v.Status,
+    AmountDue = v.AmountDue,
+    AmountReceived = v.AmountReceived,
+    ReceivedBy = v.ReceivedBy,
+    CollectionStatus = v.CollectionStatus,
+    PaymentType = v.PatientPackage?.PaymentType,
+    SettlementId = v.SettlementId
+};
     }
 }

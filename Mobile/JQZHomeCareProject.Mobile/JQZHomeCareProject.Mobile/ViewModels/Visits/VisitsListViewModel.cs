@@ -96,7 +96,7 @@ namespace JQZHomeCareProject.Mobile.ViewModels.Visits
         private async Task OpenVisitAsync(VisitDto visit)
         {
             if (visit is null) return;
-            await _navigation.GoToAsync($"visits/detail?visitId={visit.Id}");
+            await _navigation.GoToAsync($"///visits/detail?visitId={visit.Id}");
         }
 
         private void ApplyFilter()

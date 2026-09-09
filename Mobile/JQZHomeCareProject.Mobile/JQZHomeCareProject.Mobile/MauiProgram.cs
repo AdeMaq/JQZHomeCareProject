@@ -71,6 +71,8 @@ namespace JQZHomeCareProject.Mobile
             builder.Services.AddTransient<VisitsListViewModel>();
             builder.Services.AddTransient<VisitsViewModel>();
             builder.Services.AddTransient<VisitsPage>();
+            builder.Services.AddTransient<VisitDetailPage>();
+            builder.Services.AddTransient<VisitDetailViewModel>();
             builder.Services.AddTransient<AppShell>();
 
 

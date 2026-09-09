@@ -121,7 +121,7 @@ namespace JQZHomeCareProject.Mobile.ViewModels.Home
         private async Task OpenVisitAsync(VisitDto visit)
         {
             if (visit is null) return;
-            await _navigation.GoToAsync($"visits/detail?visitId={visit.Id}");
+            await _navigation.GoToAsync($"///visits/detail?visitId={visit.Id}");
         }
 
         [RelayCommand]

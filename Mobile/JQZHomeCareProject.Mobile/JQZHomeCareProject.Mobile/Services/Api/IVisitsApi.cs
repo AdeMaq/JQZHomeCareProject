@@ -9,5 +9,6 @@ namespace JQZHomeCareProject.Mobile.Services.Api
     {
         Task<List<VisitDto>> GetTodayAsync(Guid practitionerId, CancellationToken cancellationToken = default);
         Task<List<VisitDto>> GetAllAsync(CancellationToken cancellationToken = default);
+        Task<VisitDto> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
     }
 }

@@ -1,808 +1,566 @@
 <div class="edit-visit-page">
   <!-- ============================================================
        BREADCRUMB
-  ============================================================ -->
+  ============================================================= -->
 
   <div class="breadcrumb">
-    <span>Visits</span>
+    <span> Visits </span>
 
     <i class="fa-solid fa-chevron-right"></i>
 
-    <span class="current">Edit Visit</span>
+    <span class="current"> Edit Visit </span>
   </div>
 
   <!-- ============================================================
-       PAGE HEADER
-  ============================================================ -->
-
-  <div class="page-header">
-    <div class="page-header-left">
-      <div class="page-header-icon">
-        <i class="fa-solid fa-pen-to-square"></i>
-      </div>
-
-      <div>
-        <h1>Edit Visit</h1>
-
-        <p>Update the practitioner, area and schedule for this visit.</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- ============================================================
-       LOADING VISIT
-  ============================================================ -->
+       LOADING
+  ============================================================= -->
 
   @if (isLoading) {
-    <div class="loading-card">
-      <i class="fa-solid fa-spinner fa-spin"></i>
+    <div class="loading-container">
+      <div class="loading-spinner"></div>
 
-      <span>Loading visit...</span>
+      <p>Loading visit information...</p>
     </div>
   }
 
   <!-- ============================================================
-       ERROR BEFORE VISIT LOAD
-  ============================================================ -->
+       MAIN CONTENT
+  ============================================================= -->
 
-  @if (!isLoading && !visit && errorMessage) {
-    <div class="form-alert error">
-      <i class="fa-solid fa-circle-exclamation"></i>
+  @if (!isLoading && visit) {
+    <!-- ==========================================================
+         PAGE HEADER
+    =========================================================== -->
 
-      <div>
-        <strong>Unable to load visit</strong>
+    <div class="page-header">
+      <div class="page-header-left">
+        <div class="page-title-icon">
+          <i class="fa-solid fa-pen-to-square"></i>
+        </div>
 
-        <p>{{ errorMessage }}</p>
+        <div>
+          <h1>Edit Visit</h1>
+
+          <p>Update practitioner assignment and visit schedule.</p>
+        </div>
       </div>
     </div>
 
-    <div class="form-footer">
-      <button type="button" class="btn btn-secondary" (click)="cancel()">
-        <i class="fa-solid fa-arrow-left"></i>
+    <!-- ==========================================================
+         SUCCESS MESSAGE
+    =========================================================== -->
 
-        Back to Visits
-      </button>
+    @if (successMessage) {
+      <div class="alert alert-success">
+        <i class="fa-solid fa-circle-check"></i>
+
+        <span>
+          {{ successMessage }}
+        </span>
+      </div>
+    }
+
+    <!-- ==========================================================
+         ERROR MESSAGE
+    =========================================================== -->
+
+    @if (errorMessage) {
+      <div class="alert alert-error">
+        <i class="fa-solid fa-circle-exclamation"></i>
+
+        <span>
+          {{ errorMessage }}
+        </span>
+      </div>
+    }
+
+    <!-- ==========================================================
+         VISIT INFORMATION
+    =========================================================== -->
+
+    <div class="section-card">
+      <div class="section-header">
+        <div>
+          <h2>Visit Information</h2>
+
+          <p>Patient and visit details.</p>
+        </div>
+      </div>
+
+      <div class="information-grid">
+        <!-- ======================================================
+             PATIENT
+        ======================================================= -->
+
+        <div class="information-item">
+          <span class="information-label"> Patient </span>
+
+          <span class="information-value">
+            {{ getPatientName() }}
+          </span>
+        </div>
+
+        <!-- ======================================================
+             PHONE
+        ======================================================= -->
+
+        <div class="information-item">
+          <span class="information-label"> Phone Number </span>
+
+          <span class="information-value">
+            {{ getPatientPhone() }}
+          </span>
+        </div>
+
+        <!-- ======================================================
+             SERVICE
+        ======================================================= -->
+
+        <div class="information-item">
+          <span class="information-label"> Service </span>
+
+          <span class="information-value">
+            {{ getServiceName() }}
+          </span>
+        </div>
+
+        <!-- ======================================================
+             PACKAGE
+        ======================================================= -->
+
+        <div class="information-item">
+          <span class="information-label"> Package </span>
+
+          <span class="information-value">
+            {{ getPackageName() }}
+          </span>
+        </div>
+
+        <!-- ======================================================
+             AREA
+        ======================================================= -->
+
+        <div class="information-item">
+          <span class="information-label"> Current Area </span>
+
+          <span class="information-value">
+            {{ getAreaName() }}
+          </span>
+        </div>
+
+        <!-- ======================================================
+             CURRENT PRACTITIONER
+        ======================================================= -->
+
+        <div class="information-item">
+          <span class="information-label"> Current Practitioner </span>
+
+          <span class="information-value">
+            {{ getCurrentPractitionerName() }}
+          </span>
+        </div>
+
+        <!-- ======================================================
+             STATUS
+        ======================================================= -->
+
+        <div class="information-item">
+          <span class="information-label"> Status </span>
+
+          <span
+            class="status-badge"
+            [class.scheduled]="visit.status === 'Scheduled'"
+            [class.accepted]="visit.status === 'Accepted'"
+            [class.completed]="visit.status === 'Completed'"
+            [class.cancelled]="visit.status === 'Cancelled'"
+          >
+            <span class="status-dot"></span>
+
+            {{ visit.status }}
+          </span>
+        </div>
+      </div>
     </div>
-  }
 
-  <!-- ============================================================
-       EDIT FORM
-  ============================================================ -->
+    <!-- ==========================================================
+         PATIENT DETAILS
+    =========================================================== -->
 
-  @if (!isLoading && visit) {
-    <form class="visit-form" (ngSubmit)="submit()" #editVisitForm="ngForm">
+    <div class="section-card">
+      <div class="section-header">
+        <div>
+          <h2>Patient Information</h2>
+
+          <p>Current patient information associated with this visit.</p>
+        </div>
+      </div>
+
+      <div class="patient-details-grid">
+        <!-- ======================================================
+             ADDRESS
+        ======================================================= -->
+
+        <div class="detail-box">
+          <div class="detail-icon">
+            <i class="fa-solid fa-location-dot"></i>
+          </div>
+
+          <div>
+            <span class="detail-label"> Address </span>
+
+            <p>
+              {{ getPatientAddress() }}
+            </p>
+          </div>
+        </div>
+
+        <!-- ======================================================
+             DESCRIPTION
+        ======================================================= -->
+
+        <div class="detail-box">
+          <div class="detail-icon">
+            <i class="fa-solid fa-notes-medical"></i>
+          </div>
+
+          <div>
+            <span class="detail-label"> Description </span>
+
+            <p>
+              {{ getPatientDescription() }}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==========================================================
+         PRACTITIONER ASSIGNMENT
+    =========================================================== -->
+
+    <div class="section-card">
+      <div class="section-header">
+        <div>
+          <h2>Practitioner Assignment</h2>
+
+          <p>Select a practitioner for this visit.</p>
+        </div>
+      </div>
+
+      <div class="form-grid">
+        <!-- ======================================================
+             AREA
+        ======================================================= -->
+
+        <div class="form-field">
+          <label for="area"> Area </label>
+
+          <div class="input-wrapper">
+            <i class="fa-solid fa-location-dot"></i>
+
+            <select
+              id="area"
+              name="area"
+              [(ngModel)]="form.areaId"
+              (ngModelChange)="onAreaChange()"
+            >
+              <option [ngValue]="null">Select Area</option>
+
+              @for (area of areas; track trackByArea($index, area)) {
+                <option [ngValue]="area.id">
+                  {{ area.name }}
+                </option>
+              }
+            </select>
+          </div>
+
+          <small class="field-hint">
+            Practitioners covering the selected area are prioritized first.
+          </small>
+        </div>
+
+        <!-- ======================================================
+             PRACTITIONER
+        ======================================================= -->
+
+        <div class="form-field">
+          <label for="practitioner">
+            Practitioner
+
+            @if (hasPractitionerChanged()) {
+              <span class="required"> * </span>
+            }
+          </label>
+
+          <div class="custom-select-wrapper">
+            <button
+              type="button"
+              id="practitioner"
+              class="custom-select"
+              [class.open]="isPractitionerDropdownOpen"
+              (click)="togglePractitionerDropdown()"
+            >
+              <span>
+                <i class="fa-solid fa-user-doctor"></i>
+
+                {{ form.practitionerId ? getSelectedPractitionerName() : 'Select Practitioner' }}
+              </span>
+
+              <i
+                class="fa-solid"
+                [class.fa-chevron-down]="!isPractitionerDropdownOpen"
+                [class.fa-chevron-up]="isPractitionerDropdownOpen"
+              ></i>
+            </button>
+
+            @if (isPractitionerDropdownOpen) {
+              <div class="custom-dropdown">
+                <!-- ==========================================
+                     SEARCH
+                =========================================== -->
+
+                <div class="dropdown-search">
+                  <i class="fa-solid fa-magnifying-glass"></i>
+
+                  <input
+                    type="text"
+                    name="practitionerSearch"
+                    placeholder="Search practitioner..."
+                    [(ngModel)]="practitionerSearchTerm"
+                    (ngModelChange)="onPractitionerSearchChange()"
+                    (click)="$event.stopPropagation()"
+                  />
+                </div>
+
+                <!-- ==========================================
+                     OPTIONS
+                =========================================== -->
+
+                <div class="dropdown-options">
+                  @if (filteredPractitioners.length === 0) {
+                    <div class="empty-option">
+                      <i class="fa-solid fa-user-doctor"></i>
+
+                      <span> No practitioners found. </span>
+                    </div>
+                  }
+
+                  @for (
+                    practitioner of filteredPractitioners;
+                    track trackByPractitioner($index, practitioner)
+                  ) {
+                    <button
+                      type="button"
+                      class="dropdown-option"
+                      [class.selected]="form.practitionerId === practitioner.id"
+                      (click)="selectPractitioner(practitioner)"
+                    >
+                      <div class="practitioner-option-icon">
+                        <i class="fa-solid fa-user-doctor"></i>
+                      </div>
+
+                      <div class="practitioner-option-content">
+                        <span class="practitioner-name">
+                          {{ practitioner.name }}
+                        </span>
+
+                        @if (
+                          form.areaId && practitioner.areas?.some((area) => area.id === form.areaId)
+                        ) {
+                          <span class="area-match-badge">
+                            <i class="fa-solid fa-location-dot"></i>
+
+                            Same Area
+                          </span>
+                        }
+                      </div>
+
+                      @if (form.practitionerId === practitioner.id) {
+                        <i class="fa-solid fa-check selected-icon"></i>
+                      }
+                    </button>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+
+          <small class="field-hint">
+            Only practitioners for this visit's service are shown. Practitioners covering the
+            selected area appear first.
+          </small>
+        </div>
+      </div>
+
       <!-- ========================================================
-           VISIT INFORMATION
-      ======================================================== -->
+           AREA API LIMITATION
+      ========================================================= -->
 
-      <section class="form-card">
-        <div class="card-header">
-          <div class="card-header-icon">
+      @if (hasAreaChanged()) {
+        <div class="reassignment-box">
+          <div class="reassignment-header">
+            <div class="reassignment-icon">
+              <i class="fa-solid fa-circle-info"></i>
+            </div>
+
+            <div>
+              <h3>Area Change</h3>
+
+              <p>
+                The current backend reassignment API does not support saving an area change. Keep
+                the original area to save this visit.
+              </p>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- ==========================================================
+         VISIT SCHEDULE
+    =========================================================== -->
+
+    <div class="section-card">
+      <div class="section-header">
+        <div>
+          <h2>Visit Schedule</h2>
+
+          <p>Update the date and time for this visit.</p>
+        </div>
+      </div>
+
+      <div class="form-grid">
+        <!-- ======================================================
+             DATE
+        ======================================================= -->
+
+        <div class="form-field">
+          <label for="scheduledDate"> Scheduled Date </label>
+
+          <div class="input-wrapper">
+            <i class="fa-solid fa-calendar-days"></i>
+
+            <input
+              id="scheduledDate"
+              name="scheduledDate"
+              type="date"
+              [(ngModel)]="form.scheduledDate"
+              (ngModelChange)="onScheduledDateChange()"
+            />
+          </div>
+        </div>
+
+        <!-- ======================================================
+             START TIME
+        ======================================================= -->
+
+        <div class="form-field">
+          <label for="startTime"> Start Time </label>
+
+          <div class="input-wrapper">
+            <i class="fa-solid fa-clock"></i>
+
+            <input id="startTime" name="startTime" type="time" [(ngModel)]="form.startTime" />
+          </div>
+        </div>
+
+        <!-- ======================================================
+             END TIME
+        ======================================================= -->
+
+        <div class="form-field">
+          <label for="endTime"> End Time </label>
+
+          <div class="input-wrapper">
+            <i class="fa-solid fa-clock"></i>
+
+            <input id="endTime" name="endTime" type="time" [(ngModel)]="form.endTime" />
+          </div>
+        </div>
+      </div>
+
+      <!-- ========================================================
+           SCHEDULE LOADING
+      ========================================================= -->
+
+      @if (isLoadingSchedule) {
+        <div class="schedule-status">
+          <i class="fa-solid fa-spinner fa-spin"></i>
+
+          <span> Checking practitioner schedule... </span>
+        </div>
+      }
+
+      <!-- ========================================================
+           SCHEDULE ERROR
+      ========================================================= -->
+
+      @if (scheduleErrorMessage) {
+        <div class="schedule-error">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+
+          <span>
+            {{ scheduleErrorMessage }}
+          </span>
+        </div>
+      }
+
+      <!-- ========================================================
+           SCHEDULE SUMMARY
+      ========================================================= -->
+
+      @if (form.scheduledDate && form.startTime && form.endTime) {
+        <div class="schedule-summary">
+          <div class="schedule-summary-icon">
             <i class="fa-solid fa-calendar-check"></i>
           </div>
 
           <div>
-            <h2>Visit Information</h2>
-
-            <p>Basic information for the selected visit.</p>
-          </div>
-        </div>
-
-        <div class="card-body">
-          <div class="info-grid">
-            <!-- PATIENT -->
-
-            <div class="info-item">
-              <div class="info-item-label">
-                <i class="fa-solid fa-user"></i>
-
-                <span>Patient</span>
-              </div>
-
-              <strong>
-                {{ visit.patientName }}
-              </strong>
-            </div>
-
-            <!-- SERVICE -->
-
-            <div class="info-item">
-              <div class="info-item-label">
-                <i class="fa-solid fa-briefcase-medical"></i>
-
-                <span>Service</span>
-              </div>
-
-              <strong>
-                {{ visit.serviceName || '—' }}
-              </strong>
-            </div>
-
-            <!-- PACKAGE -->
-
-            <div class="info-item">
-              <div class="info-item-label">
-                <i class="fa-solid fa-box-open"></i>
-
-                <span>Package</span>
-              </div>
-
-              <strong>
-                {{ visit.packageName || '—' }}
-              </strong>
-            </div>
-
-            <!-- STATUS -->
-
-            <div class="info-item">
-              <div class="info-item-label">
-                <i class="fa-solid fa-circle-info"></i>
-
-                <span>Status</span>
-              </div>
-
-              <span
-                class="status-badge"
-                [class.scheduled]="visit.status === 'Scheduled'"
-                [class.accepted]="visit.status === 'Accepted'"
-                [class.completed]="visit.status === 'Completed'"
-                [class.cancelled]="visit.status === 'Cancelled'"
-              >
-                {{ visit.status }}
-              </span>
-            </div>
-
-            <!-- AMOUNT DUE -->
-
-            <div class="info-item">
-              <div class="info-item-label">
-                <i class="fa-solid fa-money-bill-wave"></i>
-
-                <span>Amount Due</span>
-              </div>
-
-              <strong> PKR {{ visit.amountDue | number: '1.0-2' }} </strong>
-            </div>
-
-            <!-- COLLECTION STATUS -->
-
-            <div class="info-item">
-              <div class="info-item-label">
-                <i class="fa-solid fa-wallet"></i>
-
-                <span>Collection Status</span>
-              </div>
-
-              <strong>
-                {{ visit.collectionStatus }}
-              </strong>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- ========================================================
-           PRACTITIONER ASSIGNMENT
-      ======================================================== -->
-
-      <section class="form-card">
-        <div class="card-header">
-          <div class="card-header-icon">
-            <i class="fa-solid fa-user-doctor"></i>
-          </div>
-
-          <div>
-            <h2>Practitioner Assignment</h2>
-
-            <p>Update the area and practitioner assigned to this visit.</p>
-          </div>
-        </div>
-
-        <div class="card-body">
-          <div class="form-grid">
-            <!-- AREA -->
-
-            <div class="form-field searchable-field">
-              <label for="areaSearch"> Area </label>
-
-              <div class="searchable-select">
-                <div class="searchable-input" [class.open]="isAreaDropdownOpen">
-                  <i class="fa-solid fa-location-dot"></i>
-
-                  <input
-                    id="areaSearch"
-                    type="text"
-                    autocomplete="off"
-                    [(ngModel)]="areaSearchTerm"
-                    name="areaSearchTerm"
-                    placeholder="Search or select area..."
-                    (focus)="openAreaDropdown()"
-                    (input)="filterAreas()"
-                  />
-
-                  @if (form.areaId) {
-                    <button
-                      type="button"
-                      class="clear-selection-btn"
-                      (click)="clearAreaSelection()"
-                      title="Clear area"
-                    >
-                      <i class="fa-solid fa-xmark"></i>
-                    </button>
-                  }
-
-                  <button
-                    type="button"
-                    class="dropdown-toggle"
-                    (click)="toggleAreaDropdown()"
-                    title="Toggle areas"
-                  >
-                    <i class="fa-solid fa-chevron-down" [class.rotated]="isAreaDropdownOpen"></i>
-                  </button>
-                </div>
-
-                @if (isAreaDropdownOpen) {
-                  <div class="searchable-dropdown">
-                    @if (isLoadingAreas) {
-                      <div class="no-results">
-                        <i class="fa-solid fa-spinner fa-spin"></i>
-
-                        <span>Loading areas...</span>
-                      </div>
-                    } @else if (getFilteredAreas().length > 0) {
-                      @for (area of getFilteredAreas(); track area.id) {
-                        <button
-                          type="button"
-                          class="searchable-option"
-                          [class.selected]="isAreaSelected(area.id)"
-                          (click)="selectArea(area)"
-                        >
-                          <div class="option-main">
-                            <div class="option-icon">
-                              <i class="fa-solid fa-location-dot"></i>
-                            </div>
-
-                            <div class="option-text">
-                              <span class="option-title">
-                                {{ area.name }}
-                              </span>
-
-                              @if (area.cityName) {
-                                <span class="option-subtitle">
-                                  {{ area.cityName }}
-                                </span>
-                              }
-                            </div>
-                          </div>
-
-                          @if (isAreaSelected(area.id)) {
-                            <i class="fa-solid fa-check option-check"></i>
-                          }
-                        </button>
-                      }
-                    } @else {
-                      <div class="no-results">
-                        <i class="fa-solid fa-magnifying-glass"></i>
-
-                        <span>No areas found</span>
-                      </div>
-                    }
-                  </div>
-                }
-              </div>
-            </div>
-
-            <!-- PRACTITIONER -->
-
-            <div class="form-field searchable-field">
-              <label for="practitionerSearch"> Practitioner </label>
-
-              <div class="searchable-select">
-                <div class="searchable-input" [class.open]="isPractitionerDropdownOpen">
-                  <i class="fa-solid fa-user-doctor"></i>
-
-                  <input
-                    id="practitionerSearch"
-                    type="text"
-                    autocomplete="off"
-                    [(ngModel)]="practitionerSearchTerm"
-                    name="practitionerSearchTerm"
-                    placeholder="Search or select practitioner..."
-                    (focus)="openPractitionerDropdown()"
-                    (input)="filterPractitioners()"
-                  />
-
-                  @if (form.practitionerId) {
-                    <button
-                      type="button"
-                      class="clear-selection-btn"
-                      (click)="clearPractitionerSelection()"
-                      title="Clear practitioner"
-                    >
-                      <i class="fa-solid fa-xmark"></i>
-                    </button>
-                  }
-
-                  <button
-                    type="button"
-                    class="dropdown-toggle"
-                    (click)="togglePractitionerDropdown()"
-                    title="Toggle practitioners"
-                  >
-                    <i
-                      class="fa-solid fa-chevron-down"
-                      [class.rotated]="isPractitionerDropdownOpen"
-                    ></i>
-                  </button>
-                </div>
-
-                @if (isPractitionerDropdownOpen) {
-                  <div class="searchable-dropdown practitioner-dropdown">
-                    @if (isLoadingPractitioners) {
-                      <div class="no-results">
-                        <i class="fa-solid fa-spinner fa-spin"></i>
-
-                        <span>Loading practitioners...</span>
-                      </div>
-                    } @else if (getFilteredPractitioners().length > 0) {
-                      @for (practitioner of getFilteredPractitioners(); track practitioner.id) {
-                        <button
-                          type="button"
-                          class="searchable-option practitioner-option"
-                          [class.selected]="isPractitionerSelected(practitioner.id)"
-                          (click)="selectPractitioner(practitioner)"
-                        >
-                          <div class="option-main">
-                            <div class="practitioner-avatar">
-                              <i class="fa-solid fa-user-doctor"></i>
-                            </div>
-
-                            <div class="option-text">
-                              <div class="practitioner-name-row">
-                                <span class="option-title">
-                                  {{ practitioner.name }}
-                                </span>
-
-                                @if (isPractitionerAssignedToSelectedArea(practitioner)) {
-                                  <span class="assigned-badge">
-                                    <i class="fa-solid fa-star"></i>
-
-                                    Assigned to Area
-                                  </span>
-                                }
-                              </div>
-
-                              @if (practitioner.serviceName) {
-                                <span class="option-subtitle">
-                                  {{ practitioner.serviceName }}
-                                </span>
-                              }
-
-                              @if (practitioner.email || practitioner.phone) {
-                                <span class="option-meta">
-                                  @if (practitioner.email) {
-                                    {{ practitioner.email }}
-                                  }
-
-                                  @if (practitioner.email && practitioner.phone) {
-                                    <span class="meta-separator"> • </span>
-                                  }
-
-                                  @if (practitioner.phone) {
-                                    {{ practitioner.phone }}
-                                  }
-                                </span>
-                              }
-                            </div>
-                          </div>
-
-                          @if (isPractitionerSelected(practitioner.id)) {
-                            <i class="fa-solid fa-check option-check"></i>
-                          }
-                        </button>
-                      }
-                    } @else {
-                      <div class="no-results">
-                        <i class="fa-solid fa-user-slash"></i>
-
-                        <span>No practitioners found</span>
-                      </div>
-                    }
-                  </div>
-                }
-              </div>
-            </div>
-          </div>
-
-          <!-- REASSIGNMENT INFORMATION -->
-
-          @if (hasReassignment()) {
-            <div class="reassignment-box">
-              <div class="reassignment-title">
-                <div class="reassignment-icon">
-                  <i class="fa-solid fa-arrows-rotate"></i>
-                </div>
-
-                <strong>Reassignment Information</strong>
-              </div>
-
-              <p>A reason is required when changing the practitioner or assigned area.</p>
-
-              <div class="form-grid">
-                <div class="form-field">
-                  <label for="refusedBy">
-                    Refused By
-
-                    <span class="required">*</span>
-                  </label>
-
-                  <div class="input-wrapper">
-                    <i class="fa-solid fa-user-slash"></i>
-
-                    <select id="refusedBy" name="refusedBy" [(ngModel)]="form.refusedBy">
-                      <option value="Practitioner">Practitioner</option>
-
-                      <option value="Patient">Patient</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div class="form-field">
-                  <label for="reason">
-                    Reason
-
-                    <span class="required">*</span>
-                  </label>
-
-                  <div class="input-wrapper textarea-wrapper">
-                    <i class="fa-solid fa-comment"></i>
-
-                    <textarea
-                      id="reason"
-                      name="reason"
-                      [(ngModel)]="form.reason"
-                      maxlength="500"
-                      rows="3"
-                      placeholder="Enter the reason for reassignment"
-                    ></textarea>
-                  </div>
-                </div>
-              </div>
-            </div>
-          }
-        </div>
-      </section>
-
-      <!-- ========================================================
-           VISIT SCHEDULE
-      ======================================================== -->
-
-      <section class="form-card">
-        <div class="card-header">
-          <div class="card-header-icon">
-            <i class="fa-solid fa-clock"></i>
-          </div>
-
-          <div>
-            <h2>Visit Schedule</h2>
-
-            <p>Select the date and time and review the practitioner's availability.</p>
-          </div>
-        </div>
-
-        <div class="card-body">
-          <!-- SCHEDULE FIELDS -->
-
-          <div class="schedule-fields">
-            <!-- DATE -->
-
-            <div class="form-field">
-              <label for="scheduledDate">
-                Scheduled Date
-
-                <span class="required">*</span>
-              </label>
-
-              <div class="input-wrapper">
-                <i class="fa-solid fa-calendar"></i>
-
-                <input
-                  id="scheduledDate"
-                  name="scheduledDate"
-                  type="date"
-                  [(ngModel)]="form.scheduledDate"
-                  (ngModelChange)="onScheduleDateChange()"
-                  required
-                />
-              </div>
-            </div>
-
-            <!-- START TIME -->
-
-            <div class="form-field">
-              <label for="startTime">
-                Start Time
-
-                <span class="required">*</span>
-              </label>
-
-              <div class="input-wrapper">
-                <i class="fa-solid fa-clock"></i>
-
-                <input
-                  id="startTime"
-                  name="startTime"
-                  type="time"
-                  [(ngModel)]="form.startTime"
-                  (ngModelChange)="onTimeChange()"
-                  required
-                />
-              </div>
-            </div>
-
-            <!-- END TIME -->
-
-            <div class="form-field">
-              <label for="endTime">
-                End Time
-
-                <span class="required">*</span>
-              </label>
-
-              <div class="input-wrapper">
-                <i class="fa-solid fa-clock"></i>
-
-                <input
-                  id="endTime"
-                  name="endTime"
-                  type="time"
-                  [(ngModel)]="form.endTime"
-                  (ngModelChange)="onTimeChange()"
-                  required
-                />
-              </div>
-            </div>
-          </div>
-
-          <!-- TIME RANGE ERROR -->
-
-          @if (getTimeRangeError()) {
-            <div class="schedule-validation-error">
-              <i class="fa-solid fa-triangle-exclamation"></i>
-
-              <span>
-                {{ getTimeRangeError() }}
-              </span>
-            </div>
-          }
-
-          <!-- PRACTITIONER SCHEDULE -->
-
-          @if (shouldShowPractitionerSchedule()) {
-            <div class="practitioner-schedule">
-              <!-- SCHEDULE HEADER -->
-
-              <div class="practitioner-schedule-header">
-                <div class="schedule-title">
-                  <div class="schedule-title-icon">
-                    <i class="fa-solid fa-calendar-day"></i>
-                  </div>
-
-                  <div>
-                    <h3>Practitioner Schedule</h3>
-
-                    <p>
-                      {{ getSelectedPractitionerDisplay() }}
-                    </p>
-                  </div>
-                </div>
-
-                <div class="schedule-summary">
-                  <span>
-                    <strong>
-                      {{ getBookedVisitCount() }}
-                    </strong>
-
-                    booked
-                  </span>
-
-                  <span>
-                    <strong>
-                      {{ getAvailableSlotCount() }}
-                    </strong>
-
-                    available
-                  </span>
-                </div>
-              </div>
-
-              <!-- LOADING -->
-
-              @if (isLoadingSchedule) {
-                <div class="schedule-loading">
-                  <i class="fa-solid fa-spinner fa-spin"></i>
-
-                  <span> Loading practitioner schedule... </span>
-                </div>
-              }
-
-              <!-- ERROR -->
-
-              @if (!isLoadingSchedule && scheduleError) {
-                <div class="schedule-error">
-                  <i class="fa-solid fa-circle-exclamation"></i>
-
-                  <span>
-                    {{ scheduleError }}
-                  </span>
-                </div>
-              }
-
-              <!-- SCHEDULE -->
-
-              @if (!isLoadingSchedule && !scheduleError) {
-                <!-- LEGEND -->
-
-                <div class="schedule-legend">
-                  <div class="legend-item">
-                    <span class="legend-dot available-dot"></span>
-
-                    Available
-                  </div>
-
-                  <div class="legend-item">
-                    <span class="legend-dot booked-dot"></span>
-
-                    Booked
-                  </div>
-
-                  <div class="legend-item">
-                    <span class="legend-dot current-dot"></span>
-
-                    Current Visit
-                  </div>
-                </div>
-
-                <!-- SCHEDULE SLOTS -->
-
-                <div class="schedule-slots">
-                  @for (
-                    slot of getPractitionerSchedule();
-                    track slot.start + '-' + slot.end + '-' + slot.status
-                  ) {
-                    <div
-                      class="schedule-slot"
-                      [class.booked]="slot.status === 'BOOKED'"
-                      [class.available]="slot.status === 'AVAILABLE'"
-                      [class.current]="slot.status === 'CURRENT'"
-                    >
-                      <div class="schedule-time">
-                        <i class="fa-solid fa-clock"></i>
-
-                        <span>
-                          {{ formatTimeForDisplay(slot.start) }}
-                          -
-                          {{ formatTimeForDisplay(slot.end) }}
-                        </span>
-                      </div>
-
-                      <div class="schedule-slot-content">
-                        <span
-                          class="schedule-status"
-                          [class.booked-status]="slot.status === 'BOOKED'"
-                          [class.available-status]="slot.status === 'AVAILABLE'"
-                          [class.current-status]="slot.status === 'CURRENT'"
-                        >
-                          @if (slot.status === 'BOOKED') {
-                            <i class="fa-solid fa-lock"></i>
-                          } @else if (slot.status === 'CURRENT') {
-                            <i class="fa-solid fa-pen"></i>
-                          } @else {
-                            <i class="fa-solid fa-check"></i>
-                          }
-
-                          @if (slot.status === 'CURRENT') {
-                            CURRENT VISIT
-                          } @else {
-                            {{ slot.status }}
-                          }
-                        </span>
-
-                        @if (slot.status === 'BOOKED' || slot.status === 'CURRENT') {
-                          <span class="schedule-patient">
-                            {{ slot.patientName }}
-                          </span>
-                        }
-                      </div>
-                    </div>
-                  }
-                </div>
-              }
-            </div>
-          } @else {
-            <div class="schedule-empty-state">
-              <div class="schedule-empty-icon">
-                <i class="fa-solid fa-calendar-plus"></i>
-              </div>
-
-              <div>
-                <strong> Practitioner schedule unavailable </strong>
-
-                <p>Select a practitioner and scheduled date to view the availability.</p>
-              </div>
-            </div>
-          }
-        </div>
-      </section>
-
-      <!-- ========================================================
-           ERROR MESSAGE
-      ======================================================== -->
-
-      @if (errorMessage && visit) {
-        <div class="form-alert error">
-          <i class="fa-solid fa-circle-exclamation"></i>
-
-          <div>
-            <strong> Unable to update visit </strong>
+            <span class="schedule-summary-label"> New Schedule </span>
 
             <p>
-              {{ errorMessage }}
+              {{ form.scheduledDate }}
+
+              &nbsp;•&nbsp;
+
+              {{ form.startTime }}
+
+              -
+
+              {{ form.endTime }}
             </p>
           </div>
         </div>
       }
+    </div>
 
-      <!-- ========================================================
-           SUCCESS MESSAGE
-      ======================================================== -->
+    <!-- ==========================================================
+         FOOTER
+    =========================================================== -->
 
-      @if (successMessage) {
-        <div class="form-alert success">
-          <i class="fa-solid fa-circle-check"></i>
+    <div class="form-footer">
+      <button type="button" class="btn btn-secondary" [disabled]="isSaving" (click)="cancelEdit()">
+        <i class="fa-solid fa-xmark"></i>
 
-          <div>
-            <strong>Success</strong>
+        Cancel
+      </button>
 
-            <p>
-              {{ successMessage }}
-            </p>
-          </div>
-        </div>
-      }
+      <button
+        type="button"
+        class="btn btn-primary"
+        [disabled]="isSaving || isLoading"
+        (click)="saveChanges()"
+      >
+        @if (isSaving) {
+          <i class="fa-solid fa-spinner fa-spin"></i>
 
-      <!-- ========================================================
-           FOOTER
-      ======================================================== -->
+          Saving...
+        } @else {
+          <i class="fa-solid fa-floppy-disk"></i>
 
-      <div class="form-footer">
-        <button
-          type="button"
-          class="btn btn-secondary"
-          (click)="cancel()"
-          [disabled]="isSubmitting"
-        >
-          <i class="fa-solid fa-xmark"></i>
-
-          Cancel
-        </button>
-
-        <button
-          type="submit"
-          class="btn btn-primary"
-          [disabled]="isSubmitting || !editVisitForm.valid || !!getTimeRangeError()"
-        >
-          @if (isSubmitting) {
-            <i class="fa-solid fa-spinner fa-spin"></i>
-
-            Saving...
-          } @else {
-            <i class="fa-solid fa-floppy-disk"></i>
-
-            Save Changes
-          }
-        </button>
-      </div>
-    </form>
+          Save Changes
+        }
+      </button>
+    </div>
   }
 </div>

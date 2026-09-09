@@ -40,7 +40,7 @@
       <div>
         <h2>All Visits</h2>
 
-        <p>View patient visits, practitioners, schedules and payments.</p>
+        <p>View patient visits, practitioners, services, areas and schedules.</p>
       </div>
 
       @if (!isLoading && !errorMessage) {
@@ -57,7 +57,9 @@
     ======================================================== -->
 
     <div class="filters-container">
-      <!-- SEARCH -->
+      <!-- =====================================================
+           SEARCH
+      ====================================================== -->
 
       <div class="search-box">
         <i class="fa-solid fa-magnifying-glass"></i>
@@ -75,7 +77,9 @@
         }
       </div>
 
-      <!-- STATUS FILTER -->
+      <!-- =====================================================
+           STATUS FILTER
+      ====================================================== -->
 
       <div class="filter-control">
         <label for="visit-status"> Status </label>
@@ -93,22 +97,11 @@
         </select>
       </div>
 
-      <!-- COLLECTION FILTER -->
+      <!-- =====================================================
+           CLEAR FILTERS
+      ====================================================== -->
 
-      <div class="filter-control">
-        <label for="collection-status"> Collection </label>
-
-        <select id="collection-status" [(ngModel)]="selectedCollectionStatus">
-          <option value="All">All</option>
-          <option value="Pending">Pending</option>
-          <option value="InstallmentPending">Installment Pending</option>
-          <option value="Received">Received</option>
-        </select>
-      </div>
-
-      <!-- CLEAR FILTERS -->
-
-      @if (searchTerm || selectedStatus !== 'All' || selectedCollectionStatus !== 'All') {
+      @if (searchTerm || selectedStatus !== 'All') {
         <button
           type="button"
           class="secondary-button clear-filters-button"
@@ -223,10 +216,6 @@
               <th>Schedule</th>
 
               <th>Status</th>
-
-              <th>Amount</th>
-
-              <th>Collection</th>
 
               <th>Actions</th>
             </tr>
@@ -347,45 +336,6 @@
 
                     {{ visit.status }}
                   </span>
-                </td>
-
-                <!-- =================================================
-                     AMOUNT
-                ================================================== -->
-
-                <td>
-                  <div class="amount-cell">
-                    <strong>
-                      {{ formatAmount(visit.amountDue) }}
-                    </strong>
-
-                    <span>
-                      Received:
-                      {{ formatAmount(visit.amountReceived) }}
-                    </span>
-                  </div>
-                </td>
-
-                <!-- =================================================
-                     COLLECTION
-                ================================================== -->
-
-                <td>
-                  <div class="collection-cell">
-                    <span
-                      class="collection-badge"
-                      [ngClass]="getCollectionStatusClass(visit.collectionStatus)"
-                    >
-                      {{ visit.collectionStatus }}
-                    </span>
-
-                    @if (getPendingAmount(visit) > 0) {
-                      <span class="pending-amount">
-                        {{ formatAmount(getPendingAmount(visit)) }}
-                        pending
-                      </span>
-                    }
-                  </div>
                 </td>
 
                 <!-- =================================================

@@ -3,11 +3,23 @@ import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { forkJoin, finalize } from 'rxjs';
 
-import { CollectionStatus, Visit } from '../../visits/visits.interface';
-
+import { Visit } from '../../visits/visits.interface';
 import { VisitsService } from '../../visits/visits.service';
 
-import { PatientPackageService } from '../../../core/services/patient-package.service';
+import {
+  PatientPackage,
+  PatientPackageService,
+} from '../../../core/services/patient-package.service';
+
+// ============================================================
+// FILTER TYPES
+// ============================================================
+
+type CollectionStatusFilter = 'All' | 'Pending' | 'InstallmentPending' | 'Received';
+
+// ============================================================
+// COMPONENT
+// ============================================================
 
 @Component({
   selector: 'app-payment-collection',
@@ -33,6 +45,16 @@ export class PaymentCollection implements OnInit {
 
   visits: Visit[] = [];
 
+  /**
+   * PatientPackage payment information is package-level.
+   *
+   * A Visit only contains patientPackageId.
+   *
+   * Payment information must therefore be resolved through
+   * this lookup map instead of being read from Visit.
+   */
+  private patientPackageMap = new Map<string, PatientPackage>();
+
   // ============================================================
   // UI STATE
   // ============================================================
@@ -57,7 +79,7 @@ export class PaymentCollection implements OnInit {
 
   searchTerm = '';
 
-  selectedCollectionStatus: 'All' | CollectionStatus = 'All';
+  selectedCollectionStatus: CollectionStatusFilter = 'All';
 
   // ============================================================
   // COLLECTION MODAL
@@ -95,7 +117,7 @@ export class PaymentCollection implements OnInit {
       )
       .subscribe({
         next: (visits) => {
-          this.enrichVisitsWithPackagePaymentType(visits);
+          this.enrichVisitsWithPatientPackages(visits);
         },
 
         error: (error) => {
@@ -104,21 +126,34 @@ export class PaymentCollection implements OnInit {
           this.errorMessage = this.getErrorMessage(error, 'Failed to load payment collections.');
 
           this.visits = [];
+
+          this.patientPackageMap.clear();
         },
       });
   }
 
   // ============================================================
-  // ENRICH VISITS WITH PATIENT PACKAGE PAYMENT TYPE
+  // LOAD PATIENT PACKAGE PAYMENT INFORMATION
   // ============================================================
 
-  private enrichVisitsWithPackagePaymentType(visits: Visit[]): void {
+  /**
+   * Loads the PatientPackage associated with every visit.
+   *
+   * IMPORTANT:
+   *
+   * Payment information is owned by PatientPackage.
+   *
+   * Visit only provides patientPackageId.
+   */
+  private enrichVisitsWithPatientPackages(visits: Visit[]): void {
     // ----------------------------------------------------------
     // NO VISITS
     // ----------------------------------------------------------
 
     if (!visits.length) {
       this.visits = [];
+
+      this.patientPackageMap.clear();
 
       return;
     }
@@ -138,6 +173,8 @@ export class PaymentCollection implements OnInit {
     if (!patientPackageIds.length) {
       this.visits = visits;
 
+      this.patientPackageMap.clear();
+
       return;
     }
 
@@ -150,87 +187,35 @@ export class PaymentCollection implements OnInit {
     forkJoin(packageRequests).subscribe({
       next: (packages) => {
         // ------------------------------------------------------
+        // CLEAR PREVIOUS LOOKUP
+        // ------------------------------------------------------
+
+        this.patientPackageMap.clear();
+
+        // ------------------------------------------------------
         // CREATE PATIENT PACKAGE LOOKUP MAP
         // ------------------------------------------------------
 
-        const packageMap = new Map(
-          packages.map((patientPackage) => [patientPackage.id, patientPackage]),
-        );
+        for (const patientPackage of packages) {
+          this.patientPackageMap.set(patientPackage.id, patientPackage);
+        }
 
         // ------------------------------------------------------
-        // ENRICH VISITS
+        // KEEP ORIGINAL VISITS
+        // ------------------------------------------------------
+        //
+        // We intentionally do NOT copy payment information
+        // onto the Visit object.
+        //
+        // Payment information is accessed through:
+        //
+        // Visit.patientPackageId
+        //          ↓
+        // PatientPackage
+        //
         // ------------------------------------------------------
 
-        this.visits = visits.map((visit) => {
-          const patientPackage = visit.patientPackageId
-            ? packageMap.get(visit.patientPackageId)
-            : undefined;
-
-          // ----------------------------------------------------
-          // PACKAGE NOT FOUND
-          //
-          // Keep original visit data.
-          // ----------------------------------------------------
-
-          if (!patientPackage) {
-            return visit;
-          }
-
-          // ----------------------------------------------------
-          // MAP PAYMENT TYPE
-          // ----------------------------------------------------
-
-          const paymentType = this.mapPatientPackagePaymentType(patientPackage.paymentType);
-
-          // ----------------------------------------------------
-          // FULL ADVANCE
-          //
-          // The package amount was already received by Company
-          // at the time of package purchase.
-          //
-          // This is ONLY frontend display normalization.
-          //
-          // We are NOT modifying the backend database.
-          // ----------------------------------------------------
-
-          if (paymentType === 'FullAdvance') {
-            return {
-              ...visit,
-
-              paymentType: 'FullAdvance',
-
-              amountReceived: Number(visit.amountDue) || 0,
-
-              collectionStatus: 'Received',
-
-              receivedBy: 'Company',
-            };
-          }
-
-          // ----------------------------------------------------
-          // INSTALLMENT
-          //
-          // Preserve the actual visit payment information
-          // returned by the backend.
-          // ----------------------------------------------------
-
-          if (paymentType === 'Installment') {
-            return {
-              ...visit,
-
-              paymentType: 'Installment',
-            };
-          }
-
-          // ----------------------------------------------------
-          // UNKNOWN PAYMENT TYPE
-          //
-          // Do not alter the visit if the package payment type
-          // cannot be determined.
-          // ----------------------------------------------------
-
-          return visit;
-        });
+        this.visits = visits;
 
         this.cdr.detectChanges();
       },
@@ -239,17 +224,51 @@ export class PaymentCollection implements OnInit {
         console.error('Failed to load patient package payment information:', error);
 
         // ------------------------------------------------------
-        // IMPORTANT
-        //
-        // If package enrichment fails, preserve the original
-        // visit data instead of clearing the payment table.
+        // PRESERVE ORIGINAL VISITS
         // ------------------------------------------------------
 
         this.visits = visits;
 
+        this.patientPackageMap.clear();
+
         this.cdr.detectChanges();
       },
     });
+  }
+
+  // ============================================================
+  // GET PATIENT PACKAGE FOR VISIT
+  // ============================================================
+
+  /**
+   * Resolves the PatientPackage associated with a Visit.
+   *
+   * Payment information must always be obtained from this
+   * package rather than from the Visit.
+   */
+  getPatientPackage(visit: Visit | null): PatientPackage | null {
+    if (!visit?.patientPackageId) {
+      return null;
+    }
+
+    return this.patientPackageMap.get(visit.patientPackageId) ?? null;
+  }
+
+  // ============================================================
+  // PAYMENT TYPE
+  // ============================================================
+
+  /**
+   * Returns the payment type from PatientPackage.
+   */
+  getPaymentType(visit: Visit): 'FullAdvance' | 'Installment' | null {
+    const patientPackage = this.getPatientPackage(visit);
+
+    if (!patientPackage) {
+      return null;
+    }
+
+    return this.mapPatientPackagePaymentType(patientPackage.paymentType);
   }
 
   // ============================================================
@@ -259,11 +278,6 @@ export class PaymentCollection implements OnInit {
   private mapPatientPackagePaymentType(value: unknown): 'FullAdvance' | 'Installment' | null {
     // ----------------------------------------------------------
     // NUMERIC BACKEND ENUM
-    //
-    // Backend:
-    //
-    // FullAdvance = 0
-    // Installment = 1
     // ----------------------------------------------------------
 
     if (typeof value === 'number') {
@@ -298,6 +312,196 @@ export class PaymentCollection implements OnInit {
   }
 
   // ============================================================
+  // COLLECTION STATUS
+  // ============================================================
+
+  /**
+   * Returns the authoritative collection status from the
+   * PatientPackage.
+   *
+   * IMPORTANT:
+   *
+   * CollectionStatus no longer belongs to Visit.
+   */
+  getCollectionStatus(visit: Visit | null): 'Pending' | 'Received' | 'InstallmentPending' | null {
+    const patientPackage = this.getPatientPackage(visit);
+
+    if (!patientPackage) {
+      return null;
+    }
+
+    return this.mapCollectionStatus(patientPackage.collectionStatus);
+  }
+
+  // ============================================================
+  // MAP COLLECTION STATUS
+  // ============================================================
+
+  private mapCollectionStatus(
+    value: unknown,
+  ): 'Pending' | 'Received' | 'InstallmentPending' | null {
+    // ----------------------------------------------------------
+    // NUMERIC BACKEND ENUM
+    // ----------------------------------------------------------
+
+    if (typeof value === 'number') {
+      switch (value) {
+        case 0:
+          return 'Pending';
+
+        case 1:
+          return 'Received';
+
+        case 2:
+          return 'InstallmentPending';
+
+        default:
+          return null;
+      }
+    }
+
+    // ----------------------------------------------------------
+    // STRING BACKEND ENUM
+    // ----------------------------------------------------------
+
+    if (typeof value === 'string') {
+      const normalized = value.trim().toLowerCase();
+
+      if (normalized === 'pending') {
+        return 'Pending';
+      }
+
+      if (normalized === 'received') {
+        return 'Received';
+      }
+
+      if (normalized === 'installmentpending' || normalized === 'installment pending') {
+        return 'InstallmentPending';
+      }
+    }
+
+    return null;
+  }
+
+  // ============================================================
+  // RECEIVED BY
+  // ============================================================
+
+  /**
+   * Returns the authoritative ReceivedBy value from
+   * PatientPackage.
+   *
+   * ReceivedBy is package-level because payment collection
+   * belongs to the PatientPackage payment lifecycle.
+   */
+  getReceivedBy(visit: Visit | null): 'Practitioner' | 'Company' | null {
+    const patientPackage = this.getPatientPackage(visit);
+
+    if (!patientPackage) {
+      return null;
+    }
+
+    return this.mapReceivedBy(patientPackage.receivedBy);
+  }
+
+  // ============================================================
+  // MAP RECEIVED BY
+  // ============================================================
+
+  private mapReceivedBy(value: unknown): 'Practitioner' | 'Company' | null {
+    // ----------------------------------------------------------
+    // NUMERIC BACKEND ENUM
+    // ----------------------------------------------------------
+
+    if (typeof value === 'number') {
+      switch (value) {
+        case 0:
+          return 'Practitioner';
+
+        case 1:
+          return 'Company';
+
+        default:
+          return null;
+      }
+    }
+
+    // ----------------------------------------------------------
+    // STRING BACKEND ENUM
+    // ----------------------------------------------------------
+
+    if (typeof value === 'string') {
+      const normalized = value.trim().toLowerCase();
+
+      if (normalized === 'practitioner') {
+        return 'Practitioner';
+      }
+
+      if (normalized === 'company') {
+        return 'Company';
+      }
+    }
+
+    return null;
+  }
+
+  // ============================================================
+  // PAYMENT AMOUNTS
+  // ============================================================
+
+  /**
+   * Returns the package total amount.
+   *
+   * This value comes from PatientPackage.TotalAmount.
+   */
+  getAmountDue(visit: Visit | null): number {
+    const patientPackage = this.getPatientPackage(visit);
+
+    if (!patientPackage) {
+      return 0;
+    }
+
+    return Number(patientPackage.totalAmount) || 0;
+  }
+
+  /**
+   * Returns the package amount already paid.
+   *
+   * This value comes from PatientPackage.AmountPaid.
+   */
+  getAmountReceived(visit: Visit | null): number {
+    const patientPackage = this.getPatientPackage(visit);
+
+    if (!patientPackage) {
+      return 0;
+    }
+
+    return Number(patientPackage.amountPaid) || 0;
+  }
+
+  /**
+   * Returns the package amount still pending.
+   *
+   * This value comes from PatientPackage.AmountPending.
+   *
+   * We intentionally do not calculate:
+   *
+   * amountDue - amountReceived
+   *
+   * because the backend already owns this package-level
+   * payment state.
+   */
+  getPendingAmount(visit: Visit | null): number {
+    const patientPackage = this.getPatientPackage(visit);
+
+    if (!patientPackage) {
+      return 0;
+    }
+
+    return Math.max(Number(patientPackage.amountPending) || 0, 0);
+  }
+
+  // ============================================================
   // FILTERED VISITS
   // ============================================================
 
@@ -305,25 +509,28 @@ export class PaymentCollection implements OnInit {
     const search = this.searchTerm.trim().toLowerCase();
 
     return this.visits.filter((visit) => {
-      // ----------------------------------------------------------
+      // --------------------------------------------------------
       // SEARCH FILTER
-      // ----------------------------------------------------------
+      // --------------------------------------------------------
 
       const matchesSearch =
         !search ||
         (visit.patientName ?? '').toLowerCase().includes(search) ||
+        (visit.patientPhone ?? '').toLowerCase().includes(search) ||
         (visit.practitionerName ?? '').toLowerCase().includes(search) ||
         (visit.serviceName ?? '').toLowerCase().includes(search) ||
         (visit.areaName ?? '').toLowerCase().includes(search) ||
         (visit.packageName ?? '').toLowerCase().includes(search);
 
-      // ----------------------------------------------------------
+      // --------------------------------------------------------
       // COLLECTION STATUS FILTER
-      // ----------------------------------------------------------
+      // --------------------------------------------------------
+
+      const collectionStatus = this.getCollectionStatus(visit);
 
       const matchesCollectionStatus =
         this.selectedCollectionStatus === 'All' ||
-        visit.collectionStatus === this.selectedCollectionStatus;
+        collectionStatus === this.selectedCollectionStatus;
 
       return matchesSearch && matchesCollectionStatus;
     });
@@ -338,15 +545,16 @@ export class PaymentCollection implements OnInit {
   }
 
   get pendingVisits(): number {
-    return this.visits.filter((visit) => visit.collectionStatus === 'Pending').length;
+    return this.visits.filter((visit) => this.getCollectionStatus(visit) === 'Pending').length;
   }
 
   get installmentVisits(): number {
-    return this.visits.filter((visit) => visit.collectionStatus === 'InstallmentPending').length;
+    return this.visits.filter((visit) => this.getCollectionStatus(visit) === 'InstallmentPending')
+      .length;
   }
 
   get receivedVisits(): number {
-    return this.visits.filter((visit) => visit.collectionStatus === 'Received').length;
+    return this.visits.filter((visit) => this.getCollectionStatus(visit) === 'Received').length;
   }
 
   // ============================================================
@@ -354,11 +562,11 @@ export class PaymentCollection implements OnInit {
   // ============================================================
 
   get totalAmountDue(): number {
-    return this.visits.reduce((total, visit) => total + (Number(visit.amountDue) || 0), 0);
+    return this.visits.reduce((total, visit) => total + this.getAmountDue(visit), 0);
   }
 
   get totalAmountReceived(): number {
-    return this.visits.reduce((total, visit) => total + (Number(visit.amountReceived) || 0), 0);
+    return this.visits.reduce((total, visit) => total + this.getAmountReceived(visit), 0);
   }
 
   get totalAmountPending(): number {
@@ -366,38 +574,15 @@ export class PaymentCollection implements OnInit {
   }
 
   // ============================================================
-  // PAYMENT AMOUNTS
-  // ============================================================
-
-  /**
-   * Display-only calculation.
-   *
-   * For FullAdvance visits, the enrichment step changes
-   * amountReceived to amountDue, therefore this returns 0.
-   *
-   * For Installment visits, this returns the actual remaining
-   * balance.
-   */
-  getPendingAmount(visit: Visit): number {
-    const amountDue = Number(visit.amountDue) || 0;
-
-    const amountReceived = Number(visit.amountReceived) || 0;
-
-    return Math.max(amountDue - amountReceived, 0);
-  }
-
-  // ============================================================
   // PAYMENT STATE
   // ============================================================
 
   /**
-   * CollectionStatus is authoritative.
-   *
-   * Do NOT derive the payment state from
-   * amountDue / amountReceived.
+   * CollectionStatus is authoritative and comes from
+   * PatientPackage.
    */
   getPaymentState(visit: Visit): string {
-    switch (visit.collectionStatus) {
+    switch (this.getCollectionStatus(visit)) {
       case 'Received':
         return 'Payment Received';
 
@@ -417,7 +602,7 @@ export class PaymentCollection implements OnInit {
   // ============================================================
 
   getPaymentStateClass(visit: Visit): string {
-    switch (visit.collectionStatus) {
+    switch (this.getCollectionStatus(visit)) {
       case 'Received':
         return 'payment-received';
 
@@ -436,7 +621,9 @@ export class PaymentCollection implements OnInit {
   // COLLECTION STATUS LABEL
   // ============================================================
 
-  getCollectionStatusLabel(status: CollectionStatus | string | null | undefined): string {
+  getCollectionStatusLabel(
+    status: 'Pending' | 'Received' | 'InstallmentPending' | string | null | undefined,
+  ): string {
     switch (status) {
       case 'Received':
         return 'Received';
@@ -456,7 +643,9 @@ export class PaymentCollection implements OnInit {
   // COLLECTION STATUS CLASS
   // ============================================================
 
-  getCollectionStatusClass(status: CollectionStatus | string | null | undefined): string {
+  getCollectionStatusClass(
+    status: 'Pending' | 'Received' | 'InstallmentPending' | string | null | undefined,
+  ): string {
     switch (status) {
       case 'Received':
         return 'collection-received';
@@ -473,11 +662,11 @@ export class PaymentCollection implements OnInit {
   }
 
   // ============================================================
-  // RECEIVED BY
+  // RECEIVED BY LABEL
   // ============================================================
 
-  getReceivedBy(visit: Visit): string {
-    switch (visit.receivedBy) {
+  getReceivedByLabel(visit: Visit): string {
+    switch (this.getReceivedBy(visit)) {
       case 'Practitioner':
         return 'Practitioner';
 
@@ -494,7 +683,7 @@ export class PaymentCollection implements OnInit {
   // ============================================================
 
   getReceivedByClass(visit: Visit): string {
-    switch (visit.receivedBy) {
+    switch (this.getReceivedBy(visit)) {
       case 'Practitioner':
         return 'received-by-practitioner';
 
@@ -511,45 +700,34 @@ export class PaymentCollection implements OnInit {
   // ============================================================
 
   /**
-   * Determines whether the admin/company can collect
-   * payment through this screen.
+   * Determines whether the company can collect payment.
    *
-   * Business rules:
-   *
-   * - Cancelled visits cannot be collected.
-   *
-   * - FullAdvance visits cannot be collected here because
-   *   the package amount was already received by Company.
-   *
-   * - Received visits cannot be collected again.
-   *
-   * - Installment visits with a remaining balance can
-   *   be collected.
-   *
-   * IMPORTANT:
-   *
-   * receivedBy is NOT used as an exclusive collection lock.
-   *
-   * A remaining installment balance may still be collected
-   * by the company even if a practitioner previously
-   * collected an amount.
+   * Payment state comes from PatientPackage.
    */
   canCollectPayment(visit: Visit): boolean {
     // ----------------------------------------------------------
     // CANCELLED VISIT
     // ----------------------------------------------------------
 
-    if (visit.status === 'Cancelled') {
+    if (this.isVisitCancelled(visit)) {
+      return false;
+    }
+
+    // ----------------------------------------------------------
+    // PATIENT PACKAGE
+    // ----------------------------------------------------------
+
+    const patientPackage = this.getPatientPackage(visit);
+
+    if (!patientPackage) {
       return false;
     }
 
     // ----------------------------------------------------------
     // FULL ADVANCE
-    //
-    // Package was already fully paid to Company.
     // ----------------------------------------------------------
 
-    if (visit.paymentType === 'FullAdvance') {
+    if (this.getPaymentType(visit) === 'FullAdvance') {
       return false;
     }
 
@@ -557,7 +735,7 @@ export class PaymentCollection implements OnInit {
     // ALREADY FULLY RECEIVED
     // ----------------------------------------------------------
 
-    if (visit.collectionStatus === 'Received') {
+    if (this.getCollectionStatus(visit) === 'Received') {
       return false;
     }
 
@@ -581,17 +759,15 @@ export class PaymentCollection implements OnInit {
     // CANCELLED
     // ----------------------------------------------------------
 
-    if (visit.status === 'Cancelled') {
+    if (this.isVisitCancelled(visit)) {
       return 'Cancelled';
     }
 
     // ----------------------------------------------------------
     // FULL ADVANCE
-    //
-    // The package was already paid to the company.
     // ----------------------------------------------------------
 
-    if (visit.paymentType === 'FullAdvance') {
+    if (this.getPaymentType(visit) === 'FullAdvance') {
       return 'Received by Company';
     }
 
@@ -599,7 +775,7 @@ export class PaymentCollection implements OnInit {
     // FULLY RECEIVED
     // ----------------------------------------------------------
 
-    if (visit.collectionStatus === 'Received') {
+    if (this.getCollectionStatus(visit) === 'Received') {
       return 'Paid';
     }
 
@@ -627,7 +803,7 @@ export class PaymentCollection implements OnInit {
     // CANCELLED
     // ----------------------------------------------------------
 
-    if (visit.status === 'Cancelled') {
+    if (this.isVisitCancelled(visit)) {
       return 'Payment cannot be collected for a cancelled visit.';
     }
 
@@ -635,7 +811,7 @@ export class PaymentCollection implements OnInit {
     // FULL ADVANCE
     // ----------------------------------------------------------
 
-    if (visit.paymentType === 'FullAdvance') {
+    if (this.getPaymentType(visit) === 'FullAdvance') {
       return 'This visit belongs to a Full Advance package. The package amount was already received by the company.';
     }
 
@@ -643,7 +819,7 @@ export class PaymentCollection implements OnInit {
     // ALREADY RECEIVED
     // ----------------------------------------------------------
 
-    if (visit.collectionStatus === 'Received') {
+    if (this.getCollectionStatus(visit) === 'Received') {
       return 'Payment has already been fully received.';
     }
 
@@ -675,22 +851,29 @@ export class PaymentCollection implements OnInit {
     // CANCELLED VISIT
     // ----------------------------------------------------------
 
-    if (visit.status === 'Cancelled') {
+    if (this.isVisitCancelled(visit)) {
       this.errorMessage = 'Payment cannot be collected for a cancelled visit.';
 
       return;
     }
 
     // ----------------------------------------------------------
-    // FULL ADVANCE
-    //
-    // Defensive guard.
-    //
-    // The button should never be shown for FullAdvance,
-    // but this prevents accidental/manual invocation.
+    // PATIENT PACKAGE
     // ----------------------------------------------------------
 
-    if (visit.paymentType === 'FullAdvance') {
+    const patientPackage = this.getPatientPackage(visit);
+
+    if (!patientPackage) {
+      this.errorMessage = 'Payment information is unavailable for this visit.';
+
+      return;
+    }
+
+    // ----------------------------------------------------------
+    // FULL ADVANCE
+    // ----------------------------------------------------------
+
+    if (this.getPaymentType(visit) === 'FullAdvance') {
       this.errorMessage =
         'This visit belongs to a Full Advance package. The package amount was already received by the company.';
 
@@ -701,7 +884,7 @@ export class PaymentCollection implements OnInit {
     // ALREADY RECEIVED
     // ----------------------------------------------------------
 
-    if (visit.collectionStatus === 'Received') {
+    if (this.getCollectionStatus(visit) === 'Received') {
       this.errorMessage = 'Payment has already been fully collected for this visit.';
 
       return;
@@ -760,6 +943,20 @@ export class PaymentCollection implements OnInit {
   // COLLECT PAYMENT
   // ============================================================
 
+  /**
+   * Payment collection endpoint is intentionally not called
+   * here yet.
+   *
+   * The old VisitsService.collectPayment() workflow belonged
+   * to the removed visit-level payment architecture.
+   *
+   * The current backend uses PatientPackage /
+   * InstallmentPayment for payment collection.
+   *
+   * This method will be connected to the correct backend
+   * payment endpoint after the payment backend contract is
+   * verified.
+   */
   collectPayment(): void {
     this.errorMessage = '';
 
@@ -781,22 +978,29 @@ export class PaymentCollection implements OnInit {
     // CANCELLED VISIT
     // ----------------------------------------------------------
 
-    if (visit.status === 'Cancelled') {
+    if (this.isVisitCancelled(visit)) {
       this.errorMessage = 'Payment cannot be collected for a cancelled visit.';
 
       return;
     }
 
     // ----------------------------------------------------------
-    // FULL ADVANCE
-    //
-    // Defensive guard.
-    //
-    // A FullAdvance visit must never be submitted to
-    // the company collection endpoint.
+    // PATIENT PACKAGE
     // ----------------------------------------------------------
 
-    if (visit.paymentType === 'FullAdvance') {
+    const patientPackage = this.getPatientPackage(visit);
+
+    if (!patientPackage) {
+      this.errorMessage = 'Payment information is unavailable for this visit.';
+
+      return;
+    }
+
+    // ----------------------------------------------------------
+    // FULL ADVANCE
+    // ----------------------------------------------------------
+
+    if (this.getPaymentType(visit) === 'FullAdvance') {
       this.errorMessage =
         'This visit belongs to a Full Advance package. The package amount was already received by the company.';
 
@@ -807,7 +1011,7 @@ export class PaymentCollection implements OnInit {
     // ALREADY RECEIVED
     // ----------------------------------------------------------
 
-    if (visit.collectionStatus === 'Received') {
+    if (this.getCollectionStatus(visit) === 'Received') {
       this.errorMessage = 'Payment has already been fully collected for this visit.';
 
       return;
@@ -844,51 +1048,55 @@ export class PaymentCollection implements OnInit {
     }
 
     // ----------------------------------------------------------
-    // START COLLECTION
+    // PAYMENT ENDPOINT
+    // ----------------------------------------------------------
+    //
+    // DO NOT call:
+    //
+    // this.visitsService.collectPayment(...)
+    //
+    // because that endpoint belonged to the previous
+    // visit-level payment architecture.
+    //
+    // The correct PatientPackage / InstallmentPayment
+    // endpoint will be connected after the backend payment
+    // contract is verified.
+    //
     // ----------------------------------------------------------
 
-    this.isCollecting = true;
+    this.errorMessage =
+      'The payment collection endpoint is not connected yet. The payment state has been migrated to the PatientPackage model.';
+  }
 
-    this.collectingVisitId = visit.id;
+  // ============================================================
+  // VISIT STATUS HELPER
+  // ============================================================
 
-    this.visitsService
-      .collectPayment(visit.id, {
-        amount,
-      })
-      .pipe(
-        finalize(() => {
-          this.isCollecting = false;
+  /**
+   * Keeps Visit status handling isolated from the
+   * package-level payment logic.
+   *
+   * The Visit model may expose the backend enum as either
+   * a string or a numeric value.
+   */
+  private isVisitCancelled(visit: Visit): boolean {
+    const status = visit.status as unknown;
 
-          this.collectingVisitId = null;
+    if (typeof status === 'string') {
+      return status.trim().toLowerCase() === 'cancelled';
+    }
 
-          this.cdr.detectChanges();
-        }),
-      )
-      .subscribe({
-        // --------------------------------------------------------
-        // SUCCESS
-        // --------------------------------------------------------
+    if (typeof status === 'number') {
+      // Standard VisitStatus enum ordering:
+      // Scheduled = 0
+      // Accepted  = 1
+      // Completed = 2
+      // Cancelled = 3
 
-        next: () => {
-          this.successMessage = 'Payment collected successfully.';
+      return status === 3;
+    }
 
-          this.selectedVisit = null;
-
-          this.collectionAmount = 0;
-
-          this.loadPaymentCollections();
-        },
-
-        // --------------------------------------------------------
-        // ERROR
-        // --------------------------------------------------------
-
-        error: (error) => {
-          console.error('Failed to collect payment:', error);
-
-          this.errorMessage = this.getErrorMessage(error, 'Failed to collect payment.');
-        },
-      });
+    return false;
   }
 
   // ============================================================

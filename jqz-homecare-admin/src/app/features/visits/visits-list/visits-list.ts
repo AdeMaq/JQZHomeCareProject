@@ -4,7 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { forkJoin } from 'rxjs';
 
-import { CollectionStatus, Visit, VisitStatus } from '../visits.interface';
+import { Visit, VisitStatus } from '../visits.interface';
+
 import { VisitsService } from '../visits.service';
 
 import { Practitioner, PractitionerService } from '../../../core/services/practitioner';
@@ -17,6 +18,10 @@ import { Practitioner, PractitionerService } from '../../../core/services/practi
   styleUrl: './visits-list.css',
 })
 export class VisitsList implements OnInit {
+  // ============================================================
+  // SERVICES
+  // ============================================================
+
   private readonly visitsService = inject(VisitsService);
 
   private readonly practitionerService = inject(PractitionerService);
@@ -49,8 +54,6 @@ export class VisitsList implements OnInit {
 
   selectedStatus: VisitStatus | 'All' = 'All';
 
-  selectedCollectionStatus: CollectionStatus | 'All' = 'All';
-
   // ============================================================
   // LIFECYCLE
   // ============================================================
@@ -77,11 +80,11 @@ export class VisitsList implements OnInit {
      * 1. GET /api/visits
      * 2. GET /api/practitioners
      *
-     * The Visits API currently returns practitionerId
-     * but practitionerName is null.
+     * The Visits API may return practitionerId
+     * while practitionerName can be null.
      *
      * Therefore we use the Practitioner API to resolve
-     * the practitioner name on the frontend.
+     * practitioner names on the frontend.
      */
 
     forkJoin({
@@ -400,33 +403,30 @@ export class VisitsList implements OnInit {
     const search = this.searchTerm.trim().toLowerCase();
 
     return this.visits.filter((visit) => {
-      // --------------------------------------------------------
+      // ------------------------------------------------------
       // SEARCH
-      // --------------------------------------------------------
+      //
+      // Search only actual Visit fields.
+      //
+      // Payment collection state is NOT part of Visit.
+      // ------------------------------------------------------
 
       const matchesSearch =
         !search ||
         visit.patientName?.toLowerCase().includes(search) ||
+        visit.patientPhone?.toLowerCase().includes(search) ||
         visit.practitionerName?.toLowerCase().includes(search) ||
         visit.serviceName?.toLowerCase().includes(search) ||
         visit.areaName?.toLowerCase().includes(search) ||
         visit.packageName?.toLowerCase().includes(search);
 
-      // --------------------------------------------------------
+      // ------------------------------------------------------
       // STATUS
-      // --------------------------------------------------------
+      // ------------------------------------------------------
 
       const matchesStatus = this.selectedStatus === 'All' || visit.status === this.selectedStatus;
 
-      // --------------------------------------------------------
-      // COLLECTION STATUS
-      // --------------------------------------------------------
-
-      const matchesCollectionStatus =
-        this.selectedCollectionStatus === 'All' ||
-        visit.collectionStatus === this.selectedCollectionStatus;
-
-      return matchesSearch && matchesStatus && matchesCollectionStatus;
+      return matchesSearch && matchesStatus;
     });
   }
 
@@ -446,8 +446,6 @@ export class VisitsList implements OnInit {
     this.searchTerm = '';
 
     this.selectedStatus = 'All';
-
-    this.selectedCollectionStatus = 'All';
   }
 
   // ============================================================
@@ -483,26 +481,6 @@ export class VisitsList implements OnInit {
 
       case 'Cancelled':
         return 'status-cancelled';
-
-      default:
-        return '';
-    }
-  }
-
-  // ============================================================
-  // COLLECTION STATUS CLASS
-  // ============================================================
-
-  getCollectionStatusClass(status: CollectionStatus): string {
-    switch (status) {
-      case 'Received':
-        return 'collection-received';
-
-      case 'Pending':
-        return 'collection-pending';
-
-      case 'InstallmentPending':
-        return 'collection-installment-pending';
 
       default:
         return '';
@@ -599,30 +577,5 @@ export class VisitsList implements OnInit {
     }
 
     return `${start} - ${end}`;
-  }
-
-  // ============================================================
-  // AMOUNT FORMAT
-  // ============================================================
-
-  formatAmount(amount: number | null | undefined): string {
-    const value = Number(amount ?? 0);
-
-    return value.toLocaleString('en-PK', {
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 2,
-    });
-  }
-
-  // ============================================================
-  // PENDING AMOUNT
-  // ============================================================
-
-  getPendingAmount(visit: Visit): number {
-    const due = Number(visit.amountDue ?? 0);
-
-    const received = Number(visit.amountReceived ?? 0);
-
-    return Math.max(due - received, 0);
   }
 }

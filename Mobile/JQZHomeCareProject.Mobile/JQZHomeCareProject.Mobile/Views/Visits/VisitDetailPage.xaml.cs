@@ -1,9 +1,13 @@
-namespace JQZHomeCareProject.Mobile.Views.Visits;
+using JQZHomeCareProject.Mobile.ViewModels.Visits;
 
-public partial class VisitDetailPage : ContentPage
+namespace JQZHomeCareProject.Mobile.Views.Visits
 {
-	public VisitDetailPage()
-	{
-		InitializeComponent();
-	}
+    public partial class VisitDetailPage : ContentPage
+    {
+        public VisitDetailPage(VisitDetailViewModel viewModel)
+        {
+            InitializeComponent();
+            BindingContext = viewModel;
+        }
+    }
 }

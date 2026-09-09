@@ -1,12 +1,233 @@
-<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8"?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:JQZHomeCareProject.Mobile.ViewModels.Visits"
              x:Class="JQZHomeCareProject.Mobile.Views.Visits.VisitDetailPage"
-             Title="VisitDetailPage">
-    <VerticalStackLayout>
-        <Label 
-            Text="Welcome to .NET MAUI!"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
-    </VerticalStackLayout>
+             x:DataType="vm:VisitDetailViewModel"
+             BackgroundColor="#F6F7FB"
+             Title="Visit Details">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <Color x:Key="JqzRed">#E11B22</Color>
+            <Color x:Key="JqzRedDark">#B5121B</Color>
+            <Color x:Key="InkDark">#191A2E</Color>
+            <Color x:Key="InkMuted">#8A8FA3</Color>
+
+            <Color x:Key="UpcomingText">#E11B22</Color>
+            <Color x:Key="UpcomingBg">#FDECEC</Color>
+            <Color x:Key="InProgressText">#2E7D32</Color>
+            <Color x:Key="InProgressBg">#E6F4EA</Color>
+            <Color x:Key="CompletedText">#55606B</Color>
+            <Color x:Key="CompletedBg">#EEF1F4</Color>
+            <Color x:Key="CancelledText">#C62828</Color>
+            <Color x:Key="CancelledBg">#FBE4E4</Color>
+
+            <Shadow x:Key="CardShadow" Brush="#191A2E" Offset="0,4" Radius="12" Opacity="0.06" />
+
+            <Style x:Key="Card" TargetType="Border">
+                <Setter Property="StrokeShape" Value="RoundRectangle 16" />
+                <Setter Property="Stroke" Value="Transparent" />
+                <Setter Property="StrokeThickness" Value="0" />
+                <Setter Property="BackgroundColor" Value="White" />
+                <Setter Property="Padding" Value="16" />
+                <Setter Property="Shadow" Value="{StaticResource CardShadow}" />
+            </Style>
+
+            <Style x:Key="CardLabel" TargetType="Label">
+                <Setter Property="FontSize" Value="12" />
+                <Setter Property="FontAttributes" Value="Bold" />
+                <Setter Property="TextColor" Value="{StaticResource InkMuted}" />
+            </Style>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <RefreshView IsRefreshing="{Binding IsRefreshing}"
+                 Command="{Binding RefreshCommand}"
+                 RefreshColor="{StaticResource JqzRed}"
+                 BackgroundColor="Transparent">
+        <ScrollView BackgroundColor="Transparent">
+            <VerticalStackLayout Padding="20,16,20,28" Spacing="16">
+
+                <Label Text="{Binding ErrorMessage}"
+                       TextColor="{StaticResource JqzRedDark}"
+                       IsVisible="{Binding ErrorMessage, Converter={StaticResource StringNotEmptyConverter}}" />
+
+                <VerticalStackLayout Spacing="16" IsVisible="{Binding Visit, Converter={StaticResource NotNullConverter}}">
+
+                    <!-- Status badge -->
+                    <Border StrokeShape="RoundRectangle 14"
+                            Stroke="Transparent"
+                            StrokeThickness="0"
+                            Padding="12,6"
+                            HorizontalOptions="Start">
+                        <Border.Triggers>
+                            <DataTrigger TargetType="Border" Binding="{Binding IsScheduled}" Value="True">
+                                <Setter Property="BackgroundColor" Value="{StaticResource UpcomingBg}" />
+                            </DataTrigger>
+                            <DataTrigger TargetType="Border" Binding="{Binding IsInProgress}" Value="True">
+                                <Setter Property="BackgroundColor" Value="{StaticResource InProgressBg}" />
+                            </DataTrigger>
+                            <DataTrigger TargetType="Border" Binding="{Binding IsCompleted}" Value="True">
+                                <Setter Property="BackgroundColor" Value="{StaticResource CompletedBg}" />
+                            </DataTrigger>
+                            <DataTrigger TargetType="Border" Binding="{Binding IsCancelled}" Value="True">
+                                <Setter Property="BackgroundColor" Value="{StaticResource CancelledBg}" />
+                            </DataTrigger>
+                        </Border.Triggers>
+                        <HorizontalStackLayout Spacing="6">
+                            <Ellipse WidthRequest="6" HeightRequest="6" VerticalOptions="Center">
+                                <Ellipse.Triggers>
+                                    <DataTrigger TargetType="Ellipse" Binding="{Binding IsScheduled}" Value="True">
+                                        <Setter Property="Fill" Value="{StaticResource UpcomingText}" />
+                                    </DataTrigger>
+                                    <DataTrigger TargetType="Ellipse" Binding="{Binding IsInProgress}" Value="True">
+                                        <Setter Property="Fill" Value="{StaticResource InProgressText}" />
+                                    </DataTrigger>
+                                    <DataTrigger TargetType="Ellipse" Binding="{Binding IsCompleted}" Value="True">
+                                        <Setter Property="Fill" Value="{StaticResource CompletedText}" />
+                                    </DataTrigger>
+                                    <DataTrigger TargetType="Ellipse" Binding="{Binding IsCancelled}" Value="True">
+                                        <Setter Property="Fill" Value="{StaticResource CancelledText}" />
+                                    </DataTrigger>
+                                </Ellipse.Triggers>
+                            </Ellipse>
+                            <Label Text="{Binding StatusLabel}" FontSize="12" FontAttributes="Bold">
+                                <Label.Triggers>
+                                    <DataTrigger TargetType="Label" Binding="{Binding IsScheduled}" Value="True">
+                                        <Setter Property="TextColor" Value="{StaticResource UpcomingText}" />
+                                    </DataTrigger>
+                                    <DataTrigger TargetType="Label" Binding="{Binding IsInProgress}" Value="True">
+                                        <Setter Property="TextColor" Value="{StaticResource InProgressText}" />
+                                    </DataTrigger>
+                                    <DataTrigger TargetType="Label" Binding="{Binding IsCompleted}" Value="True">
+                                        <Setter Property="TextColor" Value="{StaticResource CompletedText}" />
+                                    </DataTrigger>
+                                    <DataTrigger TargetType="Label" Binding="{Binding IsCancelled}" Value="True">
+                                        <Setter Property="TextColor" Value="{StaticResource CancelledText}" />
+                                    </DataTrigger>
+                                </Label.Triggers>
+                            </Label>
+                        </HorizontalStackLayout>
+                    </Border>
+
+                    <!-- Client information -->
+                    <Border Style="{StaticResource Card}">
+                        <VerticalStackLayout Spacing="10">
+                            <Label Text="{Binding Visit.PatientName}" FontSize="18" FontAttributes="Bold" TextColor="{StaticResource InkDark}" />
+
+                            <Grid ColumnDefinitions="Auto,*,Auto">
+                                <Label Grid.Column="0" Text="&#x1F4DE;" FontSize="14" VerticalOptions="Center" Margin="0,0,8,0" />
+                                <Label Grid.Column="1" Text="{Binding Visit.PatientPhone}" FontSize="14" TextColor="{StaticResource InkDark}" VerticalOptions="Center" />
+                                <Label Grid.Column="2" Text="Call" FontSize="12.5" FontAttributes="Bold" TextColor="{StaticResource JqzRed}" VerticalOptions="Center">
+                                    <Label.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding CallPatientCommand}" />
+                                    </Label.GestureRecognizers>
+                                </Label>
+                            </Grid>
+
+                            <Grid ColumnDefinitions="Auto,*,Auto">
+                                <Label Grid.Column="0" Text="&#x1F4CD;" FontSize="14" VerticalOptions="Start" Margin="0,0,8,0" />
+                                <Label Grid.Column="1" Text="{Binding Visit.PatientAddress}" FontSize="14" TextColor="{StaticResource InkDark}" LineBreakMode="WordWrap" />
+                                <Label Grid.Column="2" Text="Navigate &#x203A;" FontSize="12.5" FontAttributes="Bold" TextColor="{StaticResource JqzRed}" VerticalOptions="Start">
+                                    <Label.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding NavigateToPatientCommand}" />
+                                    </Label.GestureRecognizers>
+                                </Label>
+                            </Grid>
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <!-- Visit time -->
+                    <Border Style="{StaticResource Card}">
+                        <VerticalStackLayout Spacing="6">
+                            <Label Text="Visit Time" Style="{StaticResource CardLabel}" />
+                            <Label Text="{Binding Visit.FullDateLabel}" FontSize="15" FontAttributes="Bold" TextColor="{StaticResource InkDark}" />
+                            <Label Text="{Binding Visit.SlotRangeLabel}" FontSize="14" TextColor="{StaticResource InkMuted}" />
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <!-- Expected amount -->
+                    <Border Style="{StaticResource Card}">
+                        <VerticalStackLayout Spacing="6">
+                            <Label Text="Expected Amount" Style="{StaticResource CardLabel}" />
+                            <Label Text="{Binding Visit.AmountDueDisplay}" FontSize="20" FontAttributes="Bold" TextColor="{StaticResource JqzRed}" />
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <!-- ===== Actions: Scheduled / InProgress only ===== -->
+                    <VerticalStackLayout Spacing="10" IsVisible="{Binding IsActionable}">
+
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                            <Button Grid.Column="0"
+                                    Text="Check-in"
+                                    Command="{Binding GoToCheckInCommand}"
+                                    IsEnabled="{Binding CanCheckIn}"
+                                    BackgroundColor="{StaticResource JqzRed}"
+                                    TextColor="White"
+                                    FontAttributes="Bold"
+                                    CornerRadius="12"
+                                    HeightRequest="46" />
+
+                            <Button Grid.Column="1"
+                                    Text="Cancel Visit"
+                                    Command="{Binding GoToCancelCommand}"
+                                    IsEnabled="{Binding CanCancel}"
+                                    BackgroundColor="White"
+                                    TextColor="{StaticResource JqzRedDark}"
+                                    BorderColor="{StaticResource JqzRedDark}"
+                                    BorderWidth="1"
+                                    FontAttributes="Bold"
+                                    CornerRadius="12"
+                                    HeightRequest="46" />
+                        </Grid>
+
+                        <Label Text="{Binding CancelNoticeText}"
+                               FontSize="12"
+                               TextColor="{StaticResource InkMuted}"
+                               IsVisible="{Binding CancelNoticeText, Converter={StaticResource StringNotEmptyConverter}}" />
+
+                        <!-- After Check-in -->
+                        <Border Style="{StaticResource Card}">
+                            <VerticalStackLayout Spacing="10">
+                                <Button Text="Check-out"
+                                        Command="{Binding GoToCheckOutCommand}"
+                                        IsEnabled="{Binding CanCheckOut}"
+                                        BackgroundColor="{StaticResource InProgressText}"
+                                        TextColor="White"
+                                        FontAttributes="Bold"
+                                        CornerRadius="12"
+                                        HeightRequest="46" />
+                                <Label Text="Amount Received: PKR --"
+                                       FontSize="13"
+                                       TextColor="{StaticResource InkMuted}" />
+                            </VerticalStackLayout>
+                        </Border>
+
+                    </VerticalStackLayout>
+
+                    <!-- ===== Payment info: Completed only ===== -->
+                    <Border Style="{StaticResource Card}" IsVisible="{Binding IsCompleted}">
+                        <VerticalStackLayout Spacing="8">
+                            <Label Text="Payment" Style="{StaticResource CardLabel}" />
+                            <Label Text="{Binding Visit.ReceivedByLabel}" FontSize="14" FontAttributes="Bold" TextColor="{StaticResource InkDark}" />
+                            <Label Text="{Binding Visit.AmountReceived, StringFormat='Amount Received: PKR {0:N0}'}" FontSize="14" TextColor="{StaticResource InkDark}" />
+                            <Label Text="{Binding Visit.RemainingAmountDisplay}" FontSize="13" TextColor="{StaticResource JqzRedDark}" />
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <!-- ===== Cancellation info: Cancelled only ===== -->
+                    <Border Style="{StaticResource Card}" IsVisible="{Binding IsCancelled}">
+                        <VerticalStackLayout Spacing="8">
+                            <Label Text="Cancellation Reason" Style="{StaticResource CardLabel}" />
+                            <Label Text="{Binding Visit.CancellationReason}" FontSize="14" TextColor="{StaticResource InkDark}" />
+                        </VerticalStackLayout>
+                    </Border>
+
+                </VerticalStackLayout>
+
+            </VerticalStackLayout>
+        </ScrollView>
+    </RefreshView>
+
 </ContentPage>

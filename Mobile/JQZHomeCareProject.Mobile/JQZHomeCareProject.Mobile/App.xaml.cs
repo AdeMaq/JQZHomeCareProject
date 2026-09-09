@@ -1,4 +1,5 @@
-﻿using JQZHomeCareProject.Mobile.Services.Auth;
+﻿using JQZHomeCareProject.Mobile.Helpers;
+using JQZHomeCareProject.Mobile.Services.Auth;
 using JQZHomeCareProject.Mobile.Services.Navigation;
 using JQZHomeCareProject.Mobile.Views.Auth;
 
@@ -18,8 +19,16 @@ namespace JQZHomeCareProject.Mobile
             _session = session;
             _navigation = navigation;
 
-            // Any 401 from the backend (via AuthHeaderHandler) routes back to Login.
             _session.SessionExpired += OnSessionExpired;
+
+            AppDomain.CurrentDomain.UnhandledException += (_, args) =>
+                CrashLogger.Log(args.ExceptionObject as Exception ?? new Exception("Unknown unhandled exception"));
+
+            TaskScheduler.UnobservedTaskException += (_, args) =>
+            {
+                CrashLogger.Log(args.Exception);
+                args.SetObserved();
+            };
         }
 
         protected override Window CreateWindow(IActivationState? activationState)

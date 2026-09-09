@@ -17,6 +17,11 @@ import { VisitsService } from '../../visits/visits.service';
 
 import { Visit } from '../../visits/visits.interface';
 
+import {
+  PatientPackage,
+  PatientPackageService,
+} from '../../../core/services/patient-package.service';
+
 /* =====================================================
    DASHBOARD DATE FILTER TYPE
 ===================================================== */
@@ -47,6 +52,8 @@ export class Dashboard implements OnInit, OnDestroy {
 
   private readonly visitsService = inject(VisitsService);
 
+  private readonly patientPackageService = inject(PatientPackageService);
+
   /* ===================================================
      DESTROY SIGNAL
   =================================================== */
@@ -71,6 +78,21 @@ export class Dashboard implements OnInit, OnDestroy {
   refusals: DashboardRefusal[] = [];
 
   visits: Visit[] = [];
+
+  /**
+   * PatientPackage lookup used for package-level payment
+   * information.
+   *
+   * Visit does NOT contain:
+   *
+   * - amountDue
+   * - amountReceived
+   * - collectionStatus
+   * - receivedBy
+   *
+   * Payment information belongs to PatientPackage.
+   */
+  private patientPackageMap = new Map<string, PatientPackage>();
 
   /* ===================================================
      FRONTEND PAYMENT CALCULATIONS
@@ -208,11 +230,11 @@ export class Dashboard implements OnInit, OnDestroy {
     /* ===============================================
        VISITS REQUEST
 
-       Used to calculate:
+       Used to identify the PatientPackages whose
+       visits fall inside the selected date range.
 
-       - Total amount due
-       - Total amount received
-       - Outstanding amount
+       Payment information itself is loaded separately
+       from PatientPackage.
     ================================================ */
 
     const visitsRequest = this.visitsService.getAll().pipe(
@@ -304,11 +326,15 @@ export class Dashboard implements OnInit, OnDestroy {
 
           this.visits = visits ?? [];
 
-          this.updatePaymentSummary();
+          /*
+           * Payment information is package-level.
+           *
+           * We must first load the PatientPackages
+           * associated with these visits.
+           */
+          this.loadPatientPackagesForDashboard(this.visits, currentRequestId);
 
           console.log('All visits received:', this.visits);
-
-          console.log('Dashboard payment summary:', this.paymentSummary);
         },
 
         error: (error: unknown) => {
@@ -319,6 +345,103 @@ export class Dashboard implements OnInit, OnDestroy {
           }
 
           this.errorMessage.set('Unable to load dashboard data. Please try again.');
+        },
+      });
+  }
+
+  /* ===================================================
+     LOAD PATIENT PACKAGES FOR DASHBOARD
+
+     Payment state is owned by PatientPackage.
+
+     Each package is loaded only once, even when
+     multiple visits belong to the same package.
+  =================================================== */
+
+  private loadPatientPackagesForDashboard(visits: Visit[], currentRequestId: number): void {
+    /* ===============================================
+       CLEAR OLD PACKAGE DATA
+    ================================================ */
+
+    this.patientPackageMap.clear();
+
+    /* ===============================================
+       GET UNIQUE PACKAGE IDS
+    ================================================ */
+
+    const patientPackageIds = [
+      ...new Set(visits.map((visit) => visit.patientPackageId).filter((id): id is string => !!id)),
+    ];
+
+    /* ===============================================
+       NO PACKAGE IDS
+    ================================================ */
+
+    if (!patientPackageIds.length) {
+      this.updatePaymentSummary();
+
+      return;
+    }
+
+    /* ===============================================
+       CREATE PACKAGE REQUESTS
+    ================================================ */
+
+    const packageRequests = patientPackageIds.map((id) => this.patientPackageService.getById(id));
+
+    /* ===============================================
+       LOAD PACKAGES
+    ================================================ */
+
+    forkJoin(packageRequests)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (packages) => {
+          /*
+           * Ignore stale package response.
+           */
+
+          if (currentRequestId !== this.requestId) {
+            return;
+          }
+
+          /* =========================================
+             BUILD PACKAGE LOOKUP
+          ========================================== */
+
+          for (const patientPackage of packages) {
+            this.patientPackageMap.set(patientPackage.id, patientPackage);
+          }
+
+          /* =========================================
+             CALCULATE PAYMENT SUMMARY
+          ========================================== */
+
+          this.updatePaymentSummary();
+
+          console.log('Dashboard patient packages received:', packages);
+
+          console.log('Dashboard payment summary:', this.paymentSummary);
+        },
+
+        error: (error: unknown) => {
+          console.error('Failed to load dashboard patient packages:', error);
+
+          if (currentRequestId !== this.requestId) {
+            return;
+          }
+
+          /*
+           * Keep the dashboard usable even when
+           * package payment information fails.
+           */
+          this.patientPackageMap.clear();
+
+          this.updatePaymentSummary();
+
+          console.error(
+            'Dashboard payment summary could not be populated from PatientPackage data.',
+          );
         },
       });
   }
@@ -450,20 +573,27 @@ export class Dashboard implements OnInit, OnDestroy {
   /* ===================================================
      UPDATE PAYMENT SUMMARY
 
-     Calculates payment information from the Visits API.
+     Payment information is package-level.
 
-     Only visits inside the selected date range are used.
+     Rules:
 
-     Cancelled visits are excluded.
+     1. Only non-cancelled visits inside the selected
+        date range are considered.
 
-     Amount Due:
+     2. A PatientPackage is counted only ONCE even if
+        multiple visits from that package are inside
+        the selected date range.
 
-     Sum of amountDue for all non-cancelled visits
-     in the selected date range.
+     3. Amount Due comes from PatientPackage.totalAmount.
 
-     Outstanding Amount:
+     4. Amount Received comes from
+        PatientPackage.amountPaid.
 
-     Amount Due - Amount Received
+     5. Outstanding Amount comes from
+        PatientPackage.amountPending.
+
+     We intentionally do NOT read payment information
+     from Visit.
   =================================================== */
 
   private updatePaymentSummary(): void {
@@ -471,25 +601,52 @@ export class Dashboard implements OnInit, OnDestroy {
       (visit: Visit) => this.isVisitInSelectedDateRange(visit) && visit.status !== 'Cancelled',
     );
 
-    const totalAmountDue = visitsInRange.reduce(
-      (total: number, visit: Visit) => total + Number(visit.amountDue ?? 0),
-      0,
-    );
+    /* ===============================================
+       GET UNIQUE PACKAGE IDS
+    ================================================ */
 
-    const totalAmountReceived = visitsInRange.reduce(
-      (total: number, visit: Visit) => total + Number(visit.amountReceived ?? 0),
-      0,
-    );
+    const packageIds = [
+      ...new Set(
+        visitsInRange.map((visit) => visit.patientPackageId).filter((id): id is string => !!id),
+      ),
+    ];
 
-    const totalOutstandingAmount = visitsInRange.reduce((total: number, visit: Visit) => {
-      const amountDue = Number(visit.amountDue ?? 0);
+    /* ===============================================
+       CALCULATE PACKAGE-LEVEL TOTALS
+    ================================================ */
 
-      const amountReceived = Number(visit.amountReceived ?? 0);
+    let totalAmountDue = 0;
 
-      const outstanding = Math.max(amountDue - amountReceived, 0);
+    let totalAmountReceived = 0;
 
-      return total + outstanding;
-    }, 0);
+    let totalOutstandingAmount = 0;
+
+    for (const packageId of packageIds) {
+      const patientPackage = this.patientPackageMap.get(packageId);
+
+      /*
+       * Package information may not have loaded yet.
+       */
+      if (!patientPackage) {
+        continue;
+      }
+
+      const amountDue = Number(patientPackage.totalAmount) || 0;
+
+      const amountReceived = Number(patientPackage.amountPaid) || 0;
+
+      const amountPending = Math.max(Number(patientPackage.amountPending) || 0, 0);
+
+      totalAmountDue += amountDue;
+
+      totalAmountReceived += amountReceived;
+
+      totalOutstandingAmount += amountPending;
+    }
+
+    /* ===============================================
+       UPDATE DASHBOARD PAYMENT SUMMARY
+    ================================================ */
 
     this.paymentSummary = {
       totalAmountDue,

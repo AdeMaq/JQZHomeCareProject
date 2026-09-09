@@ -163,6 +163,8 @@
 
   @if (!isLoading && !errorMessage) {
     <div class="status-summary">
+      <!-- Pending -->
+
       <div class="status-summary-item">
         <span class="status-summary-dot pending"></span>
 
@@ -172,6 +174,8 @@
         </span>
       </div>
 
+      <!-- Installment Pending -->
+
       <div class="status-summary-item">
         <span class="status-summary-dot installment"></span>
 
@@ -180,6 +184,8 @@
           <strong>{{ installmentVisits }}</strong>
         </span>
       </div>
+
+      <!-- Received -->
 
       <div class="status-summary-item">
         <span class="status-summary-dot received"></span>
@@ -400,11 +406,11 @@
                       <i
                         class="fa-solid"
                         [ngClass]="{
-                          'fa-circle-check': visit.collectionStatus === 'Received',
+                          'fa-circle-check': getCollectionStatus(visit) === 'Received',
 
-                          'fa-hourglass-half': visit.collectionStatus === 'InstallmentPending',
+                          'fa-hourglass-half': getCollectionStatus(visit) === 'InstallmentPending',
 
-                          'fa-clock': visit.collectionStatus === 'Pending',
+                          'fa-clock': getCollectionStatus(visit) === 'Pending',
                         }"
                       ></i>
 
@@ -421,7 +427,7 @@
 
                         <strong>
                           Rs.
-                          {{ formatAmount(visit.amountDue) }}
+                          {{ formatAmount(getAmountDue(visit)) }}
                         </strong>
                       </div>
 
@@ -430,7 +436,7 @@
 
                         <strong>
                           Rs.
-                          {{ formatAmount(visit.amountReceived) }}
+                          {{ formatAmount(getAmountReceived(visit)) }}
                         </strong>
                       </div>
 
@@ -448,9 +454,9 @@
 
                     <span
                       class="collection-status-badge"
-                      [ngClass]="getCollectionStatusClass(visit.collectionStatus)"
+                      [ngClass]="getCollectionStatusClass(getCollectionStatus(visit))"
                     >
-                      {{ getCollectionStatusLabel(visit.collectionStatus) }}
+                      {{ getCollectionStatusLabel(getCollectionStatus(visit)) }}
                     </span>
                   </div>
                 </td>
@@ -461,9 +467,9 @@
 
                 <td>
                   <span class="received-by-badge" [ngClass]="getReceivedByClass(visit)">
-                    @if (visit.receivedBy === 'Practitioner') {
+                    @if (getReceivedBy(visit) === 'Practitioner') {
                       <i class="fa-solid fa-user-doctor"></i>
-                    } @else if (visit.receivedBy === 'Company') {
+                    } @else if (getReceivedBy(visit) === 'Company') {
                       <i class="fa-solid fa-building"></i>
                     } @else {
                       <i class="fa-solid fa-minus"></i>
@@ -523,25 +529,25 @@
                       <span
                         class="action-status"
                         [ngClass]="{
-                          'action-paid': visit.collectionStatus === 'Received',
+                          'action-paid': getCollectionStatus(visit) === 'Received',
 
-                          'action-full-advance': visit.paymentType === 'FullAdvance',
+                          'action-full-advance': getPaymentType(visit) === 'FullAdvance',
 
                           'action-cancelled': visit.status === 'Cancelled',
 
                           'action-recorded':
                             getPendingAmount(visit) <= 0 &&
-                            visit.collectionStatus !== 'Received' &&
-                            visit.paymentType !== 'FullAdvance' &&
+                            getCollectionStatus(visit) !== 'Received' &&
+                            getPaymentType(visit) !== 'FullAdvance' &&
                             visit.status !== 'Cancelled',
                         }"
                         [title]="getCollectionActionDescription(visit)"
                       >
                         @if (visit.status === 'Cancelled') {
                           <i class="fa-solid fa-ban"></i>
-                        } @else if (visit.paymentType === 'FullAdvance') {
+                        } @else if (getPaymentType(visit) === 'FullAdvance') {
                           <i class="fa-solid fa-building"></i>
-                        } @else if (visit.collectionStatus === 'Received') {
+                        } @else if (getCollectionStatus(visit) === 'Received') {
                           <i class="fa-solid fa-circle-check"></i>
                         } @else {
                           <i class="fa-solid fa-circle-info"></i>
@@ -679,25 +685,25 @@
 
           <div class="modal-payment-summary">
             <div class="modal-summary-row">
-              <span>Amount Due</span>
+              <span> Amount Due </span>
 
               <strong>
                 Rs.
-                {{ formatAmount(selectedVisit.amountDue) }}
+                {{ formatAmount(getAmountDue(selectedVisit)) }}
               </strong>
             </div>
 
             <div class="modal-summary-row">
-              <span>Already Received</span>
+              <span> Already Received </span>
 
               <strong>
                 Rs.
-                {{ formatAmount(selectedVisit.amountReceived) }}
+                {{ formatAmount(getAmountReceived(selectedVisit)) }}
               </strong>
             </div>
 
             <div class="modal-summary-row modal-pending-row">
-              <span>Remaining Balance</span>
+              <span> Remaining Balance </span>
 
               <strong>
                 Rs.
@@ -711,13 +717,13 @@
           ----------------------------------------------------- -->
 
           <div class="modal-status-row">
-            <span>Current Collection Status</span>
+            <span> Current Collection Status </span>
 
             <span
               class="collection-status-badge"
-              [ngClass]="getCollectionStatusClass(selectedVisit.collectionStatus)"
+              [ngClass]="getCollectionStatusClass(getCollectionStatus(selectedVisit))"
             >
-              {{ getCollectionStatusLabel(selectedVisit.collectionStatus) }}
+              {{ getCollectionStatusLabel(getCollectionStatus(selectedVisit)) }}
             </span>
           </div>
 
@@ -726,7 +732,7 @@
           ----------------------------------------------------- -->
 
           <div class="modal-status-row">
-            <span>Received By</span>
+            <span> Received By </span>
 
             <span class="received-by-badge" [ngClass]="getReceivedByClass(selectedVisit)">
               {{ getReceivedBy(selectedVisit) }}
@@ -755,7 +761,7 @@
             <label for="collectionAmount">
               Collection Amount
 
-              <span class="required">*</span>
+              <span class="required"> * </span>
             </label>
 
             <div class="amount-input-wrapper">
@@ -774,7 +780,7 @@
             </div>
 
             <div class="amount-helper">
-              <span>Maximum collectible:</span>
+              <span> Maximum collectible: </span>
 
               <strong>
                 Rs.

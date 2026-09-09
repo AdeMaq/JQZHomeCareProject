@@ -1,11 +1,17 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
-
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { VisitsService } from '../visits.service';
 
-import { CollectionStatus, ReceivedByType, Visit, VisitStatus } from '../visits.interface';
+import { Visit, VisitStatus } from '../visits.interface';
+
+import {
+  CollectionStatus,
+  PatientPackage,
+  ReceivedByType,
+  PatientPackageService,
+} from '../../../core/services/patient-package.service';
 
 @Component({
   selector: 'app-visit-details',
@@ -21,7 +27,23 @@ export class VisitDetails implements OnInit {
 
   visit: Visit | null = null;
 
+  /**
+   * Payment information is package-level.
+   *
+   * Visit itself no longer owns:
+   *
+   * - amountDue
+   * - amountReceived
+   * - collectionStatus
+   * - receivedBy
+   *
+   * Those values come from PatientPackage.
+   */
+  patientPackage: PatientPackage | null = null;
+
   isLoading = true;
+
+  isLoadingPatientPackage = false;
 
   errorMessage = '';
 
@@ -35,6 +57,7 @@ export class VisitDetails implements OnInit {
     private readonly route: ActivatedRoute,
     private readonly router: Router,
     private readonly visitsService: VisitsService,
+    private readonly patientPackageService: PatientPackageService,
     private readonly cdr: ChangeDetectorRef,
   ) {}
 
@@ -60,8 +83,12 @@ export class VisitDetails implements OnInit {
     console.log('=================================');
 
     this.isLoading = true;
+    this.isLoadingPatientPackage = false;
+
     this.errorMessage = '';
+
     this.visit = null;
+    this.patientPackage = null;
 
     const id = this.route.snapshot.paramMap.get('id');
 
@@ -96,6 +123,7 @@ export class VisitDetails implements OnInit {
         console.log('VISIT:', visit);
 
         this.visit = visit;
+
         this.isLoading = false;
         this.errorMessage = '';
 
@@ -103,12 +131,18 @@ export class VisitDetails implements OnInit {
         console.log('isLoading:', this.isLoading);
         console.log('errorMessage:', this.errorMessage);
 
-        /*
-         * Explicitly trigger Angular change detection.
+        /**
+         * Payment information belongs to PatientPackage.
          *
-         * The API request is successful (HTTP 200), so the UI
-         * must now move from the loading state to the details
-         * state.
+         * Therefore, after loading the visit, load its
+         * PatientPackage using patientPackageId.
+         */
+        if (visit.patientPackageId) {
+          this.loadPatientPackage(visit.patientPackageId);
+        }
+
+        /**
+         * Explicitly trigger Angular change detection.
          */
         this.cdr.detectChanges();
 
@@ -119,22 +153,25 @@ export class VisitDetails implements OnInit {
       // ERROR
       // ========================================================
 
-      error: (error) => {
+      error: (error: unknown) => {
         console.error('=================================');
         console.error('FAILED TO LOAD VISIT DETAILS');
         console.error('=================================');
 
         console.error('ERROR:', error);
-        console.error('ERROR BODY:', error?.error);
-        console.error('ERROR MESSAGE:', error?.message);
+
+        const apiError = this.getApiError(error);
+
+        console.error('ERROR BODY:', apiError);
+        console.error('ERROR MESSAGE:', this.getApiErrorMessage(error));
 
         this.visit = null;
-        this.isLoading = false;
+        this.patientPackage = null;
 
-        this.errorMessage =
-          error?.error?.message ||
-          error?.message ||
-          'Unable to load visit details. Please try again.';
+        this.isLoading = false;
+        this.isLoadingPatientPackage = false;
+
+        this.errorMessage = this.getApiErrorMessage(error);
 
         this.cdr.detectChanges();
       },
@@ -148,12 +185,104 @@ export class VisitDetails implements OnInit {
         console.log('VISIT API REQUEST COMPLETED');
         console.log('=================================');
 
-        /*
-         * This is intentionally NOT responsible for changing
-         * isLoading.
+        /**
+         * Loading state is intentionally not changed here.
          *
-         * The success/error handlers handle that explicitly.
+         * Success/error handlers are responsible for that.
          */
+      },
+    });
+  }
+
+  // ============================================================
+  // LOAD PATIENT PACKAGE
+  // ============================================================
+
+  private loadPatientPackage(patientPackageId: string): void {
+    console.log('=================================');
+    console.log('LOADING PATIENT PACKAGE');
+    console.log('=================================');
+
+    console.log('PATIENT PACKAGE ID:', patientPackageId);
+
+    this.isLoadingPatientPackage = true;
+
+    this.patientPackageService.getById(patientPackageId).subscribe({
+      // ========================================================
+      // SUCCESS
+      // ========================================================
+
+      next: (patientPackage: PatientPackage) => {
+        console.log('=================================');
+        console.log('PATIENT PACKAGE LOADED');
+        console.log('=================================');
+
+        console.log('PATIENT PACKAGE:', patientPackage);
+
+        /**
+         * Make sure the package still belongs to the
+         * currently displayed visit.
+         */
+        if (this.visit?.patientPackageId !== patientPackage.id) {
+          console.warn('Loaded PatientPackage does not belong to the current visit.');
+
+          this.isLoadingPatientPackage = false;
+
+          this.cdr.detectChanges();
+
+          return;
+        }
+
+        this.patientPackage = patientPackage;
+
+        this.isLoadingPatientPackage = false;
+
+        console.log('Package payment information:', {
+          totalAmount: patientPackage.totalAmount,
+          amountPaid: patientPackage.amountPaid,
+          amountPending: patientPackage.amountPending,
+          collectionStatus: patientPackage.collectionStatus,
+          receivedBy: patientPackage.receivedBy,
+          installmentPayments: patientPackage.installmentPayments,
+        });
+
+        this.cdr.detectChanges();
+      },
+
+      // ========================================================
+      // ERROR
+      // ========================================================
+
+      error: (error: unknown) => {
+        console.error('=================================');
+        console.error('FAILED TO LOAD PATIENT PACKAGE');
+        console.error('=================================');
+
+        console.error('ERROR:', error);
+
+        this.patientPackage = null;
+
+        this.isLoadingPatientPackage = false;
+
+        /**
+         * The visit itself has already loaded successfully.
+         *
+         * Therefore, do not replace the entire visit page
+         * with an error state.
+         *
+         * The payment section can instead display that
+         * package payment information is unavailable.
+         */
+
+        this.cdr.detectChanges();
+      },
+
+      // ========================================================
+      // COMPLETE
+      // ========================================================
+
+      complete: () => {
+        console.log('PATIENT PACKAGE REQUEST COMPLETED');
       },
     });
   }
@@ -304,6 +433,14 @@ export class VisitDetails implements OnInit {
   }
 
   // ============================================================
+  // PACKAGE COLLECTION STATUS
+  // ============================================================
+
+  getCollectionStatus(): CollectionStatus | null {
+    return this.patientPackage?.collectionStatus ?? null;
+  }
+
+  // ============================================================
   // COLLECTION STATUS CLASS
   // ============================================================
 
@@ -366,18 +503,13 @@ export class VisitDetails implements OnInit {
   // ============================================================
   // PAYMENT PENDING
   //
-  // CollectionStatus is authoritative.
+  // CollectionStatus is package-level.
   // ============================================================
 
   isPaymentPending(): boolean {
-    if (!this.visit) {
-      return false;
-    }
+    const collectionStatus = this.patientPackage?.collectionStatus;
 
-    return (
-      this.visit.collectionStatus === 'Pending' ||
-      this.visit.collectionStatus === 'InstallmentPending'
-    );
+    return collectionStatus === 'Pending' || collectionStatus === 'InstallmentPending';
   }
 
   // ============================================================
@@ -385,11 +517,7 @@ export class VisitDetails implements OnInit {
   // ============================================================
 
   isPaymentReceived(): boolean {
-    if (!this.visit) {
-      return false;
-    }
-
-    return this.visit.collectionStatus === 'Received';
+    return this.patientPackage?.collectionStatus === 'Received';
   }
 
   // ============================================================
@@ -397,18 +525,24 @@ export class VisitDetails implements OnInit {
   // ============================================================
 
   isInstallmentPending(): boolean {
-    if (!this.visit) {
-      return false;
-    }
-
-    return this.visit.collectionStatus === 'InstallmentPending';
+    return this.patientPackage?.collectionStatus === 'InstallmentPending';
   }
 
   // ============================================================
   // MOBILE PAYMENT OPTION
+  //
+  // CollectionStatus controls whether the mobile payment
+  // option should be available.
   // ============================================================
 
   shouldShowMobilePaymentOption(): boolean {
+    /**
+     * Pending / InstallmentPending:
+     * payment collection can still be relevant.
+     *
+     * Received:
+     * payment option must remain hidden.
+     */
     return this.isPaymentPending();
   }
 
@@ -417,8 +551,8 @@ export class VisitDetails implements OnInit {
   // ============================================================
 
   getMobilePaymentStatusLabel(): string {
-    if (!this.visit) {
-      return 'Unknown';
+    if (!this.patientPackage) {
+      return 'Payment information unavailable';
     }
 
     if (this.isPaymentReceived()) {
@@ -437,8 +571,8 @@ export class VisitDetails implements OnInit {
   // ============================================================
 
   getMobilePaymentStatusDescription(): string {
-    if (!this.visit) {
-      return '';
+    if (!this.patientPackage) {
+      return 'Package payment information could not be loaded.';
     }
 
     if (this.isPaymentReceived()) {
@@ -453,18 +587,29 @@ export class VisitDetails implements OnInit {
   }
 
   // ============================================================
-  // PENDING AMOUNT
+  // PACKAGE TOTAL AMOUNT
+  // ============================================================
+
+  getTotalAmount(): number {
+    return Number(this.patientPackage?.totalAmount) || 0;
+  }
+
+  // ============================================================
+  // PACKAGE AMOUNT PAID
+  // ============================================================
+
+  getAmountPaid(): number {
+    return Number(this.patientPackage?.amountPaid) || 0;
+  }
+
+  // ============================================================
+  // PACKAGE AMOUNT PENDING
+  //
+  // AmountPending is supplied by the backend package DTO.
   // ============================================================
 
   getPendingAmount(): number {
-    if (!this.visit) {
-      return 0;
-    }
-
-    const amountDue = Number(this.visit.amountDue) || 0;
-    const amountReceived = Number(this.visit.amountReceived) || 0;
-
-    return Math.max(amountDue - amountReceived, 0);
+    return Number(this.patientPackage?.amountPending) || 0;
   }
 
   // ============================================================
@@ -487,22 +632,18 @@ export class VisitDetails implements OnInit {
   // ============================================================
   // RECEIVED BY LABEL
   //
-  // Important:
-  // ReceivedBy is independent from CollectionStatus.
+  // IMPORTANT:
+  // ReceivedBy belongs to PatientPackage.
   //
-  // Example:
-  // CollectionStatus = InstallmentPending
-  // ReceivedBy       = Company
-  //
-  // We should still display Company.
+  // It is intentionally NOT read from Visit.
   // ============================================================
 
   getReceivedByLabel(): string {
-    if (!this.visit) {
+    if (!this.patientPackage) {
       return 'Not available';
     }
 
-    switch (this.visit.receivedBy) {
+    switch (this.patientPackage.receivedBy) {
       case 'Practitioner':
         return 'Practitioner';
 
@@ -529,5 +670,104 @@ export class VisitDetails implements OnInit {
       default:
         return 'fa-solid fa-user';
     }
+  }
+
+  // ============================================================
+  // PACKAGE PAYMENT TYPE
+  // ============================================================
+
+  getPaymentTypeLabel(): string {
+    if (!this.patientPackage) {
+      return 'Not available';
+    }
+
+    return this.patientPackage.paymentType === 'Installment' ? 'Installment' : 'Full Advance';
+  }
+
+  // ============================================================
+  // PAYMENT PACKAGE LOADING STATE
+  // ============================================================
+
+  isPaymentInformationLoading(): boolean {
+    return !!this.visit?.patientPackageId && this.isLoadingPatientPackage;
+  }
+
+  // ============================================================
+  // PAYMENT INFORMATION AVAILABLE
+  // ============================================================
+
+  hasPaymentInformation(): boolean {
+    return !!this.patientPackage;
+  }
+
+  // ============================================================
+  // API ERROR HELPERS
+  // ============================================================
+
+  private getApiError(error: unknown): unknown {
+    if (typeof error !== 'object' || error === null) {
+      return null;
+    }
+
+    const response = error as {
+      error?: unknown;
+    };
+
+    return response.error ?? null;
+  }
+
+  private getApiErrorMessage(error: unknown): string {
+    if (typeof error !== 'object' || error === null) {
+      return 'Unable to load visit details. Please try again.';
+    }
+
+    const response = error as {
+      status?: number;
+      message?: string;
+      error?: {
+        message?: string;
+        title?: string;
+        detail?: string;
+        errors?: Record<string, string[]>;
+      };
+    };
+
+    if (response.error?.message) {
+      return response.error.message;
+    }
+
+    if (response.error?.detail) {
+      return response.error.detail;
+    }
+
+    if (response.error?.title) {
+      return response.error.title;
+    }
+
+    if (response.error?.errors) {
+      const validationErrors = Object.values(response.error.errors)
+        .flat()
+        .filter(
+          (message): message is string => typeof message === 'string' && message.trim().length > 0,
+        );
+
+      if (validationErrors.length > 0) {
+        return validationErrors.join(' ');
+      }
+    }
+
+    if (response.message && response.message.trim().length > 0) {
+      return response.message;
+    }
+
+    if ((response.status ?? 0) >= 500) {
+      return 'The server encountered an error while loading the visit information. Please try again.';
+    }
+
+    if ((response.status ?? 0) >= 400) {
+      return 'The visit could not be loaded. Please check the information and try again.';
+    }
+
+    return 'Unable to load visit details. Please try again.';
   }
 }

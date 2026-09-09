@@ -80,7 +80,7 @@ namespace JQZHomeCareProject.Application.Services
             Id = v.Id,
             PatientId = v.PatientId,
             PatientName = v.PatientNameSnapshot ?? v.Patient?.Name ?? string.Empty,
-            PatientPhone = v.PatientPhoneSnapshot ?? v.Patient?.Phone ?? string.Empty,
+            PatientPhone = v.Patient?.Phone ?? string.Empty,
             PatientAddress = v.PatientAddressSnapshot ?? v.Patient?.Location?.Address ?? string.Empty,
             PatientDescription = v.PatientDescriptionSnapshot ?? v.Patient?.PatientDescription,
             PractitionerId = v.PractitionerId,

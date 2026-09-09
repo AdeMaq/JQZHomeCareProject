@@ -412,226 +412,303 @@
         <div>
           <h2>Payment &amp; Collection</h2>
 
-          <p>Financial summary and collection information.</p>
+          <p>Package-level financial summary and collection information.</p>
         </div>
 
         <!-- =================================================
              COLLECTION STATUS
         ================================================== -->
 
-        <span class="collection-badge" [ngClass]="getCollectionStatusClass(visit.collectionStatus)">
-          <i [class]="getCollectionIcon(visit.collectionStatus)"></i>
+        @if (isPaymentInformationLoading()) {
+          <span class="collection-badge collection-unknown">
+            <i class="fa-solid fa-spinner fa-spin"></i>
 
-          {{ getCollectionStatusLabel(visit.collectionStatus) }}
-        </span>
+            Loading
+          </span>
+        } @else if (hasPaymentInformation()) {
+          <span
+            class="collection-badge"
+            [ngClass]="getCollectionStatusClass(getCollectionStatus())"
+          >
+            <i [class]="getCollectionIcon(getCollectionStatus())"></i>
+
+            {{ getCollectionStatusLabel(getCollectionStatus()) }}
+          </span>
+        } @else {
+          <span class="collection-badge collection-unknown">
+            <i class="fa-solid fa-circle-question"></i>
+
+            Unavailable
+          </span>
+        }
       </div>
 
       <!-- =====================================================
-           PAYMENT STATUS MESSAGE
+           PAYMENT INFORMATION LOADING
       ====================================================== -->
 
-      @if (isPaymentReceived()) {
-        <div class="payment-status-message payment-status-received">
-          <div class="payment-status-message-icon">
-            <i class="fa-solid fa-circle-check"></i>
-          </div>
-
-          <div>
-            <strong>Payment Received</strong>
-
-            <p>
-              The full payment due for this visit has been received. No further collection is
-              required.
-            </p>
-          </div>
-        </div>
-
-      } @else if (isInstallmentPending()) {
-        <div class="payment-status-message payment-status-installment">
-          <div class="payment-status-message-icon">
-            <i class="fa-solid fa-hourglass-half"></i>
-          </div>
-
-          <div>
-            <strong>Installment Pending</strong>
-
-            <p>
-              Part of the payment has been received and a remaining balance is still pending. The
-              outstanding amount can be collected by the company or practitioner.
-            </p>
-          </div>
-        </div>
-
-      } @else if (isPaymentPending()) {
+      @if (isPaymentInformationLoading()) {
         <div class="payment-status-message payment-status-pending">
           <div class="payment-status-message-icon">
-            <i class="fa-solid fa-clock"></i>
+            <i class="fa-solid fa-spinner fa-spin"></i>
           </div>
 
           <div>
-            <strong>Payment Pending</strong>
+            <strong>Loading Payment Information</strong>
+
+            <p>Please wait while the package payment information is being loaded.</p>
+          </div>
+        </div>
+      }
+
+      <!-- =====================================================
+           PAYMENT INFORMATION UNAVAILABLE
+      ====================================================== -->
+
+      @else if (!hasPaymentInformation()) {
+        <div class="payment-status-message payment-status-pending">
+          <div class="payment-status-message-icon">
+            <i class="fa-solid fa-circle-exclamation"></i>
+          </div>
+
+          <div>
+            <strong>Payment Information Unavailable</strong>
 
             <p>
-              Payment has not yet been received for this visit. The outstanding amount remains
-              available for collection.
+              The visit was loaded successfully, but the associated package payment information
+              could not be loaded.
             </p>
           </div>
         </div>
       }
 
       <!-- =====================================================
-           PAYMENT AMOUNTS
+           PAYMENT INFORMATION
       ====================================================== -->
 
-      <div class="payment-grid">
+      @else {
         <!-- ===================================================
-             AMOUNT DUE
+             PAYMENT STATUS MESSAGE
         ==================================================== -->
 
-        <div class="payment-stat due-stat">
-          <div class="payment-stat-header">
-            <span>Amount Due</span>
+        @if (isPaymentReceived()) {
+          <div class="payment-status-message payment-status-received">
+            <div class="payment-status-message-icon">
+              <i class="fa-solid fa-circle-check"></i>
+            </div>
 
-            <i class="fa-solid fa-money-bill-wave"></i>
+            <div>
+              <strong>Payment Received</strong>
+
+              <p>
+                The package payment has been received. No further collection is currently required.
+              </p>
+            </div>
           </div>
 
-          <strong> PKR {{ formatAmount(visit.amountDue) }} </strong>
-        </div>
+        } @else if (isInstallmentPending()) {
+          <div class="payment-status-message payment-status-installment">
+            <div class="payment-status-message-icon">
+              <i class="fa-solid fa-hourglass-half"></i>
+            </div>
+
+            <div>
+              <strong>Installment Pending</strong>
+
+              <p>
+                Part of the package payment has been received and a remaining balance is still
+                pending. The outstanding amount can be collected by the company or practitioner.
+              </p>
+            </div>
+          </div>
+
+        } @else if (isPaymentPending()) {
+          <div class="payment-status-message payment-status-pending">
+            <div class="payment-status-message-icon">
+              <i class="fa-solid fa-clock"></i>
+            </div>
+
+            <div>
+              <strong>Payment Pending</strong>
+
+              <p>
+                Payment is still pending for this package. The outstanding amount remains available
+                for collection.
+              </p>
+            </div>
+          </div>
+        }
 
         <!-- ===================================================
-             AMOUNT RECEIVED
+             PAYMENT SUMMARY
         ==================================================== -->
 
-        <div class="payment-stat received-stat">
-          <div class="payment-stat-header">
-            <span>Amount Received</span>
+        <div class="payment-grid">
+          <!-- =================================================
+               TOTAL PACKAGE AMOUNT
+          ================================================== -->
 
-            <i class="fa-solid fa-circle-check"></i>
+          <div class="payment-stat due-stat">
+            <div class="payment-stat-header">
+              <span>Total Package Amount</span>
+
+              <i class="fa-solid fa-money-bill-wave"></i>
+            </div>
+
+            <strong> PKR {{ formatAmount(getTotalAmount()) }} </strong>
           </div>
 
-          <strong> PKR {{ formatAmount(visit.amountReceived) }} </strong>
-        </div>
+          <!-- =================================================
+               AMOUNT PAID
+          ================================================== -->
 
-        <!-- ===================================================
-             AMOUNT PENDING
-        ==================================================== -->
+          <div class="payment-stat received-stat">
+            <div class="payment-stat-header">
+              <span>Amount Paid</span>
 
-        <div class="payment-stat pending-stat">
-          <div class="payment-stat-header">
-            <span>Amount Pending</span>
+              <i class="fa-solid fa-circle-check"></i>
+            </div>
 
-            <i class="fa-solid fa-clock"></i>
+            <strong> PKR {{ formatAmount(getAmountPaid()) }} </strong>
           </div>
 
-          <strong> PKR {{ formatAmount(getPendingAmount()) }} </strong>
-        </div>
-      </div>
+          <!-- =================================================
+               AMOUNT PENDING
+          ================================================== -->
 
-      <!-- =====================================================
-           PAYMENT DETAILS
-      ====================================================== -->
+          <div class="payment-stat pending-stat">
+            <div class="payment-stat-header">
+              <span>Amount Pending</span>
 
-      <div class="payment-details-card">
-        <!-- ===================================================
-             RECEIVED BY
-        ==================================================== -->
-
-        <div class="payment-detail-row">
-          <div class="payment-detail-label">
-            <i [class]="getReceivedByIcon(visit.receivedBy)"></i>
-
-            <span>Received By</span>
-          </div>
-
-          <strong>
-            {{ getReceivedByLabel() }}
-          </strong>
-        </div>
-
-        <!-- ===================================================
-             SETTLEMENT ID
-        ==================================================== -->
-
-        <div class="payment-detail-row">
-          <div class="payment-detail-label">
-            <i class="fa-solid fa-file-invoice"></i>
-
-            <span>Settlement ID</span>
-          </div>
-
-          <strong class="settlement-value">
-            {{ visit.settlementId || 'Not available' }}
-          </strong>
-        </div>
-
-        <!-- ===================================================
-             COLLECTION STATUS
-        ==================================================== -->
-
-        <div class="payment-detail-row">
-          <div class="payment-detail-label">
-            <i class="fa-solid fa-receipt"></i>
-
-            <span>Collection Status</span>
-          </div>
-
-          <strong
-            class="collection-status-value"
-            [ngClass]="getCollectionStatusClass(visit.collectionStatus)"
-          >
-            {{ getCollectionStatusLabel(visit.collectionStatus) }}
-          </strong>
-        </div>
-      </div>
-
-      <!-- =====================================================
-           PAYMENT BREAKDOWN
-      ====================================================== -->
-
-      <div class="payment-breakdown-card">
-        <div class="payment-breakdown-header">
-          <div>
-            <span class="eyebrow">Payment Overview</span>
-
-            <h3>Visit payment breakdown</h3>
-          </div>
-
-          <div
-            class="payment-breakdown-status"
-            [ngClass]="getCollectionStatusClass(visit.collectionStatus)"
-          >
-            <i [class]="getCollectionIcon(visit.collectionStatus)"></i>
-
-            {{ getCollectionStatusLabel(visit.collectionStatus) }}
-          </div>
-        </div>
-
-        <div class="payment-breakdown-list">
-          <!-- TOTAL DUE -->
-
-          <div class="payment-breakdown-row">
-            <span>Total Amount Due</span>
-
-            <strong> PKR {{ formatAmount(visit.amountDue) }} </strong>
-          </div>
-
-          <!-- TOTAL RECEIVED -->
-
-          <div class="payment-breakdown-row received-row">
-            <span>Total Amount Received</span>
-
-            <strong> PKR {{ formatAmount(visit.amountReceived) }} </strong>
-          </div>
-
-          <!-- REMAINING BALANCE -->
-
-          <div class="payment-breakdown-row pending-row">
-            <span>Remaining Balance</span>
+              <i class="fa-solid fa-clock"></i>
+            </div>
 
             <strong> PKR {{ formatAmount(getPendingAmount()) }} </strong>
           </div>
         </div>
-      </div>
+
+        <!-- ===================================================
+             PAYMENT DETAILS
+        ==================================================== -->
+
+        <div class="payment-details-card">
+          <!-- =================================================
+               PAYMENT TYPE
+          ================================================== -->
+
+          <div class="payment-detail-row">
+            <div class="payment-detail-label">
+              <i class="fa-solid fa-credit-card"></i>
+
+              <span>Payment Type</span>
+            </div>
+
+            <strong>
+              {{ getPaymentTypeLabel() }}
+            </strong>
+          </div>
+
+          <!-- =================================================
+               RECEIVED BY
+          ================================================== -->
+
+          <div class="payment-detail-row">
+            <div class="payment-detail-label">
+              <i [class]="getReceivedByIcon(patientPackage?.receivedBy)"></i>
+
+              <span>Received By</span>
+            </div>
+
+            <strong>
+              {{ getReceivedByLabel() }}
+            </strong>
+          </div>
+
+          <!-- =================================================
+               SETTLEMENT ID
+          ================================================== -->
+
+          <div class="payment-detail-row">
+            <div class="payment-detail-label">
+              <i class="fa-solid fa-file-invoice"></i>
+
+              <span>Settlement ID</span>
+            </div>
+
+            <strong class="settlement-value">
+              {{ visit.settlementId || 'Not available' }}
+            </strong>
+          </div>
+
+          <!-- =================================================
+               COLLECTION STATUS
+          ================================================== -->
+
+          <div class="payment-detail-row">
+            <div class="payment-detail-label">
+              <i class="fa-solid fa-receipt"></i>
+
+              <span>Collection Status</span>
+            </div>
+
+            <strong
+              class="collection-status-value"
+              [ngClass]="getCollectionStatusClass(getCollectionStatus())"
+            >
+              {{ getCollectionStatusLabel(getCollectionStatus()) }}
+            </strong>
+          </div>
+        </div>
+
+        <!-- ===================================================
+             PAYMENT BREAKDOWN
+        ==================================================== -->
+
+        <div class="payment-breakdown-card">
+          <div class="payment-breakdown-header">
+            <div>
+              <span class="eyebrow">Payment Overview</span>
+
+              <h3>Package payment breakdown</h3>
+            </div>
+
+            <div
+              class="payment-breakdown-status"
+              [ngClass]="getCollectionStatusClass(getCollectionStatus())"
+            >
+              <i [class]="getCollectionIcon(getCollectionStatus())"></i>
+
+              {{ getCollectionStatusLabel(getCollectionStatus()) }}
+            </div>
+          </div>
+
+          <div class="payment-breakdown-list">
+            <!-- TOTAL PACKAGE AMOUNT -->
+
+            <div class="payment-breakdown-row">
+              <span>Total Package Amount</span>
+
+              <strong> PKR {{ formatAmount(getTotalAmount()) }} </strong>
+            </div>
+
+            <!-- TOTAL PAID -->
+
+            <div class="payment-breakdown-row received-row">
+              <span>Total Amount Paid</span>
+
+              <strong> PKR {{ formatAmount(getAmountPaid()) }} </strong>
+            </div>
+
+            <!-- REMAINING BALANCE -->
+
+            <div class="payment-breakdown-row pending-row">
+              <span>Remaining Balance</span>
+
+              <strong> PKR {{ formatAmount(getPendingAmount()) }} </strong>
+            </div>
+          </div>
+        </div>
+      }
     </section>
   }
 

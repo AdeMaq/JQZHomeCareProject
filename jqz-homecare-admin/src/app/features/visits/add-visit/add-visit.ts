@@ -16,7 +16,7 @@ import {
 
 import { CreateVisitRequest, VisitsService } from '../visits.service';
 
-import { Visit } from '../visits.interface';
+import { PackagePaymentType, Visit } from '../visits.interface';
 
 // ============================================================
 // FORM MODELS
@@ -123,14 +123,19 @@ export class AddVisit implements OnInit {
 
   private selectedExistingPatientPhone = '';
 
+  /**
+   * Existing visits belonging to the selected patient.
+   *
+   * These are used to discover the latest PatientPackageId.
+   */
   private existingPatientVisits: Visit[] = [];
 
   /**
-   * Separate request version for loading the existing patient's
-   * visits/package information.
+   * Separate request version for loading existing patient
+   * visit/package information.
    *
-   * This prevents an old asynchronous response from overwriting
-   * a newer selection or manually changed package.
+   * This prevents an old asynchronous response from
+   * overwriting a newer patient selection.
    */
   private existingPatientDataRequestVersion = 0;
 
@@ -323,12 +328,23 @@ export class AddVisit implements OnInit {
   // ============================================================
 
   onPatientPhoneChange(phone: string): void {
+    this.form.patientPhone = phone;
+
     const normalizedPhone = phone.trim();
 
     /*
-     * If the admin changes the phone number after selecting
-     * an existing patient, invalidate the previous patient
-     * selection and any pending patient-data request.
+     * Invalidate the current phone lookup request whenever
+     * the phone field changes.
+     *
+     * This prevents an older lookup response from being used
+     * after the admin has entered a different phone number.
+     */
+    this.patientLookupRequestVersion++;
+
+    /*
+     * If the admin changes the phone after selecting an
+     * existing patient, invalidate the selected patient and
+     * any previous visit/package restoration.
      */
     if (this.selectedExistingPatient && normalizedPhone !== this.selectedExistingPatientPhone) {
       this.selectedExistingPatient = null;
@@ -344,6 +360,8 @@ export class AddVisit implements OnInit {
       this.existingPatientDataRequestVersion++;
 
       this.isLoadingExistingPatientData = false;
+
+      this.clearPackageSelection();
     }
 
     this.patientLookupError = '';
@@ -397,10 +415,18 @@ export class AddVisit implements OnInit {
     this.patientService.getPatientByPhone(phone).subscribe({
       next: (patient: Patient) => {
         /*
-         * Ignore an older request if the admin has already
-         * entered another phone number.
+         * Ignore an older response if another phone lookup
+         * has already started.
          */
         if (requestVersion !== this.patientLookupRequestVersion) {
+          return;
+        }
+
+        /*
+         * Also make sure the phone field still contains the
+         * phone number that initiated this request.
+         */
+        if (this.form.patientPhone.trim() !== phone.trim()) {
           return;
         }
 
@@ -417,6 +443,10 @@ export class AddVisit implements OnInit {
 
       error: (error: unknown) => {
         if (requestVersion !== this.patientLookupRequestVersion) {
+          return;
+        }
+
+        if (this.form.patientPhone.trim() !== phone.trim()) {
           return;
         }
 
@@ -470,7 +500,8 @@ export class AddVisit implements OnInit {
     /*
      * Populate the current Add Visit form.
      *
-     * These are normal editable form values.
+     * These are editable form values.
+     *
      * They do NOT update the existing Patient entity.
      */
     this.form.patientPhone = patient.phone ?? '';
@@ -495,8 +526,8 @@ export class AddVisit implements OnInit {
       'Existing patient selected. Patient information can still be edited.';
 
     /*
-     * Clear the current package/assignment state before
-     * restoring the patient's previous package.
+     * Clear current package/assignment state before restoring
+     * the patient's previous package.
      */
     this.clearPackageSelection();
 
@@ -513,6 +544,8 @@ export class AddVisit implements OnInit {
     this.selectedPackage = null;
 
     this.form.packageId = '';
+
+    this.form.paymentType = 'FullAdvance';
 
     this.form.initialAmountPaid = null;
 
@@ -546,10 +579,10 @@ export class AddVisit implements OnInit {
      * - practitionerId
      *
      * Therefore we use the patient's existing visits to
-     * recover the previous package assignment information.
+     * recover the latest PatientPackageId.
      */
     this.visitsService.getAll().subscribe({
-      next: (visits) => {
+      next: (visits: Visit[]) => {
         /*
          * Ignore stale asynchronous response.
          */
@@ -564,14 +597,23 @@ export class AddVisit implements OnInit {
           return;
         }
 
+        /*
+         * Only visits belonging to this patient and linked
+         * to a PatientPackage are relevant.
+         */
         const patientVisits = visits
           .filter((visit) => visit.patientId === patientId && !!visit.patientPackageId)
           .sort((a, b) => this.getVisitDateValue(b) - this.getVisitDateValue(a));
 
         this.existingPatientVisits = patientVisits;
 
+        console.log('Existing patient visits:', patientVisits);
+
         const latestVisit = this.getLatestPatientVisit(patientVisits);
 
+        /*
+         * No previous package was found.
+         */
         if (!latestVisit || !latestVisit.patientPackageId) {
           this.isLoadingExistingPatientData = false;
 
@@ -583,6 +625,19 @@ export class AddVisit implements OnInit {
           return;
         }
 
+        console.log('Latest patient visit:', latestVisit);
+
+        console.log('Latest PatientPackageId:', latestVisit.patientPackageId);
+
+        /*
+         * Continue:
+         *
+         * Visit
+         *   ↓
+         * PatientPackageId
+         *   ↓
+         * PatientPackage
+         */
         this.loadExistingPatientPackage(latestVisit, requestVersion);
       },
 
@@ -616,6 +671,8 @@ export class AddVisit implements OnInit {
       return;
     }
 
+    console.log('Loading PatientPackage:', visit.patientPackageId);
+
     this.patientPackageService.getById(visit.patientPackageId).subscribe({
       next: (patientPackage: PatientPackage) => {
         /*
@@ -626,12 +683,25 @@ export class AddVisit implements OnInit {
         }
 
         /*
-         * Make sure the same existing patient is still selected.
+         * Make sure an existing patient is still selected.
          */
         if (!this.selectedExistingPatient) {
           return;
         }
 
+        console.log('Existing PatientPackage loaded:', patientPackage);
+
+        // ======================================================
+        // PATIENT PACKAGE
+        // ======================================================
+
+        /*
+         * PatientPackage
+         *     ↓
+         * PackageId
+         *     ↓
+         * Package
+         */
         const existingPackage = this.packages.find((pkg) => pkg.id === patientPackage.packageId);
 
         if (!existingPackage) {
@@ -645,64 +715,173 @@ export class AddVisit implements OnInit {
           return;
         }
 
+        // ======================================================
+        // PACKAGE
+        // ======================================================
+
         /*
-         * Use the normal package-change workflow.
+         * The selected package determines:
          *
-         * The true argument tells onPackageChange() that
-         * this change is part of existing-patient restoration
-         * and should NOT invalidate this request.
+         * - Service
+         * - Number of visits
+         * - Package amount
+         *
+         * onPackageChange() creates the correct number
+         * of assignment cards.
          */
         this.form.packageId = existingPackage.id;
 
+        /*
+         * true means that the package change is part of
+         * existing-patient restoration.
+         *
+         * Therefore the restoration request must remain valid.
+         */
         this.onPackageChange(true);
 
-        /*
-         * onPackageChange() creates the correct number of
-         * assignments for the selected package.
-         */
-        const firstAssignment = this.form.visitAssignments[0];
+        // ======================================================
+        // PAYMENT
+        // ======================================================
 
-        if (firstAssignment) {
-          /*
-           * Restore area only if that area still exists.
-           */
-          if (visit.areaId) {
-            const existingArea = this.areas.find((area) => area.id === visit.areaId);
+        /*
+         * Restore only the previous payment TYPE.
+         *
+         * We intentionally do NOT copy:
+         *
+         * - AmountPaid
+         * - AmountPending
+         * - Previous installment amount
+         *
+         * because Add Visit creates a NEW package purchase.
+         */
+        this.form.paymentType =
+          patientPackage.paymentType === 'Installment' ? 'Installment' : 'FullAdvance';
+
+        this.form.initialAmountPaid = null;
+
+        console.log('Restored payment type:', this.form.paymentType);
+
+        // ======================================================
+        // ALL PREVIOUS PACKAGE VISITS
+        // ======================================================
+
+        /*
+         * Backend PatientPackageDto contains:
+         *
+         * Visits: List<VisitDto>
+         *
+         * Restore every available visit.
+         */
+        const previousVisits = this.getVisitsForRestoration(patientPackage.visits ?? []);
+
+        console.log('Previous package visits available for restoration:', previousVisits);
+
+        /*
+         * Only restore as many visits as the newly selected
+         * package actually contains.
+         */
+        const assignmentCount = Math.min(previousVisits.length, this.form.visitAssignments.length);
+
+        console.log('Number of assignments to restore:', assignmentCount);
+
+        // ======================================================
+        // RESTORE EACH ASSIGNMENT
+        // ======================================================
+
+        for (let i = 0; i < assignmentCount; i++) {
+          const previousVisit = previousVisits[i];
+
+          const assignment = this.form.visitAssignments[i];
+
+          if (!previousVisit || !assignment) {
+            continue;
+          }
+
+          // ====================================================
+          // AREA
+          // ====================================================
+
+          if (previousVisit.areaId) {
+            const existingArea = this.areas.find((area) => area.id === previousVisit.areaId);
 
             if (existingArea) {
-              firstAssignment.areaId = existingArea.id;
+              assignment.areaId = existingArea.id;
 
-              this.areaSearchTerms[0] = existingArea.cityName
+              this.areaSearchTerms[i] = existingArea.cityName
                 ? `${existingArea.name} — ${existingArea.cityName}`
                 : existingArea.name;
             }
           }
 
+          // ====================================================
+          // PRACTITIONER
+          // ====================================================
+
           /*
-           * Restore practitioner only if:
-           *
-           * 1. practitioner still exists
-           * 2. practitioner belongs to the package service
+           * Practitioner must belong to the package's
+           * service.
            */
-          if (visit.practitionerId) {
+          if (previousVisit.practitionerId) {
             const existingPractitioner = this.practitioners.find(
               (practitioner) =>
-                practitioner.id === visit.practitionerId &&
+                practitioner.id === previousVisit.practitionerId &&
                 practitioner.serviceId === existingPackage.serviceId,
             );
 
             if (existingPractitioner) {
-              firstAssignment.practitionerId = existingPractitioner.id;
+              assignment.practitionerId = existingPractitioner.id;
 
-              this.practitionerSearchTerms[0] = existingPractitioner.name;
+              this.practitionerSearchTerms[i] = existingPractitioner.name;
             }
           }
+
+          // ====================================================
+          // SCHEDULED DATE
+          // ====================================================
+
+          assignment.scheduledDate = previousVisit.scheduledDate
+            ? this.toDateInputValue(previousVisit.scheduledDate)
+            : null;
+
+          // ====================================================
+          // START TIME
+          // ====================================================
+
+          assignment.slotStart = previousVisit.slotStart
+            ? this.toTimeInputValue(previousVisit.slotStart)
+            : null;
+
+          // ====================================================
+          // END TIME
+          // ====================================================
+
+          assignment.slotEnd = previousVisit.slotEnd
+            ? this.toTimeInputValue(previousVisit.slotEnd)
+            : null;
+
+          // ====================================================
+          // PRACTITIONER SCHEDULE
+          // ====================================================
+
+          /*
+           * If the restored practitioner and date exist,
+           * load that practitioner's schedule.
+           */
+          if (assignment.practitionerId && assignment.scheduledDate) {
+            this.loadPractitionerSchedule(i);
+          }
         }
+
+        // ======================================================
+        // RESTORATION COMPLETE
+        // ======================================================
 
         this.isLoadingExistingPatientData = false;
 
         this.patientLookupMessage =
-          'Existing patient information has been populated. You can edit any field before creating the visit.';
+          'Existing patient, package, payment type and all available visit assignments have been loaded. You can edit any value before creating the new visit package.';
+
+        console.log('Restored Add Visit form:', this.form);
 
         this.cdr.markForCheck();
       },
@@ -716,12 +895,68 @@ export class AddVisit implements OnInit {
 
         this.isLoadingExistingPatientData = false;
 
-        this.patientLookupError =
-          'Patient was found, but the previous package information could not be loaded. Please select a package manually.';
+        this.patientLookupError = this.getErrorMessage(
+          error,
+          'Patient was found, but the previous package information could not be loaded. Please select a package manually.',
+        );
 
         this.cdr.markForCheck();
       },
     });
+  }
+
+  // ============================================================
+  // GET VISITS FOR RESTORATION
+  // ============================================================
+
+  private getVisitsForRestoration(visits: Visit[]): Visit[] {
+    if (!visits?.length) {
+      return [];
+    }
+
+    /*
+     * The backend returns the package's Visit collection.
+     *
+     * We create a stable restoration order:
+     *
+     * 1. Visits with scheduled dates are ordered
+     *    chronologically.
+     *
+     * 2. Visits without dates retain their original
+     *    backend collection order.
+     */
+    return visits
+      .map((visit, index) => ({
+        visit,
+        index,
+      }))
+      .sort((a, b) => {
+        const aDate = this.getVisitDateValue(a.visit);
+
+        const bDate = this.getVisitDateValue(b.visit);
+
+        /*
+         * Both visits have scheduled dates.
+         */
+        if (aDate > 0 && bDate > 0) {
+          return aDate - bDate;
+        }
+
+        /*
+         * Neither visit has a scheduled date.
+         *
+         * Preserve backend collection order.
+         */
+        if (aDate === 0 && bDate === 0) {
+          return a.index - b.index;
+        }
+
+        /*
+         * Scheduled visits come before unscheduled visits.
+         */
+        return aDate === 0 ? 1 : -1;
+      })
+      .map((item) => item.visit);
   }
 
   // ============================================================
@@ -733,6 +968,10 @@ export class AddVisit implements OnInit {
       return null;
     }
 
+    /*
+     * loadExistingPatientVisitData() sorts visits descending
+     * by scheduled date, so the first item is the latest visit.
+     */
     return visits[0] ?? null;
   }
 
@@ -756,13 +995,13 @@ export class AddVisit implements OnInit {
 
   onPackageChange(restoringExistingPatient = false): void {
     /*
-     * If the admin manually changes the package while an
-     * existing-patient package restoration is in progress,
+     * If the admin manually changes the package while
+     * existing-patient restoration is in progress,
      * invalidate the old asynchronous restoration.
      *
-     * When restoringExistingPatient === true, this method is
-     * being called by loadExistingPatientPackage(), so the
-     * request must remain valid.
+     * When restoringExistingPatient === true, this method
+     * is being called by loadExistingPatientPackage(), so
+     * the restoration request remains valid.
      */
     if (!restoringExistingPatient) {
       this.existingPatientDataRequestVersion++;
@@ -795,8 +1034,8 @@ export class AddVisit implements OnInit {
     }
 
     /*
-     * Package number of visits determines how many assignment
-     * cards are created.
+     * Package number of visits determines how many
+     * assignment cards are created.
      */
     this.form.visitAssignments = Array.from(
       {
@@ -804,6 +1043,8 @@ export class AddVisit implements OnInit {
       },
       () => this.createEmptyAssignment(),
     );
+
+    console.log('Assignments created for package:', this.form.visitAssignments.length);
   }
 
   // ============================================================
@@ -965,9 +1206,10 @@ export class AddVisit implements OnInit {
       (practitioner) => practitioner.serviceId === requiredServiceId,
     );
 
-    /*
-     * SEARCH FILTER
-     */
+    // ==========================================================
+    // SEARCH FILTER
+    // ==========================================================
+
     const search = (this.practitionerSearchTerms[index] ?? '').trim().toLowerCase();
 
     if (search) {
@@ -976,11 +1218,17 @@ export class AddVisit implements OnInit {
       );
     }
 
+    // ==========================================================
+    // PRIORITY
+    // ==========================================================
+
     /*
-     * PRIORITY:
+     * Priority:
      *
      * 1. Same service + selected area
      * 2. Same service but different/no area
+     *
+     * Different-service practitioners are never included.
      */
     if (assignment.areaId) {
       const selectedAreaId = assignment.areaId;
@@ -1033,6 +1281,10 @@ export class AddVisit implements OnInit {
     this.closeDropdown();
   }
 
+  // ============================================================
+  // PRACTITIONER CHANGE
+  // ============================================================
+
   onPractitionerChange(index: number): void {
     const assignment = this.form.visitAssignments[index];
 
@@ -1049,8 +1301,21 @@ export class AddVisit implements OnInit {
     this.loadPractitionerSchedule(index);
   }
 
+  // ============================================================
+  // AREA CHANGE
+  // ============================================================
+
   onAreaChange(index: number): void {
+    /*
+     * Changing the area changes practitioner priority.
+     *
+     * We intentionally do not automatically remove the
+     * selected practitioner because the practitioner may
+     * still belong to the package's service.
+     */
     this.invalidateScheduleRequest(index);
+
+    this.cdr.markForCheck();
   }
 
   // ============================================================
@@ -1165,6 +1430,24 @@ export class AddVisit implements OnInit {
 
     this.cdr.markForCheck();
 
+    /*
+     * IMPORTANT:
+     *
+     * getPractitionerVisitsByDate() is now a frontend-only
+     * helper in VisitsService.
+     *
+     * It calls:
+     *
+     *   GET /api/visits/by-date?date=YYYY-MM-DD
+     *
+     * and then filters the returned visits by practitionerId.
+     *
+     * It does NOT call:
+     *
+     *   /api/visits/practitioner/{id}/by-date
+     *
+     * because that backend endpoint does not exist.
+     */
     this.visitsService.getPractitionerVisitsByDate(practitionerId, scheduledDate).subscribe({
       next: (visits) => {
         if (this.scheduleRequestVersions[index] !== requestVersion) {
@@ -1472,6 +1755,80 @@ export class AddVisit implements OnInit {
   }
 
   // ============================================================
+  // DATE / TIME RESTORATION HELPERS
+  // ============================================================
+
+  private toDateInputValue(value: string | Date | null | undefined): string | null {
+    if (!value) {
+      return null;
+    }
+
+    /*
+     * If backend already returns yyyy-MM-dd,
+     * keep it exactly as-is.
+     */
+    if (typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value)) {
+      return value;
+    }
+
+    const date = new Date(value);
+
+    if (Number.isNaN(date.getTime())) {
+      return null;
+    }
+
+    const year = date.getFullYear();
+
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+
+    const day = date.getDate().toString().padStart(2, '0');
+
+    return `${year}-${month}-${day}`;
+  }
+
+  private toTimeInputValue(value: string | Date | null | undefined): string | null {
+    if (!value) {
+      return null;
+    }
+
+    /*
+     * Backend TimeSpan values normally arrive as:
+     *
+     * HH:mm:ss
+     *
+     * or:
+     *
+     * HH:mm
+     */
+    if (typeof value === 'string') {
+      const match = value.match(/^(\d{1,2}):(\d{2})(?::\d{2})?/);
+
+      if (match) {
+        const hours = match[1].padStart(2, '0');
+
+        const minutes = match[2];
+
+        return `${hours}:${minutes}`;
+      }
+    }
+
+    /*
+     * Fallback for Date-like values.
+     */
+    const date = new Date(value);
+
+    if (Number.isNaN(date.getTime())) {
+      return null;
+    }
+
+    const hours = date.getHours().toString().padStart(2, '0');
+
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+
+    return `${hours}:${minutes}`;
+  }
+
+  // ============================================================
   // TIME HELPERS
   // ============================================================
 
@@ -1568,6 +1925,10 @@ export class AddVisit implements OnInit {
       return true;
     }
 
+    /*
+     * Also check conflicts between assignments
+     * within the current new package.
+     */
     return this.form.visitAssignments.some((otherAssignment, otherIndex) => {
       if (otherIndex === index) {
         return false;
@@ -1613,8 +1974,8 @@ export class AddVisit implements OnInit {
   // PAYMENT TYPE
   // ============================================================
 
-  private getPaymentTypeValue(): 0 | 1 {
-    return this.form.paymentType === 'FullAdvance' ? 0 : 1;
+  private getPaymentTypeValue(): PackagePaymentType {
+    return this.form.paymentType;
   }
 
   // ============================================================
@@ -1700,7 +2061,9 @@ export class AddVisit implements OnInit {
       const assignment = this.form.visitAssignments[i];
 
       if (this.hasPartialSchedule(assignment)) {
-        this.errorMessage = `Visit #${i + 1}: Scheduled date, start time and end time must all be provided together.`;
+        this.errorMessage = `Visit #${
+          i + 1
+        }: Scheduled date, start time and end time must all be provided together.`;
 
         return;
       }
@@ -1729,7 +2092,9 @@ export class AddVisit implements OnInit {
       }
 
       if (this.hasScheduleConflict(i)) {
-        this.errorMessage = `Visit #${i + 1}: The selected time overlaps with an existing visit for this practitioner. Please choose another time.`;
+        this.errorMessage = `Visit #${
+          i + 1
+        }: The selected time overlaps with an existing visit for this practitioner. Please choose another time.`;
 
         return;
       }
@@ -1745,19 +2110,22 @@ export class AddVisit implements OnInit {
        *
        * These are the CURRENT values in the Add Visit form.
        *
-       * If the admin selected an existing patient and then
-       * edited the name/address/description, these edited
+       * If an existing patient was selected and the admin
+       * edited the name/address/description, the edited
        * values are sent here.
        *
-       * The backend must store these values as visit-level
-       * snapshot data rather than modifying the existing
-       * Patient entity.
+       * The backend stores the appropriate historical
+       * patient snapshot values for the new visit.
+       *
+       * Patient.Phone remains the permanent patient phone
+       * on the backend and is not changed by this operation.
        */
+
       patientName: this.form.patientName.trim(),
 
       patientPhone: this.form.patientPhone.trim(),
 
-      locationAddress: this.form.locationAddress.trim(),
+      patientAddress: this.form.locationAddress.trim(),
 
       patientDescription: this.form.description.trim() || null,
 
@@ -1765,10 +2133,10 @@ export class AddVisit implements OnInit {
 
       paymentType: this.getPaymentTypeValue(),
 
-      initialAmountPaid:
-        this.form.paymentType === 'Installment' ? Number(this.form.initialAmountPaid) : null,
+      initialAmount:
+        this.form.paymentType === 'Installment' ? Number(this.form.initialAmountPaid) : undefined,
 
-      visitAssignments: this.form.visitAssignments.map((assignment) => ({
+      assignments: this.form.visitAssignments.map((assignment) => ({
         practitionerId: assignment.practitionerId,
 
         areaId: assignment.areaId,
@@ -1789,7 +2157,7 @@ export class AddVisit implements OnInit {
     // CREATE
     // ==========================================================
 
-    this.visitsService.create(payload).subscribe({
+    this.visitsService.createVisit(payload).subscribe({
       next: (response: unknown) => {
         console.log('VISIT CREATED SUCCESSFULLY', response);
 
@@ -1839,16 +2207,11 @@ export class AddVisit implements OnInit {
     if (typeof error === 'object' && error !== null) {
       const response = error as {
         status?: number;
-
         message?: string;
-
         error?: {
           message?: string;
-
           title?: string;
-
           detail?: string;
-
           errors?: Record<string, string[]>;
         };
       };
@@ -1883,11 +2246,11 @@ export class AddVisit implements OnInit {
       }
 
       if ((response.status ?? 0) >= 500) {
-        return 'The server encountered an error while creating the visit. Please try again.';
+        return 'The server encountered an error while creating or loading the visit information. Please try again.';
       }
 
       if ((response.status ?? 0) >= 400) {
-        return 'The visit could not be created. Please check the entered information and try again.';
+        return 'The visit could not be processed. Please check the entered information and try again.';
       }
     }
 

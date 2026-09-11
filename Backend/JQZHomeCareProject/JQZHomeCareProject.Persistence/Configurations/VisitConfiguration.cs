@@ -8,61 +8,49 @@ namespace JQZHomeCareProject.Persistence.Configurations
     {
         public void Configure(EntityTypeBuilder<Visit> builder)
         {
-            builder.ToTable("Visits");
-
-            builder.HasKey(v => v.Id);
-
-            builder.Property(v => v.SlotStart).HasColumnType("time");
-            builder.Property(v => v.SlotEnd).HasColumnType("time");
-            builder.Property(v => v.CheckInLocation).HasMaxLength(500);
-            builder.Property(v => v.CheckOutLocation).HasMaxLength(500);
+            builder.Property(v => v.PatientNameSnapshot).HasMaxLength(200);
+            builder.Property(v => v.PatientAddressSnapshot).HasMaxLength(500);
+            builder.Property(v => v.PatientDescriptionSnapshot).HasMaxLength(1000);
+            builder.Property(v => v.CheckInLocation).HasMaxLength(100);
+            builder.Property(v => v.CheckOutLocation).HasMaxLength(100);
 
             builder.HasOne(v => v.Patient)
                 .WithMany(p => p.Visits)
                 .HasForeignKey(v => v.PatientId)
-                .IsRequired()
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasOne(v => v.Practitioner)
                 .WithMany(p => p.Visits)
                 .HasForeignKey(v => v.PractitionerId)
-                .IsRequired(false)
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasOne(v => v.Area)
                 .WithMany(a => a.Visits)
                 .HasForeignKey(v => v.AreaId)
-                .IsRequired(false)
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasOne(v => v.Service)
                 .WithMany()
                 .HasForeignKey(v => v.ServiceId)
-                .IsRequired()
-                .OnDelete(DeleteBehavior.Restrict);
-
-            builder.HasOne(v => v.CreatedByUser)
-                .WithMany()
-                .HasForeignKey(v => v.CreatedByUserId)
-                .IsRequired()
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasOne(v => v.PatientPackage)
                 .WithMany(pp => pp.Visits)
                 .HasForeignKey(v => v.PatientPackageId)
-                .OnDelete(DeleteBehavior.SetNull);
+                .OnDelete(DeleteBehavior.Restrict);
 
-            builder.HasOne(v => v.Settlement)
-                .WithMany(s => s.Visits)
-                .HasForeignKey(v => v.SettlementId)
-                .OnDelete(DeleteBehavior.SetNull);
+            builder.HasOne(v => v.CreatedByUser)
+                .WithMany()
+                .HasForeignKey(v => v.CreatedByUserId)
+                .OnDelete(DeleteBehavior.Restrict);
 
-            builder.HasMany(v => v.Refusals)
-                .WithOne(r => r.Visit)
-                .HasForeignKey(r => r.VisitId)
-                .OnDelete(DeleteBehavior.Cascade);
+            // Payment is the 1-to-1 dependent side; FK lives on Payment (see PaymentConfiguration).
+            // SettlementId / settlement index REMOVED — settlement state now lives on Payment.IsSettled.
 
-            builder.HasIndex(v => new { v.PractitionerId, v.SettlementId });
+            builder.HasIndex(v => v.PractitionerId);
+            builder.HasIndex(v => v.PatientPackageId);
+            builder.HasIndex(v => v.ScheduledDate);
+            builder.HasIndex(v => new { v.PractitionerId, v.ScheduledDate });
         }
     }
 }

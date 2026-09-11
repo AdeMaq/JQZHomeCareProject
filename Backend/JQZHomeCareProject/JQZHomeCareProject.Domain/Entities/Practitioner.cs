@@ -23,6 +23,5 @@ namespace JQZHomeCareProject.Domain.Entities
         public ICollection<PractitionerArea> PractitionerAreas { get; set; } = new List<PractitionerArea>();
         public ICollection<Visit> Visits { get; set; } = new List<Visit>();
         public ICollection<Rating> Ratings { get; set; } = new List<Rating>();
-        public ICollection<PractitionerSettlement> Settlements { get; set; } = new List<PractitionerSettlement>();
     }
 }

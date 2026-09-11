@@ -66,6 +66,7 @@ builder.Services.AddScoped<ICityService, JQZHomeCareProject.Application.Services
 builder.Services.AddScoped<IServiceCategoryService, JQZHomeCareProject.Application.Services.ServiceCategoryService>();
 builder.Services.AddScoped<IPatientService, JQZHomeCareProject.Application.Services.PatientService>();
 builder.Services.AddScoped<IPatientPackageService, JQZHomeCareProject.Application.Services.PatientPackageService>();
+builder.Services.AddScoped<IPaymentService, JQZHomeCareProject.Application.Services.PaymentService>();
 builder.Services.AddScoped<IApiClientService, JQZHomeCareProject.Application.Services.ApiClientService>();
 
 var jwtSettings = builder.Configuration.GetSection("Jwt").Get<JwtSettings>()

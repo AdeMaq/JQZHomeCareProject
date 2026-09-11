@@ -24,25 +24,15 @@ namespace JQZHomeCareProject.Application.DTOs
         public Guid PackageId { get; set; }
         public string PackageName { get; set; } = string.Empty;
         public PackagePaymentType PaymentType { get; set; }
-        public decimal TotalAmount { get; set; }
+        public decimal DefaultAmount { get; set; }
+        public decimal Amount { get; set; }
         public decimal AmountPaid { get; set; }
         public decimal AmountPending { get; set; }
         public CollectionStatus CollectionStatus { get; set; }
-        public ReceivedByType? ReceivedBy { get; set; }
         public PatientPackageStatus Status { get; set; }
         public DateTime PurchaseDate { get; set; }
         public List<VisitDto> Visits { get; set; } = new();
-        public List<InstallmentPaymentDto> InstallmentPayments { get; set; } = new();
-    }
-
-    public class InstallmentPaymentDto
-    {
-        public Guid Id { get; set; }
-        public Guid PatientPackageId { get; set; }
-        public Guid? VisitId { get; set; }
-        public decimal Amount { get; set; }
-        public ReceivedByType ReceivedBy { get; set; }
-        public DateTime Date { get; set; }
+        public List<PaymentDto> Payments { get; set; } = new();
     }
 
     public class RecordInstallmentDto

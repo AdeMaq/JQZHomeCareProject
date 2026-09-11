@@ -1,115 +1,25 @@
 ﻿using JQZHomeCareProject.Application.Common.Exceptions;
 using JQZHomeCareProject.Application.Common.Interfaces;
+using JQZHomeCareProject.Application.Common.Validation;
 using JQZHomeCareProject.Application.DTOs;
 using JQZHomeCareProject.Domain.Entities;
-using JQZHomeCareProject.Domain.Enums;
 
 namespace JQZHomeCareProject.Application.Services
 {
     public class PaymentService : IPaymentService
     {
-        private readonly IPractitionerSettlementRepository _settlementRepository;
-        private readonly IVisitRepository _visitRepository;
+        private readonly IPaymentRepository _paymentRepository;
         private readonly IPractitionerRepository _practitionerRepository;
-        private readonly IInstallmentPaymentRepository _installmentPaymentRepository;
 
         public PaymentService(
-            IPractitionerSettlementRepository settlementRepository,
-            IVisitRepository visitRepository,
-            IPractitionerRepository practitionerRepository,
-            IInstallmentPaymentRepository installmentPaymentRepository)
+            IPaymentRepository paymentRepository,
+            IPractitionerRepository practitionerRepository)
         {
-            _settlementRepository = settlementRepository;
-            _visitRepository = visitRepository;
+            _paymentRepository = paymentRepository;
             _practitionerRepository = practitionerRepository;
-            _installmentPaymentRepository = installmentPaymentRepository;
         }
 
-        public async Task<PractitionerSettlementDto> GenerateWeeklySettlementAsync(Guid practitionerId, DateTime weekStart)
-        {
-            var practitioner = await _practitionerRepository.GetByIdAsync(practitionerId)
-                ?? throw new NotFoundException("Practitioner not found.");
-
-            var existing = await _settlementRepository.GetByPractitionerAndWeekAsync(practitionerId, weekStart);
-            if (existing != null)
-                throw new ValidationException("A settlement for this practitioner and week already exists.");
-
-            var weekEnd = weekStart.Date.AddDays(6);
-
-            var visits = (await _visitRepository.GetUnsettledCompletedAsync(practitionerId, weekStart.Date, weekEnd)).ToList();
-            if (visits.Count == 0)
-                throw new ValidationException("No unsettled completed visits found for this practitioner in the given week.");
-
-            var payments = (await _installmentPaymentRepository.GetByVisitIdsAsync(visits.Select(v => v.Id))).ToList();
-
-            var totalVisitAmount = payments.Sum(p => p.Amount);
-            var amountCollectedByPractitioner = payments
-                .Where(p => p.ReceivedBy == ReceivedByType.Practitioner)
-                .Sum(p => p.Amount);
-
-            var practitionerShareAmount = Math.Round(totalVisitAmount * practitioner.SharePercentage / 100m, 2);
-            var companyShareAmount = totalVisitAmount - practitionerShareAmount;
-
-            var settlement = new PractitionerSettlement
-            {
-                Id = Guid.NewGuid(),
-                PractitionerId = practitionerId,
-                WeekStartDate = weekStart.Date,
-                WeekEndDate = weekEnd,
-                TotalVisitAmount = totalVisitAmount,
-                AmountCollectedByPractitioner = amountCollectedByPractitioner,
-                PractitionerShareAmount = practitionerShareAmount,
-                CompanyShareAmount = companyShareAmount,
-                Status = CollectionStatus.Pending,
-                CreatedAt = DateTime.UtcNow
-            };
-
-            await _settlementRepository.AddAsync(settlement);
-
-            foreach (var visit in visits)
-            {
-                visit.SettlementId = settlement.Id;
-                await _visitRepository.UpdateAsync(visit);
-            }
-
-            return MapToDto(settlement, practitioner.User?.Name ?? string.Empty);
-        }
-
-        public async Task MarkSettlementReceivedAsync(Guid settlementId, Guid adminUserId)
-        {
-            var settlement = await _settlementRepository.GetByIdAsync(settlementId)
-                ?? throw new NotFoundException("Settlement not found.");
-
-            if (settlement.Status == CollectionStatus.Received)
-                throw new ValidationException("This settlement has already been marked as received.");
-
-            settlement.Status = CollectionStatus.Received;
-            settlement.ReceivedDate = DateTime.UtcNow;
-            settlement.ReceivedByUserId = adminUserId;
-
-            await _settlementRepository.UpdateAsync(settlement);
-
-            // Note: individual visits no longer carry their own CollectionStatus —
-            // that concept now lives entirely on PractitionerSettlement (here) and
-            // on PatientPackage (via RecordInstallmentAsync / CheckOutAsync).
-            // Nothing further needs to cascade down to the visits themselves.
-        }
-
-        public async Task<IEnumerable<PractitionerSettlementDto>> GetPendingSettlementsAsync()
-        {
-            var settlements = await _settlementRepository.GetPendingAsync();
-            return settlements.Select(s => MapToDto(s, s.Practitioner?.User?.Name ?? string.Empty));
-        }
-
-        public async Task<PractitionerSettlementDto> GetByIdAsync(Guid id)
-        {
-            var settlement = await _settlementRepository.GetByIdAsync(id)
-                ?? throw new NotFoundException("Settlement not found.");
-
-            return MapToDto(settlement, settlement.Practitioner?.User?.Name ?? string.Empty);
-        }
-
-        public async Task<WeeklySettlementDto> GetWeeklySummaryAsync(Guid practitionerId, DateTime weekStart)
+        public async Task<WeeklySettlementSummaryDto> GetWeeklySummaryAsync(Guid practitionerId, DateTime weekStart)
         {
             var practitioner = await _practitionerRepository.GetByIdAsync(practitionerId)
                 ?? throw new NotFoundException("Practitioner not found.");
@@ -117,90 +27,121 @@ namespace JQZHomeCareProject.Application.Services
             var weekStartDate = weekStart.Date;
             var weekEnd = weekStartDate.AddDays(6);
 
-            var existing = await _settlementRepository.GetByPractitionerAndWeekAsync(practitionerId, weekStartDate);
-            if (existing != null)
+            var payments = (await _paymentRepository.GetByPractitionerAndWeekAsync(practitionerId, weekStartDate, weekEnd)).ToList();
+
+            // Practitioner/company share split is only meaningful once a visit is fully paid —
+            // a partially-paid visit hasn't actually generated a settleable share yet.
+            var fullyPaid = payments.Where(p => p.AmountPaid >= p.Amount).ToList();
+
+            return new WeeklySettlementSummaryDto
             {
-                return new WeeklySettlementDto
-                {
-                    SettlementId = existing.Id,
-                    PractitionerId = existing.PractitionerId,
-                    PractitionerName = practitioner.User?.Name ?? string.Empty,
-                    WeekStart = existing.WeekStartDate,
-                    WeekEnd = existing.WeekEndDate,
-                    VisitCount = existing.Visits.Count,
-                    TotalVisitAmount = existing.TotalVisitAmount,
-                    AmountCollectedByPractitioner = existing.AmountCollectedByPractitioner,
-                    PractitionerShareAmount = existing.PractitionerShareAmount,
-                    CompanyShareAmount = existing.CompanyShareAmount,
-                    Status = existing.Status,
-                    ReceivedDate = existing.ReceivedDate,
-                    Visits = existing.Visits.Select(ToVisitDto).ToList()
-                };
-            }
-
-            var visits = (await _visitRepository.GetUnsettledCompletedAsync(practitionerId, weekStartDate, weekEnd)).ToList();
-            var payments = (await _installmentPaymentRepository.GetByVisitIdsAsync(visits.Select(v => v.Id))).ToList();
-
-            var totalVisitAmount = payments.Sum(p => p.Amount);
-            var amountCollectedByPractitioner = payments
-                .Where(p => p.ReceivedBy == ReceivedByType.Practitioner)
-                .Sum(p => p.Amount);
-
-            var practitionerShareAmount = Math.Round(totalVisitAmount * practitioner.SharePercentage / 100m, 2);
-            var companyShareAmount = totalVisitAmount - practitionerShareAmount;
-
-            return new WeeklySettlementDto
-            {
-                SettlementId = null,
                 PractitionerId = practitionerId,
                 PractitionerName = practitioner.User?.Name ?? string.Empty,
                 WeekStart = weekStartDate,
                 WeekEnd = weekEnd,
-                VisitCount = visits.Count,
-                TotalVisitAmount = totalVisitAmount,
-                AmountCollectedByPractitioner = amountCollectedByPractitioner,
-                PractitionerShareAmount = practitionerShareAmount,
-                CompanyShareAmount = companyShareAmount,
-                Status = CollectionStatus.Pending,
-                ReceivedDate = null,
-                Visits = visits.Select(ToVisitDto).ToList()
+                VisitCount = payments.Count,
+                Receivable = payments.Sum(p => p.Amount),
+                Received = payments.Sum(p => p.AmountPaid),
+                PractitionerShare = fullyPaid.Sum(p => p.PShareAmount),
+                CompanyShare = fullyPaid.Sum(p => p.Amount - p.PShareAmount),
+                IsFullySettled = payments.Count > 0 && payments.All(p => p.IsSettled),
+                Payments = payments
+                    .OrderBy(p => p.Visit?.ScheduledDate ?? DateTime.MaxValue)
+                    .Select(PaymentMapper.ToDto)
+                    .ToList()
             };
         }
 
-        private static VisitDto ToVisitDto(Visit v) => new()
+        // Admin confirms the week's money has actually reached the company. Locks every
+        // Payment row for that practitioner/week so its numbers can't drift afterward.
+        // Requires every visit in the week to already be fully collected — you can't settle
+        // a week that still has money outstanding.
+        public async Task MarkWeekSettledAsync(Guid practitionerId, DateTime weekStart, Guid adminUserId)
         {
-            Id = v.Id,
-            PatientId = v.PatientId,
-            PatientName = v.Patient?.Name ?? string.Empty,
-            PractitionerId = v.PractitionerId,
-            PractitionerName = v.Practitioner?.User?.Name ?? string.Empty,
-            AreaId = v.AreaId,
-            AreaName = v.Area?.Name ?? string.Empty,
-            ServiceId = v.ServiceId,
-            ServiceName = v.Service?.Name ?? string.Empty,
-            PatientPackageId = v.PatientPackageId,
-            PackageName = v.PatientPackage?.Package?.Name,
-            ScheduledDate = v.ScheduledDate,
-            SlotStart = v.SlotStart,
-            SlotEnd = v.SlotEnd,
-            Status = v.Status,
-            PaymentType = v.PatientPackage?.PaymentType,
-            SettlementId = v.SettlementId
-        };
+            var practitioner = await _practitionerRepository.GetByIdAsync(practitionerId)
+                ?? throw new NotFoundException("Practitioner not found.");
 
-        private static PractitionerSettlementDto MapToDto(PractitionerSettlement settlement, string practitionerName) => new()
+            var weekStartDate = weekStart.Date;
+            var weekEnd = weekStartDate.AddDays(6);
+
+            var payments = (await _paymentRepository.GetUnsettledByPractitionerAndWeekAsync(practitionerId, weekStartDate, weekEnd)).ToList();
+
+            if (payments.Count == 0)
+                throw new ValidationException("No unsettled payments found for this practitioner in the given week.");
+
+            if (payments.Any(p => p.AmountPaid < p.Amount))
+                throw new ValidationException("Cannot settle a week that still has unpaid or partially paid visits.");
+
+            var now = DateTime.UtcNow;
+            foreach (var payment in payments)
+            {
+                payment.IsSettled = true;
+                payment.SettledDate = now;
+                payment.SettledByUserId = adminUserId;
+            }
+
+            await _paymentRepository.UpdateRangeAsync(payments);
+        }
+
+        // Groups every fully-paid-but-not-yet-settled payment by practitioner + week, so admin
+        // can see, at a glance, every settlement that's ready to be confirmed.
+        public async Task<IEnumerable<WeeklySettlementSummaryDto>> GetPendingSettlementsAsync()
         {
-            Id = settlement.Id,
-            PractitionerId = settlement.PractitionerId,
-            PractitionerName = practitionerName,
-            WeekStart = settlement.WeekStartDate,
-            WeekEnd = settlement.WeekEndDate,
-            TotalVisitAmount = settlement.TotalVisitAmount,
-            AmountCollectedByPractitioner = settlement.AmountCollectedByPractitioner,
-            PractitionerShareAmount = settlement.PractitionerShareAmount,
-            CompanyShareAmount = settlement.CompanyShareAmount,
-            Status = settlement.Status,
-            ReceivedDate = settlement.ReceivedDate
-        };
+            var payments = (await _paymentRepository.GetAllUnsettledFullyPaidAsync()).ToList();
+
+            return payments
+                .Where(p => p.PractitionerId.HasValue)
+                .GroupBy(p => new
+                {
+                    PractitionerId = p.PractitionerId!.Value,
+                    Week = StartOfWeek(p.Visit?.ScheduledDate ?? p.DateTime)
+                })
+                .Select(g => new WeeklySettlementSummaryDto
+                {
+                    PractitionerId = g.Key.PractitionerId,
+                    PractitionerName = g.First().Practitioner?.User?.Name ?? string.Empty,
+                    WeekStart = g.Key.Week,
+                    WeekEnd = g.Key.Week.AddDays(6),
+                    VisitCount = g.Count(),
+                    Receivable = g.Sum(p => p.Amount),
+                    Received = g.Sum(p => p.AmountPaid),
+                    PractitionerShare = g.Sum(p => p.PShareAmount),
+                    CompanyShare = g.Sum(p => p.Amount - p.PShareAmount),
+                    IsFullySettled = false,
+                    Payments = g
+                        .OrderBy(p => p.Visit?.ScheduledDate ?? DateTime.MaxValue)
+                        .Select(PaymentMapper.ToDto)
+                        .ToList()
+                })
+                .OrderBy(s => s.WeekStart)
+                .ThenBy(s => s.PractitionerName);
+        }
+
+        // Admin overrides one visit's practitioner share directly (e.g. bumping 600 -> 700).
+        // Company's share is never stored — it's always derived as Amount - PShareAmount.
+        public async Task UpdatePaymentShareAsync(Guid paymentId, UpdatePaymentShareDto dto)
+        {
+            if (dto.PShareAmount < 0)
+                throw new ValidationException("PShareAmount cannot be negative.");
+
+            var payment = await _paymentRepository.GetByIdAsync(paymentId)
+                ?? throw new NotFoundException($"Payment {paymentId} not found.");
+
+            if (payment.IsSettled)
+                throw new ValidationException("Cannot change the share on a payment that has already been settled.");
+
+            if (dto.PShareAmount > payment.Amount)
+                throw new ValidationException(
+                    $"PShareAmount ({dto.PShareAmount}) cannot exceed the visit's amount ({payment.Amount}).");
+
+            payment.PShareAmount = dto.PShareAmount;
+            await _paymentRepository.UpdateAsync(payment);
+        }
+
+        private static DateTime StartOfWeek(DateTime date)
+        {
+            var diff = (7 + (date.DayOfWeek - DayOfWeek.Monday)) % 7;
+            return date.Date.AddDays(-diff);
+        }
     }
 }

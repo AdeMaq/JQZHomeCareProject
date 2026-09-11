@@ -43,7 +43,6 @@ namespace JQZHomeCareProject.Persistence.Repositories
             await WithIncludes().Where(v =>
                 v.PractitionerId == practitionerId &&
                 v.Status == VisitStatus.Completed &&
-                v.SettlementId == null &&
                 v.ScheduledDate >= from && v.ScheduledDate <= to)
                 .ToListAsync();
 

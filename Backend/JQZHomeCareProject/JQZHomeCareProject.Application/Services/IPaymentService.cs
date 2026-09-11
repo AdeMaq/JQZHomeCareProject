@@ -1,16 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using JQZHomeCareProject.Application.DTOs;
+﻿using JQZHomeCareProject.Application.DTOs;
 
 namespace JQZHomeCareProject.Application.Services
 {
     public interface IPaymentService
     {
-        Task<PractitionerSettlementDto> GenerateWeeklySettlementAsync(Guid practitionerId, DateTime weekStart);
-        Task MarkSettlementReceivedAsync(Guid settlementId, Guid adminUserId);
-        Task<IEnumerable<PractitionerSettlementDto>> GetPendingSettlementsAsync();
-        Task<PractitionerSettlementDto> GetByIdAsync(Guid id);
-        Task<WeeklySettlementDto> GetWeeklySummaryAsync(Guid practitionerId, DateTime weekStart);
+        Task<WeeklySettlementSummaryDto> GetWeeklySummaryAsync(Guid practitionerId, DateTime weekStart);
+        Task MarkWeekSettledAsync(Guid practitionerId, DateTime weekStart, Guid adminUserId);
+        Task<IEnumerable<WeeklySettlementSummaryDto>> GetPendingSettlementsAsync();
+        Task UpdatePaymentShareAsync(Guid paymentId, UpdatePaymentShareDto dto);
     }
 }

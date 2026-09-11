@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+﻿using JQZHomeCareProject.Application.Common.Interfaces;
 using JQZHomeCareProject.Application.DTOs;
 using JQZHomeCareProject.Application.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -8,42 +8,50 @@ namespace JQZHomeCareProject.API.Controllers
 {
     [ApiController]
     [Route("api/patient-packages")]
-    [Authorize(Roles = "SuperAdmin,MiddlePowerAdmin,SimpleAdmin")]
+    [Authorize]
     public class PatientPackagesController : ControllerBase
     {
         private readonly IPatientPackageService _patientPackageService;
-        private readonly IVisitService _visitService; 
 
-        public PatientPackagesController(IPatientPackageService patientPackageService, IVisitService visitService)
+        public PatientPackagesController(IPatientPackageService patientPackageService)
         {
             _patientPackageService = patientPackageService;
-            _visitService = visitService;
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllAsync() =>
-            Ok(await _patientPackageService.GetAllAsync());
+        public async Task<ActionResult<IEnumerable<PatientPackageDto>>> GetAllAsync()
+            => Ok(await _patientPackageService.GetAllAsync());
 
         [HttpGet("{id:guid}")]
-        public async Task<IActionResult> GetByIdAsync(Guid id) =>
-            Ok(await _patientPackageService.GetByIdAsync(id));
+        public async Task<ActionResult<PatientPackageDto>> GetByIdAsync(Guid id)
+            => Ok(await _patientPackageService.GetByIdAsync(id));
 
         [HttpGet("patient/{patientId:guid}")]
-        public async Task<IActionResult> GetByPatientAsync(Guid patientId) =>
-            Ok(await _patientPackageService.GetByPatientAsync(patientId));
+        public async Task<ActionResult<IEnumerable<PatientPackageDto>>> GetByPatientAsync(Guid patientId)
+            => Ok(await _patientPackageService.GetByPatientAsync(patientId));
 
         [HttpGet("{id:guid}/visits")]
-        public async Task<IActionResult> GetVisitsAsync(Guid id) =>
-            Ok(await _patientPackageService.GetVisitsAsync(id));
+        public async Task<ActionResult<IEnumerable<VisitDto>>> GetVisitsAsync(Guid id)
+            => Ok(await _patientPackageService.GetVisitsAsync(id));
 
-        [HttpPost("{id:guid}/installments")]
-        public async Task<IActionResult> RecordInstallmentAsync(Guid id, [FromBody] RecordInstallmentDto dto)
+        [HttpGet("{id:guid}/payments")]
+        public async Task<ActionResult<IEnumerable<PaymentDto>>> GetPaymentsAsync(Guid id)
+            => Ok(await _patientPackageService.GetPaymentsAsync(id));
+
+        [HttpPost("{id:guid}/payments")]
+        [Authorize(Roles = "SuperAdmin,MiddlePowerAdmin,SimpleAdmin")]
+        public async Task<IActionResult> RecordOfficePaymentAsync(Guid id, [FromBody] RecordOfficePaymentDto dto)
         {
-            await _visitService.RecordInstallmentAsync(id, dto);
+            await _patientPackageService.RecordOfficePaymentAsync(id, dto);
             return NoContent();
         }
 
-        [HttpGet("{id:guid}/installments")]
-        public async Task<IActionResult> GetInstallmentHistoryAsync(Guid id) => Ok(await _patientPackageService.GetInstallmentHistoryAsync(id));
+        [HttpPut("{id:guid}/amount")]
+        [Authorize(Roles = "SuperAdmin,MiddlePowerAdmin")]
+        public async Task<IActionResult> UpdateAmountAsync(Guid id, [FromBody] UpdatePatientPackageAmountDto dto)
+        {
+            await _patientPackageService.UpdatePatientPackageAmountAsync(id, dto);
+            return NoContent();
+        }
     }
 }

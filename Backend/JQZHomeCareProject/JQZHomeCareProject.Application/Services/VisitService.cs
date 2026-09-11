@@ -1,4 +1,5 @@
-﻿using JQZHomeCareProject.Application.Common.Exceptions;
+﻿using JQZHomeCareProject.Application.Common;
+using JQZHomeCareProject.Application.Common.Exceptions;
 using JQZHomeCareProject.Application.Common.Interfaces;
 using JQZHomeCareProject.Application.Common.Validation;
 using JQZHomeCareProject.Application.DTOs;
@@ -16,6 +17,7 @@ namespace JQZHomeCareProject.Application.Services
         private readonly IPatientService _patientService;
         private readonly IPractitionerRepository _practitionerRepository;
         private readonly IAreaRepository _areaRepository;
+        private readonly IPaymentRepository _paymentRepository;
         private readonly IUnitOfWork _unitOfWork;
 
         public VisitService(
@@ -26,6 +28,7 @@ namespace JQZHomeCareProject.Application.Services
             IPatientService patientService,
             IPractitionerRepository practitionerRepository,
             IAreaRepository areaRepository,
+            IPaymentRepository paymentRepository,
             IUnitOfWork unitOfWork)
         {
             _visitRepository = visitRepository;
@@ -35,6 +38,7 @@ namespace JQZHomeCareProject.Application.Services
             _patientService = patientService;
             _practitionerRepository = practitionerRepository;
             _areaRepository = areaRepository;
+            _paymentRepository = paymentRepository;
             _unitOfWork = unitOfWork;
         }
 
@@ -47,9 +51,8 @@ namespace JQZHomeCareProject.Application.Services
 
             if (package.NumberOfVisits <= 0)
                 throw new ValidationException($"'{package.Name}' has an invalid NumberOfVisits configuration.");
-
             if (dto.VisitAssignments.Count > package.NumberOfVisits)
-                throw new ValidationException( $"'{package.Name}' has {package.NumberOfVisits} visit(s); {dto.VisitAssignments.Count} assignment(s) were supplied.");
+                throw new ValidationException($"'{package.Name}' has {package.NumberOfVisits} visit(s); {dto.VisitAssignments.Count} assignment(s) were supplied.");
 
             if (dto.PaymentType == PackagePaymentType.Installment)
             {
@@ -58,8 +61,7 @@ namespace JQZHomeCareProject.Application.Services
                 if (dto.InitialAmountPaid.Value < 0)
                     throw new ValidationException("InitialAmountPaid cannot be negative.");
                 if (dto.InitialAmountPaid.Value > package.Amount)
-                    throw new ValidationException(
-                        $"InitialAmountPaid ({dto.InitialAmountPaid.Value}) cannot exceed the package amount ({package.Amount}).");
+                    throw new ValidationException($"InitialAmountPaid ({dto.InitialAmountPaid.Value}) cannot exceed the package amount ({package.Amount}).");
             }
 
             foreach (var assignment in dto.VisitAssignments)
@@ -68,97 +70,98 @@ namespace JQZHomeCareProject.Application.Services
             var patient = await _patientService.GetOrCreateAsync(dto.PatientName, dto.PatientPhone, dto.LocationAddress, dto.PatientDescription);
 
             CheckAssignmentsAgainstEachOther(dto.VisitAssignments);
-
             foreach (var assignment in dto.VisitAssignments)
                 await EnsureNoConflictAsync(assignment.PractitionerId, patient.Id, assignment.ScheduledDate, assignment.SlotStart, assignment.SlotEnd);
 
             PatientPackage patientPackage = null!;
             List<Visit> visits = null!;
+            List<Payment> payments = null!;
 
             await _unitOfWork.ExecuteInTransactionAsync(async () =>
             {
-                var amountPaid = dto.PaymentType == PackagePaymentType.FullAdvance
-                                ? package.Amount
-                                : dto.InitialAmountPaid!.Value;
-
-                var amountPending = package.Amount - amountPaid;
-
-                CollectionStatus initialCollectionStatus;
-                ReceivedByType? initialReceivedBy;
-
-                if (dto.PaymentType == PackagePaymentType.FullAdvance)
-                {
-                    initialCollectionStatus = CollectionStatus.Received;
-                    initialReceivedBy = ReceivedByType.Company;
-                }
-                else
-                {
-                    initialCollectionStatus = amountPending > 0
-                        ? CollectionStatus.InstallmentPending
-                        : CollectionStatus.Received;
-                    initialReceivedBy = amountPaid > 0 ? ReceivedByType.Company : null;
-                }
-
                 patientPackage = new PatientPackage
                 {
                     Id = Guid.NewGuid(),
                     PatientId = patient.Id,
                     PackageId = package.Id,
                     PaymentType = dto.PaymentType,
-                    TotalAmount = package.Amount,
-                    AmountPaid = amountPaid,
-                    AmountPending = amountPending,
-                    CollectionStatus = initialCollectionStatus,
-                    ReceivedBy = initialReceivedBy,
+                    DefaultAmount = package.Amount,
+                    Amount = package.Amount, // admin can edit this later via UpdatePatientPackageAmountAsync
+                    CollectionStatus = CollectionStatus.Pending,
                     Status = PatientPackageStatus.Active,
                     PurchaseDate = DateTime.UtcNow
                 };
                 await _patientPackageRepository.AddAsync(patientPackage);
 
-                if (amountPaid > 0)
-                {
-                    patientPackage.InstallmentPayments.Add(new InstallmentPayment
-                    {
-                        Id = Guid.NewGuid(),
-                        PatientPackageId = patientPackage.Id,
-                        VisitId = null,
-                        Amount = amountPaid,
-                        ReceivedBy = ReceivedByType.Company,
-                        Date = patientPackage.PurchaseDate
-                    });
-                }
-
                 visits = new List<Visit>(package.NumberOfVisits);
+                payments = new List<Payment>(package.NumberOfVisits);
+
+                var perVisitAmount = Math.Round(patientPackage.Amount / package.NumberOfVisits, 2);
 
                 for (var i = 0; i < package.NumberOfVisits; i++)
                 {
                     var assignment = i < dto.VisitAssignments.Count ? dto.VisitAssignments[i] : null;
 
-                    visits.Add(new Visit
-{
-    Id = Guid.NewGuid(),
-    PatientId = patient.Id,
+                    var visit = new Visit
+                    {
+                        Id = Guid.NewGuid(),
+                        PatientId = patient.Id,
+                        PatientNameSnapshot = dto.PatientName.Trim(),
+                        PatientAddressSnapshot = dto.LocationAddress.Trim(),
+                        PatientDescriptionSnapshot = string.IsNullOrWhiteSpace(dto.PatientDescription) ? null : dto.PatientDescription.Trim(),
+                        PractitionerId = assignment?.PractitionerId,
+                        AreaId = assignment?.AreaId,
+                        ServiceId = package.ServiceId,
+                        PatientPackageId = patientPackage.Id,
+                        ScheduledDate = assignment?.ScheduledDate,
+                        SlotStart = assignment?.SlotStart,
+                        SlotEnd = assignment?.SlotEnd,
+                        Status = VisitStatus.Scheduled,
+                        CreatedByUserId = createdByUserId
+                    };
+                    visits.Add(visit);
 
-    // Patient information captured for this specific visit.
-    PatientNameSnapshot = dto.PatientName.Trim(),
-    PatientAddressSnapshot = dto.LocationAddress.Trim(),
-    PatientDescriptionSnapshot = string.IsNullOrWhiteSpace(dto.PatientDescription)
-        ? null
-        : dto.PatientDescription.Trim(),
+                    decimal defaultPShare = 0, pShare = 0;
+                    if (assignment?.PractitionerId is { } practitionerId)
+                    {
+                        var practitioner = await _practitionerRepository.GetByIdAsync(practitionerId);
+                        if (practitioner != null)
+                        {
+                            defaultPShare = Math.Round(perVisitAmount * practitioner.SharePercentage / 100m, 2);
+                            pShare = defaultPShare;
+                        }
+                    }
 
-    PractitionerId = assignment?.PractitionerId,
-    AreaId = assignment?.AreaId,
-    ServiceId = package.ServiceId,
-    PatientPackageId = patientPackage.Id,
-    ScheduledDate = assignment?.ScheduledDate,
-    SlotStart = assignment?.SlotStart,
-    SlotEnd = assignment?.SlotEnd,
-    Status = VisitStatus.Scheduled,
-    CreatedByUserId = createdByUserId
-});
+                    payments.Add(new Payment
+                    {
+                        Id = Guid.NewGuid(),
+                        PatientPackageId = patientPackage.Id,
+                        PatientId = patient.Id,
+                        PractitionerId = assignment?.PractitionerId,
+                        VisitId = visit.Id,
+                        DefaultAmount = perVisitAmount,
+                        Amount = perVisitAmount,
+                        AmountPaid = 0,
+                        DefaultPShareAmount = defaultPShare,
+                        PShareAmount = pShare,
+                        Status = PaymentStatus.NotPaid,
+                        DateTime = patientPackage.PurchaseDate
+                    });
                 }
+
                 await _visitRepository.AddRangeAsync(visits);
                 await _patientRepository.IncrementVisitCountAsync(patient.Id, package.NumberOfVisits);
+
+                var upfrontAmount = dto.PaymentType == PackagePaymentType.FullAdvance
+                    ? patientPackage.Amount
+                    : dto.InitialAmountPaid!.Value;
+
+                if (upfrontAmount > 0)
+                    PaymentAllocation.ApplyOfficePayment(payments, upfrontAmount, patientPackage.PurchaseDate);
+
+                patientPackage.CollectionStatus = PaymentAllocation.ComputeCollectionStatus(payments);
+
+                await _paymentRepository.AddRangeAsync(payments);
             });
 
             return new PatientPackageDto
@@ -169,17 +172,18 @@ namespace JQZHomeCareProject.Application.Services
                 PackageId = package.Id,
                 PackageName = package.Name,
                 PaymentType = patientPackage.PaymentType,
-                TotalAmount = patientPackage.TotalAmount,
-                AmountPaid = patientPackage.AmountPaid,
-                AmountPending = patientPackage.AmountPending,
+                DefaultAmount = patientPackage.DefaultAmount,
+                Amount = patientPackage.Amount,
+                AmountPaid = payments.Sum(p => p.AmountPaid),
+                AmountPending = patientPackage.Amount - payments.Sum(p => p.AmountPaid),
                 CollectionStatus = patientPackage.CollectionStatus,
-                ReceivedBy = patientPackage.ReceivedBy,
                 Status = patientPackage.Status,
                 PurchaseDate = patientPackage.PurchaseDate,
                 Visits = visits.Select(VisitMapper.ToDto).ToList(),
-                InstallmentPayments = patientPackage.InstallmentPayments.Select(VisitMapper.ToInstallmentDto).ToList()
+                Payments = payments.Select(PaymentMapper.ToDto).ToList()
             };
         }
+
         private static bool Overlaps(TimeSpan aStart, TimeSpan aEnd, TimeSpan bStart, TimeSpan bEnd)
         {
             return aStart < bEnd && bStart < aEnd;
@@ -301,17 +305,28 @@ namespace JQZHomeCareProject.Application.Services
                 throw new ValidationException("Selected practitioner does not provide the service required for this visit.");
 
             if (dto.AreaId.HasValue)
-            {
-                _ = await _areaRepository.GetByIdAsync(dto.AreaId.Value)
-                    ?? throw new NotFoundException($"Area {dto.AreaId.Value} not found.");
-            }
+                _ = await _areaRepository.GetByIdAsync(dto.AreaId.Value) ?? throw new NotFoundException($"Area {dto.AreaId.Value} not found.");
 
             await EnsureNoConflictAsync(dto.PractitionerId, visit.PatientId, visit.ScheduledDate, visit.SlotStart, visit.SlotEnd, excludeVisitId: visitId);
 
             visit.PractitionerId = dto.PractitionerId;
             if (dto.AreaId.HasValue) visit.AreaId = dto.AreaId;
             await _visitRepository.UpdateAsync(visit);
+
+            var payment = await _paymentRepository.GetByVisitIdAsync(visitId);
+            if (payment != null)
+            {
+                payment.PractitionerId = dto.PractitionerId;
+                // Only recompute the share if admin hasn't already customized it away from default.
+                if (payment.PShareAmount == payment.DefaultPShareAmount)
+                {
+                    payment.DefaultPShareAmount = Math.Round(payment.Amount * practitioner.SharePercentage / 100m, 2);
+                    payment.PShareAmount = payment.DefaultPShareAmount;
+                }
+                await _paymentRepository.UpdateAsync(payment);
+            }
         }
+
 
         public async Task ReassignPractitionerAsync(Guid visitId, ReassignPractitionerDto dto)
         {
@@ -380,60 +395,46 @@ namespace JQZHomeCareProject.Application.Services
 
             if (visit.Status != VisitStatus.InProgress)
                 throw new ValidationException($"Cannot check out a visit with status '{visit.Status}'. It must be InProgress first.");
-
             if (visit.CheckInTime is null)
                 throw new ValidationException("This visit must be checked in before it can be checked out.");
-
             if (visit.CheckOutTime is not null)
                 throw new ValidationException("This visit has already been checked out.");
 
             Guard.EnsureValidCoordinates(dto.Latitude, dto.Longitude);
-
             if (dto.Amount < 0)
                 throw new ValidationException("Amount cannot be negative.");
+            if (dto.Amount > 0 && dto.ReceivedBy == PaymentStatus.NotPaid)
+                throw new ValidationException("ReceivedBy must be PaidToPractitioner or PaidToCompany when Amount is greater than zero.");
 
             visit.CheckOutTime = dto.Timestamp;
             visit.CheckOutLocation = $"{dto.Latitude},{dto.Longitude}";
             visit.Status = VisitStatus.Completed;
             await _visitRepository.UpdateAsync(visit);
 
-            if (visit.PatientPackageId is null)
-                return; // shouldn't happen — every visit belongs to a package — but guard anyway
+            var payment = await _paymentRepository.GetByVisitIdAsync(visitId)
+                ?? throw new NotFoundException($"Payment record for visit {visitId} not found.");
+
+            var owed = payment.Amount - payment.AmountPaid;
+            if (dto.Amount > owed)
+                throw new ValidationException($"Amount ({dto.Amount}) exceeds what's still owed for this visit ({owed}).");
+
+            if (dto.Amount > 0)
+            {
+                payment.AmountPaid += dto.Amount;
+                if (payment.AmountPaid >= payment.Amount)
+                    payment.Status = dto.ReceivedBy; // PaidToPractitioner or PaidToCompany, whichever the checkout says
+            }
+            payment.DateTime = dto.Timestamp;
+            await _paymentRepository.UpdateAsync(payment);
+
+            if (visit.PatientPackageId is null) return;
 
             var patientPackage = await _patientPackageRepository.GetByIdAsync(visit.PatientPackageId.Value)
                 ?? throw new NotFoundException($"PatientPackage {visit.PatientPackageId} not found.");
 
-            // Only Installment packages have anything left to log/collect at checkout.
-            if (patientPackage.PaymentType != PackagePaymentType.Installment)
-                return;
-
-            if (dto.Amount > patientPackage.AmountPending)
-                throw new ValidationException(
-                    $"Amount ({dto.Amount}) exceeds the package's remaining balance ({patientPackage.AmountPending}).");
-
-            if (dto.Amount > 0)
-            {
-                patientPackage.AmountPaid += dto.Amount;
-                patientPackage.AmountPending -= dto.Amount;
-                patientPackage.ReceivedBy = dto.ReceivedBy;
-                patientPackage.CollectionStatus = patientPackage.AmountPending == 0
-                    ? CollectionStatus.Received
-                    : CollectionStatus.InstallmentPending;
-
-                if (patientPackage.AmountPending == 0 && patientPackage.Status == PatientPackageStatus.Active)
-                    patientPackage.Status = PatientPackageStatus.Completed;
-            }
-
-            // Log the payment even when it's 0 — an audit trail of "nothing collected at this visit".
-            patientPackage.InstallmentPayments.Add(new InstallmentPayment
-            {
-                Id = Guid.NewGuid(),
-                PatientPackageId = patientPackage.Id,
-                VisitId = visit.Id,
-                Amount = dto.Amount,
-                ReceivedBy = dto.ReceivedBy,
-                Date = dto.Timestamp
-            });
+            patientPackage.CollectionStatus = PaymentAllocation.ComputeCollectionStatus(patientPackage.Payments);
+            if (patientPackage.CollectionStatus == CollectionStatus.AllReceived && patientPackage.Status == PatientPackageStatus.Active)
+                patientPackage.Status = PatientPackageStatus.Completed;
 
             await _patientPackageRepository.UpdateAsync(patientPackage);
         }
@@ -474,47 +475,6 @@ namespace JQZHomeCareProject.Application.Services
             return VisitMapper.ToDto(visit);
         }
 
-        public async Task RecordInstallmentAsync(Guid patientPackageId, RecordInstallmentDto dto)
-        {
-            Guard.EnsureNotEmpty(patientPackageId, "PatientPackageId");
-
-            var patientPackage = await _patientPackageRepository.GetByIdAsync(patientPackageId)
-                ?? throw new NotFoundException($"PatientPackage {patientPackageId} not found.");
-
-            if (patientPackage.PaymentType != PackagePaymentType.Installment)
-                throw new ValidationException("Installments can only be recorded on packages with PaymentType 'Installment'.");
-
-            if (patientPackage.Status != PatientPackageStatus.Active)
-                throw new ValidationException($"Cannot record an installment on a package with status '{patientPackage.Status}'.");
-
-            if (dto.Amount <= 0)
-                throw new ValidationException("Installment amount must be greater than zero.");
-
-            if (dto.Amount > patientPackage.AmountPending)
-                throw new ValidationException("Installment amount exceeds the amount pending.");
-
-            patientPackage.AmountPaid += dto.Amount;
-            patientPackage.AmountPending -= dto.Amount;
-            patientPackage.ReceivedBy = ReceivedByType.Company;
-
-            patientPackage.CollectionStatus = patientPackage.AmountPending == 0
-                ? CollectionStatus.Received
-                : CollectionStatus.InstallmentPending;
-
-            if (patientPackage.AmountPending == 0 && patientPackage.Status == PatientPackageStatus.Active)
-                patientPackage.Status = PatientPackageStatus.Completed;
-
-            patientPackage.InstallmentPayments.Add(new InstallmentPayment
-            {
-                Id = Guid.NewGuid(),
-                PatientPackageId = patientPackage.Id,
-                VisitId = null,
-                Amount = dto.Amount,
-                ReceivedBy = ReceivedByType.Company,
-                Date = DateTime.UtcNow
-            });
-
-            await _patientPackageRepository.UpdateAsync(patientPackage);
-        }
+        
     }
 }

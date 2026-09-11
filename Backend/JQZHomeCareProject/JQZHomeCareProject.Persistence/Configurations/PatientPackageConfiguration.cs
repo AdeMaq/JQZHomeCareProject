@@ -8,26 +8,27 @@ namespace JQZHomeCareProject.Persistence.Configurations
     {
         public void Configure(EntityTypeBuilder<PatientPackage> builder)
         {
-            builder.ToTable("PatientPackages");
+            builder.Property(pp => pp.DefaultAmount).HasPrecision(18, 2);
+            builder.Property(pp => pp.Amount).HasPrecision(18, 2);
 
-            builder.HasKey(pp => pp.Id);
-
-            builder.Property(pp => pp.TotalAmount).HasColumnType("decimal(12,2)");
-            builder.Property(pp => pp.AmountPaid).HasColumnType("decimal(12,2)");
-            builder.Property(pp => pp.AmountPending).HasColumnType("decimal(12,2)");
+            // AmountPaid / AmountPending are [NotMapped] computed properties — EF ignores them
+            // automatically, no explicit Ignore() call needed, but left here for clarity/safety.
+            builder.Ignore(pp => pp.AmountPaid);
+            builder.Ignore(pp => pp.AmountPending);
 
             builder.HasOne(pp => pp.Patient)
                 .WithMany(p => p.PatientPackages)
                 .HasForeignKey(pp => pp.PatientId)
-                .IsRequired()
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasOne(pp => pp.Package)
                 .WithMany(p => p.PatientPackages)
                 .HasForeignKey(pp => pp.PackageId)
-                .IsRequired()
                 .OnDelete(DeleteBehavior.Restrict);
 
+            builder.HasIndex(pp => pp.PatientId);
+            builder.HasIndex(pp => pp.Status);
+            builder.HasIndex(pp => pp.CollectionStatus);
         }
     }
 }

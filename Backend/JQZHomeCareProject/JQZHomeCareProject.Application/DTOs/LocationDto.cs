@@ -23,8 +23,8 @@ namespace JQZHomeCareProject.Application.DTOs
         [Range(-180, 180, ErrorMessage = "Longitude must be between -180 and 180.")]
         public double Longitude { get; set; }
         public DateTime Timestamp { get; set; }
-        public ReceivedByType ReceivedBy { get; set; }
         public decimal Amount { get; set; } = 0; // amount collected at this visit; 0 = nothing collected here
+        public PaymentStatus ReceivedBy { get; set; } // must be PaidToPractitioner or PaidToCompany if Amount > 0
     }
     public class ParseLocationLinkDto
     {

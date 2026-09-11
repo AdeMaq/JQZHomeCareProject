@@ -89,6 +89,34 @@ export class AddVisit implements OnInit {
   }
 
   // ============================================================
+  // LOCATION PARSING STATE
+  // ============================================================
+
+  get isParsingLocation(): boolean {
+    return this.logic.isParsingLocation;
+  }
+
+  get locationParseError(): string {
+    return this.logic.locationParseError;
+  }
+
+  get locationParseMessage(): string {
+    return this.logic.locationParseMessage;
+  }
+
+  get locationLatitude(): number | null {
+    return this.logic.locationLatitude;
+  }
+
+  get locationLongitude(): number | null {
+    return this.logic.locationLongitude;
+  }
+
+  get locationSource(): 'link' | 'geocoded' | null {
+    return this.logic.locationSource;
+  }
+
+  // ============================================================
   // DROPDOWN STATE
   // ============================================================
 
@@ -211,6 +239,14 @@ export class AddVisit implements OnInit {
 
   selectExistingPatient(patient: Patient): void {
     this.logic.selectExistingPatient(patient);
+  }
+
+  // ============================================================
+  // LOCATION
+  // ============================================================
+
+  parseLocation(): void {
+    this.logic.parseLocation();
   }
 
   // ============================================================

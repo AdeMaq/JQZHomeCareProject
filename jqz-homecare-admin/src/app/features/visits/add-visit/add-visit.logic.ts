@@ -18,6 +18,8 @@ import { Patient, PatientService } from '../../../core/services/patient.service'
 
 import { PatientPackageService } from '../../../core/services/patient-package.service';
 
+import { LocationCoordinates, LocationService } from '../../../core/services/location.service';
+
 import { AddVisitForm, OpenDropdown, PractitionerScheduleItem } from './add-visit.models';
 
 import { AddVisitPatientLogic } from './add-visit.patient.logic';
@@ -54,6 +56,8 @@ export class AddVisitLogic {
 
   private readonly patientPackageService = inject(PatientPackageService);
 
+  private readonly locationService = inject(LocationService);
+
   // ============================================================
   // CHILD LOGIC
   // ============================================================
@@ -79,6 +83,22 @@ export class AddVisitLogic {
   packages: Package[] = [];
   practitioners: Practitioner[] = [];
   areas: Area[] = [];
+
+  // ============================================================
+  // LOCATION PARSING
+  // ============================================================
+
+  isParsingLocation = false;
+
+  locationParseError = '';
+
+  locationParseMessage = '';
+
+  locationLatitude: number | null = null;
+
+  locationLongitude: number | null = null;
+
+  locationSource: 'link' | 'geocoded' | null = null;
 
   // ============================================================
   // LOADING
@@ -321,6 +341,56 @@ export class AddVisitLogic {
       this.packages,
       (error: unknown) => this.getErrorMessage(error),
     );
+  }
+
+  // ============================================================
+  // LOCATION PARSING
+  // ============================================================
+
+  parseLocation(): void {
+    this.locationParseError = '';
+    this.locationParseMessage = '';
+
+    const input = this.form.locationAddress.trim();
+
+    if (!input) {
+      this.locationParseError = 'Please enter a location link or address first.';
+      return;
+    }
+
+    this.isParsingLocation = true;
+
+    this.locationService.parseLocationLink(input).subscribe({
+      next: (location: LocationCoordinates) => {
+        this.isParsingLocation = false;
+
+        this.locationLatitude = location.latitude;
+
+        this.locationLongitude = location.longitude;
+
+        this.locationSource = location.source;
+
+        if (location.formattedAddress) {
+          this.form.locationAddress = location.formattedAddress;
+
+          this.locationParseMessage = 'Location parsed successfully and address updated.';
+        } else {
+          this.locationParseMessage = 'Location coordinates parsed successfully.';
+        }
+      },
+
+      error: (error: unknown) => {
+        this.isParsingLocation = false;
+
+        this.locationLatitude = null;
+
+        this.locationLongitude = null;
+
+        this.locationSource = null;
+
+        this.locationParseError = this.getErrorMessage(error);
+      },
+    });
   }
 
   // ============================================================

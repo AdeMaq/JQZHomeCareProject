@@ -118,7 +118,7 @@
                 <i class="fa-solid fa-user-check"></i>
 
                 <div>
-                  <strong> Existing patient found </strong>
+                  <strong>Existing patient found</strong>
 
                   <p style="margin: 4px 0 0">
                     {{ existingPatientSuggestion.name }}
@@ -203,12 +203,98 @@
                 required
                 maxlength="500"
                 rows="3"
-                placeholder="Enter patient's visit location address"
+                placeholder="Enter patient's visit location address or paste a location link"
               ></textarea>
             </div>
 
             @if (locationAddress.invalid && locationAddress.touched) {
               <span class="field-error"> Location address is required. </span>
+            }
+
+            <!-- ==================================================
+                 LOCATION PARSER ACTION
+            =================================================== -->
+
+            <div style="display: flex; align-items: center; gap: 10px; margin-top: 10px">
+              <button
+                type="button"
+                class="btn btn-secondary"
+                (click)="parseLocation()"
+                [disabled]="isParsingLocation || !form.locationAddress.trim()"
+              >
+                @if (isParsingLocation) {
+                  <i class="fa-solid fa-spinner fa-spin"></i>
+
+                  Parsing Location...
+                } @else {
+                  <i class="fa-solid fa-location-crosshairs"></i>
+
+                  Parse Location
+                }
+              </button>
+            </div>
+
+            <!-- ==================================================
+                 LOCATION PARSE SUCCESS
+            =================================================== -->
+
+            @if (locationParseMessage) {
+              <div class="assignment-info" style="margin-top: 10px">
+                <i class="fa-solid fa-circle-check"></i>
+
+                <div>
+                  <strong>Location detected</strong>
+
+                  <p style="margin: 4px 0 0">
+                    {{ locationParseMessage }}
+                  </p>
+                </div>
+              </div>
+            }
+
+            <!-- ==================================================
+                 LOCATION PARSE ERROR
+            =================================================== -->
+
+            @if (locationParseError) {
+              <div class="assignment-warning" style="margin-top: 10px">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+
+                <span>
+                  {{ locationParseError }}
+                </span>
+              </div>
+            }
+
+            <!-- ==================================================
+                 PARSED COORDINATES
+            =================================================== -->
+
+            @if (locationLatitude !== null && locationLongitude !== null) {
+              <div class="assignment-info" style="margin-top: 10px">
+                <i class="fa-solid fa-map-location-dot"></i>
+
+                <div>
+                  <strong>Location Coordinates</strong>
+
+                  <p style="margin: 4px 0 0">
+                    Latitude:
+                    {{ locationLatitude }}
+                  </p>
+
+                  <p style="margin: 2px 0 0">
+                    Longitude:
+                    {{ locationLongitude }}
+                  </p>
+
+                  @if (locationSource) {
+                    <small style="display: block; margin-top: 4px">
+                      Source:
+                      {{ locationSource === 'link' ? 'Location Link' : 'Address Geocoding' }}
+                    </small>
+                  }
+                </div>
+              </div>
             }
           </div>
 

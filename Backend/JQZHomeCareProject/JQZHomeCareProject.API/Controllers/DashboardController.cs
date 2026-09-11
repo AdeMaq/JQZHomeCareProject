@@ -1,4 +1,6 @@
-﻿using JQZHomeCareProject.Application.Services;
+﻿using JQZHomeCareProject.Application.Common.Interfaces;
+using JQZHomeCareProject.Application.DTOs;
+using JQZHomeCareProject.Application.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,17 +19,11 @@ namespace JQZHomeCareProject.API.Controllers
         }
 
         [HttpGet("summary")]
-        public async Task<IActionResult> GetSummaryAsync([FromQuery] DateTime from, [FromQuery] DateTime to)
-        {
-            var result = await _dashboardService.GetSummaryAsync(from, to);
-            return Ok(result);
-        }
+        public async Task<ActionResult<DashboardSummaryDto>> GetSummaryAsync([FromQuery] DateTime from, [FromQuery] DateTime to)
+            => Ok(await _dashboardService.GetSummaryAsync(from, to));
 
         [HttpGet("refusals")]
         public async Task<IActionResult> GetRefusalsAsync([FromQuery] DateTime from, [FromQuery] DateTime to)
-        {
-            var result = await _dashboardService.GetRefusalsAsync(from, to);
-            return Ok(result);
-        }
+            => Ok(await _dashboardService.GetRefusalsAsync(from, to));
     }
 }

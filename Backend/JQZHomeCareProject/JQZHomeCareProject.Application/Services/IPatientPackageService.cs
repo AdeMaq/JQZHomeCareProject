@@ -9,8 +9,10 @@ namespace JQZHomeCareProject.Application.Services
     {
         Task<PatientPackageDto> GetByIdAsync(Guid id);
         Task<IEnumerable<PatientPackageDto>> GetAllAsync();
-        Task<IEnumerable<InstallmentPaymentDto>> GetInstallmentHistoryAsync(Guid patientPackageId);
         Task<IEnumerable<PatientPackageDto>> GetByPatientAsync(Guid patientId);
         Task<IEnumerable<VisitDto>> GetVisitsAsync(Guid patientPackageId);
+        Task<IEnumerable<PaymentDto>> GetPaymentsAsync(Guid patientPackageId);
+        Task RecordOfficePaymentAsync(Guid patientPackageId, RecordOfficePaymentDto dto);
+        Task UpdatePatientPackageAmountAsync(Guid patientPackageId, UpdatePatientPackageAmountDto dto);
     }
 }

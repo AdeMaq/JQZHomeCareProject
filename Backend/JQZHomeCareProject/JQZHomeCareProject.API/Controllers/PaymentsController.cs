@@ -1,16 +1,12 @@
-﻿using JQZHomeCareProject.Application.Services;
+﻿using System.Security.Claims;
+using JQZHomeCareProject.Application.Common.Interfaces;
+using JQZHomeCareProject.Application.DTOs;
+using JQZHomeCareProject.Application.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 namespace JQZHomeCareProject.API.Controllers
 {
-    public class GenerateSettlementRequest
-    {
-        public Guid PractitionerId { get; set; }
-        public DateTime WeekStart { get; set; }
-    }
-
     [ApiController]
     [Route("api/payments")]
     [Authorize(Roles = "SuperAdmin,MiddlePowerAdmin,SimpleAdmin")]
@@ -24,39 +20,32 @@ namespace JQZHomeCareProject.API.Controllers
         }
 
         [HttpGet("weekly-summary/{practitionerId:guid}")]
-        public async Task<IActionResult> GetWeeklySummary(Guid practitionerId, [FromQuery] DateTime weekStart)
-        {
-            var result = await _paymentService.GetWeeklySummaryAsync(practitionerId, weekStart);
-            return Ok(result);
-        }
+        public async Task<ActionResult<WeeklySettlementSummaryDto>> GetWeeklySummary(Guid practitionerId, [FromQuery] DateTime weekStart)
+            => Ok(await _paymentService.GetWeeklySummaryAsync(practitionerId, weekStart));
 
         [HttpGet("pending")]
-        public async Task<IActionResult> GetPendingSettlements()
-        {
-            var result = await _paymentService.GetPendingSettlementsAsync();
-            return Ok(result);
-        }
+        public async Task<ActionResult<IEnumerable<WeeklySettlementSummaryDto>>> GetPendingSettlements()
+            => Ok(await _paymentService.GetPendingSettlementsAsync());
 
-        [HttpGet("{id:guid}")]
-        public async Task<IActionResult> GetById(Guid id)
+        [HttpPost("{practitionerId:guid}/settle")]
+        public async Task<IActionResult> SettleWeek(Guid practitionerId, [FromQuery] DateTime weekStart)
         {
-            var result = await _paymentService.GetByIdAsync(id);
-            return Ok(result);
-        }
-
-        [HttpPost("generate")]
-        public async Task<IActionResult> Generate([FromBody] GenerateSettlementRequest request)
-        {
-            var result = await _paymentService.GenerateWeeklySettlementAsync(request.PractitionerId, request.WeekStart);
-            return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
-        }
-
-        [HttpPut("{id:guid}/received")]
-        public async Task<IActionResult> MarkReceived(Guid id)
-        {
-            var adminUserId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-            await _paymentService.MarkSettlementReceivedAsync(id, adminUserId);
+            var adminUserId = ResolveCurrentUserId();
+            await _paymentService.MarkWeekSettledAsync(practitionerId, weekStart, adminUserId);
             return NoContent();
+        }
+
+        [HttpPut("{paymentId:guid}/share")]
+        public async Task<IActionResult> UpdateShare(Guid paymentId, [FromBody] UpdatePaymentShareDto dto)
+        {
+            await _paymentService.UpdatePaymentShareAsync(paymentId, dto);
+            return NoContent();
+        }
+
+        private Guid ResolveCurrentUserId()
+        {
+            var idClaim = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirstValue("sub");
+            return Guid.TryParse(idClaim, out var id) ? id : throw new UnauthorizedAccessException("Invalid or missing user id claim.");
         }
     }
 }

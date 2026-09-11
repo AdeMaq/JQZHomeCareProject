@@ -8,52 +8,43 @@ namespace JQZHomeCareProject.Application.Services
     public class DashboardService : IDashboardService
     {
         private readonly IVisitRepository _visitRepository;
+        private readonly IPaymentRepository _paymentRepository;
         private readonly IRefusalRepository _refusalRepository;
-        private readonly IInstallmentPaymentRepository _installmentPaymentRepository;
-        private readonly IPatientPackageRepository _patientPackageRepository;
 
         public DashboardService(
             IVisitRepository visitRepository,
-            IRefusalRepository refusalRepository,
-            IInstallmentPaymentRepository installmentPaymentRepository,
-            IPatientPackageRepository patientPackageRepository)
+            IPaymentRepository paymentRepository,
+            IRefusalRepository refusalRepository)
         {
             _visitRepository = visitRepository;
+            _paymentRepository = paymentRepository;
             _refusalRepository = refusalRepository;
-            _installmentPaymentRepository = installmentPaymentRepository;
-            _patientPackageRepository = patientPackageRepository;
         }
 
         public async Task<DashboardSummaryDto> GetSummaryAsync(DateTime from, DateTime to)
         {
-            var visits = (await _visitRepository.GetInRangeAsync(from, to)).ToList();
+            var visitsInRange = (await _visitRepository.GetInRangeAsync(from, to)).ToList();
 
-            var expectedVisits = visits.Count(v => v.Status != VisitStatus.Cancelled);
-            var completedVisits = visits.Count(v => v.Status == VisitStatus.Completed);
+            var expectedVisits = visitsInRange.Count(v => v.Status != VisitStatus.Cancelled);
+            var actualVisitsDone = visitsInRange.Count(v => v.Status == VisitStatus.Completed);
 
-            // Money actually collected in the window — office payments and visit-collected payments alike.
-            var paymentReceived = await _installmentPaymentRepository.GetTotalInRangeAsync(from, to);
+            var paymentsInRange = (await _paymentRepository.GetInRangeAsync(from, to)).ToList();
+            var paymentReceived = paymentsInRange.Sum(p => p.AmountPaid);
 
-            // "Pending" is now a package-level concept, not a per-visit one — this is the
-            // total still owed across every currently Active package (a live snapshot,
-            // not filtered by the from/to range, since a package's balance isn't tied to
-            // any single visit anymore).
-            var activePackages = (await _patientPackageRepository.GetAllAsync())
-                .Where(pp => pp.Status == PatientPackageStatus.Active);
-            var pendingCollectionAmount = activePackages.Sum(pp => pp.AmountPending);
+            // Pending collection is a point-in-time balance across active packages, not date-scoped —
+            // money owed doesn't become irrelevant just because it fell outside the requested window.
+            var pendingCollectionAmount = await _paymentRepository.GetTotalPendingAsync();
 
             return new DashboardSummaryDto
             {
                 ExpectedVisits = expectedVisits,
-                ActualVisitsDone = completedVisits,
+                ActualVisitsDone = actualVisitsDone,
                 PaymentReceived = paymentReceived,
                 PendingCollectionAmount = pendingCollectionAmount
             };
         }
 
-        public Task<IEnumerable<Refusal>> GetRefusalsAsync(DateTime from, DateTime to)
-        {
-            return _refusalRepository.GetByDateRangeAsync(from, to);
-        }
+        public async Task<IEnumerable<Refusal>> GetRefusalsAsync(DateTime from, DateTime to)
+            => await _refusalRepository.GetByDateRangeAsync(from, to);
     }
 }

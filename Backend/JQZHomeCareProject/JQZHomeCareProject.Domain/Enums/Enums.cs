@@ -10,11 +10,11 @@ namespace JQZHomeCareProject.Domain.Enums
 
     public enum RefusedBy { Patient, Practitioner }
 
-    public enum ReceivedByType { Practitioner, Company }
+    public enum PaymentStatus { NotPaid = 0, PaidToPractitioner = 1, PaidToCompany = 2 }
 
     public enum PackagePaymentType { FullAdvance, Installment }
 
     public enum PatientPackageStatus { Active, Completed, Cancelled }
 
-    public enum CollectionStatus { Pending, Received, InstallmentPending }
+    public enum CollectionStatus { Pending, InstallmentPending, AllReceived }
 }
